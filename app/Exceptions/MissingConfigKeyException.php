@@ -11,7 +11,7 @@ use Throwable;
  *
  * @package Forte\Api\Generator\Exceptions
  */
-class MissingConfigKeyException extends \Exception
+class MissingConfigKeyException extends GeneratorException
 {
     /**
      * The missing key.
