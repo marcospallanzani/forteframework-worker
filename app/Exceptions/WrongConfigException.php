@@ -9,7 +9,7 @@ use Throwable;
  *
  * @package Forte\Api\Generator\Exceptions
  */
-class WrongConfigException extends \Exception
+class WrongConfigException extends GeneratorException
 {
     /**
      * The wrong-configured key.
