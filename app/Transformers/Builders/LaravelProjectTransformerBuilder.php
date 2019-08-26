@@ -24,6 +24,6 @@ class LaravelProjectTransformerBuilder extends ProjectTransformerBuilder
         $this
             ->initFromZipFile('skeleton/forteframework-api-skeleton.zip')
             ->copyFileTo($this->getFilePathInProject('.env.example'), '.env')
-            ->copyFileTo($this->getFilePathInProject('.env.testing.example'), '.env.testing')();
+            ->copyFileTo($this->getFilePathInProject('.env.testing.example'), '.env.testing');
     }
 }
