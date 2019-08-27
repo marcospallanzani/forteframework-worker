@@ -40,7 +40,7 @@ class Reader
             if (array_key_exists($currentKey, $config)) {
                 $value = $config[$currentKey];
             } else {
-                throw new MissingConfigKeyException($key, "Configuration key '$key' not found.'");
+                throw new MissingConfigKeyException($key, "Configuration key '$key' not found.");
             }
 
             try {
@@ -58,7 +58,7 @@ class Reader
                 }
             } catch (MissingConfigKeyException $e) {
                 $composedKey = $currentKey . self::CONFIG_LEVEL_SEPARATOR . $e->getMissingKey();
-                throw new MissingConfigKeyException($composedKey, "Configuration key '$composedKey' not found.'");
+                throw new MissingConfigKeyException($composedKey, "Configuration key '$composedKey' not found.");
             }
         }
         return $value;
