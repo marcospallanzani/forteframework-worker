@@ -37,7 +37,7 @@ class FileExists extends AbstractCheck
      */
     public function isValid(): bool
     {
-        // The zip file path cannot be empty
+        // The file path cannot be empty
         if (empty($this->filePath)) {
             $this->throwCheckException($this, "You must specify the file path.");
         }
