@@ -2,11 +2,11 @@
 
 namespace Forte\Api\Generator\Transformers\Transforms\File;
 
+use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\TransformException;
 use Forte\Api\Generator\Filters\File\Copy as CopyFilter;
 use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
 use Zend\Filter\Exception\RuntimeException;
-use Zend\Validator\File\NotExists;
 
 /**
  * Class Copy
@@ -33,37 +33,30 @@ class Copy extends AbstractTransform
     /**
      * Get whether this instance is in a valid state or not.
      *
-     * @return bool
+     * @return bool Returns true if this AbstractTransform subclass
+     * instance is correctly configured; false otherwise.
      *
+     * @throws GeneratorException
      * @throws TransformException
      */
     public function isValid(): bool
     {
         // The origin file path cannot be empty
         if (empty($this->originFilePath)) {
-            throw new TransformException($this, "You must specify a file to be copied.");
-        }
-
-        // We check if the origin file exists
-        $notExists = new NotExists();
-        if ($notExists->isValid($this->originFilePath)) {
-            throw new TransformException($this, sprintf(
-                "The origin file '%s' does not exist.",
-                $this->originFilePath
-            ));
+            $this->throwTransformException($this, "You must specify a file to be copied.");
         }
 
         // If no destination folder is specified, or it is the same as the origin folder,
         // AND the destination file name is the same as the original file name,
         // THEN we throw an error
-        $info = pathinfo($this->originFilePath);
-        $destinationFilePath = $this->getDestinationFilePath($info['dirname']);
+        $destinationFilePath = $this->getDestinationFilePath();
         if (rtrim($this->originFilePath, DIRECTORY_SEPARATOR) === $destinationFilePath) {
-            throw new TransformException($this, sprintf(
+            $this->throwTransformException(
+                $this,
                 "The origin file '%s' and the specified destination file '%s' cannot be the same.",
                 $this->originFilePath,
                 $destinationFilePath
-            ));
+            );
         }
 
         return true;
@@ -72,14 +65,22 @@ class Copy extends AbstractTransform
     /**
      * Apply the transformation.
      *
-     * @return bool
+     * @return bool Returns true if this AbstractTransform subclass
+     * instance has been successfully applied; false otherwise.
      *
+     * @throws GeneratorException
      * @throws TransformException
      */
     public function transform(): bool
     {
         if ($this->isValid()) {
+            // We check if the origin file exists
+            $this->checkFileExists($this->originFilePath);
+
             try {
+                // We run the pre-transform checks
+                $this->runAndReportBeforeChecks(true);
+
                 $info = pathinfo($this->originFilePath);
 
                 // We check if a destination folder is set:
@@ -95,21 +96,26 @@ class Copy extends AbstractTransform
                 }
 
                 $copyFilter = new CopyFilter([
-                    'target' => $this->getDestinationFilePath($info['dirname']),
+                    'target' => $this->getDestinationFilePath(),
                     'overwrite' => true
                 ]);
                 $copyFilter->filter($this->originFilePath);
 
+                // We run the post-transform checks
+                $this->runAndReportAfterChecks(true);
+
                 return true;
             } catch (RuntimeException $runtimeException) {
-                throw new TransformException($this, sprintf(
+                $this->throwTransformException(
+                    $this,
                     "An error occurred while copying file '%s' to '%s'. Error message is: '%s'",
                     $this->originFilePath,
                     $this->destinationFolder,
                     $runtimeException->getMessage()
-                ));
+                );
             }
         }
+
         return false;
     }
 
@@ -165,8 +171,13 @@ class Copy extends AbstractTransform
      * @return string The full destination file path
      * (concat destination folder and destination name).
      */
-    protected function getDestinationFilePath(string $defaultDestinationFolder = ""): string
+    public function getDestinationFilePath(string $defaultDestinationFolder = ""): string
     {
+        // If no default destination folder is specified, we try to use the default class destination folder
+        if (empty($defaultDestinationFolder)) {
+            $defaultDestinationFolder = $this->getDefaultDestinationFolder();
+        }
+
         if (empty($this->destinationFolder)) {
             if (!empty($defaultDestinationFolder)) {
                 return
@@ -183,5 +194,29 @@ class Copy extends AbstractTransform
             DIRECTORY_SEPARATOR .
             $this->destinationFileName
             ;
+    }
+
+    /**
+     * Returns the default destination folder (i.e. same folder as the original file path).
+     *
+     * @return string
+     */
+    public function getDefaultDestinationFolder(): string
+    {
+        $info = pathinfo($this->originFilePath);
+        if (is_array($info) && array_key_exists('dirname', $info)) {
+            return $info['dirname'];
+        }
+        return "";
+    }
+
+    /**
+     * Returns a string representation of this AbstractTransform subclass instance.
+     *
+     * @return string
+     */
+    public function stringify(): string
+    {
+        return sprintf("Copy file '%s' to '%s'.", $this->originFilePath, $this->getDestinationFilePath());
     }
 }
