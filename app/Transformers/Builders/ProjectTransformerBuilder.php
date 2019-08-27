@@ -5,6 +5,7 @@ namespace Forte\Api\Generator\Transformers\Builders;
 
 use Forte\Api\Generator\Transformers\ProjectTransformer;
 use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
+use Forte\Api\Generator\Transformers\Transforms\Checks\FileExists;
 use Forte\Api\Generator\Transformers\Transforms\File\Copy;
 use Forte\Api\Generator\Transformers\Transforms\File\Unzip;
 
@@ -42,13 +43,27 @@ class ProjectTransformerBuilder
      */
     public function initFromZipFile(string $zipFilePath): self
     {
-        $this->addTransform(
-            (new Unzip())
-                ->open($zipFilePath)
-                ->extractTo($this->transformer->getFullPathProjectFolder())
-        );
+        $this->addTransform($this->getUnzipFileTransform($zipFilePath));
 
         return $this;
+    }
+
+    /**
+     * Returns an instance of the Unzip transform object.
+     *
+     * @param string $zipFilePath The zip file to unzip.
+     *
+     * @return Unzip
+     */
+    public function getUnzipFileTransform(string $zipFilePath): Unzip
+    {
+        $fullProjectPath = $this->transformer->getFullPathProjectFolder();
+        return (new Unzip())
+            ->addBeforeCheck(new FileExists($zipFilePath))
+            ->addAfterCheck(new FileExists($fullProjectPath))
+            ->open($zipFilePath)
+            ->extractTo($fullProjectPath)
+        ;
     }
 
     /**
@@ -69,13 +84,15 @@ class ProjectTransformerBuilder
         string $targetFolder = ''
     ): self
     {
+        $copy = new Copy();
         $this->addTransform(
-            (new Copy())
+            $copy
                 ->copy($sourceFilePath)
                 ->toFolder($targetFolder)
                 ->withName($targeFileName)
+                ->addBeforeCheck(new FileExists($sourceFilePath))
+                ->addAfterCheck(new FileExists($copy->getDestinationFilePath()))
         );
-
         return $this;
     }
 
