@@ -10,11 +10,11 @@ use Zend\Config\Reader\Json;
 use Zend\Config\Reader\Xml;
 
 /**
- * Class HasValidConfigEntries
+ * Class FileHasValidConfigEntries
  *
  * @package Forte\Api\Generator\Transformers\Transforms\Checks
  */
-class HasValidConfigEntries extends AbstractCheck
+class FileHasValidConfigEntries extends FileExists
 {
     /**
      * Supported content types.
@@ -24,11 +24,6 @@ class HasValidConfigEntries extends AbstractCheck
     const CONTENT_TYPE_YAML  = "content_yaml";
     const CONTENT_TYPE_XML   = "content_xml";
     const CONTENT_TYPE_ARRAY = "content_array";
-
-    /**
-     * @var string
-     */
-    protected $filePath;
 
     /**
      * @var string
@@ -51,6 +46,8 @@ class HasValidConfigEntries extends AbstractCheck
      */
     public function isValid(): bool
     {
+        parent::isValid();
+
         // Check if the given type is supported
         try {
             $contentTypeConstants = self::getClassConstants('CONTENT_TYPE');
@@ -89,9 +86,6 @@ class HasValidConfigEntries extends AbstractCheck
             }
         }
 
-        // We check if the specified file exists
-        $this->checkFileExists($this->filePath);
-
         return true;
     }
 
@@ -106,6 +100,9 @@ class HasValidConfigEntries extends AbstractCheck
      */
     public function check(): bool
     {
+        // We check if the specified file exists
+        $this->checkFileExists($this->filePath);
+
         $failed = array();
 
         if ($this->isValid()) {
@@ -161,27 +158,13 @@ class HasValidConfigEntries extends AbstractCheck
     }
 
     /**
-     * Sets the path of the file to be opened.
-     *
-     * @param string $filePath The full file path to open.
-     *
-     * @return self
-     */
-    public function open(string $filePath): self
-    {
-        $this->filePath = $filePath;
-
-        return $this;
-    }
-
-    /**
      * Sets the file content type. Accepted values are the class constants
      * with prefix "CONTENT_TYPE".
      *
      * @param string $type The content type; accepted values are the class
      * constants with prefix "CONTENT_TYPE".
      *
-     * @return self
+     * @return FileHasValidConfigEntries
      */
     public function contentType(string $type): self
     {
@@ -196,7 +179,7 @@ class HasValidConfigEntries extends AbstractCheck
      *
      * @param string $key The expected key.
      *
-     * @return HasValidConfigEntries
+     * @return FileHasValidConfigEntries
      */
     public function hasKey(string $key): self
     {
@@ -211,7 +194,7 @@ class HasValidConfigEntries extends AbstractCheck
      *
      * @param string $key The key with an expected empty value.
      *
-     * @return HasValidConfigEntries
+     * @return FileHasValidConfigEntries
      */
     public function hasKeyWithEmptyValue(string $key): self
     {
@@ -226,7 +209,7 @@ class HasValidConfigEntries extends AbstractCheck
      *
      * @param string $key The key with an expected non-empty value.
      *
-     * @return HasValidConfigEntries
+     * @return FileHasValidConfigEntries
      */
     public function hasKeyWithNonEmptyValue(string $key): self
     {
@@ -246,7 +229,7 @@ class HasValidConfigEntries extends AbstractCheck
      * @param string $operation The comparison operation to be performed. Accepted
      * values are the ArrayCheckParameters constants with prefix "CHECK_".
      *
-     * @return HasValidConfigEntries
+     * @return FileHasValidConfigEntries
      */
     public function hasKeyWithValue(
         string $key,
@@ -266,7 +249,7 @@ class HasValidConfigEntries extends AbstractCheck
      */
     public function stringify(): string
     {
-        $message = "Check if the configured configuration keys meet the configured operations in file '" . $this->filePath . "'.";
+        $message = "Check if a set of configuration keys meet the configured operations in file '" . $this->filePath . "'.";
         foreach ($this->checks as $key => $check) {
             $message .= " $key. " . (string) $check;
         }
