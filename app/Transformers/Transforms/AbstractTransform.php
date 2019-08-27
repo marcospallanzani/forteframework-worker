@@ -98,8 +98,8 @@ abstract class AbstractTransform
         $failedChecks = array();
         foreach ($this->beforeChecks as $check) {
             try {
-                if ($check instanceof AbstractCheck) {
-                    $check->check();
+                if ($check instanceof AbstractCheck && !$check->check()) {
+                    $failedChecks[] = new CheckException($check, "Check failed.");
                 }
             } catch (GeneratorException $generatorException) {
                 $failedChecks[] = new CheckException($check,
@@ -123,8 +123,8 @@ abstract class AbstractTransform
         $failedChecks = array();
         foreach ($this->afterChecks as $check) {
             try {
-                if ($check instanceof AbstractCheck) {
-                    $check->check();
+                if ($check instanceof AbstractCheck && !$check->check()) {
+                    $failedChecks[] = new CheckException($check, "Check failed.");
                 }
             } catch (GeneratorException $generatorException) {
                 $failedChecks[] = new CheckException($check,
