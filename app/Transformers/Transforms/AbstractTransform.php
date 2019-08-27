@@ -8,7 +8,7 @@ use Forte\Api\Generator\Exceptions\TransformException;
 use Forte\Api\Generator\Helpers\ClassConstantsTrait;
 use Forte\Api\Generator\Helpers\FileTrait;
 use Forte\Api\Generator\Helpers\ThrowsErrors;
-use Forte\Api\Generator\Transformers\Transforms\Checks\AbstractCheck;
+use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
 
 /**
  * Class AbstractTransform

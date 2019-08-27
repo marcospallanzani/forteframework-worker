@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers\Transforms\Checks;
+namespace Forte\Api\Generator\Checkers\Checks;
 
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Helpers\ClassConstantsTrait;
@@ -10,7 +10,7 @@ use Forte\Api\Generator\Helpers\ThrowsErrors;
 /**
  * Class AbstractCheck
  *
- * @package Forte\Api\Generator\Transformers\Transforms\Checks
+ * @package Forte\Api\Generator\Checkers\Checks
  */
 abstract class AbstractCheck
 {

@@ -1,15 +1,15 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers\Builders;
+namespace Forte\Api\Generator\Builders;
 
-use Forte\Api\Generator\Transformers\Transforms\Checks\ArrayCheckParameters;
-use Forte\Api\Generator\Transformers\Transforms\Checks\FileHasValidConfigEntries;
+use Forte\Api\Generator\Checkers\Checks\ArrayCheckParameters;
+use Forte\Api\Generator\Checkers\Checks\FileHasValidConfigEntries;
 
 /**
  * Class LaravelProjectTransformerBuilder. Class in charge of building a project transformer
  * with specific transformations for a Laravel project.
  *
- * @package Forte\Api\Generator\Transformers\Builders
+ * @package Forte\Api\Generator\Builders
  */
 class LaravelProjectTransformerBuilder extends ProjectTransformerBuilder
 {

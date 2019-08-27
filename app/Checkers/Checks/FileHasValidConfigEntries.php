@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers\Transforms\Checks;
+namespace Forte\Api\Generator\Checkers\Checks;
 
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
@@ -12,7 +12,7 @@ use Zend\Config\Reader\Xml;
 /**
  * Class FileHasValidConfigEntries
  *
- * @package Forte\Api\Generator\Transformers\Transforms\Checks
+ * @package Forte\Api\Generator\Checkers\Checks
  */
 class FileHasValidConfigEntries extends FileExists
 {

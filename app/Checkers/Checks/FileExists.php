@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers\Transforms\Checks;
+namespace Forte\Api\Generator\Checkers\Checks;
 
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
@@ -8,7 +8,7 @@ use Forte\Api\Generator\Exceptions\GeneratorException;
 /**
  * Class FileExists
  *
- * @package Forte\Api\Generator\Transformers\Transforms\Checks
+ * @package Forte\Api\Generator\Checkers\Checks
  */
 class FileExists extends AbstractCheck
 {

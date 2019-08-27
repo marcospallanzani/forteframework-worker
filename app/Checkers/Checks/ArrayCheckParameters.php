@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers\Transforms\Checks;
+namespace Forte\Api\Generator\Checkers\Checks;
 
 use Forte\Api\Generator\Config\Reader;
 use Forte\Api\Generator\Exceptions\GeneratorException;
@@ -12,7 +12,7 @@ use Forte\Api\Generator\Helpers\ThrowsErrors;
 /**
  * Class ArrayCheckParameters. Class used to wrap all required check parameters.
  *
- * @package Forte\Api\Generator\Transformers\Transforms\Checks
+ * @package Forte\Api\Generator\Checkers\Checks
  */
 class ArrayCheckParameters
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers\Builders;
+namespace Forte\Api\Generator\Builders;
 
 
 use Forte\Api\Generator\Transformers\ProjectTransformer;
 use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
-use Forte\Api\Generator\Transformers\Transforms\Checks\FileExists;
-use Forte\Api\Generator\Transformers\Transforms\Checks\FileHasInstantiableClass;
+use Forte\Api\Generator\Checkers\Checks\FileExists;
+use Forte\Api\Generator\Checkers\Checks\FileHasInstantiableClass;
 use Forte\Api\Generator\Transformers\Transforms\EmptyTransform;
 use Forte\Api\Generator\Transformers\Transforms\File\Copy;
 use Forte\Api\Generator\Transformers\Transforms\File\Unzip;
@@ -14,7 +14,7 @@ use Forte\Api\Generator\Transformers\Transforms\File\Unzip;
 /**
  * Class ProjectTransformerBuilder
  *
- * @package Forte\Api\Generator\Transformers\Builders
+ * @package Forte\Api\Generator\Builders
  */
 class ProjectTransformerBuilder
 {

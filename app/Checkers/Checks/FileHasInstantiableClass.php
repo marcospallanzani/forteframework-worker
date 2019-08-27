@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers\Transforms\Checks;
+namespace Forte\Api\Generator\Checkers\Checks;
 
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
@@ -9,7 +9,7 @@ use Forte\Api\Generator\Exceptions\GeneratorException;
  * Class FileHasInstantiableClass. This class check if a given file
  * has an instantiable class.
  *
- * @package Forte\Api\Generator\Transformers\Transforms\Checks
+ * @package Forte\Api\Generator\Checkers\Checks
  */
 class FileHasInstantiableClass extends FileExists
 {

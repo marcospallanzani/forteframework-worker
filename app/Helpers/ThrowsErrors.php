@@ -6,7 +6,7 @@ use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\TransformException;
 use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
-use Forte\Api\Generator\Transformers\Transforms\Checks\AbstractCheck;
+use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
 
 /**
  * Trait ThrowsErrors. Methods to easily throw application exceptions.

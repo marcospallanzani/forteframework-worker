@@ -2,7 +2,7 @@
 
 namespace Forte\Api\Generator\Exceptions;
 
-use Forte\Api\Generator\Transformers\Transforms\Checks\AbstractCheck;
+use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
 use Throwable;
 
 /**
