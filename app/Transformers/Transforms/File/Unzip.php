@@ -5,7 +5,6 @@ namespace Forte\Api\Generator\Transformers\Transforms\File;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\TransformException;
 use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
-use Zend\Validator\File\NotExists;
 
 /**
  * Class Unzip
@@ -27,24 +26,17 @@ class Unzip extends AbstractTransform
     /**
      * Get whether this instance is in a valid state or not.
      *
-     * @return bool
+     * @return bool Returns true if this AbstractTransform subclass
+     * instance is correctly configured; false otherwise.
      *
+     * @throws GeneratorException
      * @throws TransformException
      */
     public function isValid(): bool
     {
         // The zip file path cannot be empty
         if (empty($this->zipFilePath)) {
-            throw new TransformException($this, "You must specify the zip file path.");
-        }
-
-        // We check if the zip file exists
-        $notExists = new NotExists();
-        if ($notExists->isValid($this->zipFilePath)) {
-            throw new TransformException($this, sprintf(
-                "The zip file '%s' does not exist.",
-                $this->zipFilePath
-            ));
+            $this->throwTransformException($this, "You must specify the zip file path.");
         }
 
         return true;
@@ -54,7 +46,8 @@ class Unzip extends AbstractTransform
      * Apply the transformation. It unzips the configured zip files.
      * If no extraction folder is set, the zip file folder will be used.
      *
-     * @return bool
+     * @return bool Returns true if this AbstractTransform subclass
+     * instance has been successfully applied; false otherwise.
      *
      * @throws GeneratorException
      * @throws TransformException
@@ -62,6 +55,12 @@ class Unzip extends AbstractTransform
     public function transform(): bool
     {
         if ($this->isValid()) {
+
+            // We run the pre-transform checks
+            $this->runAndReportBeforeChecks(true);
+
+            // We check if the zip file exists
+            $this->checkFileExists($this->zipFilePath);
 
             $info = pathinfo($this->zipFilePath);
 
@@ -76,11 +75,14 @@ class Unzip extends AbstractTransform
                 $zip->extractTo($this->extractToPath);
                 $zip->close();
             } else {
-                throw new GeneratorException(sprintf(
+                $this->throwGeneratorException(
                     "Impossible to unzip the given ZIP file '%s'",
                     $this->zipFilePath
-                ));
+                );
             }
+
+            // We run the post-transform checks
+            $this->runAndReportAfterChecks(true);
 
             return true;
         }
@@ -116,5 +118,14 @@ class Unzip extends AbstractTransform
         return $this;
     }
 
-
+    /**
+     * Returns a string representation of this AbstractTransform subclass instance.
+     *
+     * @return string
+     */
+    public function stringify(): string
+    {
+        //return compact('zipFilePath', 'extractToPath');
+        return sprintf("Unzip file '%s' to '%s'.", $this->zipFilePath, $this->extractToPath);
+    }
 }
