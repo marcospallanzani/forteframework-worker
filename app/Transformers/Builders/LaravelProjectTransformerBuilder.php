@@ -3,7 +3,7 @@
 namespace Forte\Api\Generator\Transformers\Builders;
 
 use Forte\Api\Generator\Transformers\Transforms\Checks\ArrayCheckParameters;
-use Forte\Api\Generator\Transformers\Transforms\Checks\HasValidConfigEntries;
+use Forte\Api\Generator\Transformers\Transforms\Checks\FileHasValidConfigEntries;
 
 /**
  * Class LaravelProjectTransformerBuilder. Class in charge of building a project transformer
@@ -29,6 +29,8 @@ class LaravelProjectTransformerBuilder extends ProjectTransformerBuilder
             ->addLaravelUnzipFileTransform('skeleton/forteframework-api-skeleton.zip')
             ->copyFileTo($this->getFilePathInProject('.env.example'), '.env')
             ->copyFileTo($this->getFilePathInProject('.env.testing.example'), '.env.testing')
+            ->hasInstantiableClass($this->getFilePathInProject('app/Exceptions/Handler.php'), 'Handler')
+            ->hasInstantiableClass($this->getFilePathInProject('app/Http/Kernel.php'), 'Kernel')
         ;
     }
 
@@ -46,9 +48,9 @@ class LaravelProjectTransformerBuilder extends ProjectTransformerBuilder
             $this
                 ->getUnzipFileTransform($zipFilePath)
                 ->addAfterCheck(
-                    (new HasValidConfigEntries())
-                        ->open($this->getFilePathInProject('composer.json'))
-                        ->contentType(HasValidConfigEntries::CONTENT_TYPE_JSON)
+                    (new FileHasValidConfigEntries())
+                        ->setPath($this->getFilePathInProject('composer.json'))
+                        ->contentType(FileHasValidConfigEntries::CONTENT_TYPE_JSON)
                         ->hasKeyWithNonEmptyValue("require.laravel/framework")
                         ->hasKey("require.forteframework/api")
                         ->hasKey("require.php")
