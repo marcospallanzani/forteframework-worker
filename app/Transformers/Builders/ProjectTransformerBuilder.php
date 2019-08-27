@@ -6,6 +6,8 @@ namespace Forte\Api\Generator\Transformers\Builders;
 use Forte\Api\Generator\Transformers\ProjectTransformer;
 use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
 use Forte\Api\Generator\Transformers\Transforms\Checks\FileExists;
+use Forte\Api\Generator\Transformers\Transforms\Checks\FileHasInstantiableClass;
+use Forte\Api\Generator\Transformers\Transforms\EmptyTransform;
 use Forte\Api\Generator\Transformers\Transforms\File\Copy;
 use Forte\Api\Generator\Transformers\Transforms\File\Unzip;
 
@@ -93,6 +95,25 @@ class ProjectTransformerBuilder
                 ->addBeforeCheck(new FileExists($sourceFilePath))
                 ->addAfterCheck(new FileExists($copy->getDestinationFilePath()))
         );
+        return $this;
+    }
+
+    /**
+     * Add an empty Transform instance to only check if the given class file path contains
+     * an instantiable class, whose name is the given class name.
+     *
+     * @param string $classFilePath The class file path.
+     * @param string $className The class name.
+     *
+     * @return ProjectTransformerBuilder
+     */
+    public function hasInstantiableClass(string $classFilePath, string $className): self
+    {
+        $this->addTransform(
+            (new EmptyTransform())
+                ->addBeforeCheck(new FileHasInstantiableClass($classFilePath, $className))
+        );
+
         return $this;
     }
 
