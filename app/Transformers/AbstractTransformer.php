@@ -2,6 +2,7 @@
 
 namespace Forte\Api\Generator\Transformers;
 
+use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
 
 /**
@@ -40,14 +41,24 @@ class AbstractTransformer
 
     /**
      * Apply all configured transformations in the given sequence.
+     * This method returns a list of AbstractTransform subclass
+     * instances that executed correctly, but failed.
      *
-     * @throws \Forte\Api\Generator\Exceptions\TransformException
+     * @return array A list of AbstractTransform subclass instances
+     * that executed correctly, but failed.
      */
-    public function applyTransformations(): void
+    public function applyTransformations(): array
     {
+        $failedTransforms = array();
         foreach ($this->transforms as $transform) {
-            /** @var AbstractTransform $transform */
-            $transform->transform();
+            try {
+                if ($transform instanceof AbstractTransform && !$transform->transform()) {
+                    $failedTransforms[] = $transform;
+                }
+            } catch (GeneratorException $generatorException) {
+                $failedTransforms[] = $generatorException->getMessage();
+            }
         }
+        return $failedTransforms;
     }
 }
