@@ -31,11 +31,6 @@ class ProjectTransformer extends AbstractTransformer
         $this->deploymentParentFolder = rtrim($deploymentParentFolder, DIRECTORY_SEPARATOR);
     }
 
-    public function initFromGitRepositorySsh(string $gitRepositorySsh): void
-    {
-        //TODO
-    }
-
     /**
      * Returns the project root folder.
      *
