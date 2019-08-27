@@ -20,19 +20,19 @@ class TransformException extends GeneratorException
     /**
      * TransformException constructor.
      *
-     * @param AbstractTransform $transformer The AbstractTransform subclass instance that generated the error
+     * @param AbstractTransform $transform The AbstractTransform subclass instance that generated the error
      * @param string $message The exception message
      * @param int $code The exception code
      * @param Throwable|null $previous
      */
     public function __construct(
-        AbstractTransform $transformer,
+        AbstractTransform $transform,
         string $message = "",
         int $code = 0,
         Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);
-        $this->transform = $transformer;
+        $this->transform = $transform;
     }
 
     /**
