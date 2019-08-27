@@ -42,7 +42,7 @@ class AbstractTransformer
     /**
      * Apply all configured transformations in the given sequence.
      * This method returns a list of AbstractTransform subclass
-     * instances that executed correctly, but failed.
+     * that failed  or that did not execute correctly.
      *
      * @return array A list of AbstractTransform subclass instances
      * that executed correctly, but failed.
