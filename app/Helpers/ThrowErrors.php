@@ -9,11 +9,11 @@ use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
 use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
 
 /**
- * Trait ThrowsErrors. Methods to easily throw application exceptions.
+ * Trait ThrowErrors. Methods to easily throw application exceptions.
  *
  * @package Forte\Api\Generator\Helpers
  */
-trait ThrowsErrors
+trait ThrowErrors
 {
     /**
      * Throws a GeneratorException with the given message and parameters.
