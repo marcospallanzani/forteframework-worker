@@ -45,7 +45,7 @@ class Reader
 
             try {
                 // If a value for the current key was found, we check
-                // if we need to iterate again throught the given config tree;
+                // if we need to iterate again through the given config tree;
                 if (count($keysTree) === 2) {
                     if(is_array($value)) {
                         $value = self::getRequiredNestedConfigValue($keysTree[1], $value);
