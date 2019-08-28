@@ -4,10 +4,7 @@ namespace Forte\Api\Generator\Checkers\Checks;
 
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
-use Symfony\Component\Yaml\Yaml;
-use Zend\Config\Reader\Ini;
-use Zend\Config\Reader\Json;
-use Zend\Config\Reader\Xml;
+use Forte\Api\Generator\Helpers\FileParser;
 
 /**
  * Class FileHasValidConfigEntries
@@ -16,15 +13,6 @@ use Zend\Config\Reader\Xml;
  */
 class FileHasValidConfigEntries extends FileExists
 {
-    /**
-     * Supported content types.
-     */
-    const CONTENT_TYPE_JSON  = "content_json";
-    const CONTENT_TYPE_INI   = "content_ini";
-    const CONTENT_TYPE_YAML  = "content_yaml";
-    const CONTENT_TYPE_XML   = "content_xml";
-    const CONTENT_TYPE_ARRAY = "content_array";
-
     /**
      * @var string
      */
@@ -42,7 +30,6 @@ class FileHasValidConfigEntries extends FileExists
      * instance is correctly configured; false otherwise.
      *
      * @throws CheckException
-     * @throws GeneratorException
      */
     public function isValid(): bool
     {
@@ -50,40 +37,40 @@ class FileHasValidConfigEntries extends FileExists
 
         // Check if the given type is supported
         try {
-            $contentTypeConstants = self::getClassConstants('CONTENT_TYPE');
-        } catch (\ReflectionException $reflectionException) {
-            $this->throwGeneratorException(
-                "A general error occurred while retrieving the content types list. Error message is: '%s'.",
-                $reflectionException->getMessage()
-            );
-        }
+            $contentTypeConstants = FileParser::getSupportedContentTypes();
 
-        if (!in_array($this->contentType, $contentTypeConstants)) {
-            $this->throwCheckException(
-                $this,
-                "The specified content type '%s' is not supported. Supported types are: '%s'",
-                $this->contentType,
-                implode(',', $contentTypeConstants)
-            );
-        }
-
-        // Check if the specified checks are well configured
-        foreach ($this->checks as $check) {
-
-            if (!$check instanceof ArrayCheckParameters) {
+            if (!in_array($this->contentType, $contentTypeConstants)) {
                 $this->throwCheckException(
                     $this,
-                    "Check parameters should be registered as an instance of class '%s'.",
-                    ArrayCheckParameters::class
+                    "The specified content type '%s' is not supported. Supported types are: '%s'",
+                    $this->contentType,
+                    implode(',', $contentTypeConstants)
                 );
             }
 
-            try {
-                // We check if the current check parameters are valid; if not valid an exception will be thrown
-                $check->isValid();
-            } catch (GeneratorException $generatorException) {
-                $this->throwCheckException($this, $generatorException->getMessage());
+            // Check if the specified checks are well configured
+            foreach ($this->checks as $check) {
+
+                if (!$check instanceof ArrayCheckParameters) {
+                    $this->throwCheckException(
+                        $this,
+                        "Check parameters should be registered as instances of class '%s'.",
+                        ArrayCheckParameters::class
+                    );
+                }
+
+                try {
+                    // We check if the current check parameters are valid; if not valid, an exception will be thrown
+                    $check->isValid();
+                } catch (GeneratorException $generatorException) {
+                    $this->throwCheckException($this, $generatorException->getMessage());
+                }
             }
+        } catch (\ReflectionException $reflectionException) {
+            $this->throwCheckException($this,
+                "A general error occurred while retrieving the content types list. Error message is: '%s'.",
+                $reflectionException->getMessage()
+            );
         }
 
         return true;
@@ -107,28 +94,7 @@ class FileHasValidConfigEntries extends FileExists
 
         if ($this->isValid()) {
             // We read the file and we convert it to an array, when possible.
-            $parsedContent = null;
-            switch ($this->contentType) {
-                case self::CONTENT_TYPE_INI:
-                    $iniReader = new Ini();
-                    $parsedContent = $iniReader->fromFile($this->filePath);
-                    break;
-                case self::CONTENT_TYPE_YAML:
-                    $parsedContent = Yaml::parseFile($this->filePath);
-                    break;
-                case self::CONTENT_TYPE_JSON:
-                    $jsonReader = new Json();
-                    $parsedContent = $jsonReader->fromFile($this->filePath);
-                    break;
-                case self::CONTENT_TYPE_XML:
-                    $xmlReader = new Xml();
-                    $parsedContent = $xmlReader->fromFile($this->filePath);
-                    break;
-                case self::CONTENT_TYPE_ARRAY:
-                    $parsedContent = include ($this->filePath);
-                    break;
-            }
-
+            $parsedContent = FileParser::parseConfigFile($this->filePath, $this->contentType);
             if (!is_array($parsedContent)) {
                 $this->throwCheckException(
                     $this,
@@ -158,11 +124,11 @@ class FileHasValidConfigEntries extends FileExists
     }
 
     /**
-     * Sets the file content type. Accepted values are the class constants
-     * with prefix "CONTENT_TYPE".
+     * Sets the file content type. Accepted values are the FileParser
+     * class constants with prefix "CONTENT_TYPE".
      *
-     * @param string $type The content type; accepted values are the class
-     * constants with prefix "CONTENT_TYPE".
+     * @param string $type The content type; accepted values are the
+     * FileParser class constants with prefix "CONTENT_TYPE".
      *
      * @return FileHasValidConfigEntries
      */
