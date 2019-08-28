@@ -21,5 +21,8 @@
       "psr-4" : {
         "Forte\\Api\\Generator\\": ["app"]
       }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8"
     }
 }
