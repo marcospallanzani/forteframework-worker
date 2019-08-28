@@ -35,3 +35,10 @@ RUN apt-get update && \
          && docker-php-ext-install zip
 ```
 
+## TESTS
+
+To run all tests, execute the following command from the base project folder:
+
+```
+./vendor/bin/phpunit --bootstrap vendor/autoload.php tests
+```
