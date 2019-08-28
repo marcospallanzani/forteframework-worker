@@ -3,7 +3,7 @@
 namespace Forte\Api\Generator\Checkers\Checks;
 
 use Forte\Api\Generator\Exceptions\CheckException;
-use Forte\Api\Generator\Helpers\ClassConstantsTrait;
+use Forte\Api\Generator\Helpers\ClassAccessTrait;
 use Forte\Api\Generator\Helpers\FileTrait;
 use Forte\Api\Generator\Helpers\ThrowErrors;
 
@@ -14,7 +14,7 @@ use Forte\Api\Generator\Helpers\ThrowErrors;
  */
 abstract class AbstractCheck
 {
-    use ClassConstantsTrait, FileTrait, ThrowErrors;
+    use ClassAccessTrait, FileTrait, ThrowErrors;
 
     /**
      * Get whether this instance is in a valid state or not.

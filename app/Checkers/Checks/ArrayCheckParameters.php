@@ -6,7 +6,7 @@ use Forte\Api\Generator\Config\Reader;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
 use Forte\Api\Generator\Exceptions\WrongConfigException;
-use Forte\Api\Generator\Helpers\ClassConstantsTrait;
+use Forte\Api\Generator\Helpers\ClassAccessTrait;
 use Forte\Api\Generator\Helpers\ThrowErrors;
 
 /**
@@ -16,7 +16,7 @@ use Forte\Api\Generator\Helpers\ThrowErrors;
  */
 class ArrayCheckParameters
 {
-    use ClassConstantsTrait, ThrowErrors;
+    use ClassAccessTrait, ThrowErrors;
 
     /**
      * Supported operations.

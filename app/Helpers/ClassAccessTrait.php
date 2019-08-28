@@ -3,12 +3,11 @@
 namespace Forte\Api\Generator\Helpers;
 
 /**
- * Trait ClassConstantsTrait. A trait that identifies class constants.
- *
+ * Trait ClassAccessTrait. A trait that identifies class constants.
  *
  * @package Forte\Api\Generator\Helpers
  */
-trait ClassConstantsTrait
+trait ClassAccessTrait
 {
     /**
      * Get all class constants by prefixed name.
@@ -21,7 +20,7 @@ trait ClassConstantsTrait
      *
      * @throws \ReflectionException
      */
-    protected static function getClassConstants($prefix = '')
+    public static function getClassConstants($prefix = '')
     {
         $reflectClass = new \ReflectionClass(static::class);
         $constants = $reflectClass->getConstants();
