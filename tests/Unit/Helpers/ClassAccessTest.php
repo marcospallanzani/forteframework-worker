@@ -15,7 +15,7 @@ class ClassAccessTest extends TestCase
     /**
      * Returns an anonymous class to test ClassAccessTrait.
      *
-     * @return @298
+     * @return object
      */
     protected function getAnonymousTestClass()
     {
