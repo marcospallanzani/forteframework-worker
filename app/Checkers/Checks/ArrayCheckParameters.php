@@ -7,7 +7,7 @@ use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
 use Forte\Api\Generator\Exceptions\WrongConfigException;
 use Forte\Api\Generator\Helpers\ClassConstantsTrait;
-use Forte\Api\Generator\Helpers\ThrowsErrors;
+use Forte\Api\Generator\Helpers\ThrowErrors;
 
 /**
  * Class ArrayCheckParameters. Class used to wrap all required check parameters.
@@ -16,7 +16,7 @@ use Forte\Api\Generator\Helpers\ThrowsErrors;
  */
 class ArrayCheckParameters
 {
-    use ClassConstantsTrait, ThrowsErrors;
+    use ClassConstantsTrait, ThrowErrors;
 
     /**
      * Supported operations.
@@ -46,7 +46,7 @@ class ArrayCheckParameters
      * ArrayCheckParameters constructor.
      *
      * @param string $key
-     * @param null $value
+     * @param mixed $value
      * @param string $operation
      */
     public function __construct(string $key, $value = null, string $operation = "")
@@ -63,7 +63,7 @@ class ArrayCheckParameters
      * - if a non-empty value is specified, an operation must be specified;
      * - if a non-empty value is specified, only operations different than 'content_any' are valid;
      * - if a non-empty value and an operation are specified, the operation must equal to one
-     *   class constant starting with prefix 'CHECK_';
+     *   of the class constants starting with prefix 'CHECK_';
      * - if an empty value is specified (e.g. null, ""), the valid operations are 'content_equals'
      *   and 'content_any'; this case can be used to check if a given key is set and empty or null;
      *
@@ -83,7 +83,7 @@ class ArrayCheckParameters
             );
         }
 
-        if (empty($this->getKey())) {
+        if (empty($this->key)) {
             $this->throwGeneratorException("You need to specify the 'key' for the following check: '%s'.", $this);
         }
 
