@@ -2,7 +2,6 @@
 
 namespace Forte\Api\Generator\Filters;
 
-use Forte\Api\Generator\Config\Reader;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Helpers\ClassConstantsTrait;
 use Forte\Api\Generator\Helpers\ThrowsErrors;
@@ -22,6 +21,11 @@ class ModifyArray
     const MODIFY_ADD          = "modify_add";
     const MODIFY_REMOVE_KEY   = "modify_remove_key";
     const MODIFY_CHANGE_VALUE = "modify_change_value";
+
+    /**
+     * Elements separator
+     */
+    const ARRAY_LEVELS_SEPARATOR = ".";
 
     /**
      * @var string
@@ -152,7 +156,7 @@ class ModifyArray
      */
     public function applyChangeToArray(array &$array, string $key, string $operation, $modifiedValue)
     {
-        $keysTree = explode(Reader::CONFIG_LEVEL_SEPARATOR, $key, 2);
+        $keysTree = explode(self::ARRAY_LEVELS_SEPARATOR, $key, 2);
         $value = null;
         if (count($keysTree) <= 2) {
             // We check if a value for the current array key exists;
