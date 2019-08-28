@@ -7,7 +7,7 @@ use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\TransformException;
 use Forte\Api\Generator\Helpers\ClassConstantsTrait;
 use Forte\Api\Generator\Helpers\FileTrait;
-use Forte\Api\Generator\Helpers\ThrowsErrors;
+use Forte\Api\Generator\Helpers\ThrowErrors;
 use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
 
 /**
@@ -17,7 +17,7 @@ use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
  */
 abstract class AbstractTransform
 {
-    use ClassConstantsTrait, FileTrait, ThrowsErrors;
+    use ClassConstantsTrait, FileTrait, ThrowErrors;
 
     /**
      * List of AbstractCheck subclass instances to be run before the transform method.
