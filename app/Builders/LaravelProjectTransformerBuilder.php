@@ -4,6 +4,7 @@ namespace Forte\Api\Generator\Builders;
 
 use Forte\Api\Generator\Checkers\Checks\ArrayCheckParameters;
 use Forte\Api\Generator\Checkers\Checks\FileHasValidConfigEntries;
+use Forte\Api\Generator\Helpers\FileParser;
 
 /**
  * Class LaravelProjectTransformerBuilder. Class in charge of building a project transformer
@@ -50,7 +51,7 @@ class LaravelProjectTransformerBuilder extends ProjectTransformerBuilder
                 ->addAfterCheck(
                     (new FileHasValidConfigEntries())
                         ->setPath($this->getFilePathInProject('composer.json'))
-                        ->contentType(FileHasValidConfigEntries::CONTENT_TYPE_JSON)
+                        ->contentType(FileParser::CONTENT_TYPE_JSON)
                         ->hasKeyWithNonEmptyValue("require.laravel/framework")
                         ->hasKey("require.forteframework/api")
                         ->hasKey("require.php")
