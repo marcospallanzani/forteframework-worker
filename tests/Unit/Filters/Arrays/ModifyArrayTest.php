@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Filters;
+namespace Tests\Unit\Filters\Arrays;
 
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Filters\Arrays\ModifyArray;
@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class ModifyArrayTest
  *
- * @package Tests\Unit\Filters
+ * @package Tests\Unit\Filters\Arrays
  */
 class ModifyArrayTest extends TestCase
 {
