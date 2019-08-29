@@ -23,15 +23,15 @@ class MissingConfigKeyException extends GeneratorException
     /**
      * MissingConfigKeyException constructor.
      *
-     * @param string $wrongKey
+     * @param string $missingKey
      * @param string $message
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $wrongKey, string $message = "", int $code = 0, Throwable $previous = null)
+    public function __construct(string $missingKey, string $message = "", int $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        $this->missingKey = $wrongKey;
+        $this->missingKey = $missingKey;
     }
 
     /**
