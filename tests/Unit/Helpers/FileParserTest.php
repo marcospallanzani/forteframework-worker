@@ -19,38 +19,42 @@ class FileParserTest extends TestCase
      */
     public function filesProvider(): array
     {
+        $now = time();
         $expectedArray = [
-            "key1" => "value1",
-            "key2" => [
-                "key3" => "value3",
-                "key4" => [
-                    "key5" => "value5"
+            "key1$now" => "value1$now",
+            "key2$now" => [
+                "key3$now" => "value3$now",
+                "key4$now" => [
+                    "key5$now" => "value5$now"
                 ]
             ]
         ];
 
         return [
-            [__DIR__ . '/data/parsetest.ini', FileParser::CONTENT_TYPE_INI, $expectedArray],
-            [__DIR__ . '/data/parsetest.json', FileParser::CONTENT_TYPE_JSON, $expectedArray],
-            [__DIR__ . '/data/parsetest.php', FileParser::CONTENT_TYPE_ARRAY, $expectedArray],
-            [__DIR__ . '/data/parsetest.xml', FileParser::CONTENT_TYPE_XML, $expectedArray],
-            [__DIR__ . '/data/parsetest.yml', FileParser::CONTENT_TYPE_YAML, $expectedArray],
+            [__DIR__ . "/data/simple-config.ini", FileParser::CONTENT_TYPE_INI, $expectedArray],
+            [__DIR__ . "/data/simple-config.json", FileParser::CONTENT_TYPE_JSON, $expectedArray],
+            [__DIR__ . "/data/simple-config.php", FileParser::CONTENT_TYPE_ARRAY, $expectedArray],
+            [__DIR__ . "/data/simple-config.xml", FileParser::CONTENT_TYPE_XML, $expectedArray],
+            [__DIR__ . "/data/simple-config.yml", FileParser::CONTENT_TYPE_YAML, $expectedArray],
         ];
     }
 
     /**
-     * Tests the FileParser::parseConfigFile() function.
+     * Tests the FileParser::parseConfigFile() and FileParser::writeToConfigFile() functions.
      *
      * @dataProvider filesProvider
      *
      * @param string $filePath
      * @param string $contentType
-     * @param array $expectedArray
+     * @param array $content
+     *
+     * @throws \Forte\Api\Generator\Exceptions\GeneratorException
      */
-    public function testParseConfigFile(string $filePath, string $contentType, array $expectedArray): void
+    public function testWriteAndParseConfigFile(string $filePath, string $contentType, array $content): void
     {
+        FileParser::writeToConfigFile($content, $filePath, $contentType);
         $parsedArray = FileParser::parseConfigFile($filePath, $contentType);
-        $this->assertEquals($expectedArray, $parsedArray);
+        $this->assertEquals($content, $parsedArray);
     }
 
     /**

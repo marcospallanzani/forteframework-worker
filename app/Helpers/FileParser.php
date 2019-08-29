@@ -2,11 +2,16 @@
 
 namespace Forte\Api\Generator\Helpers;
 
+use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\MissingKeyException;
-use Symfony\Component\Yaml\Yaml;
-use Zend\Config\Reader\Ini;
-use Zend\Config\Reader\Json;
-use Zend\Config\Reader\Xml;
+use Symfony\Component\Yaml\Yaml as YamlReader;
+use Zend\Config\Reader\Ini as IniReader;
+use Zend\Config\Reader\Json as JsonReader;
+use Zend\Config\Reader\Xml as XmlReader;
+use Zend\Config\Writer\Ini as IniWriter;
+use Zend\Config\Writer\Json as JsonWriter;
+use Zend\Config\Writer\PhpArray;
+use Zend\Config\Writer\Xml as XmlWriter;
 
 /**
  * Class FileParser
@@ -46,18 +51,18 @@ class FileParser
         $parsedContent = null;
         switch ($contentType) {
             case self::CONTENT_TYPE_INI:
-                $iniReader = new Ini();
+                $iniReader = new IniReader();
                 $parsedContent = $iniReader->fromFile($filePath);
                 break;
             case self::CONTENT_TYPE_YAML:
-                $parsedContent = Yaml::parseFile($filePath);
+                $parsedContent = YamlReader::parseFile($filePath);
                 break;
             case self::CONTENT_TYPE_JSON:
-                $jsonReader = new Json();
+                $jsonReader = new JsonReader();
                 $parsedContent = $jsonReader->fromFile($filePath);
                 break;
             case self::CONTENT_TYPE_XML:
-                $xmlReader = new Xml();
+                $xmlReader = new XmlReader();
                 $parsedContent = $xmlReader->fromFile($filePath);
                 break;
             case self::CONTENT_TYPE_ARRAY:
@@ -66,6 +71,50 @@ class FileParser
         }
 
         return $parsedContent;
+    }
+
+    /**
+     * Write the given content to the specified file.
+     *
+     * @param mixed $content The content to be written.
+     * @param string $filePath The file to be changed.
+     * @param string $contentType The content type (supported types are the
+     * constants whose name starts with the prefix 'CONTENT_TYPE').
+     *
+     * @throws GeneratorException
+     */
+    public static function writeToConfigFile($content, string $filePath, string $contentType): void
+    {
+        try {
+            switch ($contentType) {
+                case self::CONTENT_TYPE_INI:
+                    $iniWriter = new IniWriter();
+                    $iniWriter->toFile($filePath, $content);
+                    break;
+                case self::CONTENT_TYPE_YAML:
+                    $ymlContent = YamlReader::dump($content);
+                    file_put_contents($filePath, $ymlContent);
+                    break;
+                case self::CONTENT_TYPE_JSON:
+                    $jsonWriter = new JsonWriter();
+                    $jsonWriter->toFile($filePath, $content);
+                    break;
+                case self::CONTENT_TYPE_XML:
+                    $xmlWriter = new XmlWriter();
+                    $xmlWriter->toFile($filePath, $content);
+                    break;
+                case self::CONTENT_TYPE_ARRAY:
+                    $phpWriter = new PhpArray();
+                    $phpWriter->toFile($filePath, $content);
+                    break;
+            }
+        } catch (\Exception $exception) {
+            throw new GeneratorException(sprintf(
+                "It was not possible to save the given content to the specified file '%s'. Error message is: '%s",
+                $filePath,
+                $exception->getMessage()
+            ));
+        }
     }
 
     /**
