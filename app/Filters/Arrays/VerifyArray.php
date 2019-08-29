@@ -4,7 +4,6 @@ namespace Forte\Api\Generator\Filters\Arrays;
 
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
-use Forte\Api\Generator\Exceptions\WrongConfigException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
 use Forte\Api\Generator\Helpers\FileParser;
 use Forte\Api\Generator\Helpers\ThrowErrors;
@@ -130,21 +129,21 @@ class VerifyArray extends AbstractArray
     }
 
     /**
-     * Check if the configured key has a value, that respects the configured operation.
+     * Check if the configured key has a value in the given array,
+     * that respects the configured operation.
      *
-     * @param array $config The array containing the configuration keys to be checked.
+     * @param array $array The array containing the keys to be checked.
      *
      * @return bool
      *
      * @throws GeneratorException
      * @throws MissingConfigKeyException
-     * @throws WrongConfigException
      */
-    public function checkCondition(array $config): bool
+    public function checkCondition(array $array): bool
     {
         if ($this->isValid()) {
 
-            $value = FileParser::getRequiredNestedConfigValue($this->key, $config);
+            $value = FileParser::getRequiredNestedConfigValue($this->key, $array);
             // If no exceptions are thrown, then the key was found in the given config array
             switch($this->operation) {
                 case self::CHECK_CONTAINS:
@@ -223,7 +222,7 @@ class VerifyArray extends AbstractArray
     {
         switch($this->operation) {
             case self::CHECK_CONTAINS:
-                return ($this->reverseAction ? "does not contains" : "contains");
+                return ($this->reverseAction ? "does not contain" : "contains");
                 break;
             case self::CHECK_ENDS_WITH:
                 return ($this->reverseAction ? "does not end" : "ends");
@@ -281,10 +280,11 @@ class VerifyArray extends AbstractArray
     protected function endsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
-            if (substr_compare($this->value, $value, -strlen($value)) === 0) {
+            $length = strlen($this->value);
+            if ($length == 0) {
                 return true;
             }
-            return false;
+            return (substr($value, -$length) === $this->value);
         }
         $this->throwGeneratorException(
             "It was not possible to verify if the value for key '%s' ends with the configured value. ".
@@ -306,10 +306,8 @@ class VerifyArray extends AbstractArray
     protected function startsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
-            if (substr_compare($this->value, $value, -strlen($value)) === 0) {
-                return true;
-            }
-            return false;
+            $length = strlen($this->value);
+            return (substr($value, 0, $length) === $this->value);
         }
         $this->throwGeneratorException(
             "It was not possible to verify if the value for key '%s' starts with the configured value. ".
