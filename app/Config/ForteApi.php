@@ -2,7 +2,7 @@
 
 namespace Forte\Api\Generator\Config;
 
-use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
+use Forte\Api\Generator\Exceptions\MissingKeyException;
 use Forte\Api\Generator\Helpers\FileParser;
 
 /**
@@ -47,7 +47,7 @@ class ForteApi
      *
      * @param array $config List of all required and optional parameters required for the API generation
      *
-     * @throws MissingConfigKeyException
+     * @throws MissingKeyException
      */
     public function __construct(array $config)
     {
@@ -65,7 +65,7 @@ class ForteApi
      *
      * @return mixed
      *
-     * @throws MissingConfigKeyException
+     * @throws MissingKeyException
      */
     public function getRequiredParameter(string $key)
     {

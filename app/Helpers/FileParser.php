@@ -2,7 +2,7 @@
 
 namespace Forte\Api\Generator\Helpers;
 
-use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
+use Forte\Api\Generator\Exceptions\MissingKeyException;
 use Symfony\Component\Yaml\Yaml;
 use Zend\Config\Reader\Ini;
 use Zend\Config\Reader\Json;
@@ -77,7 +77,7 @@ class FileParser
      *
      * @return mixed
      *
-     * @throws MissingConfigKeyException
+     * @throws MissingKeyException
      */
     public static function getRequiredNestedConfigValue(string $key, array $config)
     {
@@ -90,7 +90,7 @@ class FileParser
             if (array_key_exists($currentKey, $config)) {
                 $value = $config[$currentKey];
             } else {
-                throw new MissingConfigKeyException($key, "Configuration key '$key' not found.");
+                throw new MissingKeyException($key, "Configuration key '$key' not found.");
             }
 
             try {
@@ -100,15 +100,15 @@ class FileParser
                     if(is_array($value)) {
                         $value = self::getRequiredNestedConfigValue($keysTree[1], $value);
                     } else {
-                        throw new MissingConfigKeyException(
+                        throw new MissingKeyException(
                             $key,
                             "The value associated to the middle-level configuration key '$key' should be an array"
                         );
                     }
                 }
-            } catch (MissingConfigKeyException $e) {
+            } catch (MissingKeyException $e) {
                 $composedKey = $currentKey . self::CONFIG_LEVEL_SEPARATOR . $e->getMissingKey();
-                throw new MissingConfigKeyException($composedKey, "Configuration key '$composedKey' not found.");
+                throw new MissingKeyException($composedKey, "Configuration key '$composedKey' not found.");
             }
         }
         return $value;

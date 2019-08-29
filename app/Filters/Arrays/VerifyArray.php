@@ -3,7 +3,7 @@
 namespace Forte\Api\Generator\Filters\Arrays;
 
 use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
+use Forte\Api\Generator\Exceptions\MissingKeyException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
 use Forte\Api\Generator\Helpers\FileParser;
 use Forte\Api\Generator\Helpers\ThrowErrors;
@@ -137,7 +137,7 @@ class VerifyArray extends AbstractArray
      * @return bool
      *
      * @throws GeneratorException
-     * @throws MissingConfigKeyException
+     * @throws MissingKeyException
      */
     public function checkCondition(array $array): bool
     {

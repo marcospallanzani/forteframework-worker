@@ -3,8 +3,7 @@
 namespace Forte\Api\Generator\Commands;
 
 use Forte\Api\Generator\Config\ForteApi;
-use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
-use Forte\Api\Generator\Exceptions\WrongConfigException;
+use Forte\Api\Generator\Exceptions\MissingKeyException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -140,7 +139,7 @@ class GenerateForteAPI extends Command
         $forteAPI = null;
         try {
             $forteAPI = new ForteApi($apiConfig);
-        } catch (MissingConfigKeyException $missingConfigKeyException) {
+        } catch (MissingKeyException $missingConfigKeyException) {
             $output->writeln(sprintf(
                 "The configuration key '%s' was not found in file '%s'.",
                 $missingConfigKeyException->getMissingKey(),

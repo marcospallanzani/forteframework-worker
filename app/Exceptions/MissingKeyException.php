@@ -5,13 +5,13 @@ namespace Forte\Api\Generator\Exceptions;
 use Throwable;
 
 /**
- * Class MissingConfigKeyException.
+ * Class MissingKeyException.
  *
  * Exception used to throw an error when a required configuration key is missing.
  *
  * @package Forte\Api\Generator\Exceptions
  */
-class MissingConfigKeyException extends GeneratorException
+class MissingKeyException extends GeneratorException
 {
     /**
      * The missing key.
@@ -21,7 +21,7 @@ class MissingConfigKeyException extends GeneratorException
     protected $missingKey;
 
     /**
-     * MissingConfigKeyException constructor.
+     * MissingKeyException constructor.
      *
      * @param string $missingKey
      * @param string $message

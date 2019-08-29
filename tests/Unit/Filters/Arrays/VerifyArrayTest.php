@@ -4,7 +4,7 @@
 namespace Tests\Unit\Filters\Arrays;
 
 use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
+use Forte\Api\Generator\Exceptions\MissingKeyException;
 use Forte\Api\Generator\Filters\Arrays\VerifyArray;
 use PHPUnit\Framework\TestCase;
 
@@ -323,7 +323,7 @@ class VerifyArrayTest extends TestCase
      * to a VerifyArray instance.
      *
      * @throws GeneratorException
-     * @throws MissingConfigKeyException
+     * @throws MissingKeyException
      */
     public function testMissingKey(): void
     {
@@ -331,7 +331,7 @@ class VerifyArrayTest extends TestCase
             "test1" => "test2"
         ];
         $verifyArray = new VerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
-        $this->expectException(MissingConfigKeyException::class);
+        $this->expectException(MissingKeyException::class);
         $verifyArray->checkCondition($array);
     }
 }
