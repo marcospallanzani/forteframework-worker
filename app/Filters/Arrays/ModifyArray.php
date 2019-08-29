@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Api\Generator\Filters;
+namespace Forte\Api\Generator\Filters\Arrays;
 
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
@@ -9,9 +9,9 @@ use Forte\Api\Generator\Helpers\ThrowErrors;
 /**
  * Class ModifyArray.
  *
- * @package Forte\Api\Generator\Filters
+ * @package Forte\Api\Generator\Filters\Arrays
  */
-class ModifyArray
+class ModifyArray extends AbstractArray
 {
     use ClassAccessTrait, ThrowErrors;
 
@@ -26,36 +26,6 @@ class ModifyArray
      * Elements separator
      */
     const ARRAY_LEVELS_SEPARATOR = ".";
-
-    /**
-     * @var string
-     */
-    protected $key;
-
-    /**
-     * @var mixed|null
-     */
-    protected $value;
-
-    /**
-     * @var string
-     */
-    protected $operation;
-
-    /**
-     * ModifyArray constructor.
-     *
-     * @param string $key The array key to access (multi-level keys separated by '.').
-     * @param string $operation The operation to perform (one of the class constants
-     * starting with prefix 'MODIFY_').
-     * @param mixed  $value The value to set/change/remove.
-     */
-    public function __construct(string $key, string $operation, $value = null)
-    {
-        $this->key       = $key;
-        $this->operation = $operation;
-        $this->value     = $value;
-    }
 
     /**
      * Returns true if this ModifyArray instance is well configured:
@@ -111,36 +81,6 @@ class ModifyArray
         }
 
         return $array;
-    }
-
-    /**
-     * Returns the key.
-     *
-     * @return string
-     */
-    public function getKey(): string
-    {
-        return $this->key;
-    }
-
-    /**
-     * Returns the value.
-     *
-     * @return mixed
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    /**
-     * Returns the operation.
-     *
-     * @return string
-     */
-    public function getOperation(): string
-    {
-        return $this->operation;
     }
 
     /**
@@ -249,28 +189,5 @@ class ModifyArray
             default:
                 return "";
         }
-    }
-
-    /**
-     * Returns a string version of the set value (it converts arrays to json).
-     *
-     * @return string
-     */
-    public function stringifyValue(): string
-    {
-        if (is_array($this->value)) {
-            return json_encode($this->value);
-        }
-        return (string) $this->value;
-    }
-
-    /**
-     * Returns a string representation of this ArrayCheckParameters instance.
-     *
-     * @return false|string
-     */
-    public function __toString()
-    {
-        return $this->getOperationMessage();
     }
 }

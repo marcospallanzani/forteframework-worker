@@ -3,7 +3,7 @@
 namespace Tests\Unit\Filters;
 
 use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Filters\ModifyArray;
+use Forte\Api\Generator\Filters\Arrays\ModifyArray;
 use PHPUnit\Framework\TestCase;
 
 /**
