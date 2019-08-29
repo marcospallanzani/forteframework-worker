@@ -110,5 +110,5 @@ abstract class AbstractArray
      *
      * @return string
      */
-    protected abstract function getOperationMessage(): string;
+    public abstract function getOperationMessage(): string;
 }
