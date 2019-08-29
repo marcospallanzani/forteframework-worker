@@ -3,7 +3,6 @@
 namespace Forte\Api\Generator\Helpers;
 
 use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
-use Forte\Api\Generator\Exceptions\WrongConfigException;
 use Symfony\Component\Yaml\Yaml;
 use Zend\Config\Reader\Ini;
 use Zend\Config\Reader\Json;
@@ -79,7 +78,6 @@ class FileParser
      * @return mixed
      *
      * @throws MissingConfigKeyException
-     * @throws WrongConfigException
      */
     public static function getRequiredNestedConfigValue(string $key, array $config)
     {
@@ -102,7 +100,7 @@ class FileParser
                     if(is_array($value)) {
                         $value = self::getRequiredNestedConfigValue($keysTree[1], $value);
                     } else {
-                        throw new WrongConfigException(
+                        throw new MissingConfigKeyException(
                             $key,
                             "The value associated to the middle-level configuration key '$key' should be an array"
                         );

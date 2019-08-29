@@ -147,13 +147,6 @@ class GenerateForteAPI extends Command
                 $configFile
             ));
             $this->logErrorMessageAndTrace($missingConfigKeyException);
-        } catch (WrongConfigException $wrongConfigException) {
-            $output->writeln(sprintf(
-                "The configuration key '%s' in file '%s' is not well configured.",
-                $wrongConfigException->getWrongKey(),
-                $configFile
-            ));
-            $this->logErrorMessageAndTrace($wrongConfigException);
         }
 
         /**************************************************************
