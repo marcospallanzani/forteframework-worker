@@ -150,7 +150,7 @@ class FileHasValidConfigEntries extends FileExists
      */
     public function hasKey(string $key): self
     {
-        $this->checks[] = new VerifyArray($key);
+        $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_ANY);
 
         return $this;
     }
@@ -165,7 +165,7 @@ class FileHasValidConfigEntries extends FileExists
      */
     public function hasKeyWithEmptyValue(string $key): self
     {
-        $this->checks[] = new VerifyArray($key, "", VerifyArray::CHECK_EQUALS);
+        $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_EMPTY);
 
         return $this;
     }
@@ -180,7 +180,7 @@ class FileHasValidConfigEntries extends FileExists
      */
     public function hasKeyWithNonEmptyValue(string $key): self
     {
-        $this->checks[] = new VerifyArray($key, "", VerifyArray::CHECK_ANY);
+        $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_NON_EMPTY);
 
         return $this;
     }
@@ -204,7 +204,7 @@ class FileHasValidConfigEntries extends FileExists
         string $operation = VerifyArray::CHECK_CONTAINS
     ): self
     {
-        $this->checks[] = new VerifyArray($key, $value, $operation);
+        $this->checks[] = new VerifyArray($key, $operation, $value);
 
         return $this;
     }
@@ -216,7 +216,7 @@ class FileHasValidConfigEntries extends FileExists
      */
     public function stringify(): string
     {
-        $message = "Check if a set of configuration keys meet the configured operations in file '" . $this->filePath . "'.";
+        $message = "Check if configured keys meet the configured check operations in file '" . $this->filePath . "'.";
         foreach ($this->checks as $key => $check) {
             $message .= " $key. " . (string) $check;
         }

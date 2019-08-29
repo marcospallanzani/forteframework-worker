@@ -50,12 +50,12 @@ class LaravelProjectTransformerBuilder extends ProjectTransformerBuilder
                 ->getUnzipFileTransform($zipFilePath)
                 ->addAfterCheck(
                     (new FileHasValidConfigEntries())
-                        ->setPath($this->getFilePathInProject('composer.json'))
-                        ->contentType(FileParser::CONTENT_TYPE_JSON)
                         ->hasKeyWithNonEmptyValue("require.laravel/framework")
                         ->hasKey("require.forteframework/api")
                         ->hasKey("require.php")
                         ->hasKeyWithValue("type", "project", VerifyArray::CHECK_EQUALS)
+                        ->contentType(FileParser::CONTENT_TYPE_JSON)
+                        ->setPath($this->getFilePathInProject('composer.json'))
                 )
         );
 

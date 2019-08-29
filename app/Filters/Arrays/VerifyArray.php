@@ -25,18 +25,21 @@ class VerifyArray extends AbstractArray
     const CHECK_ENDS_WITH    = "check_ends_with";
     const CHECK_CONTAINS     = "check_contains";
     const CHECK_EQUALS       = "check_equals";
+    const CHECK_EMPTY        = "check_empty";
+    const CHECK_NON_EMPTY    = "check_non_empty";
     const CHECK_ANY          = "check_any";
 
     /**
      * Returns true if this VerifyArray instance is well configured and
      * respects the following rules:
      * - the field key must be specified and not empty;
-     * - if a non-empty value is specified, an operation must be specified;
-     * - if a non-empty value is specified, only operations different than 'content_any' are valid;
-     * - if a non-empty value and an operation are specified, the operation must equal to one
-     *   of the class constants starting with prefix 'CHECK_';
-     * - if an empty value is specified (e.g. null, ""), the valid operations are 'content_equals'
-     *   and 'content_any'; this case can be used to check if a given key is set and empty or null;
+     * - the field operation must be specified and not empty;
+     * - if an empty value is specified (e.g. null, ""), the valid operations are
+     *   'check_equals', 'check_empty' or 'check_any';
+     *
+     * The check `check_any` with an empty value can be used to check if a key is set.
+     * The check `check_empty` with an empty value can be used to check if a key is set
+     * and its value is empty or null.
      *
      * @return bool Returns true, if this check parameters are correctly
      * configured and consistent; false otherwise.
@@ -47,69 +50,48 @@ class VerifyArray extends AbstractArray
     {
         try {
             $checkOperationsConstants = self::getClassConstants('CHECK_');
-        } catch (\ReflectionException $reflectionException) {
-            $this->throwGeneratorException(
-                "A general error occurred while retrieving the checks list. Error message is: '%s'.",
-                $reflectionException->getMessage()
-            );
-        }
 
-        if (empty($this->key)) {
-            $this->throwGeneratorException("You need to specify the 'key' for the following check: '%s'.", $this);
-        }
+            // Validate the key
+            if (empty($this->key)) {
+                $this->throwGeneratorException("You need to specify the 'key' for check: '%s'.", $this);
+            }
 
-        // If a non-empty value is specified, we need to check if an operation is set: if not, we throw an error.
-        // If a non-empty value is set, we will use only operations different than 'content_any'.
-        $operation = $this->getOperation();
-        if (!empty($operation)) {
-            if (!empty($this->getValue())) {
-                // You need to specify one operation for non-empty values
-                if (empty($operation)) {
-                    // If value is not empty, at least one operation should be specified
-                    $this->throwGeneratorException(
-                        "You need to specify an operation for checks with non-empty values. " .
-                        "Impacted check is: '%s'. Supported operations are: '%s'",
-                        $this,
-                        implode(',', $checkOperationsConstants)
-                    );
-                }
+            // Validate the operation.
+            $operation = $this->getOperation();
+            if (empty($this->operation)) {
+                $this->throwGeneratorException("You need to specify the 'operation' for check: '%s'.", $this);
+            }
 
-                // If no operation is specified OR an unsupported operation is given, then we throw an error.
-                if (!in_array($operation, $checkOperationsConstants)) {
-                    $this->throwGeneratorException(
-                        "The check '%s' is not supported. Impacted check is: '%s'. Supported checks are: '%s'",
-                        $operation,
-                        $this,
-                        implode(',', $checkOperationsConstants)
-                    );
-                }
+            // If no operation is specified OR an unsupported operation is given, then we throw an error.
+            if (!in_array($operation, $checkOperationsConstants)) {
+                $this->throwGeneratorException(
+                    "The check '%s' is not supported. Impacted check is: '%s'. Supported checks are: '%s'",
+                    $operation,
+                    $this,
+                    implode(',', $checkOperationsConstants)
+                );
+            }
 
-                // If value is not empty, an operation different than 'content_any' should be specified
-                if ($operation === VerifyArray::CHECK_ANY) {
-                    unset($checkOperationsConstants['CHECK_ANY']);
-                    $this->throwGeneratorException(
-                        "The operation '%s' is not supported for non-empty values. Impacted check is: '%s'. " .
-                        "Supported operations for non-empty values are: '%s'",
-                        VerifyArray::CHECK_ANY,
-                        $this,
-                        implode(',', $checkOperationsConstants)
-                    );
-                }
-            } else {
+            // Validate the value
+            if (empty($this->getValue())) {
                 // If an empty value is specified (e.g. null, ""), we will use this check, only if the set operation
-                // is 'content_equals' or 'content_any'.
-                if ($operation !== VerifyArray::CHECK_ANY
-                    && $operation !== VerifyArray::CHECK_EQUALS
-                ) {
+                // is 'check_equals', 'check_empty', 'check_non_empty' or 'check_any'.
+                $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY, self::CHECK_NON_EMPTY];
+                if (!in_array($operation, $acceptsEmptyValue)) {
                     $this->throwGeneratorException(
                         "The operation '%s' is not supported for empty values. Impacted check is: '%s'. " .
                         "Supported operations for empty values are: '%s'",
                         $operation,
                         $this,
-                        implode(',', [VerifyArray::CHECK_ANY, VerifyArray::CHECK_EQUALS])
+                        implode(', ', $acceptsEmptyValue)
                     );
                 }
             }
+        } catch (\ReflectionException $reflectionException) {
+            $this->throwGeneratorException(
+                "A general error occurred while retrieving the checks list. Error message is: '%s'.",
+                $reflectionException->getMessage()
+            );
         }
 
         return true;
@@ -133,13 +115,6 @@ class VerifyArray extends AbstractArray
             $value = FileParser::getRequiredNestedConfigValue($this->key, $config);
             // If no exceptions are thrown, then the key was found in the given config array
             switch($this->operation) {
-                case self::CHECK_ANY:
-                case "":
-                    // At this point, if the reader has found a value, it means that the key is defined
-                    // AND its value is either empty or not. So we can just return true.
-                    // In case no operation is set (empty string), we rely on the method getRequiredNestedConfigValue
-                    // that returns a value only if the is define.
-                    return true;
                 case self::CHECK_CONTAINS:
                     if (is_string($this->value)) {
                         if (strpos($value, $this->value) !== false) {
@@ -155,6 +130,7 @@ class VerifyArray extends AbstractArray
                         $this->key,
                         self::CHECK_CONTAINS
                     );
+                    break;
                 case self::CHECK_ENDS_WITH:
                     if (is_string($this->value) && is_string($value)) {
                         if (substr_compare($this->value, $value, -strlen($value)) === 0) {
@@ -168,11 +144,7 @@ class VerifyArray extends AbstractArray
                         $this->key,
                         self::CHECK_ENDS_WITH
                     );
-                case self::CHECK_EQUALS:
-                    if ($this->value === $value) {
-                        return true;
-                    }
-                    return false;
+                    break;
                 case self::CHECK_STARTS_WITH:
                     if (is_string($this->value) && is_string($value)) {
                         if (substr_compare($this->value, $value, -strlen($value)) === 0) {
@@ -186,8 +158,37 @@ class VerifyArray extends AbstractArray
                         $this->key,
                         self::CHECK_STARTS_WITH
                     );
+                    break;
+                case self::CHECK_ANY:
+                    /**
+                     * At this point, if the reader has found a value, it means that the key is defined
+                     * AND its value is either empty or not. So we can just return true. In case no operation
+                     * is set (empty string), we rely on the method getRequiredNestedConfigValue that returns
+                     * a value only if the is define.
+                     */
+                    return true;
+                    break;
+                case self::CHECK_EQUALS:
+                    if ($this->value === $value) {
+                        return true;
+                    }
+                    return false;
+                    break;
+                case self::CHECK_EMPTY:
+                    if (empty($value)) {
+                        return true;
+                    }
+                    return false;
+                    break;
+                case self::CHECK_NON_EMPTY:
+                    if (!empty($value)) {
+                        return true;
+                    }
+                    return false;
+                    break;
                 default:
                     $this->throwGeneratorException("It was not possible to verify the configured check condition.");
+                    break;
             }
         }
 
@@ -211,6 +212,10 @@ class VerifyArray extends AbstractArray
                 return $baseMessage . " and ends with value '" . $this->stringifyValue() . "'";
             case self::CHECK_EQUALS:
                 return $baseMessage . " and is equal to value '" . $this->stringifyValue() . "'";
+            case self::CHECK_EMPTY:
+                return $baseMessage . " and is empty (empty string or null)";
+            case self::CHECK_NON_EMPTY:
+                return $baseMessage . " and is not empty (not empty string, not null)";
             case self::CHECK_STARTS_WITH:
                 return $baseMessage . " and starts with value '" . $this->stringifyValue() . "'";
             default:
