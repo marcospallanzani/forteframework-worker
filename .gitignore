@@ -7,6 +7,7 @@ yarn-error.log
 .project
 .settings
 .svn
+simple-config*
 
 # Storage - Logs
 storage
