@@ -195,40 +195,26 @@ class VerifyArray extends AbstractArray
     }
 
     /**
-     * Returns a string representation of this VerifyArray instance.
-     *
-     * @return false|string
-     */
-    public function __toString()
-    {
-        return sprintf(
-            "Check if %skey '%s' %s",
-            ($this->value ? "value with " : ""),
-            $this->key,
-            $this->getOperationMessage()
-        );
-    }
-
-    /**
      * Returns a human-readable description of this check operation.
      *
      * @return string
      */
-    protected function getOperationMessage(): string
+    public function getOperationMessage(): string
     {
+        $baseMessage = "Check if key '" . $this->key . "' is set";
         switch($this->operation) {
             case self::CHECK_ANY:
-                return "is set and has any value";
+                return $baseMessage . " and has any value";
             case self::CHECK_CONTAINS:
-                return "contains value '" . $this->stringifyValue() . "'";
+                return $baseMessage . " and contains value '" . $this->stringifyValue() . "'";
             case self::CHECK_ENDS_WITH:
-                return "ends with value '" . $this->stringifyValue() . "'";
+                return $baseMessage . " and ends with value '" . $this->stringifyValue() . "'";
             case self::CHECK_EQUALS:
-                return "is equal to '" . $this->stringifyValue() . "'";
+                return $baseMessage . " and is equal to value '" . $this->stringifyValue() . "'";
             case self::CHECK_STARTS_WITH:
-                return "starts with value '" . $this->stringifyValue() . "'";
+                return $baseMessage . " and starts with value '" . $this->stringifyValue() . "'";
             default:
-                return "exists";
+                return $baseMessage;
         }
     }
 }
