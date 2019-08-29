@@ -4,7 +4,7 @@ namespace Forte\Api\Generator\Transformers\Transforms\File;
 
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\TransformException;
-use Forte\Api\Generator\Filters\File\Copy as CopyFilter;
+use Forte\Api\Generator\Filters\Files\Copy as CopyFilter;
 use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
 use Zend\Filter\Exception\RuntimeException;
 
