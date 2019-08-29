@@ -145,15 +145,8 @@ class FileParser
             try {
                 // If a value for the current key was found, we check
                 // if we need to iterate again through the given config tree;
-                if (count($keysTree) === 2) {
-                    if(is_array($value)) {
-                        $value = self::getRequiredNestedConfigValue($keysTree[1], $value);
-                    } else {
-                        throw new MissingKeyException(
-                            $key,
-                            "The value associated to the middle-level configuration key '$key' should be an array"
-                        );
-                    }
+                if (count($keysTree) === 2 && is_array($value)) {
+                    $value = self::getRequiredNestedConfigValue($keysTree[1], $value);
                 }
             } catch (MissingKeyException $e) {
                 $composedKey = $currentKey . self::CONFIG_LEVEL_SEPARATOR . $e->getMissingKey();
