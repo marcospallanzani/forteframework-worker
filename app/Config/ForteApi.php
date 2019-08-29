@@ -4,6 +4,7 @@ namespace Forte\Api\Generator\Config;
 
 use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
 use Forte\Api\Generator\Exceptions\WrongConfigException;
+use Forte\Api\Generator\Helpers\FileParser;
 
 /**
  * Class ForteApi.
@@ -71,6 +72,6 @@ class ForteApi
      */
     public function getRequiredParameter(string $key)
     {
-        return Reader::getRequiredNestedConfigValue($key, $this->config);
+        return FileParser::getRequiredNestedConfigValue($key, $this->config);
     }
 }

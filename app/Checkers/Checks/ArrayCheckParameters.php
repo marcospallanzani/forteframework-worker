@@ -2,11 +2,11 @@
 
 namespace Forte\Api\Generator\Checkers\Checks;
 
-use Forte\Api\Generator\Config\Reader;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
 use Forte\Api\Generator\Exceptions\WrongConfigException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
+use Forte\Api\Generator\Helpers\FileParser;
 use Forte\Api\Generator\Helpers\ThrowErrors;
 
 /**
@@ -159,7 +159,7 @@ class ArrayCheckParameters
     {
         if ($this->isValid()) {
 
-            $value = Reader::getRequiredNestedConfigValue($this->key, $config);
+            $value = FileParser::getRequiredNestedConfigValue($this->key, $config);
             // If no exceptions are thrown, then the key was found in the given config array
             switch($this->operation) {
                 case self::CHECK_ANY:
