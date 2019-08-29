@@ -2,7 +2,7 @@
 
 namespace Forte\Api\Generator\Builders;
 
-use Forte\Api\Generator\Checkers\Checks\ArrayCheckParameters;
+use Forte\Api\Generator\Filters\Arrays\VerifyArray;
 use Forte\Api\Generator\Checkers\Checks\FileHasValidConfigEntries;
 use Forte\Api\Generator\Helpers\FileParser;
 
@@ -55,7 +55,7 @@ class LaravelProjectTransformerBuilder extends ProjectTransformerBuilder
                         ->hasKeyWithNonEmptyValue("require.laravel/framework")
                         ->hasKey("require.forteframework/api")
                         ->hasKey("require.php")
-                        ->hasKeyWithValue("type", "project", ArrayCheckParameters::CHECK_EQUALS)
+                        ->hasKeyWithValue("type", "project", VerifyArray::CHECK_EQUALS)
                 )
         );
 

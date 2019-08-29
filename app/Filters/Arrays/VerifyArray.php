@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Api\Generator\Checkers\Checks;
+namespace Forte\Api\Generator\Filters\Arrays;
 
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\MissingConfigKeyException;
@@ -10,11 +10,11 @@ use Forte\Api\Generator\Helpers\FileParser;
 use Forte\Api\Generator\Helpers\ThrowErrors;
 
 /**
- * Class ArrayCheckParameters. Class used to wrap all required check parameters.
+ * Class VerifyArray. Class used to wrap all required check parameters.
  *
- * @package Forte\Api\Generator\Checkers\Checks
+ * @package Forte\Api\Generator\Filters\Arrays
  */
-class ArrayCheckParameters
+class VerifyArray extends AbstractArray
 {
     use ClassAccessTrait, ThrowErrors;
 
@@ -28,36 +28,7 @@ class ArrayCheckParameters
     const CHECK_ANY          = "check_any";
 
     /**
-     * @var string
-     */
-    protected $key;
-
-    /**
-     * @var mixed|null
-     */
-    protected $value;
-
-    /**
-     * @var string
-     */
-    protected $operation;
-
-    /**
-     * ArrayCheckParameters constructor.
-     *
-     * @param string $key
-     * @param mixed $value
-     * @param string $operation
-     */
-    public function __construct(string $key, $value = null, string $operation = "")
-    {
-        $this->key = $key;
-        $this->value = $value;
-        $this->operation = $operation;
-    }
-
-    /**
-     * Returns true if this ArrayCheckParameters instance is well configured and
+     * Returns true if this VerifyArray instance is well configured and
      * respects the following rules:
      * - the field key must be specified and not empty;
      * - if a non-empty value is specified, an operation must be specified;
@@ -114,12 +85,12 @@ class ArrayCheckParameters
                 }
 
                 // If value is not empty, an operation different than 'content_any' should be specified
-                if ($operation === ArrayCheckParameters::CHECK_ANY) {
+                if ($operation === VerifyArray::CHECK_ANY) {
                     unset($checkOperationsConstants['CHECK_ANY']);
                     $this->throwGeneratorException(
                         "The operation '%s' is not supported for non-empty values. Impacted check is: '%s'. " .
                         "Supported operations for non-empty values are: '%s'",
-                        ArrayCheckParameters::CHECK_ANY,
+                        VerifyArray::CHECK_ANY,
                         $this,
                         implode(',', $checkOperationsConstants)
                     );
@@ -127,15 +98,15 @@ class ArrayCheckParameters
             } else {
                 // If an empty value is specified (e.g. null, ""), we will use this check, only if the set operation
                 // is 'content_equals' or 'content_any'.
-                if ($operation !== ArrayCheckParameters::CHECK_ANY
-                    && $operation !== ArrayCheckParameters::CHECK_EQUALS
+                if ($operation !== VerifyArray::CHECK_ANY
+                    && $operation !== VerifyArray::CHECK_EQUALS
                 ) {
                     $this->throwGeneratorException(
                         "The operation '%s' is not supported for empty values. Impacted check is: '%s'. " .
                         "Supported operations for empty values are: '%s'",
                         $operation,
                         $this,
-                        implode(',', [ArrayCheckParameters::CHECK_ANY, ArrayCheckParameters::CHECK_EQUALS])
+                        implode(',', [VerifyArray::CHECK_ANY, VerifyArray::CHECK_EQUALS])
                     );
                 }
             }
@@ -224,31 +195,7 @@ class ArrayCheckParameters
     }
 
     /**
-     * @return string
-     */
-    public function getKey(): string
-    {
-        return $this->key;
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOperation(): string
-    {
-        return $this->operation;
-    }
-
-    /**
-     * Returns a string representation of this ArrayCheckParameters instance.
+     * Returns a string representation of this VerifyArray instance.
      *
      * @return false|string
      */
@@ -273,16 +220,15 @@ class ArrayCheckParameters
             case self::CHECK_ANY:
                 return "is set and has any value";
             case self::CHECK_CONTAINS:
-                return "contains value '" . $this->value . "'";
+                return "contains value '" . $this->stringifyValue() . "'";
             case self::CHECK_ENDS_WITH:
-                return "ends with value '" . $this->value . "'";
+                return "ends with value '" . $this->stringifyValue() . "'";
             case self::CHECK_EQUALS:
-                return "is equal to '" . $this->value . "'";
+                return "is equal to '" . $this->stringifyValue() . "'";
             case self::CHECK_STARTS_WITH:
-                return "starts with value '" . $this->value . "'";
+                return "starts with value '" . $this->stringifyValue() . "'";
             default:
                 return "exists";
         }
     }
 }
-

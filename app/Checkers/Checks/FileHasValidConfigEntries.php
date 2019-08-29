@@ -4,6 +4,7 @@ namespace Forte\Api\Generator\Checkers\Checks;
 
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
+use Forte\Api\Generator\Filters\Arrays\VerifyArray;
 use Forte\Api\Generator\Helpers\FileParser;
 
 /**
@@ -51,11 +52,11 @@ class FileHasValidConfigEntries extends FileExists
             // Check if the specified checks are well configured
             foreach ($this->checks as $check) {
 
-                if (!$check instanceof ArrayCheckParameters) {
+                if (!$check instanceof VerifyArray) {
                     $this->throwCheckException(
                         $this,
                         "Check parameters should be registered as instances of class '%s'.",
-                        ArrayCheckParameters::class
+                        VerifyArray::class
                     );
                 }
 
@@ -106,7 +107,7 @@ class FileHasValidConfigEntries extends FileExists
             // We check all configured conditions for the configured file
             foreach ($this->checks as $check) {
                 try {
-                    /** @var ArrayCheckParameters $check */
+                    /** @var VerifyArray $check */
                     if (!$check->checkCondition($parsedContent)) {
                         $failed[] = sprintf("Check failed: %s.", $check);
                     }
@@ -149,7 +150,7 @@ class FileHasValidConfigEntries extends FileExists
      */
     public function hasKey(string $key): self
     {
-        $this->checks[] = new ArrayCheckParameters($key);
+        $this->checks[] = new VerifyArray($key);
 
         return $this;
     }
@@ -164,7 +165,7 @@ class FileHasValidConfigEntries extends FileExists
      */
     public function hasKeyWithEmptyValue(string $key): self
     {
-        $this->checks[] = new ArrayCheckParameters($key, "", ArrayCheckParameters::CHECK_EQUALS);
+        $this->checks[] = new VerifyArray($key, "", VerifyArray::CHECK_EQUALS);
 
         return $this;
     }
@@ -179,7 +180,7 @@ class FileHasValidConfigEntries extends FileExists
      */
     public function hasKeyWithNonEmptyValue(string $key): self
     {
-        $this->checks[] = new ArrayCheckParameters($key, "", ArrayCheckParameters::CHECK_ANY);
+        $this->checks[] = new VerifyArray($key, "", VerifyArray::CHECK_ANY);
 
         return $this;
     }
@@ -188,22 +189,22 @@ class FileHasValidConfigEntries extends FileExists
      * Checks if the specified decoded file (i.e. converted to array) has a value,
      * whose key correspond to the given one, and whose value meets the condition
      * defined by the couple value-operation. For more details about the possible
-     * conditions, check the class ArrayCheckParameters.
+     * conditions, check the class VerifyArray.
      *
      * @param string $key The key.
      * @param mixed $value The expected value
      * @param string $operation The comparison operation to be performed. Accepted
-     * values are the ArrayCheckParameters constants with prefix "CHECK_".
+     * values are the VerifyArray constants with prefix "CHECK_".
      *
      * @return FileHasValidConfigEntries
      */
     public function hasKeyWithValue(
         string $key,
         $value,
-        string $operation = ArrayCheckParameters::CHECK_CONTAINS
+        string $operation = VerifyArray::CHECK_CONTAINS
     ): self
     {
-        $this->checks[] = new ArrayCheckParameters($key, $value, $operation);
+        $this->checks[] = new VerifyArray($key, $value, $operation);
 
         return $this;
     }
