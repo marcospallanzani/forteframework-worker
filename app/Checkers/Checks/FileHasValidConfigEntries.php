@@ -180,7 +180,7 @@ class FileHasValidConfigEntries extends FileExists
      */
     public function hasKeyWithNonEmptyValue(string $key): self
     {
-        $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_NON_EMPTY);
+        $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_EMPTY, null, true);
 
         return $this;
     }

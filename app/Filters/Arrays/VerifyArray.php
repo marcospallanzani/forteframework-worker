@@ -26,12 +26,35 @@ class VerifyArray extends AbstractArray
     const CHECK_CONTAINS     = "check_contains";
     const CHECK_EQUALS       = "check_equals";
     const CHECK_EMPTY        = "check_empty";
-    const CHECK_NON_EMPTY    = "check_non_empty";
     const CHECK_ANY          = "check_any";
 
     /**
-     * Returns true if this VerifyArray instance is well configured and
-     * respects the following rules:
+     * If true, the opposite check will be performed
+     * (e.g. contains -> not-contains).
+     *
+     * @var bool
+     */
+    protected $reverseAction = false;
+
+    /**
+     * VerifyArray constructor.
+     *
+     * @param string $key The array key to access (multi-level keys separated by '.').
+     * @param string $operation The operation to perform (look inside isValid() implementation
+     * for list of supported values).
+     * @param mixed $value The value to set/change/remove.
+     * @param bool $reverseAction Whether the reverse actions should be performed or not
+     * (e.g. contains -> not-contains).
+     */
+    public function __construct(string $key, string $operation, $value = null, bool $reverseAction = false)
+    {
+        parent::__construct($key, $operation, $value);
+        $this->reverseAction = $reverseAction;
+    }
+
+    /**
+     * Validate the current VerifyArray instance. It returns true if this VerifyArray
+     * instance is well configured and respects the following rules:
      * - the field key must be specified and not empty;
      * - the field operation must be specified and not empty;
      * - if an empty value is specified (e.g. null, ""), the valid operations are
@@ -72,11 +95,20 @@ class VerifyArray extends AbstractArray
                 );
             }
 
+            if ($this->reverseAction && $operation === self::CHECK_ANY) {
+                $this->throwGeneratorException(
+                    "The check '%s' is not supported in the reverse mode. Use '%s' instead. Impacted check is: '%s'.",
+                    $operation,
+                    self::CHECK_EQUALS,
+                    $this
+                );
+            }
+
             // Validate the value
             if (empty($this->getValue())) {
                 // If an empty value is specified (e.g. null, ""), we will use this check, only if the set operation
                 // is 'check_equals', 'check_empty', 'check_non_empty' or 'check_any'.
-                $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY, self::CHECK_NON_EMPTY];
+                $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY];
                 if (!in_array($operation, $acceptsEmptyValue)) {
                     $this->throwGeneratorException(
                         "The operation '%s' is not supported for empty values. Impacted check is: '%s'. " .
@@ -98,7 +130,7 @@ class VerifyArray extends AbstractArray
     }
 
     /**
-     * Checks if the configured key has a value, that respects the configured operation.
+     * Check if the configured key has a value, that respects the configured operation.
      *
      * @param array $config The array containing the configuration keys to be checked.
      *
@@ -116,48 +148,16 @@ class VerifyArray extends AbstractArray
             // If no exceptions are thrown, then the key was found in the given config array
             switch($this->operation) {
                 case self::CHECK_CONTAINS:
-                    if (is_string($this->value)) {
-                        if (strpos($value, $this->value) !== false) {
-                            return true;
-                        }
-                        return false;
-                    } elseif (is_array($this->value)) {
-                        return in_array($value, $this->value);
-                    }
-                    $this->throwGeneratorException(
-                        "It was not possible to verify if the value for key '%s' contains the configured value. ".
-                        "The check '%s' supports only strings and arrays for both the configured and expected values.",
-                        $this->key,
-                        self::CHECK_CONTAINS
-                    );
+                    $contains = $this->contains($value);
+                    return $this->reverseAction ? !$contains : $contains;
                     break;
                 case self::CHECK_ENDS_WITH:
-                    if (is_string($this->value) && is_string($value)) {
-                        if (substr_compare($this->value, $value, -strlen($value)) === 0) {
-                            return true;
-                        }
-                        return false;
-                    }
-                    $this->throwGeneratorException(
-                        "It was not possible to verify if the value for key '%s' ends with the configured value. ".
-                        "The check '%s' supports only strings for both the configured and expected values.",
-                        $this->key,
-                        self::CHECK_ENDS_WITH
-                    );
+                    $endsWith = $this->endsWith($value);
+                    return $this->reverseAction ? !$endsWith : $endsWith;
                     break;
                 case self::CHECK_STARTS_WITH:
-                    if (is_string($this->value) && is_string($value)) {
-                        if (substr_compare($this->value, $value, -strlen($value)) === 0) {
-                            return true;
-                        }
-                        return false;
-                    }
-                    $this->throwGeneratorException(
-                        "It was not possible to verify if the value for key '%s' starts with the configured value. ".
-                        "The check '%s' supports only strings for both the configured and expected values.",
-                        $this->key,
-                        self::CHECK_STARTS_WITH
-                    );
+                    $startsWith = $this->startsWith($value);
+                    return $this->reverseAction ? !$startsWith : $startsWith;
                     break;
                 case self::CHECK_ANY:
                     /**
@@ -165,29 +165,22 @@ class VerifyArray extends AbstractArray
                      * AND its value is either empty or not. So we can just return true. In case no operation
                      * is set (empty string), we rely on the method getRequiredNestedConfigValue that returns
                      * a value only if the is define.
+                     * REVERSE MODE IS NOT SUPPORTED FOR CHECK_ANY, SO WE DO NOT NEED TO REVERSE ITS ACTION.
                      */
                     return true;
                     break;
                 case self::CHECK_EQUALS:
-                    if ($this->value === $value) {
-                        return true;
-                    }
-                    return false;
+                    $equalsTo = $this->equalsTo($value);
+                    return $this->reverseAction ? !$equalsTo : $equalsTo;
                     break;
                 case self::CHECK_EMPTY:
-                    if (empty($value)) {
-                        return true;
-                    }
-                    return false;
-                    break;
-                case self::CHECK_NON_EMPTY:
-                    if (!empty($value)) {
-                        return true;
-                    }
-                    return false;
+                    return $this->reverseAction ? !empty($value) : empty($value);
                     break;
                 default:
-                    $this->throwGeneratorException("It was not possible to verify the configured check condition.");
+                    $this->throwGeneratorException(sprintf(
+                        "It was not possible to verify the configured check condition. Impacted check is: '%s'",
+                        $this
+                    ));
                     break;
             }
         }
@@ -196,30 +189,148 @@ class VerifyArray extends AbstractArray
     }
 
     /**
-     * Returns a human-readable description of this check operation.
+     * Return a human-readable description of this check operation.
      *
      * @return string
      */
     public function getOperationMessage(): string
     {
         $baseMessage = "Check if key '" . $this->key . "' is set";
+        $reverseAction = $this->getReverseActionTag();
         switch($this->operation) {
             case self::CHECK_ANY:
                 return $baseMessage . " and has any value";
             case self::CHECK_CONTAINS:
-                return $baseMessage . " and contains value '" . $this->stringifyValue() . "'";
+                return $baseMessage . " and $reverseAction value '" . $this->stringifyValue() . "'";
             case self::CHECK_ENDS_WITH:
-                return $baseMessage . " and ends with value '" . $this->stringifyValue() . "'";
-            case self::CHECK_EQUALS:
-                return $baseMessage . " and is equal to value '" . $this->stringifyValue() . "'";
-            case self::CHECK_EMPTY:
-                return $baseMessage . " and is empty (empty string or null)";
-            case self::CHECK_NON_EMPTY:
-                return $baseMessage . " and is not empty (not empty string, not null)";
             case self::CHECK_STARTS_WITH:
-                return $baseMessage . " and starts with value '" . $this->stringifyValue() . "'";
+                return $baseMessage . " and $reverseAction with value '" . $this->stringifyValue() . "'";
+            case self::CHECK_EQUALS:
+                return $baseMessage . " and $reverseAction equal to value '" . $this->stringifyValue() . "'";
+            case self::CHECK_EMPTY:
+                return $baseMessage . " and $reverseAction empty (empty string or null)";
             default:
                 return $baseMessage;
         }
+    }
+
+    /**
+     * Return a human-readable action description.
+     *
+     * @return string
+     */
+    protected function getReverseActionTag(): string
+    {
+        switch($this->operation) {
+            case self::CHECK_CONTAINS:
+                return ($this->reverseAction ? "does not contains" : "contains");
+                break;
+            case self::CHECK_ENDS_WITH:
+                return ($this->reverseAction ? "does not end" : "ends");
+                break;
+            case self::CHECK_EQUALS:
+            case self::CHECK_EMPTY:
+                return ($this->reverseAction ? "is not" : "is");
+                break;
+            case self::CHECK_STARTS_WITH:
+                return ($this->reverseAction ? "does not start" : "starts");
+                break;
+            default:
+                return "not";
+        }
+    }
+
+    /**
+     * Check if the configured value contains the given value.
+     * Supported value types are strings and arrays.
+     *
+     * @param mixed $value The value that should be contained in the class value.
+     *
+     * @return bool
+     *
+     * @throws GeneratorException
+     */
+    protected function contains($value): bool
+    {
+        if (is_string($this->value)) {
+            if (strpos($value, $this->value) !== false) {
+                return true;
+            }
+            return false;
+        } elseif (is_array($this->value)) {
+            return in_array($value, $this->value);
+        }
+
+        $this->throwGeneratorException(
+            "It was not possible to verify if the value for key '%s' contains the configured value. ".
+            "The check '%s' supports only strings and arrays for both the configured and expected values.",
+            $this->key,
+            self::CHECK_CONTAINS
+        );
+    }
+
+    /**
+     * Check if the configured value ends with the given value.
+     *
+     * @param mixed $value The value with which the class value should end.
+     *
+     * @return bool
+     *
+     * @throws GeneratorException
+     */
+    protected function endsWith($value): bool
+    {
+        if (is_string($this->value) && is_string($value)) {
+            if (substr_compare($this->value, $value, -strlen($value)) === 0) {
+                return true;
+            }
+            return false;
+        }
+        $this->throwGeneratorException(
+            "It was not possible to verify if the value for key '%s' ends with the configured value. ".
+            "The check '%s' supports only strings for both the configured and expected values.",
+            $this->key,
+            self::CHECK_ENDS_WITH
+        );
+    }
+
+    /**
+     * Check if the configured value starts with the given value.
+     *
+     * @param mixed $value The value with which the class value should start.
+     *
+     * @return bool
+     *
+     * @throws GeneratorException
+     */
+    protected function startsWith($value): bool
+    {
+        if (is_string($this->value) && is_string($value)) {
+            if (substr_compare($this->value, $value, -strlen($value)) === 0) {
+                return true;
+            }
+            return false;
+        }
+        $this->throwGeneratorException(
+            "It was not possible to verify if the value for key '%s' starts with the configured value. ".
+            "The check '%s' supports only strings for both the configured and expected values.",
+            $this->key,
+            self::CHECK_STARTS_WITH
+        );
+    }
+
+    /**
+     * Check if the configured value is equal to the given value.
+     *
+     * @param mixed $value The value to be compared.
+     *
+     * @return bool
+     */
+    protected function equalsTo($value): bool
+    {
+        if ($this->value === $value) {
+            return true;
+        }
+        return false;
     }
 }
