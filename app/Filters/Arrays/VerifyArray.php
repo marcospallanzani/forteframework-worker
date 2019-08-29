@@ -26,6 +26,7 @@ class VerifyArray extends AbstractArray
     const CHECK_EQUALS       = "check_equals";
     const CHECK_EMPTY        = "check_empty";
     const CHECK_ANY          = "check_any";
+    const CHECK_MISSING_KEY  = "check_missing_key";
 
     /**
      * If true, the opposite check will be performed
@@ -107,7 +108,7 @@ class VerifyArray extends AbstractArray
             if (empty($this->getValue())) {
                 // If an empty value is specified (e.g. null, ""), we will use this check, only if the set operation
                 // is 'check_equals', 'check_empty', 'check_non_empty' or 'check_any'.
-                $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY];
+                $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY, self::CHECK_MISSING_KEY];
                 if (!in_array($operation, $acceptsEmptyValue)) {
                     $this->throwGeneratorException(
                         "The operation '%s' is not supported for empty values. Impacted check is: '%s'. " .
@@ -143,44 +144,61 @@ class VerifyArray extends AbstractArray
     {
         if ($this->isValid()) {
 
-            $value = FileParser::getRequiredNestedConfigValue($this->key, $array);
-            // If no exceptions are thrown, then the key was found in the given config array
-            switch($this->operation) {
-                case self::CHECK_CONTAINS:
-                    $contains = $this->contains($value);
-                    return $this->reverseAction ? !$contains : $contains;
-                    break;
-                case self::CHECK_ENDS_WITH:
-                    $endsWith = $this->endsWith($value);
-                    return $this->reverseAction ? !$endsWith : $endsWith;
-                    break;
-                case self::CHECK_STARTS_WITH:
-                    $startsWith = $this->startsWith($value);
-                    return $this->reverseAction ? !$startsWith : $startsWith;
-                    break;
-                case self::CHECK_ANY:
-                    /**
-                     * At this point, if the reader has found a value, it means that the key is defined
-                     * AND its value is either empty or not. So we can just return true. In case no operation
-                     * is set (empty string), we rely on the method getRequiredNestedConfigValue that returns
-                     * a value only if the is define.
-                     * REVERSE MODE IS NOT SUPPORTED FOR CHECK_ANY, SO WE DO NOT NEED TO REVERSE ITS ACTION.
-                     */
+            try {
+                $value = FileParser::getRequiredNestedConfigValue($this->key, $array);
+
+                // If no exceptions are thrown, then the key was found in the given config array
+                switch($this->operation) {
+                    case self::CHECK_CONTAINS:
+                        $contains = $this->contains($value);
+                        return $this->reverseAction ? !$contains : $contains;
+                        break;
+                    case self::CHECK_ENDS_WITH:
+                        $endsWith = $this->endsWith($value);
+                        return $this->reverseAction ? !$endsWith : $endsWith;
+                        break;
+                    case self::CHECK_STARTS_WITH:
+                        $startsWith = $this->startsWith($value);
+                        return $this->reverseAction ? !$startsWith : $startsWith;
+                        break;
+                    case self::CHECK_ANY:
+                        /**
+                         * At this point, if the reader has found a value, it means that the key is defined
+                         * AND its value is either empty or not. So we can just return true. In case no operation
+                         * is set (empty string), we rely on the method getRequiredNestedConfigValue that returns
+                         * a value only if the is define.
+                         * REVERSE MODE IS NOT SUPPORTED FOR CHECK_ANY, SO WE DO NOT NEED TO REVERSE ITS ACTION.
+                         */
+                        return true;
+                        break;
+                    case self::CHECK_EQUALS:
+                        $equalsTo = $this->equalsTo($value);
+                        return $this->reverseAction ? !$equalsTo : $equalsTo;
+                        break;
+                    case self::CHECK_EMPTY:
+                        return $this->reverseAction ? !empty($value) : empty($value);
+                        break;
+                    case self::CHECK_MISSING_KEY:
+                        /**
+                         * The only condition where we get to this point is that we
+                         * are in the reverse mode (i.e. missing-key => not-missing key).
+                         * In this case, the key is defined in the given array, so we
+                         * can return true, which means that the given key is not missing.
+                         */
+                        return true;
+                        break;
+                    default:
+                        $this->throwGeneratorException(sprintf(
+                            "It was not possible to verify the configured check condition. Impacted check is: '%s'",
+                            $this
+                        ));
+                        break;
+                }
+            } catch (MissingKeyException $missingKeyException) {
+                if ($this->operation === self::CHECK_MISSING_KEY) {
                     return true;
-                    break;
-                case self::CHECK_EQUALS:
-                    $equalsTo = $this->equalsTo($value);
-                    return $this->reverseAction ? !$equalsTo : $equalsTo;
-                    break;
-                case self::CHECK_EMPTY:
-                    return $this->reverseAction ? !empty($value) : empty($value);
-                    break;
-                default:
-                    $this->throwGeneratorException(sprintf(
-                        "It was not possible to verify the configured check condition. Impacted check is: '%s'",
-                        $this
-                    ));
-                    break;
+                }
+                throw $missingKeyException;
             }
         }
 
@@ -208,6 +226,8 @@ class VerifyArray extends AbstractArray
                 return $baseMessage . " and $reverseAction equal to value '" . $this->stringifyValue() . "'";
             case self::CHECK_EMPTY:
                 return $baseMessage . " and $reverseAction empty (empty string or null)";
+            case self::CHECK_MISSING_KEY:
+                return "Check if key '" . $this->key . "' $reverseAction set";
             default:
                 return $baseMessage;
         }
@@ -230,6 +250,9 @@ class VerifyArray extends AbstractArray
             case self::CHECK_EQUALS:
             case self::CHECK_EMPTY:
                 return ($this->reverseAction ? "is not" : "is");
+                break;
+            case self::CHECK_MISSING_KEY:
+                return ($this->reverseAction ? "is" : "is not");
                 break;
             case self::CHECK_STARTS_WITH:
                 return ($this->reverseAction ? "does not start" : "starts");

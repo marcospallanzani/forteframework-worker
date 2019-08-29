@@ -27,6 +27,7 @@ class VerifyArrayTest extends TestCase
     {
         return [
             ['key1', VerifyArray::CHECK_ANY, 'value1', $reverse, "Check if key 'key1' is set and has any value"],
+            ['key1', VerifyArray::CHECK_MISSING_KEY, 'value1', $reverse, "Check if key 'key1' is " . ($reverse ? "" : "not ") . "set"],
             ['key1', VerifyArray::CHECK_ENDS_WITH, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not end" : "ends") . " with value 'value1'"],
             ['key1', VerifyArray::CHECK_STARTS_WITH, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not start" : "starts") . " with value 'value1'"],
             ['key1', VerifyArray::CHECK_EQUALS, 'value1', $reverse, "Check if key 'key1' is set and is " . ($reverse ? "not " : "") . "equal to value 'value1'"],
@@ -67,6 +68,9 @@ class VerifyArrayTest extends TestCase
             ['key', VerifyArray::CHECK_ANY, '', $reverse, $anyException],
             ['key', VerifyArray::CHECK_ANY, 'value', $reverse, $anyException],
             ['', VerifyArray::CHECK_ANY, '', $reverse, true],
+            ['key', VerifyArray::CHECK_MISSING_KEY, '', $reverse, false],
+            ['', VerifyArray::CHECK_MISSING_KEY, '', $reverse, true],
+            ['', VerifyArray::CHECK_MISSING_KEY, 'value', $reverse, true],
             ['key', VerifyArray::CHECK_ENDS_WITH, '', $reverse, true],
             ['', VerifyArray::CHECK_ENDS_WITH, '', $reverse, true],
             ['', VerifyArray::CHECK_ENDS_WITH, 'value', $reverse, true],
@@ -188,6 +192,18 @@ class VerifyArrayTest extends TestCase
             [$array, '', VerifyArray::CHECK_EMPTY, 'value', $reverse, false, true],
             [$array, 'test16.test17', VerifyArray::CHECK_EMPTY, '', $reverse, true, false],
             [$array, 'test16.test18', VerifyArray::CHECK_EMPTY, '', $reverse, false, false],
+            /** CHECK_MISSING_KEY tests */
+            [$array, '', VerifyArray::CHECK_MISSING_KEY, '', $reverse, false, true],
+            [$array, '', VerifyArray::CHECK_MISSING_KEY, 'value', $reverse, false, true],
+            /**
+             * Missing key -> key not defined & not in reverse mode -> true
+             * Missing key -> key not defined & in reverse mode -> false
+             * Missing key -> key defined & not in reverse mode -> true
+             * Missing key -> key defined & in reverse mode -> false
+             * The above conditions correspond to !$reverse
+             */
+             [$array, 'test.notdefined', VerifyArray::CHECK_MISSING_KEY, '', $reverse, !$reverse, false],
+             [$array, 'test16.test18', VerifyArray::CHECK_MISSING_KEY, '', $reverse, !$reverse, false],
             /** general fail tests */
             [$array, 'key1', 'wrong_action', '', $reverse, false, true],
             [$array, '', '', '', $reverse, false, true],
