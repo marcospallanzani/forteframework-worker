@@ -157,6 +157,21 @@ class FileHasValidConfigEntries extends FileExists
 
     /**
      * Checks if the specified decoded file (i.e. converted to array)
+     * has the given key.
+     *
+     * @param string $key The expected key.
+     *
+     * @return FileHasValidConfigEntries
+     */
+    public function doesNotHaveKey(string $key): self
+    {
+        $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_MISSING_KEY);
+
+        return $this;
+    }
+
+    /**
+     * Checks if the specified decoded file (i.e. converted to array)
      * has the given key with an empty value.
      *
      * @param string $key The key with an expected empty value.

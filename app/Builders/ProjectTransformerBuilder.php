@@ -3,11 +3,14 @@
 namespace Forte\Api\Generator\Builders;
 
 
+use Forte\Api\Generator\Filters\Arrays\VerifyArray;
+use Forte\Api\Generator\Checkers\Checks\FileHasValidConfigEntries;
 use Forte\Api\Generator\Transformers\ProjectTransformer;
 use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
 use Forte\Api\Generator\Checkers\Checks\FileExists;
 use Forte\Api\Generator\Checkers\Checks\FileHasInstantiableClass;
 use Forte\Api\Generator\Transformers\Transforms\EmptyTransform;
+use Forte\Api\Generator\Transformers\Transforms\File\ChangeFileConfigEntries;
 use Forte\Api\Generator\Transformers\Transforms\File\Copy;
 use Forte\Api\Generator\Transformers\Transforms\File\Unzip;
 
@@ -112,6 +115,87 @@ class ProjectTransformerBuilder
         $this->addTransform(
             (new EmptyTransform())
                 ->addBeforeCheck(new FileHasInstantiableClass($classFilePath, $className))
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add the given config key with the given value to the specified file.
+     * If the file does not have the specified key, this method will add it
+     * to the file. Multi-level configuration keys are supported (each level
+     * separated by the constant FileParser::CONFIG_LEVEL_SEPARATOR - a dot).
+     * e.g. key1.key2.key3=value3
+     *
+     * @param string $filePath The file to modify.
+     * @param string $contentType The content type (accepted values -> constants FileParser::CONTENT_TYPE_XXX).
+     * @param string $key The key to modify.
+     * @param mixed $value The new key value.
+     *
+     * @return ProjectTransformerBuilder
+     */
+    public function modifyConfigKey(string $filePath, string $contentType, string $key, $value): self
+    {
+        $this->addTransform(
+            (new ChangeFileConfigEntries($filePath, $contentType))
+                ->modifyConfigKeyWithValue($key, $value)
+                ->addAfterCheck(
+                    (new FileHasValidConfigEntries($filePath))
+                        ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
+                )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add the given config key with the given value to the specified file.
+     * Multi-level configuration keys are supported (each level separated
+     * by the constant FileParser::CONFIG_LEVEL_SEPARATOR - a dot).
+     * e.g. key1.key2.key3=value3
+     *
+     * @param string $filePath The file to modify.
+     * @param string $contentType The content type (accepted values -> constants FileParser::CONTENT_TYPE_XXX).
+     * @param string $key The key to add.
+     * @param mixed $value The new key value.
+     *
+     * @return ProjectTransformerBuilder
+     */
+    public function addConfigKey(string $filePath, string $contentType, string $key, $value): self
+    {
+        $this->addTransform(
+            (new ChangeFileConfigEntries($filePath, $contentType))
+                ->addConfigKeyWithValue($key, $value)
+                ->addAfterCheck(
+                    (new FileHasValidConfigEntries($filePath))
+                        ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
+                )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add the given config key with the given value to the specified file.
+     * Multi-level configuration keys are supported (each level separated
+     * by the constant FileParser::CONFIG_LEVEL_SEPARATOR - a dot).
+     * e.g. key1.key2.key3=value3
+     *
+     * @param string $filePath The file to modify.
+     * @param string $contentType The content type (accepted values -> constants FileParser::CONTENT_TYPE_XXX).
+     * @param string $key The key to remove.
+     *
+     * @return ProjectTransformerBuilder
+     */
+    public function removeConfigKey(string $filePath, string $contentType, string $key): self
+    {
+        $this->addTransform(
+            (new ChangeFileConfigEntries($filePath, $contentType))
+                ->removeConfigKey($key)
+                ->addAfterCheck(
+                    (new FileHasValidConfigEntries($filePath))
+                        ->doesNotHaveKey($key)
+                )
         );
 
         return $this;
