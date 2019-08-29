@@ -22,7 +22,6 @@ class ModifyArrayTest extends TestCase
     {
         return [
             ['key1', ModifyArray::MODIFY_ADD, 'value1', "Add value 'value1' with key 'key1'"],
-            ['key1', ModifyArray::MODIFY_ADD, 'value1', "Add value 'value1' with key 'key1'"],
             ['key1', ModifyArray::MODIFY_ADD, ['test-array' => 'array-value'], "Add value '{\"test-array\":\"array-value\"}' with key 'key1'"],
             ['key1', ModifyArray::MODIFY_ADD, true, "Add value '1' with key 'key1'"],
             ['key1', ModifyArray::MODIFY_ADD, null, "Add value '' with key 'key1'"],
@@ -106,6 +105,27 @@ class ModifyArrayTest extends TestCase
     {
         $modifyArray = new ModifyArray($key, $operation, $value);
         $this->assertEquals($expected, $modifyArray->getOperationMessage());
+        $this->assertEquals($expected, (string) $modifyArray);
+        $this->assertEquals($key, $modifyArray->getKey());
+        $this->assertEquals($operation, $modifyArray->getOperation());
+        $this->assertEquals($value, $modifyArray->getValue());
+    }
+
+    /**
+     * Tests all object getters.
+     *
+     * @dataProvider modificationsProvider
+     *
+     * @param string $key
+     * @param string $operation
+     * @param mixed  $value
+     */
+    public function testGetters(string $key, string $operation, $value): void
+    {
+        $modifyArray = new ModifyArray($key, $operation, $value);
+        $this->assertEquals($key, $modifyArray->getKey());
+        $this->assertEquals($operation, $modifyArray->getOperation());
+        $this->assertEquals($value, $modifyArray->getValue());
     }
 
     /**
