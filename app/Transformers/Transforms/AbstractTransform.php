@@ -2,9 +2,9 @@
 
 namespace Forte\Api\Generator\Transformers\Transforms;
 
+use Forte\Api\Generator\Actions\ValidatedAction;
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\TransformException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
 use Forte\Api\Generator\Helpers\FileTrait;
 use Forte\Api\Generator\Helpers\ThrowErrors;
@@ -15,7 +15,7 @@ use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
  *
  * @package Forte\Api\Generator\Transformers\Transforms
  */
-abstract class AbstractTransform
+abstract class AbstractTransform implements ValidatedAction
 {
     use ClassAccessTrait, FileTrait, ThrowErrors;
 
@@ -34,7 +34,7 @@ abstract class AbstractTransform
     protected $afterChecks = array();
 
     /**
-     * Get whether this instance is in a valid state or not.
+     * Whether this instance is in a valid state or not.
      *
      * @return bool Returns true if this AbstractTransform subclass
      * instance is correctly configured; false otherwise.
@@ -55,15 +55,15 @@ abstract class AbstractTransform
     protected abstract function apply(): bool;
 
     /**
-     * Apply the sub-class transformation action with pre-validation,
-     * pre- and post-transformation checks
+     * Run the sub-class transformation action with pre-validation,
+     * pre- and post-transformation checks.
      *
      * @return bool Returns true if this AbstractTransform subclass
      * instance has been successfully applied; false otherwise.
      *
      * @throws GeneratorException
      */
-    public function transform(): bool
+    public function run(): bool
     {
         $result = false;
 

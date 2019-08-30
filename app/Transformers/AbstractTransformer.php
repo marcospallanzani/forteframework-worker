@@ -52,7 +52,7 @@ class AbstractTransformer
         $failedTransforms = array();
         foreach ($this->transforms as $transform) {
             try {
-                if ($transform instanceof AbstractTransform && !$transform->transform()) {
+                if ($transform instanceof AbstractTransform && !$transform->run()) {
                     $failedTransforms[] = $transform;
                 }
             } catch (GeneratorException $generatorException) {
