@@ -23,7 +23,7 @@ class FileDoesNotExist extends FileExists
     /**
      * Run the check.
      *
-     * @return bool True if this AbstractCheck subclass instance
+     * @return bool True if this FileDoesNotExist instance
      * check was successful; false otherwise.
      *
      * @throws GeneratorException

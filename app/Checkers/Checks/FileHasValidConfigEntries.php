@@ -39,8 +39,8 @@ class FileHasValidConfigEntries extends FileExists
     /**
      * Whether this instance is in a valid state or not.
      *
-     * @return bool Returns true if this AbstractCheck subclass
-     * instance is correctly configured; false otherwise.
+     * @return bool Returns true if this FileHasValidConfigEntries
+     * instance was well configured; false otherwise.
      *
      * @throws CheckException
      */
@@ -92,8 +92,8 @@ class FileHasValidConfigEntries extends FileExists
     /**
      * Run the check.
      *
-     * @return bool Returns true if this AbstractCheck subclass
-     * instance check has been successfully; false otherwise.
+     * @return bool Returns true if this FileHasValidConfigEntries
+     * instance check was successful; false otherwise.
      *
      * @throws CheckException
      * @throws GeneratorException

@@ -30,8 +30,8 @@ class FileExists extends AbstractCheck
     /**
      * Whether this instance is in a valid state or not.
      *
-     * @return bool True if this AbstractCheck subclass instance
-     * was correctly configured; false otherwise.
+     * @return bool True if this FileExists instance
+     * was well configured; false otherwise.
      *
      * @throws CheckException
      */
@@ -48,7 +48,7 @@ class FileExists extends AbstractCheck
     /**
      * Run the check.
      *
-     * @return bool True if this AbstractCheck subclass instance
+     * @return bool True if this FileExists instance
      * check was successful; false otherwise.
      *
      * @throws GeneratorException

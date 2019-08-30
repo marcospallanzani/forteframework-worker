@@ -18,7 +18,7 @@ class FileHasInstantiableClass extends FileExists
     protected $class;
 
     /**
-     * FileExists constructor.
+     * FileHasInstantiableClass constructor.
      *
      * @param string $filePath The file path to check.
      * @param string $class The class name to search for.
@@ -32,8 +32,8 @@ class FileHasInstantiableClass extends FileExists
     /**
      * Run the check.
      *
-     * @return bool Returns true if this AbstractCheck subclass
-     * instance check has been successfully; false otherwise.
+     * @return bool Returns true if this FileHasInstantiableClass
+     * instance check was successful; false otherwise.
      *
      * @throws GeneratorException
      */
