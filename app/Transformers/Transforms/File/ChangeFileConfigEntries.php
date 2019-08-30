@@ -36,7 +36,8 @@ class ChangeFileConfigEntries extends AbstractTransform
      * ChangeFileConfigEntries constructor.
      *
      * @param string $filePath The file to modify.
-     * @param string $contentType The content type (accepted values -> constants FileParser::CONTENT_TYPE_XXX).
+     * @param string $contentType The content type (accepted values:
+     * constants FileParser::CONTENT_TYPE_XXX).
      */
     public function __construct(string $filePath, string $contentType)
     {
@@ -227,9 +228,11 @@ class ChangeFileConfigEntries extends AbstractTransform
     }
 
     /**
-     * Returns a string representation of this AbstractTransform subclass instance.
+     * Return a human-readable string representation of this
+     * ChangeFileConfigEntries instance.
      *
-     * @return string
+     * @return string A human-readable string representation
+     * of this ChangeFileConfigEntries instance.
      */
     public function stringify(): string
     {

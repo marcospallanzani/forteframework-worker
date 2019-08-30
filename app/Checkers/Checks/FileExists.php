@@ -74,9 +74,10 @@ class FileExists extends AbstractCheck
     }
 
     /**
-     * Return a string representation of this AbstractCheck subclass instance.
+     * Return a human-readable string representation of this FileExists instance.
      *
-     * @return string
+     * @return string A human-readable string representation of this FileExists
+     * instance.
      */
     public function stringify(): string
     {

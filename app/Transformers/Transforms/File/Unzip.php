@@ -24,12 +24,12 @@ class Unzip extends AbstractTransform
     protected $extractToPath;
 
     /**
-     * Get whether this instance is in a valid state or not.
+     * Whether this instance is in a valid state or not.
      *
-     * @return bool Returns true if this AbstractTransform subclass
-     * instance is correctly configured; false otherwise.
+     * @return bool True if an Unzip instance was well configured;
+     * false otherwise.
      *
-     * @throws TransformException
+     * @throws TransformException If an Unzip instance was not well configured.
      */
     public function isValid(): bool
     {
@@ -44,12 +44,11 @@ class Unzip extends AbstractTransform
     /**
      * Apply the sub-class transformation action.
      *
-     * @return bool Returns true if the transform action implemented by
-     * this AbstractTransform subclass instance has been successfully
-     * applied; false otherwise.
+     * @return bool True if the transform action implemented by this
+     * Unzip instance was successfully applied; false otherwise.
      *
-     * @throws GeneratorException
-     * @throws TransformException
+     * @throws GeneratorException If a general or validation error occurred.
+     * @throws TransformException If the transformation action failed.
      */
     protected function apply(): bool
     {
@@ -80,9 +79,9 @@ class Unzip extends AbstractTransform
     }
 
     /**
-     * Opens the specified zip file.
+     * Open the specified zip file.
      *
-     * @param string $zipFilePath The zip file path
+     * @param string $zipFilePath The zip file path.
      *
      * @return Unzip
      */
@@ -94,9 +93,9 @@ class Unzip extends AbstractTransform
     }
 
     /**
-     * Extracts the zip file to the specified destination path.
+     * Extract the zip file to the specified destination path.
      *
-     * @param string $extractToPath The destination extraction path
+     * @param string $extractToPath The destination extraction path.
      *
      * @return Unzip
      */
@@ -108,9 +107,9 @@ class Unzip extends AbstractTransform
     }
 
     /**
-     * Returns a string representation of this AbstractTransform subclass instance.
+     * Return a human-readable string representation of this Unzip instance.
      *
-     * @return string
+     * @return string A human-readable string representation of this Unzip instance.
      */
     public function stringify(): string
     {

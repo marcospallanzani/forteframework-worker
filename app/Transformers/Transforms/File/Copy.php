@@ -31,10 +31,10 @@ class Copy extends AbstractTransform
     protected $destinationFileName;
 
     /**
-     * Get whether this instance is in a valid state or not.
+     * Whether this instance is in a valid state or not.
      *
-     * @return bool Returns true if this AbstractTransform subclass
-     * instance is correctly configured; false otherwise.
+     * @return bool True if this Copy instance was well configured;
+     * false otherwise.
      *
      * @throws GeneratorException
      * @throws TransformException
@@ -65,9 +65,8 @@ class Copy extends AbstractTransform
     /**
      * Apply the sub-class transformation action.
      *
-     * @return bool Returns true if the transform action implemented by
-     * this AbstractTransform subclass instance has been successfully
-     * applied; false otherwise.
+     * @return bool True if the transform action implemented by this
+     * Copy instance was successfully applied; false otherwise.
      *
      * @throws GeneratorException
      * @throws TransformException
@@ -113,7 +112,7 @@ class Copy extends AbstractTransform
     }
 
     /**
-     * Sets the origin file path.
+     * Set the origin file path.
      *
      * @param string $originFilePath The full file path to be copied
      *
@@ -127,7 +126,7 @@ class Copy extends AbstractTransform
     }
 
     /**
-     * Sets the destination folder.
+     * Set the destination folder.
      *
      * @param string $destinationFolder The full destination directory path
      *
@@ -141,7 +140,7 @@ class Copy extends AbstractTransform
     }
 
     /**
-     * Sets the destination file name.
+     * Set the destination file name.
      *
      * @param string $fileName The destination file name
      *
@@ -155,18 +154,19 @@ class Copy extends AbstractTransform
     }
 
     /**
-     * Creates the full destination file path as a concatenation
-     * of the destination folder and the destination name.
+     * Create the full destination file path as a concatenation of the
+     * destination folder and the destination name.
      *
-     * @param string $defaultDestinationFolder If the class destination folder is empty, t
-     * he given default destination folder will be used.
+     * @param string $defaultDestinationFolder Default destination folder
+     * to be used, if the class destination folder is empty.
      *
-     * @return string The full destination file path
-     * (concat destination folder and destination name).
+     * @return string The full destination file path (concat destination
+     * folder and destination name).
      */
     public function getDestinationFilePath(string $defaultDestinationFolder = ""): string
     {
-        // If no default destination folder is specified, we try to use the default class destination folder
+        // If no default destination folder is specified, we try to use
+        // the default class destination folder
         if (empty($defaultDestinationFolder)) {
             $defaultDestinationFolder = $this->getDefaultDestinationFolder();
         }
@@ -190,9 +190,10 @@ class Copy extends AbstractTransform
     }
 
     /**
-     * Returns the default destination folder (i.e. same folder as the original file path).
+     * Return the default destination folder (i.e. same folder as
+     * the original file path).
      *
-     * @return string
+     * @return string The default destination folder.
      */
     public function getDefaultDestinationFolder(): string
     {
@@ -204,9 +205,9 @@ class Copy extends AbstractTransform
     }
 
     /**
-     * Returns a string representation of this AbstractTransform subclass instance.
+     * Return a human-readable string representation of this Copy instance.
      *
-     * @return string
+     * @return string A human-readable string representation of this Copy instance.
      */
     public function stringify(): string
     {

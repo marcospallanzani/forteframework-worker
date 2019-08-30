@@ -16,10 +16,10 @@ use Forte\Api\Generator\Exceptions\TransformException;
 class EmptyTransform extends AbstractTransform
 {
     /**
-     * Get whether this instance is in a valid state or not.
+     * Whether this instance is in a valid state or not.
      *
-     * @return bool Returns true if this AbstractTransform subclass
-     * instance is correctly configured; false otherwise.
+     * @return bool True if this EmptyTransform instance
+     * was well configured; false otherwise.
      */
     public function isValid(): bool
     {
@@ -29,9 +29,8 @@ class EmptyTransform extends AbstractTransform
     /**
      * Apply the sub-class transformation action.
      *
-     * @return bool Returns true if the transform action implemented by
-     * this AbstractTransform subclass instance has been successfully
-     * applied; false otherwise.
+     * @return bool True if the transform action implemented by this
+     * EmptyTransform instance was successfully applied; false otherwise.
      */
     protected function apply(): bool
     {

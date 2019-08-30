@@ -237,9 +237,11 @@ class FileHasValidConfigEntries extends FileExists
     }
 
     /**
-     * Return a string representation of this AbstractCheck subclass instance.
+     * Return a human-readable string representation of this
+     * FileHasValidConfigEntries instance.
      *
-     * @return string
+     * @return string A human-readable string representation
+     * of this FileHasValidConfigEntries instance.
      */
     public function stringify(): string
     {
