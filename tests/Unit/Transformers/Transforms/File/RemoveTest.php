@@ -11,8 +11,8 @@
 
 namespace Tests\Unit\Transformers\Transforms\File;
 
-use Forte\Api\Generator\Checkers\Checks\FileDoesNotExist;
-use Forte\Api\Generator\Checkers\Checks\FileExists;
+use Forte\Api\Generator\Checkers\Checks\File\FileDoesNotExist;
+use Forte\Api\Generator\Checkers\Checks\File\FileExists;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\TransformException;
 use Forte\Api\Generator\Transformers\Transforms\File\Remove;

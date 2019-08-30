@@ -1,6 +1,15 @@
 <?php
+/**
+ * This file is part of the ForteFramework package.
+ *
+ * Copyright (c) 2019  Marco Spallanzani <marco@forteframework.com>
+ *
+ *  For the full copyright and license information,
+ *  please view the LICENSE file that was distributed
+ *  with this source code.
+ */
 
-namespace Forte\Api\Generator\Checkers\Checks;
+namespace Forte\Api\Generator\Checkers\Checks\File;
 
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
@@ -10,7 +19,7 @@ use Forte\Api\Generator\Helpers\FileParser;
 /**
  * Class FileHasValidConfigEntries
  *
- * @package Forte\Api\Generator\Checkers\Checks
+ * @package Forte\Api\Generator\Checkers\Checks\File
  */
 class FileHasValidConfigEntries extends FileExists
 {

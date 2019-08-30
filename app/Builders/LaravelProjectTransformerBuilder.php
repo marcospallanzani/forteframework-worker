@@ -3,7 +3,7 @@
 namespace Forte\Api\Generator\Builders;
 
 use Forte\Api\Generator\Filters\Arrays\VerifyArray;
-use Forte\Api\Generator\Checkers\Checks\FileHasValidConfigEntries;
+use Forte\Api\Generator\Checkers\Checks\File\FileHasValidConfigEntries;
 use Forte\Api\Generator\Helpers\FileParser;
 
 /**

@@ -3,11 +3,11 @@
 namespace Forte\Api\Generator\Builders;
 
 use Forte\Api\Generator\Filters\Arrays\VerifyArray;
-use Forte\Api\Generator\Checkers\Checks\FileHasValidConfigEntries;
+use Forte\Api\Generator\Checkers\Checks\File\FileHasValidConfigEntries;
 use Forte\Api\Generator\Transformers\ProjectTransformer;
 use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
-use Forte\Api\Generator\Checkers\Checks\FileExists;
-use Forte\Api\Generator\Checkers\Checks\FileHasInstantiableClass;
+use Forte\Api\Generator\Checkers\Checks\File\FileExists;
+use Forte\Api\Generator\Checkers\Checks\File\FileHasInstantiableClass;
 use Forte\Api\Generator\Transformers\Transforms\EmptyTransform;
 use Forte\Api\Generator\Transformers\Transforms\File\ChangeFileConfigEntries;
 use Forte\Api\Generator\Transformers\Transforms\File\Copy;

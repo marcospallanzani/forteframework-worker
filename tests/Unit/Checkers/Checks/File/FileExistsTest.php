@@ -9,18 +9,17 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Checkers\Checks;
+namespace Tests\Unit\Checkers\Checks\File;
 
-use Forte\Api\Generator\Checkers\Checks\FileExists;
+use Forte\Api\Generator\Checkers\Checks\File\FileExists;
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use PHPUnit\Framework\TestCase;
-use SebastianBergmann\CodeCoverage\Node\File;
 
 /**
  * Class FileExistsTest.
  *
- * @package Tests\Unit\Checkers\Checks
+ * @package Tests\Unit\Checkers\Checks\File
  */
 class FileExistsTest extends TestCase
 {

@@ -1,6 +1,15 @@
 <?php
+/**
+ * This file is part of the ForteFramework package.
+ *
+ * Copyright (c) 2019  Marco Spallanzani <marco@forteframework.com>
+ *
+ *  For the full copyright and license information,
+ *  please view the LICENSE file that was distributed
+ *  with this source code.
+ */
 
-namespace Forte\Api\Generator\Checkers\Checks;
+namespace Forte\Api\Generator\Checkers\Checks\File;
 
 use Forte\Api\Generator\Exceptions\GeneratorException;
 
@@ -8,7 +17,7 @@ use Forte\Api\Generator\Exceptions\GeneratorException;
  * Class FileHasInstantiableClass. This class checks if a given file
  * has an instantiable class.
  *
- * @package Forte\Api\Generator\Checkers\Checks
+ * @package Forte\Api\Generator\Checkers\Checks\File
  */
 class FileHasInstantiableClass extends FileExists
 {

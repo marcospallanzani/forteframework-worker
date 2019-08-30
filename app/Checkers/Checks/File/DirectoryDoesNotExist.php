@@ -9,12 +9,12 @@
  *  with this source code.
  */
 
-namespace Forte\Api\Generator\Checkers\Checks;
+namespace Forte\Api\Generator\Checkers\Checks\File;
 
 /**
  * Class DirectoryDoesNotExist.
  *
- * @package Forte\Api\Generator\Checkers\Checks
+ * @package Forte\Api\Generator\Checkers\Checks\File
  */
 class DirectoryDoesNotExist extends FileDoesNotExist
 {
