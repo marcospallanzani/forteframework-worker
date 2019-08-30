@@ -6,7 +6,7 @@ use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 
 /**
- * Class FileHasInstantiableClass. This class check if a given file
+ * Class FileHasInstantiableClass. This class checks if a given file
  * has an instantiable class.
  *
  * @package Forte\Api\Generator\Checkers\Checks
@@ -30,7 +30,7 @@ class FileHasInstantiableClass extends FileExists
     }
 
     /**
-     * Apply the check.
+     * Run the check.
      *
      * @return bool Returns true if this AbstractCheck subclass
      * instance check has been successfully; false otherwise.
@@ -85,7 +85,7 @@ class FileHasInstantiableClass extends FileExists
     }
 
     /**
-     * Sets the expected class to be searched in the configured file path.
+     * Set the expected class to be searched in the configured file path.
      *
      * @param string $class The expected class
      *
@@ -99,7 +99,7 @@ class FileHasInstantiableClass extends FileExists
     }
 
     /**
-     * Returns a string representation of this AbstractCheck subclass instance.
+     * Return a string representation of this AbstractCheck subclass instance.
      *
      * @return string
      */

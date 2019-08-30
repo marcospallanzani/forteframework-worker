@@ -37,7 +37,7 @@ class FileHasValidConfigEntries extends FileExists
     }
 
     /**
-     * Get whether this instance is in a valid state or not.
+     * Whether this instance is in a valid state or not.
      *
      * @return bool Returns true if this AbstractCheck subclass
      * instance is correctly configured; false otherwise.
@@ -90,7 +90,7 @@ class FileHasValidConfigEntries extends FileExists
     }
 
     /**
-     * Apply the check.
+     * Run the check.
      *
      * @return bool Returns true if this AbstractCheck subclass
      * instance check has been successfully; false otherwise.
@@ -137,7 +137,7 @@ class FileHasValidConfigEntries extends FileExists
     }
 
     /**
-     * Sets the file content type. Accepted values are the FileParser
+     * Set the file content type. Accepted values are the FileParser
      * class constants with prefix "CONTENT_TYPE".
      *
      * @param string $type The content type; accepted values are the
@@ -153,7 +153,7 @@ class FileHasValidConfigEntries extends FileExists
     }
 
     /**
-     * Checks if the specified decoded file (i.e. converted to array)
+     * Check if the specified decoded file (i.e. converted to array)
      * has the given key.
      *
      * @param string $key The expected key.
@@ -168,7 +168,7 @@ class FileHasValidConfigEntries extends FileExists
     }
 
     /**
-     * Checks if the specified decoded file (i.e. converted to array)
+     * Check if the specified decoded file (i.e. converted to array)
      * has the given key.
      *
      * @param string $key The expected key.
@@ -183,7 +183,7 @@ class FileHasValidConfigEntries extends FileExists
     }
 
     /**
-     * Checks if the specified decoded file (i.e. converted to array)
+     * Check if the specified decoded file (i.e. converted to array)
      * has the given key with an empty value.
      *
      * @param string $key The key with an expected empty value.
@@ -198,7 +198,7 @@ class FileHasValidConfigEntries extends FileExists
     }
 
     /**
-     * Checks if the specified decoded file (i.e. converted to array)
+     * Check if the specified decoded file (i.e. converted to array)
      * has the given key with a non-empty value.
      *
      * @param string $key The key with an expected non-empty value.
@@ -213,7 +213,7 @@ class FileHasValidConfigEntries extends FileExists
     }
 
     /**
-     * Checks if the specified decoded file (i.e. converted to array) has a value,
+     * Check if the specified decoded file (i.e. converted to array) has a value,
      * whose key correspond to the given one, and whose value meets the condition
      * defined by the couple value-operation. For more details about the possible
      * conditions, check the class VerifyArray.
@@ -237,7 +237,7 @@ class FileHasValidConfigEntries extends FileExists
     }
 
     /**
-     * Returns a string representation of this AbstractCheck subclass instance.
+     * Return a string representation of this AbstractCheck subclass instance.
      *
      * @return string
      */

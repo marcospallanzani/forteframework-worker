@@ -2,7 +2,9 @@
 
 namespace Forte\Api\Generator\Checkers\Checks;
 
+use Forte\Api\Generator\Actions\ValidatedAction;
 use Forte\Api\Generator\Exceptions\CheckException;
+use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
 use Forte\Api\Generator\Helpers\FileTrait;
 use Forte\Api\Generator\Helpers\ThrowErrors;
@@ -12,41 +14,64 @@ use Forte\Api\Generator\Helpers\ThrowErrors;
  *
  * @package Forte\Api\Generator\Checkers\Checks
  */
-abstract class AbstractCheck
+abstract class AbstractCheck implements ValidatedAction
 {
     use ClassAccessTrait, FileTrait, ThrowErrors;
 
     /**
-     * Get whether this instance is in a valid state or not.
+     * Whether this instance is in a valid state or not.
      *
-     * @return bool Returns true if this AbstractCheck subclass
-     * instance is correctly configured; false otherwise.
+     * @return bool True if this AbstractCheck subclass instance
+     * was well configured; false otherwise.
      *
-     * @throws CheckException
+     * @throws CheckException If this AbstractCheck subclass instance
+     * was not well configured.
      */
     public abstract function isValid(): bool;
 
     /**
-     * Apply the check.
+     * Run the check.
      *
-     * @return bool Returns true if this AbstractCheck subclass
-     * instance check has been successfully; false otherwise.
+     * @return bool True if this AbstractCheck subclass instance
+     * ran successfully; false otherwise.
      *
-     * @throws CheckException
+     * @throws CheckException If this AbstractCheck subclass instance
+     * check did not run successfully.
      */
     public abstract function check(): bool;
 
     /**
-     * Returns a string representation of this AbstractCheck subclass instance.
+     * Return a human-readable string representation of this AbstractCheck subclass
+     * instance.
      *
-     * @return string
+     * @return string A human-readable string representation of this AbstractCheck
+     * subclass instance.
      */
     public abstract function stringify(): string;
 
     /**
-     * Returns a string representation of this AbstractCheck subclass instance.
+     * Run the action.
      *
-     * @return false|string
+     * @return bool True if this AbstractCheck subclass instance
+     * action ran successfully; false otherwise.
+     *
+     * @throws GeneratorException If this AbstractCheck subclass instance
+     * action did not run successfully.
+     */
+    public function run(): bool
+    {
+        if ($this->isValid()) {
+            return $this->check();
+        }
+
+        return false;
+    }
+
+    /**
+     * Return a string representation of this AbstractCheck subclass instance.
+     *
+     * @return false|string String representation of this AbstractCheck
+     * subclass instance.
      */
     public function __toString()
     {

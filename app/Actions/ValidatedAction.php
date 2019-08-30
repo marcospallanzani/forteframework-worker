@@ -25,7 +25,7 @@ interface ValidatedAction
      * Whether this instance is in a valid state or not.
      *
      * @return bool True if the implementing class instance
-     * is well configured; false otherwise.
+     * was well configured; false otherwise.
      *
      * @throws GeneratorException If the implementing class
      * instance was not well configured.

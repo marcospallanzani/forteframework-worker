@@ -6,7 +6,7 @@ use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 
 /**
- * Class FileExists
+ * Class FileExists.
  *
  * @package Forte\Api\Generator\Checkers\Checks
  */
@@ -20,7 +20,7 @@ class FileExists extends AbstractCheck
     /**
      * FileExists constructor.
      *
-     * @param string $filePath The file path to check
+     * @param string $filePath The file path to check.
      */
     public function __construct(string $filePath = "")
     {
@@ -28,10 +28,10 @@ class FileExists extends AbstractCheck
     }
 
     /**
-     * Get whether this instance is in a valid state or not.
+     * Whether this instance is in a valid state or not.
      *
-     * @return bool Returns true if this AbstractCheck subclass
-     * instance is correctly configured; false otherwise.
+     * @return bool True if this AbstractCheck subclass instance
+     * was correctly configured; false otherwise.
      *
      * @throws CheckException
      */
@@ -46,10 +46,10 @@ class FileExists extends AbstractCheck
     }
 
     /**
-     * Apply the check.
+     * Run the check.
      *
-     * @return bool Returns true if this AbstractCheck subclass
-     * instance check has been successfully; false otherwise.
+     * @return bool True if this AbstractCheck subclass instance
+     * check was successful; false otherwise.
      *
      * @throws GeneratorException
      */
@@ -60,7 +60,7 @@ class FileExists extends AbstractCheck
     }
 
     /**
-     * Sets the file path for this FileExists instance.
+     * Set the file path for this FileExists instance.
      *
      * @param string $filePath The file path to check
      *
@@ -74,7 +74,7 @@ class FileExists extends AbstractCheck
     }
 
     /**
-     * Returns a string representation of this AbstractCheck subclass instance.
+     * Return a string representation of this AbstractCheck subclass instance.
      *
      * @return string
      */
