@@ -25,6 +25,18 @@ class FileHasValidConfigEntries extends FileExists
     protected $checks = array();
 
     /**
+     * FileHasValidConfigEntries constructor.
+     *
+     * @param string $filePath The file path to check.
+     * @param string $contentType The file content type.
+     */
+    public function __construct(string $filePath = "", string $contentType = "")
+    {
+        parent::__construct($filePath);
+        $this->contentType = $contentType;
+    }
+
+    /**
      * Get whether this instance is in a valid state or not.
      *
      * @return bool Returns true if this AbstractCheck subclass
