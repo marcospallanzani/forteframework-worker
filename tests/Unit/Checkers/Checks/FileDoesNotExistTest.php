@@ -12,6 +12,7 @@
 namespace Tests\Unit\Checkers\Checks;
 
 use Forte\Api\Generator\Checkers\Checks\FileDoesNotExist;
+use Forte\Api\Generator\Exceptions\CheckException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -35,6 +36,38 @@ class FileDoesNotExistTest extends TestCase
     }
 
     /**
+     * Data provider for isValid() tests.
+     *
+     * @return array
+     */
+    public function validationProvider(): array
+    {
+        return [
+            ["", false, true],
+            [__FILE__, true, false]
+        ];
+    }
+
+    /**
+     * Test method FileDoesNotExist::isValid().
+     *
+     * @dataProvider validationProvider
+     *
+     * @param string $filePath
+     * @param bool $expected
+     * @param bool $exceptionExpected
+     *
+     * @throws CheckException
+     */
+    public function testIsValid(string $filePath, bool $expected, bool $exceptionExpected): void
+    {
+        if ($exceptionExpected) {
+            $this->expectException(CheckException::class);
+        }
+        $this->assertEquals($expected, (new FileDoesNotExist($filePath))->isValid());
+    }
+
+    /**
      * Test method FileDoesNotExist::run().
      *
      * @dataProvider filesProvider
@@ -46,6 +79,17 @@ class FileDoesNotExistTest extends TestCase
      */
     public function testCheckFileDoesNotExist(string $filePath, bool $expected): void
     {
-        $this->assertEquals((new FileDoesNotExist($filePath))->run(), $expected);
+        $this->assertEquals($expected, (new FileDoesNotExist($filePath))->run());
+    }
+
+    /**
+     * Test method FileDoesNotExist::stringify().
+     */
+    public function testStringify(): void
+    {
+        $filePath = "/path/to/test/file.php";
+        $fileExists = new FileDoesNotExist($filePath);
+        $this->assertEquals("Check if file '$filePath' does not exist.", (string) $fileExists);
+        $this->assertEquals("Check if file '$filePath' does not exist.", $fileExists->stringify());
     }
 }
