@@ -35,11 +35,14 @@ class FileHasInstantiableClass extends FileExists
     public function __construct(string $filePath = "", string $class = "")
     {
         parent::__construct($filePath);
-        $this->class    = $class;
+        $this->class = $class;
     }
 
     /**
-     * Run the check.
+     * Run the check. This method checks if the specified file has an
+     * instantiable class. If the additional parameter "class" is specified,
+     * then this method will also check if the class found in the file is
+     * equal to the one that was given as a parameter.
      *
      * @return bool Returns true if this FileHasInstantiableClass
      * instance check was successful; false otherwise.
@@ -71,17 +74,23 @@ class FileHasInstantiableClass extends FileExists
                         $classDeclarationPos++;
                     } elseif ($token[0] === T_STRING) {
                         if ($classDeclarationPos === ($key - 1)) {
-                            // If the current token is the one right after the 'class_declaration' token
-                            // (white spaces are ignored), then we check if the current token is a string
-                            // and is equal to the expected class name.
-                            if ($token[1] === $this->class) {
+                            /**
+                             * If the current token is the one right after the 'class_declaration' token
+                             * (white spaces are ignored), then we check the class condition:
+                             * - if a class name is specified, we check if the current token is equal to
+                             *   the expected class name;
+                             * - if no class name is given, we check if the current token is a non-empty
+                             *   string;
+                             */
+                            if ((empty($this->class) && !empty($token[1]))
+                                || (!empty($this->class) && $token[1] === $this->class)
+                            ) {
                                 $classNameFound = true;
                             }
                         }
                     }
                 }
             }
-
             if ($openTagFound && $classNameFound) {
                 return true;
             }
@@ -116,7 +125,7 @@ class FileHasInstantiableClass extends FileExists
         return sprintf(
             "Check if file '%s' has %s",
             $this->filePath,
-            (empty($this->class) ? "an instatiable class." : "the class '" . $this->class . "'")
+            (empty($this->class) ? "an instatiable class." : "the class '" . $this->class . "'.")
         );
     }
 }
