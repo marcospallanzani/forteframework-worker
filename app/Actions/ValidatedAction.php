@@ -15,7 +15,7 @@ use Forte\Api\Generator\Exceptions\GeneratorException;
 
 /**
  * Interface ValidatedAction. Basic behaviour of all classes that
- * perform an action, which needs to be valid before being run.
+ * perform an action, which needs a pre-run validation.
  *
  * @package Forte\Api\Generator\Actions
  */
@@ -24,20 +24,21 @@ interface ValidatedAction
     /**
      * Whether this instance is in a valid state or not.
      *
-     * @return bool Returns true if the implementing class
-     * instance is well configured; false otherwise.
+     * @return bool True if the implementing class instance
+     * is well configured; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws GeneratorException If the implementing class
+     * instance was not well configured.
      */
     public function isValid(): bool;
 
     /**
-     * Run the action with pre-validation checks.
+     * Run the action.
      *
-     * @return bool Returns true if the implementing class instance
-     * action has been successfully run; false otherwise.
+     * @return bool True if the implementing class instance
+     * action was successfully run; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws GeneratorException If the action was successfully run.
      */
     public function run(): bool;
 }
