@@ -2,7 +2,6 @@
 
 namespace Forte\Api\Generator\Builders;
 
-
 use Forte\Api\Generator\Filters\Arrays\VerifyArray;
 use Forte\Api\Generator\Checkers\Checks\FileHasValidConfigEntries;
 use Forte\Api\Generator\Transformers\ProjectTransformer;
@@ -140,7 +139,7 @@ class ProjectTransformerBuilder
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->modifyConfigKeyWithValue($key, $value)
                 ->addAfterCheck(
-                    (new FileHasValidConfigEntries($filePath))
+                    (new FileHasValidConfigEntries($filePath, $contentType))
                         ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
                 )
         );
@@ -167,7 +166,7 @@ class ProjectTransformerBuilder
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->addConfigKeyWithValue($key, $value)
                 ->addAfterCheck(
-                    (new FileHasValidConfigEntries($filePath))
+                    (new FileHasValidConfigEntries($filePath, $contentType))
                         ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
                 )
         );
@@ -193,7 +192,7 @@ class ProjectTransformerBuilder
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->removeConfigKey($key)
                 ->addAfterCheck(
-                    (new FileHasValidConfigEntries($filePath))
+                    (new FileHasValidConfigEntries($filePath, $contentType))
                         ->doesNotHaveKey($key)
                 )
         );
