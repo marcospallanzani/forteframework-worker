@@ -11,15 +11,15 @@
 
 namespace Tests\Unit\Checkers\Checks;
 
-use Forte\Api\Generator\Checkers\Checks\FileDoesNotExists;
+use Forte\Api\Generator\Checkers\Checks\FileDoesNotExist;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class FileDoesNotExistsTest.
+ * Class FileDoesNotExistTest.
  *
  * @package Tests\Unit\Checkers\Checks
  */
-class FileDoesNotExistsTest extends TestCase
+class FileDoesNotExistTest extends TestCase
 {
     /**
      * Data provider for does-not-exist tests.
@@ -39,10 +39,13 @@ class FileDoesNotExistsTest extends TestCase
      *
      * @dataProvider filesProvider
      *
+     * @param string $filePath
+     * @param bool $expected
+     *
      * @throws \Forte\Api\Generator\Exceptions\GeneratorException
      */
-    public function testCheckFileDoesNotExist($filePath, $expected): void
+    public function testCheckFileDoesNotExist(string $filePath, bool $expected): void
     {
-        $this->assertEquals((new FileDoesNotExists($filePath))->run(), $expected);
+        $this->assertEquals((new FileDoesNotExist($filePath))->run(), $expected);
     }
 }
