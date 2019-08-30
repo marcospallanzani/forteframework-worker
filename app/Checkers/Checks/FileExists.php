@@ -53,7 +53,7 @@ class FileExists extends AbstractCheck
      *
      * @throws GeneratorException
      */
-    public function check(): bool
+    protected function check(): bool
     {
         // We check if the origin file exists
         return $this->checkFileExists($this->filePath, false);
