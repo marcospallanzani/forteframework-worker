@@ -11,6 +11,8 @@
 
 namespace Tests\Unit\Transformers\Transforms\File;
 
+use Forte\Api\Generator\Checkers\Checks\File\DirectoryDoesNotExist;
+use Forte\Api\Generator\Checkers\Checks\File\DirectoryExists;
 use Forte\Api\Generator\Checkers\Checks\File\FileDoesNotExist;
 use Forte\Api\Generator\Checkers\Checks\File\FileExists;
 use Forte\Api\Generator\Exceptions\GeneratorException;
@@ -142,9 +144,8 @@ class RemoveTest extends TestCase
         // an exception should be thrown.
         $removeTransform = (new Remove())
             ->removeDirectory(self::TEST_DIR_TMP)
-//TODO ADD BEFORE AND AFTER CHECKS
-            ->addBeforeCheck(new FileExists(self::TEST_DIR_TMP))
-            ->addAfterCheck(new FileDoesNotExist(self::TEST_DIR_TMP))
+            ->addBeforeCheck(new DirectoryExists(self::TEST_DIR_TMP))
+            ->addAfterCheck(new DirectoryDoesNotExist(self::TEST_DIR_TMP))
             ->run();
 
         $this->assertTrue($removeTransform);
