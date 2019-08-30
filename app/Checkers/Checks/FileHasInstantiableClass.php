@@ -2,7 +2,6 @@
 
 namespace Forte\Api\Generator\Checkers\Checks;
 
-use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 
 /**
@@ -21,7 +20,8 @@ class FileHasInstantiableClass extends FileExists
     /**
      * FileExists constructor.
      *
-     * @param string $filePath The file path to check
+     * @param string $filePath The file path to check.
+     * @param string $class The class name to search for.
      */
     public function __construct(string $filePath = "", string $class = "")
     {
@@ -35,52 +35,49 @@ class FileHasInstantiableClass extends FileExists
      * @return bool Returns true if this AbstractCheck subclass
      * instance check has been successfully; false otherwise.
      *
-     * @throws CheckException
      * @throws GeneratorException
      */
-    public function check(): bool
+    protected function check(): bool
     {
+        // We check if the specified file exists
+        $this->checkFileExists($this->filePath);
 
-        if ($this->isValid()) {
-            // We check if the specified file exists
-            $this->checkFileExists($this->filePath);
+        // Check to see whether the include declared the class
+        $tokens = token_get_all(file_get_contents($this->filePath));
 
-            // Check to see whether the include declared the class
-            $tokens = token_get_all(file_get_contents($this->filePath));
+        $openTagFound = $classNameFound = false;
+        $classDeclarationPos = 0;
+        foreach ($tokens as $key => $token) {
+            if (is_array($token)) {
+                if ($token[0] === T_OPEN_TAG ) {
+                    $openTagFound = true;
+                } elseif ($token[0] === T_CLASS) {
+                    $classDeclarationPos = $key;
+                }
 
-            $openTagFound = $classNameFound = false;
-            $classDeclarationPos = 0;
-            foreach ($tokens as $key => $token) {
-                if (is_array($token)) {
-                    if ($token[0] === T_OPEN_TAG ) {
-                        $openTagFound = true;
-                    } elseif ($token[0] === T_CLASS) {
-                        $classDeclarationPos = $key;
-                    }
-
-                    if ($classDeclarationPos) {
-                        // We increment the class declaration tag position to ignore the
-                        // white spaces between the 'class' tag and the class name tag.
-                        if ($token[0] === T_WHITESPACE) {
-                            $classDeclarationPos++;
-                        } elseif ($token[0] === T_STRING) {
-                            if ($classDeclarationPos === ($key - 1)) {
-                                // If the current token is the one right after the 'class_declaration' token
-                                // (white spaces are ignored), then we check if the current token is a string
-                                // and is equal to the expected class name.
-                                if ($token[1] === $this->class) {
-                                    $classNameFound = true;
-                                }
+                if ($classDeclarationPos) {
+                    // We increment the class declaration tag position to ignore the
+                    // white spaces between the 'class' tag and the class name tag.
+                    if ($token[0] === T_WHITESPACE) {
+                        $classDeclarationPos++;
+                    } elseif ($token[0] === T_STRING) {
+                        if ($classDeclarationPos === ($key - 1)) {
+                            // If the current token is the one right after the 'class_declaration' token
+                            // (white spaces are ignored), then we check if the current token is a string
+                            // and is equal to the expected class name.
+                            if ($token[1] === $this->class) {
+                                $classNameFound = true;
                             }
                         }
                     }
                 }
+            }
 
-                if ($openTagFound && $classNameFound) {
-                    return true;
-                }
+            if ($openTagFound && $classNameFound) {
+                return true;
             }
         }
+
         return false;
     }
 
