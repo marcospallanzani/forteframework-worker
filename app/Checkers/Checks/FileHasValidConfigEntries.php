@@ -98,7 +98,7 @@ class FileHasValidConfigEntries extends FileExists
      * @throws CheckException
      * @throws GeneratorException
      */
-    public function check(): bool
+    protected function check(): bool
     {
         // We check if the specified file exists
         $this->checkFileExists($this->filePath);
