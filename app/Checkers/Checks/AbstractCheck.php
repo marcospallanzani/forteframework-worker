@@ -38,7 +38,7 @@ abstract class AbstractCheck implements ValidatedAction
      * @throws CheckException If this AbstractCheck subclass instance
      * check did not run successfully.
      */
-    public abstract function check(): bool;
+    protected abstract function check(): bool;
 
     /**
      * Run the action.

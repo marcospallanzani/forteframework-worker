@@ -123,7 +123,7 @@ abstract class AbstractTransform implements ValidatedAction
         $failedChecks = array();
         foreach ($this->beforeChecks as $check) {
             try {
-                if ($check instanceof AbstractCheck && !$check->check()) {
+                if ($check instanceof AbstractCheck && !$check->run()) {
                     $failedChecks[] = new CheckException($check, "Check failed.");
                 }
             } catch (GeneratorException $generatorException) {
@@ -146,7 +146,7 @@ abstract class AbstractTransform implements ValidatedAction
         $failedChecks = array();
         foreach ($this->afterChecks as $check) {
             try {
-                if ($check instanceof AbstractCheck && !$check->check()) {
+                if ($check instanceof AbstractCheck && !$check->run()) {
                     $failedChecks[] = new CheckException($check, "Check failed.");
                 }
             } catch (GeneratorException $generatorException) {

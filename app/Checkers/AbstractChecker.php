@@ -52,7 +52,7 @@ class AbstractChecker
         $failedChecks = array();
         foreach ($this->checks as $check) {
             try {
-                if ($check instanceof AbstractCheck && !$check->check()) {
+                if ($check instanceof AbstractCheck && !$check->run()) {
                     $failedChecks[] = $check;
                 }
             } catch (GeneratorException $generatorException) {
