@@ -14,11 +14,11 @@ namespace Forte\Api\Generator\Checkers\Checks;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 
 /**
- * Class FileDoesNotExists.
+ * Class FileDoesNotExist.
  *
  * @package Forte\Api\Generator\Checkers\Checks
  */
-class FileDoesNotExists extends FileExists
+class FileDoesNotExist extends FileExists
 {
     /**
      * Run the check.
@@ -35,7 +35,7 @@ class FileDoesNotExists extends FileExists
     }
 
     /**
-     * Return a human-readable string representation of this FileDoesNotExists instance.
+     * Return a human-readable string representation of this FileDoesNotExist instance.
      *
      * @return string A human-readable string representation of this FileExists
      * instance.
