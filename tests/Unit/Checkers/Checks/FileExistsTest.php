@@ -73,6 +73,7 @@ class FileExistsTest extends TestCase
      * Test method FileExists::run().
      *
      * @dataProvider filesProvider
+     * @depends testIsValid
      *
      * @param string $filePath
      * @param bool $expected

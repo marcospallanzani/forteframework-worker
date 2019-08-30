@@ -71,6 +71,7 @@ class FileDoesNotExistTest extends TestCase
      * Test method FileDoesNotExist::run().
      *
      * @dataProvider filesProvider
+     * @depends testIsValid
      *
      * @param string $filePath
      * @param bool $expected
