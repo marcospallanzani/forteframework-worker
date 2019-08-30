@@ -36,8 +36,8 @@ abstract class AbstractTransform implements ValidatedAction
     /**
      * Whether this instance is in a valid state or not.
      *
-     * @return bool Returns true if this AbstractTransform subclass
-     * instance is correctly configured; false otherwise.
+     * @return bool True if this AbstractTransform subclass instance
+     * was well configured; false otherwise.
      *
      * @throws GeneratorException
      */
@@ -46,9 +46,8 @@ abstract class AbstractTransform implements ValidatedAction
     /**
      * Apply the sub-class transformation action.
      *
-     * @return bool Returns true if the transform action implemented by
-     * this AbstractTransform subclass instance has been successfully
-     * applied; false otherwise.
+     * @return bool True if the action implemented by this AbstractTransform
+     * subclass instance was successfully applied; false otherwise.
      *
      * @throws GeneratorException
      */
@@ -58,7 +57,7 @@ abstract class AbstractTransform implements ValidatedAction
      * Run the sub-class transformation action with pre-validation,
      * pre- and post-transformation checks.
      *
-     * @return bool Returns true if this AbstractTransform subclass
+     * @return bool True if this AbstractTransform subclass
      * instance has been successfully applied; false otherwise.
      *
      * @throws GeneratorException
@@ -82,7 +81,7 @@ abstract class AbstractTransform implements ValidatedAction
     }
 
     /**
-     * Adds the given AbstractCheck subclass instance to the list of
+     * Add the given AbstractCheck subclass instance to the list of
      * pre-transform checks.
      *
      * @param AbstractCheck $check The AbstractCheck subclass instance
@@ -98,7 +97,7 @@ abstract class AbstractTransform implements ValidatedAction
     }
 
     /**
-     * Adds the given AbstractCheck subclass instance to the list of
+     * Add the given AbstractCheck subclass instance to the list of
      * post-transform checks.
      *
      * @param AbstractCheck $check The AbstractCheck subclass instance
@@ -117,7 +116,7 @@ abstract class AbstractTransform implements ValidatedAction
      * Run the pre-transform checks and return a list failed
      * AbstractCheck instances.
      *
-     * @return array Array with failed pre-transform checks.
+     * @return array List of failed pre-transform checks.
      */
     protected function runBeforeChecks(): array
     {
@@ -140,7 +139,7 @@ abstract class AbstractTransform implements ValidatedAction
      * Run the post-transform checks and return a list failed
      * AbstractCheck instances.
      *
-     * @return array Array with failed post-transform checks.
+     * @return array List of failed post-transform checks.
      */
     protected function runAfterChecks(): array
     {
@@ -161,14 +160,13 @@ abstract class AbstractTransform implements ValidatedAction
     }
 
     /**
-     * Runs the configured pre-transform checks and report all
-     * the occurred errors.
+     * Run the configured pre-transform checks and report all the occurred errors.
      *
-     * @param bool $throwException Whether we should throw an exception for the failed checks
-     * OR return a string representation of them.
+     * @param bool $throwException Whether we should throw an exception for the
+     * failed checks OR return a string representation of them.
      *
-     * @return string Returns a string representation of the failed checks,
-     * in case the thrownException flag is true.
+     * @return string A string representation of the failed checks, in case the
+     * thrownException flag is true.
      *
      * @throws GeneratorException
      */
@@ -199,14 +197,13 @@ abstract class AbstractTransform implements ValidatedAction
     }
 
     /**
-     * Runs the configured post-transform checks and report all
-     * the occurred errors.
+     * Run the configured post-transform checks and report all the occurred errors.
      *
-     * @param bool $throwException Whether we should throw an exception for the failed checks
-     * OR return a string representation of them.
+     * @param bool $throwException Whether we should throw an exception for the failed
+     * checks OR return a string representation of them.
      *
-     * @return string Returns a string representation of the failed checks,
-     * in case the thrownException flag is true.
+     * @return string A string representation of the failed checks, in case the
+     * thrownException flag is true.
      *
      * @throws GeneratorException
      */
@@ -237,16 +234,10 @@ abstract class AbstractTransform implements ValidatedAction
     }
 
     /**
-     * Returns a string representation of this AbstractTransform subclass instance.
+     * Return a string representation of this AbstractTransform subclass instance.
      *
-     * @return string
-     */
-    public abstract function stringify(): string;
-
-    /**
-     * Returns a string representation of this AbstractTransform subclass instance.
-     *
-     * @return false|string
+     * @return false|string A string representation of this AbstractTransform
+     * subclass instance.
      */
     public function __toString()
     {

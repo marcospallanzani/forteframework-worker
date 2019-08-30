@@ -41,4 +41,13 @@ interface ValidatedAction
      * @throws GeneratorException If the action was successfully run.
      */
     public function run(): bool;
+
+    /**
+     * Return a human-readable string representation of this
+     * implementing class instance.
+     *
+     * @return string A human-readable string representation
+     * of this implementing class instance.
+     */
+    public function stringify(): string;
 }

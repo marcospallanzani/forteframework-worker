@@ -41,15 +41,6 @@ abstract class AbstractCheck implements ValidatedAction
     public abstract function check(): bool;
 
     /**
-     * Return a human-readable string representation of this AbstractCheck subclass
-     * instance.
-     *
-     * @return string A human-readable string representation of this AbstractCheck
-     * subclass instance.
-     */
-    public abstract function stringify(): string;
-
-    /**
      * Run the action.
      *
      * @return bool True if this AbstractCheck subclass instance
@@ -70,7 +61,7 @@ abstract class AbstractCheck implements ValidatedAction
     /**
      * Return a string representation of this AbstractCheck subclass instance.
      *
-     * @return false|string String representation of this AbstractCheck
+     * @return false|string A string representation of this AbstractCheck
      * subclass instance.
      */
     public function __toString()
