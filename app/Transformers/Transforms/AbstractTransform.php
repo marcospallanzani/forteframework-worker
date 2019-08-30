@@ -39,19 +39,47 @@ abstract class AbstractTransform
      * @return bool Returns true if this AbstractTransform subclass
      * instance is correctly configured; false otherwise.
      *
-     * @throws TransformException
+     * @throws GeneratorException
      */
     public abstract function isValid(): bool;
 
     /**
-     * Apply the transformation.
+     * Apply the sub-class transformation action.
+     *
+     * @return bool Returns true if the transform action implemented by
+     * this AbstractTransform subclass instance has been successfully
+     * applied; false otherwise.
+     *
+     * @throws GeneratorException
+     */
+    protected abstract function apply(): bool;
+
+    /**
+     * Apply the sub-class transformation action with pre-validation,
+     * pre- and post-transformation checks
      *
      * @return bool Returns true if this AbstractTransform subclass
      * instance has been successfully applied; false otherwise.
      *
-     * @throws TransformException
+     * @throws GeneratorException
      */
-    public abstract function transform(): bool;
+    public function transform(): bool
+    {
+        $result = false;
+
+        if ($this->isValid()) {
+
+            // We run the pre-transform checks
+            $this->runAndReportBeforeChecks(true);
+
+            $result = $this->apply();
+
+            // We run the post-transform checks
+            $this->runAndReportAfterChecks(true);
+        }
+
+        return $result;
+    }
 
     /**
      * Adds the given AbstractCheck subclass instance to the list of
@@ -90,8 +118,6 @@ abstract class AbstractTransform
      * AbstractCheck instances.
      *
      * @return array Array with failed pre-transform checks.
-     *
-     * @throws CheckException
      */
     protected function runBeforeChecks(): array
     {
@@ -115,8 +141,6 @@ abstract class AbstractTransform
      * AbstractCheck instances.
      *
      * @return array Array with failed post-transform checks.
-     *
-     * @throws CheckException
      */
     protected function runAfterChecks(): array
     {
@@ -146,7 +170,6 @@ abstract class AbstractTransform
      * @return string Returns a string representation of the failed checks,
      * in case the thrownException flag is true.
      *
-     * @throws CheckException
      * @throws GeneratorException
      */
     protected function runAndReportBeforeChecks($throwException = false): string
@@ -185,7 +208,6 @@ abstract class AbstractTransform
      * @return string Returns a string representation of the failed checks,
      * in case the thrownException flag is true.
      *
-     * @throws CheckException
      * @throws GeneratorException
      */
     protected function runAndReportAfterChecks($throwException = false): string

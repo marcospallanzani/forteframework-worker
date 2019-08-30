@@ -108,40 +108,38 @@ class ChangeFileConfigEntries extends AbstractTransform
     }
 
     /**
-     * Apply the transformation.
+     * Apply the sub-class transformation action.
      *
-     * @return bool Returns true if this AbstractTransform subclass
-     * instance has been successfully applied; false otherwise.
+     * @return bool Returns true if the transform action implemented by
+     * this AbstractTransform subclass instance has been successfully
+     * applied; false otherwise.
      *
      * @throws GeneratorException
      * @throws TransformException
      */
-    public function transform(): bool
+    protected function apply(): bool
     {
         // We check if the specified file exists
         $this->checkFileExists($this->filePath);
 
+        // We read the file and we convert it to an array, when possible.
+        $parsedContent = FileParser::parseConfigFile($this->filePath, $this->contentType);
+        if (!is_array($parsedContent)) {
+            $this->throwTransformException(
+                $this,
+                "It was not possible to convert the content of file '%s' to an array.",
+                $this->filePath
+            );
+        }
+
+        // We check all configured conditions for the configured file
         $failed = array();
-
-        if ($this->isValid()) {
-            // We read the file and we convert it to an array, when possible.
-            $parsedContent = FileParser::parseConfigFile($this->filePath, $this->contentType);
-            if (!is_array($parsedContent)) {
-                $this->throwTransformException(
-                    $this,
-                    "It was not possible to convert the content of file '%s' to an array.",
-                    $this->filePath
-                );
-            }
-
-            // We check all configured conditions for the configured file
-            foreach ($this->modifications as $modification) {
-                try {
-                    /** @var ModifyArray $modification */
-                    $parsedContent = $modification->filter($parsedContent);
-                } catch (GeneratorException $e) {
-                    $failed[] = sprintf("Modification failed: %s. Reason is: %s", $modification, $e->getMessage());
-                }
+        foreach ($this->modifications as $modification) {
+            try {
+                /** @var ModifyArray $modification */
+                $parsedContent = $modification->filter($parsedContent);
+            } catch (GeneratorException $e) {
+                $failed[] = sprintf("Modification failed: %s. Reason is: %s", $modification, $e->getMessage());
             }
         }
 

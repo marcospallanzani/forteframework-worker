@@ -63,57 +63,50 @@ class Copy extends AbstractTransform
     }
 
     /**
-     * Apply the transformation.
+     * Apply the sub-class transformation action.
      *
-     * @return bool Returns true if this AbstractTransform subclass
-     * instance has been successfully applied; false otherwise.
+     * @return bool Returns true if the transform action implemented by
+     * this AbstractTransform subclass instance has been successfully
+     * applied; false otherwise.
      *
      * @throws GeneratorException
      * @throws TransformException
      */
-    public function transform(): bool
+    protected function apply(): bool
     {
-        if ($this->isValid()) {
+        try {
             // We check if the origin file exists
             $this->checkFileExists($this->originFilePath);
 
-            try {
-                // We run the pre-transform checks
-                $this->runAndReportBeforeChecks(true);
+            $info = pathinfo($this->originFilePath);
 
-                $info = pathinfo($this->originFilePath);
-
-                // We check if a destination folder is set:
-                // if empty, we use the same origin file folder
-                if (empty($this->destinationFolder)) {
-                    $this->destinationFolder = $info['dirname'];
-                }
-
-                // We check if the destination file name is set:
-                // if empty, we use the origin file name with a "_Copy" suffix
-                if (empty($this->destinationFileName)) {
-                    $this->destinationFileName = $info['filename'] . "_COPY" . $info['extension'];
-                }
-
-                $copyFilter = new CopyFilter([
-                    'target' => $this->getDestinationFilePath(),
-                    'overwrite' => true
-                ]);
-                $copyFilter->filter($this->originFilePath);
-
-                // We run the post-transform checks
-                $this->runAndReportAfterChecks(true);
-
-                return true;
-            } catch (RuntimeException $runtimeException) {
-                $this->throwTransformException(
-                    $this,
-                    "An error occurred while copying file '%s' to '%s'. Error message is: '%s'",
-                    $this->originFilePath,
-                    $this->destinationFolder,
-                    $runtimeException->getMessage()
-                );
+            // We check if a destination folder is set:
+            // if empty, we use the same origin file folder
+            if (empty($this->destinationFolder)) {
+                $this->destinationFolder = $info['dirname'];
             }
+
+            // We check if the destination file name is set:
+            // if empty, we use the origin file name with a "_Copy" suffix
+            if (empty($this->destinationFileName)) {
+                $this->destinationFileName = $info['filename'] . "_COPY" . $info['extension'];
+            }
+
+            $copyFilter = new CopyFilter([
+                'target' => $this->getDestinationFilePath(),
+                'overwrite' => true
+            ]);
+            $copyFilter->filter($this->originFilePath);
+
+            return true;
+        } catch (RuntimeException $runtimeException) {
+            $this->throwTransformException(
+                $this,
+                "An error occurred while copying file '%s' to '%s'. Error message is: '%s'",
+                $this->originFilePath,
+                $this->destinationFolder,
+                $runtimeException->getMessage()
+            );
         }
 
         return false;

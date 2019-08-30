@@ -29,7 +29,6 @@ class Unzip extends AbstractTransform
      * @return bool Returns true if this AbstractTransform subclass
      * instance is correctly configured; false otherwise.
      *
-     * @throws GeneratorException
      * @throws TransformException
      */
     public function isValid(): bool
@@ -43,51 +42,41 @@ class Unzip extends AbstractTransform
     }
 
     /**
-     * Apply the transformation. It unzips the configured zip files.
-     * If no extraction folder is set, the zip file folder will be used.
+     * Apply the sub-class transformation action.
      *
-     * @return bool Returns true if this AbstractTransform subclass
-     * instance has been successfully applied; false otherwise.
+     * @return bool Returns true if the transform action implemented by
+     * this AbstractTransform subclass instance has been successfully
+     * applied; false otherwise.
      *
      * @throws GeneratorException
      * @throws TransformException
      */
-    public function transform(): bool
+    protected function apply(): bool
     {
-        if ($this->isValid()) {
+        // We check if the zip file exists
+        $this->checkFileExists($this->zipFilePath);
 
-            // We run the pre-transform checks
-            $this->runAndReportBeforeChecks(true);
+        $info = pathinfo($this->zipFilePath);
 
-            // We check if the zip file exists
-            $this->checkFileExists($this->zipFilePath);
-
-            $info = pathinfo($this->zipFilePath);
-
-            // We check if an extraction folder is set:
-            // if empty, we use the folder of the set zip file.
-            if (empty($this->extractToPath)) {
-                $this->extractToPath = $info['dirname'];
-            }
-
-            $zip = new \ZipArchive();
-            if ($zip->open($this->zipFilePath) === TRUE) {
-                $zip->extractTo($this->extractToPath);
-                $zip->close();
-            } else {
-                $this->throwGeneratorException(
-                    "Impossible to unzip the given ZIP file '%s'",
-                    $this->zipFilePath
-                );
-            }
-
-            // We run the post-transform checks
-            $this->runAndReportAfterChecks(true);
-
-            return true;
+        // We check if an extraction folder is set:
+        // if empty, we use the folder of the set zip file.
+        if (empty($this->extractToPath)) {
+            $this->extractToPath = $info['dirname'];
         }
 
-        return false;
+        $zip = new \ZipArchive();
+        if ($zip->open($this->zipFilePath) === TRUE) {
+            $zip->extractTo($this->extractToPath);
+            $zip->close();
+        } else {
+            $this->throwTransformException(
+                $this,
+                "Impossible to unzip the given ZIP file '%s'",
+                $this->zipFilePath
+            );
+        }
+
+        return true;
     }
 
     /**
@@ -125,7 +114,6 @@ class Unzip extends AbstractTransform
      */
     public function stringify(): string
     {
-        //return compact('zipFilePath', 'extractToPath');
         return sprintf("Unzip file '%s' to '%s'.", $this->zipFilePath, $this->extractToPath);
     }
 }

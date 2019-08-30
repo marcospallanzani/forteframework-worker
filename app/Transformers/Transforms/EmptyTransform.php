@@ -20,8 +20,6 @@ class EmptyTransform extends AbstractTransform
      *
      * @return bool Returns true if this AbstractTransform subclass
      * instance is correctly configured; false otherwise.
-     *
-     * @throws TransformException
      */
     public function isValid(): bool
     {
@@ -29,24 +27,14 @@ class EmptyTransform extends AbstractTransform
     }
 
     /**
-     * Apply the transformation.
+     * Apply the sub-class transformation action.
      *
-     * @return bool Returns true if this AbstractTransform subclass
-     * instance has been successfully applied; false otherwise.
-     *
-     * @throws TransformException
-     * @throws CheckException
-     * @throws GeneratorException
+     * @return bool Returns true if the transform action implemented by
+     * this AbstractTransform subclass instance has been successfully
+     * applied; false otherwise.
      */
-    public function transform(): bool
+    protected function apply(): bool
     {
-        if ($this->isValid()) {
-            // We run the pre-transform checks
-            $this->runAndReportBeforeChecks(true);
-
-            // We run the post-transform checks
-            $this->runAndReportAfterChecks(true);
-        }
         return true;
     }
 
