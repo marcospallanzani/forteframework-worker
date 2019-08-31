@@ -12,12 +12,12 @@
 namespace Forte\Api\Generator\Actions;
 
 /**
- * Interface ValidatedAction. Basic behaviour of all classes that
+ * Interface ValidActionInterface. Basic behaviour of all classes that
  * perform an action, which needs a pre-run validation.
  *
  * @package Forte\Api\Generator\Actions
  */
-interface ValidatedActionInterface extends ValidInterface, ActionInterface
+interface ValidActionInterface extends ValidInterface, ActionInterface
 {
     //
 }

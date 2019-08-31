@@ -2,7 +2,7 @@
 
 namespace Forte\Api\Generator\Transformers\Transforms;
 
-use Forte\Api\Generator\Actions\ValidatedActionInterface;
+use Forte\Api\Generator\Actions\ValidActionInterface;
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
@@ -15,7 +15,7 @@ use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
  *
  * @package Forte\Api\Generator\Transformers\Transforms
  */
-abstract class AbstractTransform implements ValidatedActionInterface
+abstract class AbstractTransform implements ValidActionInterface
 {
     use ClassAccessTrait, FileTrait, ThrowErrorsTrait;
 

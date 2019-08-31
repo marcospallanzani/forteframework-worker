@@ -2,7 +2,7 @@
 
 namespace Forte\Api\Generator\Checkers\Checks;
 
-use Forte\Api\Generator\Actions\ValidatedActionInterface;
+use Forte\Api\Generator\Actions\ValidActionInterface;
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
@@ -14,7 +14,7 @@ use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
  *
  * @package Forte\Api\Generator\Checkers\Checks
  */
-abstract class AbstractCheck implements ValidatedActionInterface
+abstract class AbstractCheck implements ValidActionInterface
 {
     use ClassAccessTrait, FileTrait, ThrowErrorsTrait;
 
