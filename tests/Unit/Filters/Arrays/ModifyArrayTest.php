@@ -100,7 +100,7 @@ class ModifyArrayTest extends TestCase
             ],
             [
                 $modifyWrongAction = new ModifyArray('key1', 'wrong_action'),
-                sprintf("The operation 'wrong_action' is not supported. Impacted filter is: '%s'. Supported actions are: '%s'",
+                sprintf("The action 'wrong_action' is not supported. Impacted filter is: '%s'. Supported actions are: '%s'",
                     $modifyWrongAction,
                     implode(',', $modifyWrongAction->getSupportedActions())),
                 true,
@@ -116,22 +116,22 @@ class ModifyArrayTest extends TestCase
     }
 
     /**
-     * Tests the operation message.
+     * Tests the action message.
      *
      * @dataProvider modificationsProvider
      *
      * @param string $key
-     * @param string $operation
+     * @param string $action
      * @param mixed  $value
      * @param string $expected
      */
-    public function testOperationMessage(string $key, string $operation, $value, string $expected): void
+    public function testactionMessage(string $key, string $action, $value, string $expected): void
     {
-        $modifyArray = new ModifyArray($key, $operation, $value);
-        $this->assertEquals($expected, $modifyArray->getOperationMessage());
+        $modifyArray = new ModifyArray($key, $action, $value);
+        $this->assertEquals($expected, $modifyArray->getActionMessage());
         $this->assertEquals($expected, (string) $modifyArray);
         $this->assertEquals($key, $modifyArray->getKey());
-        $this->assertEquals($operation, $modifyArray->getOperation());
+        $this->assertEquals($action, $modifyArray->getAction());
         $this->assertEquals($value, $modifyArray->getValue());
     }
 
@@ -141,14 +141,14 @@ class ModifyArrayTest extends TestCase
      * @dataProvider modificationsProvider
      *
      * @param string $key
-     * @param string $operation
+     * @param string $action
      * @param mixed  $value
      */
-    public function testGetters(string $key, string $operation, $value): void
+    public function testGetters(string $key, string $action, $value): void
     {
-        $modifyArray = new ModifyArray($key, $operation, $value);
+        $modifyArray = new ModifyArray($key, $action, $value);
         $this->assertEquals($key, $modifyArray->getKey());
-        $this->assertEquals($operation, $modifyArray->getOperation());
+        $this->assertEquals($action, $modifyArray->getAction());
         $this->assertEquals($value, $modifyArray->getValue());
     }
 
@@ -158,15 +158,15 @@ class ModifyArrayTest extends TestCase
      * @dataProvider changesProvider
      *
      * @param string $key
-     * @param string $operation
+     * @param string $action
      * @param mixed  $value
      * @param array  $array
      * @param array  $expected
      */
-    public function testApplyChangeByType(string $key, string $operation, $value, array $array, array $expected): void
+    public function testApplyChangeByType(string $key, string $action, $value, array $array, array $expected): void
     {
-        $modifyArray = new ModifyArray($key, $operation, $value);
-        $modifyArray->applyChangeByType($array, $key, $operation, $value);
+        $modifyArray = new ModifyArray($key, $action, $value);
+        $modifyArray->applyChangeByType($array, $key, $action, $value);
         $this->assertEquals($expected, $array);
     }
 
@@ -176,15 +176,15 @@ class ModifyArrayTest extends TestCase
      * @dataProvider complexChangesProvider
      *
      * @param string $key
-     * @param string $operation
+     * @param string $action
      * @param mixed  $value
      * @param array  $array
      * @param array  $expected
      */
-    public function testApplyChangeToArray(string $key, string $operation, $value, array $array, array $expected): void
+    public function testApplyChangeToArray(string $key, string $action, $value, array $array, array $expected): void
     {
-        $modifyArray = new ModifyArray($key, $operation, $value);
-        $modifyArray->applyChangeToArray($array, $key, $operation, $value);
+        $modifyArray = new ModifyArray($key, $action, $value);
+        $modifyArray->applyChangeToArray($array, $key, $action, $value);
         $this->assertEquals($expected, $array);
     }
 
@@ -222,16 +222,16 @@ class ModifyArrayTest extends TestCase
      * @dataProvider complexChangesProvider
      *
      * @param string $key
-     * @param string $operation
+     * @param string $action
      * @param mixed  $value
      * @param array  $array
      * @param array  $expected
      *
      * @throws \Forte\Api\Generator\Exceptions\GeneratorException
      */
-    public function testFilter(string $key, string $operation, $value, array $array, array $expected): void
+    public function testFilter(string $key, string $action, $value, array $array, array $expected): void
     {
-        $modifyArray = new ModifyArray($key, $operation, $value);
+        $modifyArray = new ModifyArray($key, $action, $value);
         $modifiedArray = $modifyArray->filter($array);
         $this->assertEquals($expected, $modifiedArray);
     }

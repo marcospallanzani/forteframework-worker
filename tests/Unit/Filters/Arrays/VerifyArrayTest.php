@@ -238,7 +238,7 @@ class VerifyArrayTest extends TestCase
     public function testOperationMessage(string $key, string $operation, $value, bool $reverseAction, string $expected): void
     {
         $verifyArray = new VerifyArray($key, $operation, $value, $reverseAction);
-        $this->assertEquals($expected, $verifyArray->getOperationMessage());
+        $this->assertEquals($expected, $verifyArray->getActionMessage());
         $this->assertEquals($expected, (string) $verifyArray);
     }
 
@@ -257,7 +257,7 @@ class VerifyArrayTest extends TestCase
     {
         $modifyArray = new VerifyArray($key, $operation, $value, $reverseAction);
         $this->assertEquals($key, $modifyArray->getKey());
-        $this->assertEquals($operation, $modifyArray->getOperation());
+        $this->assertEquals($operation, $modifyArray->getAction());
         $this->assertEquals($value, $modifyArray->getValue());
     }
 

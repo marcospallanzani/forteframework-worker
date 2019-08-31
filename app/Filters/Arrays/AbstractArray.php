@@ -24,21 +24,21 @@ abstract class AbstractArray implements ValidInterface
     /**
      * @var string
      */
-    protected $operation;
+    protected $action;
 
     /**
      * AbstractArray constructor.
      *
      * @param string $key The array key to access (multi-level keys separated by '.').
-     * @param string $operation The operation to perform (look inside isValid() implementation
+     * @param string $action The action to perform (look inside isValid() implementation
      * for list of supported values).
      * @param mixed  $value The value to set/change/remove.
      */
-    public function __construct(string $key, string $operation, $value = null)
+    public function __construct(string $key, string $action, $value = null)
     {
-        $this->key       = $key;
-        $this->operation = $operation;
-        $this->value     = $value;
+        $this->key    = $key;
+        $this->action = $action;
+        $this->value  = $value;
     }
 
     /**
@@ -62,13 +62,13 @@ abstract class AbstractArray implements ValidInterface
     }
 
     /**
-     * Returns the operation.
+     * Returns the action.
      *
      * @return string
      */
-    public function getOperation(): string
+    public function getAction(): string
     {
-        return $this->operation;
+        return $this->action;
     }
 
     /**
@@ -91,13 +91,13 @@ abstract class AbstractArray implements ValidInterface
      */
     public function __toString()
     {
-        return $this->getOperationMessage();
+        return $this->getActionMessage();
     }
 
     /**
-     * Returns a human-readable description of this operation.
+     * Returns a human-readable description of this action.
      *
      * @return string
      */
-    public abstract function getOperationMessage(): string;
+    public abstract function getActionMessage(): string;
 }

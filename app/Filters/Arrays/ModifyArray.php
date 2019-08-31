@@ -30,7 +30,7 @@ class ModifyArray extends AbstractArray
     /**
      * Returns true if this ModifyArray instance is well configured:
      * - key cannot be an empty string;
-     * - operation must equal to one of the class constants
+     * - action must equal to one of the class constants
      *   starting with prefix 'MODIFY_';
      *
      * @return bool
@@ -44,12 +44,12 @@ class ModifyArray extends AbstractArray
                 $this->throwGeneratorException("You need to specify the 'key' for the following check: '%s'.", $this);
             }
 
-            // If no operation is specified OR an unsupported operation is given, then we throw an error.
+            // If no action is specified OR an unsupported action is given, then we throw an error.
             $modifyConstants = $this->getSupportedActions();
-            if (!in_array($this->operation, $modifyConstants)) {
+            if (!in_array($this->action, $modifyConstants)) {
                 $this->throwGeneratorException(
-                    "The operation '%s' is not supported. Impacted filter is: '%s'. Supported actions are: '%s'",
-                    $this->operation,
+                    "The action '%s' is not supported. Impacted filter is: '%s'. Supported actions are: '%s'",
+                    $this->action,
                     $this,
                     implode(',', $modifyConstants)
                 );
@@ -79,7 +79,7 @@ class ModifyArray extends AbstractArray
     public function filter(array $array): array
     {
         if ($this->isValid()) {
-            $this->applyChangeToArray($array, $this->key, $this->operation, $this->value);
+            $this->applyChangeToArray($array, $this->key, $this->action, $this->value);
         }
 
         return $array;
@@ -91,12 +91,12 @@ class ModifyArray extends AbstractArray
      *
      * @param array  $array
      * @param string $key
-     * @param string $operation
+     * @param string $action
      * @param mixed  $modifiedValue
      *
      * @return array|mixed|null
      */
-    public function applyChangeToArray(array &$array, string $key, string $operation, $modifiedValue)
+    public function applyChangeToArray(array &$array, string $key, string $action, $modifiedValue)
     {
         $keysTree = explode(self::ARRAY_LEVELS_SEPARATOR, $key, 2);
         $value = null;
@@ -115,21 +115,21 @@ class ModifyArray extends AbstractArray
                     $value = $this->applyChangeToArray(
                         $value,
                         $keysTree[1],
-                        $operation,
+                        $action,
                         $modifiedValue
                     );
                     // We have to merge the modified sub-array with the parent array
                     $array[$currentKey] = $value;
                 } else {
                     // We have found a non-array element but we are not at the end of our keys tree
-                    if ($operation === self::MODIFY_ADD || $operation === self::MODIFY_CHANGE_VALUE) {
+                    if ($action === self::MODIFY_ADD || $action === self::MODIFY_CHANGE_VALUE) {
                         // If key does not exist, we add the missing key
                         // (no need to apply any changes for the remove action)
                         $array[$currentKey] = [];
                         $array[$currentKey] = $this->applyChangeToArray(
                             $array[$currentKey],
                             $keysTree[1],
-                            $operation,
+                            $action,
                             $modifiedValue
                         );
                     }
@@ -139,7 +139,7 @@ class ModifyArray extends AbstractArray
                 $this->applyChangeByType(
                     $array,
                     $currentKey,
-                    $operation,
+                    $action,
                     $modifiedValue
                 );
             }
@@ -152,18 +152,18 @@ class ModifyArray extends AbstractArray
     }
 
     /**
-     * Applies the given operation to the given array for the given key and value.
+     * Applies the given action to the given array for the given key and value.
      *
      * @param array  $array
      * @param string $key
-     * @param string $operation
+     * @param string $action
      * @param mixed  $value
      *
      * @return void
      */
-    public function applyChangeByType(array &$array, string $key, string $operation, $value): void
+    public function applyChangeByType(array &$array, string $key, string $action, $value): void
     {
-        switch($operation) {
+        switch($action) {
             case self::MODIFY_ADD:
             case self::MODIFY_CHANGE_VALUE:
                 $array[$key] = $value;
@@ -175,13 +175,13 @@ class ModifyArray extends AbstractArray
     }
 
     /**
-     * Returns a human-readable description of this check operation.
+     * Returns a human-readable description of this check action.
      *
      * @return string
      */
-    public function getOperationMessage(): string
+    public function getActionMessage(): string
     {
-        switch($this->operation) {
+        switch($this->action) {
             case self::MODIFY_ADD:
                 return sprintf("Add value '%s' with key '%s'", $this->stringifyValue(), $this->key);
             case self::MODIFY_CHANGE_VALUE:

@@ -18,7 +18,7 @@ class VerifyArray extends AbstractArray
     use ClassAccessTrait, ThrowErrorsTrait;
 
     /**
-     * Supported operations.
+     * Supported actions.
      */
     const CHECK_STARTS_WITH  = "check_starts_with";
     const CHECK_ENDS_WITH    = "check_ends_with";
@@ -40,15 +40,15 @@ class VerifyArray extends AbstractArray
      * VerifyArray constructor.
      *
      * @param string $key The array key to access (multi-level keys separated by '.').
-     * @param string $operation The operation to perform (look inside isValid() implementation
+     * @param string $action The operation to perform (look inside isValid() implementation
      * for list of supported values).
      * @param mixed $value The value to set/change/remove.
      * @param bool $reverseAction Whether the reverse actions should be performed or not
      * (e.g. contains -> not-contains).
      */
-    public function __construct(string $key, string $operation, $value = null, bool $reverseAction = false)
+    public function __construct(string $key, string $action, $value = null, bool $reverseAction = false)
     {
-        parent::__construct($key, $operation, $value);
+        parent::__construct($key, $action, $value);
         $this->reverseAction = $reverseAction;
     }
 
@@ -56,8 +56,8 @@ class VerifyArray extends AbstractArray
      * Validate the current VerifyArray instance. It returns true if this VerifyArray
      * instance is well configured and respects the following rules:
      * - the field key must be specified and not empty;
-     * - the field operation must be specified and not empty;
-     * - if an empty value is specified (e.g. null, ""), the valid operations are
+     * - the field action must be specified and not empty;
+     * - if an empty value is specified (e.g. null, ""), the valid actions are
      *   'check_equals', 'check_empty' or 'check_any';
      *
      * The check `check_any` with an empty value can be used to check if a key is set.
@@ -72,33 +72,33 @@ class VerifyArray extends AbstractArray
     public function isValid(): bool
     {
         try {
-            $checkOperationsConstants = self::getClassConstants('CHECK_');
+            $checkActionsConstants = self::getClassConstants('CHECK_');
 
             // Validate the key
             if (empty($this->key)) {
                 $this->throwGeneratorException("You need to specify the 'key' for check: '%s'.", $this);
             }
 
-            // Validate the operation.
-            $operation = $this->getOperation();
-            if (empty($this->operation)) {
-                $this->throwGeneratorException("You need to specify the 'operation' for check: '%s'.", $this);
+            // Validate the action.
+            $action = $this->getAction();
+            if (empty($this->action)) {
+                $this->throwGeneratorException("You need to specify the 'action' for check: '%s'.", $this);
             }
 
-            // If no operation is specified OR an unsupported operation is given, then we throw an error.
-            if (!in_array($operation, $checkOperationsConstants)) {
+            // If no action is specified OR an unsupported action is given, then we throw an error.
+            if (!in_array($action, $checkActionsConstants)) {
                 $this->throwGeneratorException(
                     "The check '%s' is not supported. Impacted check is: '%s'. Supported checks are: '%s'",
-                    $operation,
+                    $action,
                     $this,
-                    implode(',', $checkOperationsConstants)
+                    implode(',', $checkActionsConstants)
                 );
             }
 
-            if ($this->reverseAction && $operation === self::CHECK_ANY) {
+            if ($this->reverseAction && $action === self::CHECK_ANY) {
                 $this->throwGeneratorException(
                     "The check '%s' is not supported in the reverse mode. Use '%s' instead. Impacted check is: '%s'.",
-                    $operation,
+                    $action,
                     self::CHECK_EQUALS,
                     $this
                 );
@@ -106,14 +106,14 @@ class VerifyArray extends AbstractArray
 
             // Validate the value
             if (empty($this->getValue())) {
-                // If an empty value is specified (e.g. null, ""), we will use this check, only if the set operation
+                // If an empty value is specified (e.g. null, ""), we will use this check, only if the set action
                 // is 'check_equals', 'check_empty', 'check_non_empty' or 'check_any'.
                 $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY, self::CHECK_MISSING_KEY];
-                if (!in_array($operation, $acceptsEmptyValue)) {
+                if (!in_array($action, $acceptsEmptyValue)) {
                     $this->throwGeneratorException(
-                        "The operation '%s' is not supported for empty values. Impacted check is: '%s'. " .
-                        "Supported operations for empty values are: '%s'",
-                        $operation,
+                        "The action '%s' is not supported for empty values. Impacted check is: '%s'. " .
+                        "Supported actions for empty values are: '%s'",
+                        $action,
                         $this,
                         implode(', ', $acceptsEmptyValue)
                     );
@@ -131,7 +131,7 @@ class VerifyArray extends AbstractArray
 
     /**
      * Check if the configured key has a value in the given array,
-     * that respects the configured operation.
+     * that respects the configured action.
      *
      * @param array $array The array containing the keys to be checked.
      *
@@ -148,7 +148,7 @@ class VerifyArray extends AbstractArray
                 $value = FileParser::getRequiredNestedConfigValue($this->key, $array);
 
                 // If no exceptions are thrown, then the key was found in the given config array
-                switch($this->operation) {
+                switch($this->action) {
                     case self::CHECK_CONTAINS:
                         $contains = $this->contains($value);
                         return $this->reverseAction ? !$contains : $contains;
@@ -164,7 +164,7 @@ class VerifyArray extends AbstractArray
                     case self::CHECK_ANY:
                         /**
                          * At this point, if the reader has found a value, it means that the key is defined
-                         * AND its value is either empty or not. So we can just return true. In case no operation
+                         * AND its value is either empty or not. So we can just return true. In case no action
                          * is set (empty string), we rely on the method getRequiredNestedConfigValue that returns
                          * a value only if the is define.
                          * REVERSE MODE IS NOT SUPPORTED FOR CHECK_ANY, SO WE DO NOT NEED TO REVERSE ITS ACTION.
@@ -195,7 +195,7 @@ class VerifyArray extends AbstractArray
                         break;
                 }
             } catch (MissingKeyException $missingKeyException) {
-                if ($this->operation === self::CHECK_MISSING_KEY) {
+                if ($this->action === self::CHECK_MISSING_KEY) {
                     return true;
                 }
                 throw $missingKeyException;
@@ -206,15 +206,15 @@ class VerifyArray extends AbstractArray
     }
 
     /**
-     * Return a human-readable description of this check operation.
+     * Return a human-readable description of this check action.
      *
      * @return string
      */
-    public function getOperationMessage(): string
+    public function getActionMessage(): string
     {
         $baseMessage = "Check if key '" . $this->key . "' is set";
         $reverseAction = $this->getReverseActionTag();
-        switch($this->operation) {
+        switch($this->action) {
             case self::CHECK_ANY:
                 return $baseMessage . " and has any value";
             case self::CHECK_CONTAINS:
@@ -240,7 +240,7 @@ class VerifyArray extends AbstractArray
      */
     protected function getReverseActionTag(): string
     {
-        switch($this->operation) {
+        switch($this->action) {
             case self::CHECK_CONTAINS:
                 return ($this->reverseAction ? "does not contain" : "contains");
                 break;
