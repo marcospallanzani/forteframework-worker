@@ -39,32 +39,22 @@ class ModifyArray extends AbstractArray
      */
     public function isValid(): bool
     {
-        try {
-            if (empty($this->key)) {
-                $this->throwGeneratorException("You need to specify the 'key' for the following check: '%s'.", $this);
-            }
+        if (empty($this->key)) {
+            $this->throwGeneratorException("You need to specify the 'key' for the following check: '%s'.", $this);
+        }
 
-            // If no action is specified OR an unsupported action is given, then we throw an error.
-            $modifyConstants = $this->getSupportedActions();
-            if (!in_array($this->action, $modifyConstants)) {
-                $this->throwGeneratorException(
-                    "The action '%s' is not supported. Impacted filter is: '%s'. Supported actions are: '%s'",
-                    $this->action,
-                    $this,
-                    implode(',', $modifyConstants)
-                );
-            }
-
-            return true;
-
-        } catch (\ReflectionException $reflectionException) {
+        // If no action is specified OR an unsupported action is given, then we throw an error.
+        $modifyConstants = $this->getSupportedActions();
+        if (!in_array($this->action, $modifyConstants)) {
             $this->throwGeneratorException(
-                "A general error occurred while retrieving the modifications list. Error message is: '%s'.",
-                $reflectionException->getMessage()
+                "The action '%s' is not supported. Impacted filter is: '%s'. Supported actions are: '%s'",
+                $this->action,
+                $this,
+                implode(',', $modifyConstants)
             );
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -194,14 +184,21 @@ class ModifyArray extends AbstractArray
     }
 
     /**
-     * Return a list of all available modification actions.
+     * Return a list of all available actions.
      *
      * @return array
      *
-     * @throws \ReflectionException
+     * @throws GeneratorException
      */
     public function getSupportedActions(): array
     {
-        return self::getClassConstants('MODIFY_');
+        try {
+            return self::getClassConstants('MODIFY_');
+        } catch (\ReflectionException $reflectionException) {
+            $this->throwGeneratorException(
+                "An error occurred while retrieving the list of supported actions. Error message is: '%s'.",
+                $reflectionException->getMessage()
+            );
+        }
     }
 }

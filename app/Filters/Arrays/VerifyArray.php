@@ -71,59 +71,51 @@ class VerifyArray extends AbstractArray
      */
     public function isValid(): bool
     {
-        try {
-            $checkActionsConstants = self::getClassConstants('CHECK_');
+        // Validate the key
+        if (empty($this->key)) {
+            $this->throwGeneratorException("You need to specify the 'key' for check: '%s'.", $this);
+        }
 
-            // Validate the key
-            if (empty($this->key)) {
-                $this->throwGeneratorException("You need to specify the 'key' for check: '%s'.", $this);
-            }
+        // Validate the action.
+        $action = $this->getAction();
+        if (empty($this->action)) {
+            $this->throwGeneratorException("You need to specify the 'action' for check: '%s'.", $this);
+        }
 
-            // Validate the action.
-            $action = $this->getAction();
-            if (empty($this->action)) {
-                $this->throwGeneratorException("You need to specify the 'action' for check: '%s'.", $this);
-            }
+        // If no action is specified OR an unsupported action is given, then we throw an error.
+        $checkActionsConstants = $this->getSupportedActions();
+        if (!in_array($action, $checkActionsConstants)) {
+            $this->throwGeneratorException(
+                "The check '%s' is not supported. Impacted check is: '%s'. Supported checks are: '%s'",
+                $action,
+                $this,
+                implode(',', $checkActionsConstants)
+            );
+        }
 
-            // If no action is specified OR an unsupported action is given, then we throw an error.
-            if (!in_array($action, $checkActionsConstants)) {
+        if ($this->reverseAction && $action === self::CHECK_ANY) {
+            $this->throwGeneratorException(
+                "The check '%s' is not supported in the reverse mode. Use '%s' instead. Impacted check is: '%s'.",
+                $action,
+                self::CHECK_EQUALS,
+                $this
+            );
+        }
+
+        // Validate the value
+        if (empty($this->getValue())) {
+            // If an empty value is specified (e.g. null, ""), we will use this check, only if the set action
+            // is 'check_equals', 'check_empty', 'check_non_empty' or 'check_any'.
+            $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY, self::CHECK_MISSING_KEY];
+            if (!in_array($action, $acceptsEmptyValue)) {
                 $this->throwGeneratorException(
-                    "The check '%s' is not supported. Impacted check is: '%s'. Supported checks are: '%s'",
+                    "The action '%s' is not supported for empty values. Impacted check is: '%s'. " .
+                    "Supported actions for empty values are: '%s'",
                     $action,
                     $this,
-                    implode(',', $checkActionsConstants)
+                    implode(', ', $acceptsEmptyValue)
                 );
             }
-
-            if ($this->reverseAction && $action === self::CHECK_ANY) {
-                $this->throwGeneratorException(
-                    "The check '%s' is not supported in the reverse mode. Use '%s' instead. Impacted check is: '%s'.",
-                    $action,
-                    self::CHECK_EQUALS,
-                    $this
-                );
-            }
-
-            // Validate the value
-            if (empty($this->getValue())) {
-                // If an empty value is specified (e.g. null, ""), we will use this check, only if the set action
-                // is 'check_equals', 'check_empty', 'check_non_empty' or 'check_any'.
-                $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY, self::CHECK_MISSING_KEY];
-                if (!in_array($action, $acceptsEmptyValue)) {
-                    $this->throwGeneratorException(
-                        "The action '%s' is not supported for empty values. Impacted check is: '%s'. " .
-                        "Supported actions for empty values are: '%s'",
-                        $action,
-                        $this,
-                        implode(', ', $acceptsEmptyValue)
-                    );
-                }
-            }
-        } catch (\ReflectionException $reflectionException) {
-            $this->throwGeneratorException(
-                "A general error occurred while retrieving the checks list. Error message is: '%s'.",
-                $reflectionException->getMessage()
-            );
         }
 
         return true;
@@ -230,6 +222,25 @@ class VerifyArray extends AbstractArray
                 return "Check if key '" . $this->key . "' $reverseAction set";
             default:
                 return $baseMessage;
+        }
+    }
+
+    /**
+     * Return a list of all available actions.
+     *
+     * @return array
+     *
+     * @throws GeneratorException
+     */
+    public function getSupportedActions(): array
+    {
+        try {
+            return self::getClassConstants('CHECK_');
+        } catch (\ReflectionException $reflectionException) {
+            $this->throwGeneratorException(
+                "An error occurred while retrieving the list of supported actions. Error message is: '%s'.",
+                $reflectionException->getMessage()
+            );
         }
     }
 
