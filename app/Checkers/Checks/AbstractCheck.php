@@ -7,7 +7,7 @@ use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
 use Forte\Api\Generator\Helpers\FileTrait;
-use Forte\Api\Generator\Helpers\ThrowErrors;
+use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
 
 /**
  * Class AbstractCheck
@@ -16,7 +16,7 @@ use Forte\Api\Generator\Helpers\ThrowErrors;
  */
 abstract class AbstractCheck implements ValidatedAction
 {
-    use ClassAccessTrait, FileTrait, ThrowErrors;
+    use ClassAccessTrait, FileTrait, ThrowErrorsTrait;
 
     /**
      * Whether this instance is in a valid state or not.

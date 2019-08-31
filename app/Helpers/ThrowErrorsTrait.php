@@ -9,17 +9,17 @@ use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
 use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
 
 /**
- * Trait ThrowErrors. Methods to easily throw application exceptions.
+ * Trait ThrowErrorsTrait. Methods to easily throw application exceptions.
  *
  * @package Forte\Api\Generator\Helpers
  */
-trait ThrowErrors
+trait ThrowErrorsTrait
 {
     /**
-     * Throws a GeneratorException with the given message and parameters.
+     * Throw a GeneratorException with the given message and parameters.
      *
-     * @param string $message The exception message
-     * @param string ...$parameters The values to replace in the error message
+     * @param string $message The exception message.
+     * @param string[] $parameters The values to replace in the error message.
      *
      * @throws GeneratorException
      */
@@ -29,11 +29,11 @@ trait ThrowErrors
     }
 
     /**
-     * Throws a CheckException with the given message and parameters.
+     * Throw a CheckException with the given message and parameters.
      *
      * @param AbstractCheck $check
-     * @param string $message The exception message
-     * @param string ...$parameters The values to replace in the error message
+     * @param string $message The exception message.
+     * @param string[] $parameters The values to replace in the error message.
      *
      * @throws CheckException
      */
@@ -47,11 +47,11 @@ trait ThrowErrors
     }
 
     /**
-     * Throws a TransformException with the given message and parameters.
+     * Throw a TransformException with the given message and parameters.
      *
      * @param AbstractTransform $transform
-     * @param string $message The exception message
-     * @param string ...$parameters The values to replace in the error message
+     * @param string $message The exception message.
+     * @param string[] $parameters The values to replace in the error message.
      *
      * @throws TransformException
      */

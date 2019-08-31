@@ -4,7 +4,7 @@ namespace Forte\Api\Generator\Filters\Arrays;
 
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
-use Forte\Api\Generator\Helpers\ThrowErrors;
+use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
 
 /**
  * Class ModifyArray.
@@ -13,7 +13,7 @@ use Forte\Api\Generator\Helpers\ThrowErrors;
  */
 class ModifyArray extends AbstractArray
 {
-    use ClassAccessTrait, ThrowErrors;
+    use ClassAccessTrait, ThrowErrorsTrait;
 
     /**
      * Supported operations.

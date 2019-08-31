@@ -7,7 +7,7 @@ use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
 use Forte\Api\Generator\Helpers\FileTrait;
-use Forte\Api\Generator\Helpers\ThrowErrors;
+use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
 use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
 
 /**
@@ -17,7 +17,7 @@ use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
  */
 abstract class AbstractTransform implements ValidatedAction
 {
-    use ClassAccessTrait, FileTrait, ThrowErrors;
+    use ClassAccessTrait, FileTrait, ThrowErrorsTrait;
 
     /**
      * List of AbstractCheck subclass instances to be run before the transform method.

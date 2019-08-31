@@ -6,7 +6,7 @@ use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\MissingKeyException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
 use Forte\Api\Generator\Helpers\FileParser;
-use Forte\Api\Generator\Helpers\ThrowErrors;
+use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
 
 /**
  * Class VerifyArray. Class used to wrap all required check parameters.
@@ -15,7 +15,7 @@ use Forte\Api\Generator\Helpers\ThrowErrors;
  */
 class VerifyArray extends AbstractArray
 {
-    use ClassAccessTrait, ThrowErrors;
+    use ClassAccessTrait, ThrowErrorsTrait;
 
     /**
      * Supported operations.
