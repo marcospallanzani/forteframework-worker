@@ -7,11 +7,11 @@ use Forte\Api\Generator\Helpers\FileTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class FileTest
+ * Class FileTraitTest
  *
  * @package Tests\Unit\Helpers
  */
-class FileTest extends TestCase
+class FileTraitTest extends TestCase
 {
     /**
      * Returns an anonymous class to test ClassAccessTrait.
