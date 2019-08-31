@@ -80,14 +80,38 @@ class ModifyArrayTest extends TestCase
      * Data provider for validation tests.
      *
      * @return array
+     *
+     * @throws \ReflectionException
      */
-    public function validationProvider(): array
+    public function validationWithErrorsProvider(): array
     {
         return [
-            ['key', ModifyArray::MODIFY_ADD, '', false, ['key' => '']],
-            ['', ModifyArray::MODIFY_ADD, '', true, null],
-            ['key1', 'wrong_action', '', true, null],
-            ['', '', '', true, null],
+            [
+                new ModifyArray('key', ModifyArray::MODIFY_ADD),
+                '',
+                false,
+                ['key' => '']
+            ],
+            [
+                $modify = new ModifyArray('', ModifyArray::MODIFY_ADD),
+                sprintf("You need to specify the 'key' for the following check: '%s'.", $modify),
+                true,
+                null
+            ],
+            [
+                $modifyWrongAction = new ModifyArray('key1', 'wrong_action'),
+                sprintf("The operation 'wrong_action' is not supported. Impacted filter is: '%s'. Supported actions are: '%s'",
+                    $modifyWrongAction,
+                    implode(',', $modifyWrongAction->getSupportedActions())),
+                true,
+                null
+            ],
+            [
+                $emptyModify = new ModifyArray('', ''),
+                sprintf("You need to specify the 'key' for the following check: '%s'.", $emptyModify),
+                true,
+                null
+            ],
         ];
     }
 
@@ -167,21 +191,23 @@ class ModifyArrayTest extends TestCase
     /**
      * Tests the isValid() function.
      *
-     * @dataProvider validationProvider
+     * @dataProvider validationWithErrorsProvider
      *
-     * @param string $key
-     * @param string $operation
-     * @param mixed $value
+     * @param ModifyArray $modifyArray
+     * @param string $exceptionMessage
      * @param bool $expectGeneratorException
      *
-     * @throws \Forte\Api\Generator\Exceptions\GeneratorException
+     * @throws GeneratorException
      */
-    public function testIsValid(string $key, string $operation, $value, bool $expectGeneratorException): void
+    public function testIsValidWithErrorMessage(
+        ModifyArray $modifyArray,
+        string $exceptionMessage,
+        bool $expectGeneratorException
+    ): void
     {
-        $modifyArray = new ModifyArray($key, $operation, $value);
-
         if ($expectGeneratorException) {
             $this->expectException(GeneratorException::class);
+            $this->expectExceptionMessage($exceptionMessage);
             $isValid = $modifyArray->isValid();
             $this->assertFalse($isValid);
         } else {
@@ -213,19 +239,22 @@ class ModifyArrayTest extends TestCase
     /**
      * Tests the filter() function failures.
      *
-     * @dataProvider validationProvider
+     * @dataProvider validationWithErrorsProvider
      *
-     * @param string $key
-     * @param string $operation
-     * @param mixed  $value
-     * @param bool   $expectGeneratorException
-     * @param mixed  $expected
+     * @param ModifyArray $modifyArray
+     * @param string $exceptionMessage
+     * @param bool $expectGeneratorException
+     * @param mixed $expected
      *
-     * @throws \Forte\Api\Generator\Exceptions\GeneratorException
+     * @throws GeneratorException
      */
-    public function testFailFilter(string $key, string $operation, $value, bool $expectGeneratorException, $expected): void
+    public function testFailFilter(
+        ModifyArray $modifyArray,
+        string $exceptionMessage,
+        bool $expectGeneratorException,
+        $expected
+    ): void
     {
-        $modifyArray = new ModifyArray($key, $operation, $value);
         if ($expectGeneratorException) {
             $this->expectException(GeneratorException::class);
             $modifyArray->filter([]);

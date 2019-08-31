@@ -16,7 +16,7 @@ class ModifyArray extends AbstractArray
     use ClassAccessTrait, ThrowErrorsTrait;
 
     /**
-     * Supported operations.
+     * Supported actions.
      */
     const MODIFY_ADD          = "modify_add";
     const MODIFY_REMOVE_KEY   = "modify_remove_key";
@@ -40,7 +40,23 @@ class ModifyArray extends AbstractArray
     public function isValid(): bool
     {
         try {
-            $modifyConstants = self::getClassConstants('MODIFY_');
+            if (empty($this->key)) {
+                $this->throwGeneratorException("You need to specify the 'key' for the following check: '%s'.", $this);
+            }
+
+            // If no operation is specified OR an unsupported operation is given, then we throw an error.
+            $modifyConstants = $this->getSupportedActions();
+            if (!in_array($this->operation, $modifyConstants)) {
+                $this->throwGeneratorException(
+                    "The operation '%s' is not supported. Impacted filter is: '%s'. Supported actions are: '%s'",
+                    $this->operation,
+                    $this,
+                    implode(',', $modifyConstants)
+                );
+            }
+
+            return true;
+
         } catch (\ReflectionException $reflectionException) {
             $this->throwGeneratorException(
                 "A general error occurred while retrieving the modifications list. Error message is: '%s'.",
@@ -48,21 +64,7 @@ class ModifyArray extends AbstractArray
             );
         }
 
-        if (empty($this->key)) {
-            $this->throwGeneratorException("You need to specify the 'key' for the following check: '%s'.", $this);
-        }
-
-        // If no operation is specified OR an unsupported operation is given, then we throw an error.
-        if (!in_array($this->operation, $modifyConstants)) {
-            $this->throwGeneratorException(
-                "The operation '%s' is not supported. Impacted filter is: '%s'. Supported operations are: '%s'",
-                $this->operation,
-                $this,
-                implode(',', $modifyConstants)
-            );
-        }
-
-        return true;
+        return false;
     }
 
     /**
@@ -189,5 +191,17 @@ class ModifyArray extends AbstractArray
             default:
                 return "";
         }
+    }
+
+    /**
+     * Return a list of all available modification actions.
+     *
+     * @return array
+     *
+     * @throws \ReflectionException
+     */
+    public function getSupportedActions(): array
+    {
+        return self::getClassConstants('MODIFY_');
     }
 }
