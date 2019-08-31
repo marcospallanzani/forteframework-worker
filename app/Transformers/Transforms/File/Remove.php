@@ -103,6 +103,24 @@ class Remove extends AbstractTransform
     }
 
     /**
+     * Set the file path to be removed with a specific delete mode.
+     * Accepted modes are the class constants beginning by "REMOVE_".
+     *
+     * @param string $filePath The file path to be removed.
+     * @param string $mode The delete mode (one of the class constants
+     * that begin by "REMOVE_").
+     *
+     * @return Remove
+     */
+    public function remove(string $filePath, string $mode): self
+    {
+        $this->filePath = $filePath;
+        $this->mode = $mode;
+
+        return $this;
+    }
+
+    /**
      * Set the file path to be removed. It also supports file patterns with the use
      * of the "*" character. (e.g. /path/to/test/*.txt)
      *
@@ -112,10 +130,7 @@ class Remove extends AbstractTransform
      */
     public function removeFile(string $filePath): self
     {
-        $this->filePath = $filePath;
-        $this->mode = self::REMOVE_SINGLE_FILE;
-
-        return $this;
+        return $this->remove($filePath, self::REMOVE_SINGLE_FILE);
     }
 
     /**
@@ -128,10 +143,7 @@ class Remove extends AbstractTransform
      */
     public function removeFilePattern(string $filePattern): self
     {
-        $this->filePath = $filePattern;
-        $this->mode = self::REMOVE_FILE_PATTERN;
-
-        return $this;
+        return $this->remove($filePattern, self::REMOVE_FILE_PATTERN);
     }
 
     /**
@@ -143,10 +155,7 @@ class Remove extends AbstractTransform
      */
     public function removeDirectory(string $directoryPath): self
     {
-        $this->filePath = $directoryPath;
-        $this->mode = self::REMOVE_DIRECTORY;
-
-        return $this;
+        return $this->remove($directoryPath, self::REMOVE_DIRECTORY);
     }
 
     /**
@@ -156,7 +165,20 @@ class Remove extends AbstractTransform
      */
     public function stringify(): string
     {
-        return sprintf("Remove file '%s'.", $this->filePath);
+        switch ($this->mode) {
+            case self::REMOVE_SINGLE_FILE:
+                return sprintf("Remove file '%s'.", $this->filePath);
+                break;
+            case self::REMOVE_DIRECTORY:
+                return sprintf("Remove directory '%s'.", $this->filePath);
+                break;
+            case self::REMOVE_FILE_PATTERN:
+                return sprintf("Remove files with pattern '%s'.", $this->filePath);
+                break;
+            default:
+                return sprintf("Remove file '%s'.", $this->filePath);
+        }
+
     }
 
     /**
