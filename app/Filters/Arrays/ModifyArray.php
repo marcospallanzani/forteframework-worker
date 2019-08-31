@@ -179,7 +179,7 @@ class ModifyArray extends AbstractArray
             case self::MODIFY_REMOVE_KEY:
                 return sprintf("Remove key '%s'", $this->key);
             default:
-                return "";
+                return "Unsupported action";
         }
     }
 

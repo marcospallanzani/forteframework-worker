@@ -30,7 +30,7 @@ class ModifyArrayTest extends TestCase
             ['key1', ModifyArray::MODIFY_CHANGE_VALUE, true, "Modify key 'key1' and set it to '1'"],
             ['key1', ModifyArray::MODIFY_CHANGE_VALUE, null, "Modify key 'key1' and set it to ''"],
             ['key1', ModifyArray::MODIFY_REMOVE_KEY, 'value1', "Remove key 'key1'"],
-            ['key1', "", 'value1', ""],
+            ['key1', "", 'value1', "Unsupported action"],
         ];
     }
 
