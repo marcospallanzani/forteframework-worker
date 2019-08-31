@@ -2,14 +2,14 @@
 
 namespace Forte\Api\Generator\Filters\Arrays;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
+use Forte\Api\Generator\Actions\ValidInterface;
 
 /**
  * Class AbstractArray. General class for all arrays related filters.
  *
  * @package Forte\Api\Generator\Filters\Arrays
  */
-abstract class AbstractArray
+abstract class AbstractArray implements ValidInterface
 {
     /**
      * @var string
@@ -93,17 +93,6 @@ abstract class AbstractArray
     {
         return $this->getOperationMessage();
     }
-
-    /**
-     * Returns true if this AbstractArray sub-class instance
-     * is well configured; false otherwise. In case of an
-     * error, a GeneratorException should be thrown.
-     *
-     * @return bool
-     *
-     * @throws GeneratorException
-     */
-    public abstract function isValid(): bool;
 
     /**
      * Returns a human-readable description of this operation.
