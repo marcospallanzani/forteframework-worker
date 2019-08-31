@@ -13,7 +13,6 @@ namespace Forte\Api\Generator\Checkers\Checks\Text;
 
 use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
 use Forte\Api\Generator\Exceptions\CheckException;
-use Forte\Api\Generator\Exceptions\GeneratorException;
 
 /**
  * Class VerifyText. This class describes a check condition to be executed
@@ -102,8 +101,7 @@ class VerifyText extends AbstractCheck
      * ran successfully; false otherwise.
      *
      * @throws CheckException If this AbstractCheck subclass instance
-     * check did not run successfully.
-     * @throws GeneratorException Unsupported condition.
+     * check did not run successfully OR the condition is notsupported.
      */
     protected function check(): bool
     {
@@ -112,25 +110,15 @@ class VerifyText extends AbstractCheck
                 return ($this->content === $this->conditionValue);
                 break;
             case self::CONDITION_LESS_THAN:
-                // We try to convert the given content and the given
-                // condition value to numbers and then we compare them.
-//                list($content, $conditionValue) = $this->getNumericCheckValues();
-//                return ($content && $conditionValue && $content < $conditionValue);
                 return ($this->content < $this->conditionValue);
                 break;
             case self::CONDITION_LESS_EQUAL_THAN:
-//                list($content, $conditionValue) = $this->getNumericCheckValues();
-//                return ($content && $conditionValue && $content <= $conditionValue);
                 return ($this->content <= $this->conditionValue);
                 break;
             case self::CONDITION_GREATER_THAN:
-//                list($content, $conditionValue) = $this->getNumericCheckValues();
-//                return ($content && $conditionValue && $content > $conditionValue);
                 return ($this->content > $this->conditionValue);
                 break;
             case self::CONDITION_GREATER_EQUAL_THAN:
-//                list($content, $conditionValue) = $this->getNumericCheckValues();
-//                return ($content && $conditionValue && $content >= $conditionValue);
                 return ($this->content >= $this->conditionValue);
                 break;
             case self::CONDITION_DIFFERENT_THAN:
@@ -147,7 +135,7 @@ class VerifyText extends AbstractCheck
                 return  (bool) (preg_match($this->conditionValue, $this->content));
                 break;
             default:
-                $this->throwGeneratorException("Unsupported condition '%s'", $this->condition);
+                $this->throwCheckException($this, "Unsupported condition '%s'", $this->condition);
                 return "";
         }
     }
@@ -158,7 +146,7 @@ class VerifyText extends AbstractCheck
      * @return bool True if the implementing class instance
      * was well configured; false otherwise.
      *
-     * @throws GeneratorException If the implementing class
+     * @throws CheckException If the implementing class
      * instance was not well configured.
      */
     public function isValid(): bool
@@ -166,7 +154,8 @@ class VerifyText extends AbstractCheck
         // If no action is specified OR an unsupported action is given, then we throw an error.
         $supportedConditions = $this->getSupportedConditions();
         if (!in_array($this->condition, $supportedConditions)) {
-            $this->throwGeneratorException(
+            $this->throwCheckException(
+                $this,
                 "The condition '%s' is not supported. Impacted check is: '%s'. Supported conditions are: '%s'",
                 $this->condition,
                 $this,
@@ -180,7 +169,8 @@ class VerifyText extends AbstractCheck
          * condition value (e.g. check if XXX is equal to YYY).
          */
         if ($this->condition !== self::CONDITION_IS_EMPTY && empty($this->conditionValue)) {
-            $this->throwGeneratorException(
+            $this->throwCheckException(
+                $this,
                 "The condition '%s' requires a condition value. " .
                 "Condition value can be empty only for condition '%s'.",
                 $this->condition,
@@ -197,8 +187,6 @@ class VerifyText extends AbstractCheck
      *
      * @return string A human-readable string representation
      * of this implementing class instance.
-     *
-     * @throws GeneratorException The configured condition is not supported.
      */
     public function stringify(): string
     {
@@ -266,8 +254,7 @@ class VerifyText extends AbstractCheck
                 );
                 break;
             default:
-                $this->throwGeneratorException("Unsupported condition '%s'", $this->condition);
-                return "";
+                return "Unsupported condition.";
         }
     }
 
@@ -277,14 +264,15 @@ class VerifyText extends AbstractCheck
      *
      * @return array Conditions list.
      *
-     * @throws GeneratorException
+     * @throws CheckException
      */
     public function getSupportedConditions(): array
     {
         try {
             return self::getClassConstants('CONDITION_');
         } catch (\ReflectionException $reflectionException) {
-            $this->throwGeneratorException(
+            $this->throwCheckException(
+                $this,
                 "An error occurred while retrieving the list of supported conditions. Error message is: '%s'.",
                 $reflectionException->getMessage()
             );

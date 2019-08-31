@@ -12,6 +12,7 @@
 namespace Tests\Unit\Checkers\Checks\Text;
 
 use Forte\Api\Generator\Checkers\Checks\Text\VerifyText;
+use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use PHPUnit\Framework\TestCase;
 
@@ -136,6 +137,9 @@ class VerifyTextTest extends TestCase
             [new VerifyText($longContent1, VerifyText::CONDITION_REGEX, $decimalValueRegex), true, true, false, "Check if the given content '$longContent1' respects the given regex \"$decimalValueRegex\"."],
             [new VerifyText('', VerifyText::CONDITION_REGEX, $decimalValueRegex), true, false, false, "Check if the given content '' respects the given regex \"$decimalValueRegex\"."],
             [new VerifyText('', VerifyText::CONDITION_REGEX), false, false, true, "Check if the given content '' respects the given regex \"\"."],
+            [new VerifyText('', VerifyText::CONDITION_REGEX), false, false, true, "Check if the given content '' respects the given regex \"\"."],
+            /** Wrong condition */
+            [new VerifyText('', 'wrong_condition'), false, false, true, "Unsupported condition."],
         ];
     }
 
@@ -149,7 +153,7 @@ class VerifyTextTest extends TestCase
      * @param bool $expected
      * @param bool $exceptionExpected
      *
-     * @throws GeneratorException
+     * @throws CheckException
      */
     public function testIsValid(
         VerifyText $verifyText,
@@ -159,7 +163,7 @@ class VerifyTextTest extends TestCase
     ): void
     {
         if ($exceptionExpected) {
-            $this->expectException(GeneratorException::class);
+            $this->expectException(CheckException::class);
         }
         $this->assertEquals($isValid, $verifyText->isValid());
     }
@@ -186,7 +190,7 @@ class VerifyTextTest extends TestCase
     ): void
     {
         if ($exceptionExpected) {
-            $this->expectException(GeneratorException::class);
+            $this->expectException(CheckException::class);
         }
         $this->assertEquals($expected, $verifyText->run());
     }
@@ -201,8 +205,6 @@ class VerifyTextTest extends TestCase
      * @param bool $expected
      * @param bool $exceptionExpected
      * @param string $objectMessage
-     *
-     * @throws GeneratorException
      */
     public function testStringify(
         VerifyText $verifyText,
