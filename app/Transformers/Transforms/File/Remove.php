@@ -178,7 +178,6 @@ class Remove extends AbstractTransform
             default:
                 return sprintf("Remove file '%s'.", $this->filePath);
         }
-
     }
 
     /**
