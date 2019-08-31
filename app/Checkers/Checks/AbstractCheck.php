@@ -2,7 +2,7 @@
 
 namespace Forte\Api\Generator\Checkers\Checks;
 
-use Forte\Api\Generator\Actions\ValidatedAction;
+use Forte\Api\Generator\Actions\ValidatedActionInterface;
 use Forte\Api\Generator\Exceptions\CheckException;
 use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
@@ -14,20 +14,9 @@ use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
  *
  * @package Forte\Api\Generator\Checkers\Checks
  */
-abstract class AbstractCheck implements ValidatedAction
+abstract class AbstractCheck implements ValidatedActionInterface
 {
     use ClassAccessTrait, FileTrait, ThrowErrorsTrait;
-
-    /**
-     * Whether this instance is in a valid state or not.
-     *
-     * @return bool True if this AbstractCheck subclass instance
-     * was well configured; false otherwise.
-     *
-     * @throws CheckException If this AbstractCheck subclass instance
-     * was not well configured.
-     */
-    public abstract function isValid(): bool;
 
     /**
      * Run the check.
