@@ -224,12 +224,12 @@ class FileHasValidConfigEntries extends FileExists
     /**
      * Check if the specified decoded file (i.e. converted to array) has a value,
      * whose key correspond to the given one, and whose value meets the condition
-     * defined by the couple value-operation. For more details about the possible
+     * defined by the couple value-action. For more details about the possible
      * conditions, check the class VerifyArray.
      *
      * @param string $key The key.
      * @param mixed $value The expected value
-     * @param string $operation The comparison operation to be performed. Accepted
+     * @param string $action The comparison action to be performed. Accepted
      * values are the VerifyArray constants with prefix "CHECK_".
      *
      * @return FileHasValidConfigEntries
@@ -237,10 +237,10 @@ class FileHasValidConfigEntries extends FileExists
     public function hasKeyWithValue(
         string $key,
         $value,
-        string $operation = VerifyArray::CHECK_CONTAINS
+        string $action = VerifyArray::CHECK_CONTAINS
     ): self
     {
-        $this->checks[] = new VerifyArray($key, $operation, $value);
+        $this->checks[] = new VerifyArray($key, $action, $value);
 
         return $this;
     }
@@ -254,7 +254,7 @@ class FileHasValidConfigEntries extends FileExists
      */
     public function stringify(): string
     {
-        $message = "Check if configured keys meet the configured check operations in file '" . $this->filePath . "'.";
+        $message = "Check if configured keys meet the configured check actions in file '" . $this->filePath . "'.";
         foreach ($this->checks as $key => $check) {
             $message .= " $key. " . (string) $check;
         }
