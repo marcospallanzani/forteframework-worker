@@ -67,9 +67,10 @@ class RemoveTest extends TestCase
     public function filesProvider(): array
     {
         return [
-            [self::TEST_FILE_TXT, true],
-            [self::TEST_FILE_JSON, true],
-            [self::TEST_WRONG_FILE, false]
+            [self::TEST_FILE_TXT, true, Remove::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_TXT . "'."],
+            [self::TEST_FILE_JSON, true, Remove::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_JSON . "'."],
+            [self::TEST_WRONG_FILE, false, Remove::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
+            [self::TEST_DIR_TMP, false, Remove::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."]
         ];
     }
 
@@ -182,5 +183,17 @@ class RemoveTest extends TestCase
         // an exception should be thrown.
         $this->expectException(TransformException::class);
         (new Remove())->removeFile(__DIR__ . '/files/xxx/')->run();
+    }
+
+    /**
+     * Test method Remove::stringify().
+     *
+     * @dataProvider filesProvider
+     */
+    public function testStringify(string $filePath, bool $expected, string $mode, string $message): void
+    {
+        $fileExists = (new Remove())->remove($filePath, $mode);
+        $this->assertEquals($message, (string) $fileExists);
+        $this->assertEquals($message, $fileExists->stringify());
     }
 }
