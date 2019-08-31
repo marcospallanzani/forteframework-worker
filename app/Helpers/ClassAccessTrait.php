@@ -26,7 +26,7 @@ trait ClassAccessTrait
         $constants = $reflectClass->getConstants();
         if ($prefix !== '') {
             // Filter constants by the given prefix
-            $constants = Collection::filterArrayByKey($constants, $prefix);
+            $constants = Collection::filterArrayByPrefixKey($constants, $prefix);
         }
         return $constants;
     }
@@ -48,7 +48,7 @@ trait ClassAccessTrait
         $constants = $reflectClass->getStaticProperties();
         if ($prefix !== '') {
             // Filter constants by the given prefix
-            $constants = Collection::filterArrayByKey($constants, $prefix);
+            $constants = Collection::filterArrayByPrefixKey($constants, $prefix);
         }
         return $constants;
     }

@@ -27,7 +27,7 @@ class Collection
      *
      * @return array An array whose keys starts with the given prefix.
      */
-    public static function filterArrayByKey(array $array, string $prefix = ''): array
+    public static function filterArrayByPrefixKey(array $array, string $prefix = ''): array
     {
         return array_filter(
             $array,
