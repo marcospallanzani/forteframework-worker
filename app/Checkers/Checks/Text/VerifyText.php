@@ -104,6 +104,16 @@ class VerifyText extends AbstractCheck
     }
 
     /**
+     * Return the condition value.
+     *
+     * @return mixed|string
+     */
+    public function getConditionValue()
+    {
+        return $this->conditionValue;
+    }
+
+    /**
      * Run the check.
      *
      * @return bool True if this AbstractCheck subclass instance
