@@ -30,6 +30,10 @@ use Forte\Api\Generator\Exceptions\CheckException;
  * - regex;
  * - is_empty;
  *
+ * This check can be used to compare also text representing a versioning.
+ * In this case, all filters can be used to compare two version strings
+ * (e.g. 1.0.1 < 1.0.2 will return true).
+ *
  * All of the above conditions, except for "is_empty", require a condition value.
  *
  * @package Forte\Api\Generator\Checkers\Checks\Text
