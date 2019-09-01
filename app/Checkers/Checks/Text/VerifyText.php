@@ -13,6 +13,7 @@ namespace Forte\Api\Generator\Checkers\Checks\Text;
 
 use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
 use Forte\Api\Generator\Exceptions\CheckException;
+use Forte\Api\Generator\Helpers\StringParser;
 
 /**
  * Class VerifyText. This class describes a check condition to be executed
@@ -27,6 +28,8 @@ use Forte\Api\Generator\Exceptions\CheckException;
  * - greater_equal_than;
  * - different_than;
  * - contains;
+ * - ends with;
+ * - starts with;
  * - regex;
  * - is_empty;
  *
@@ -50,6 +53,8 @@ class VerifyText extends AbstractCheck
     const CONDITION_GREATER_EQUAL_THAN   = "greater_equal_than";
     const CONDITION_DIFFERENT_THAN       = "different_than";
     const CONDITION_CONTAINS             = "contains";
+    const CONDITION_STARTS_WITH          = "starts_with";
+    const CONDITION_ENDS_WITH            = "ends_with";
     const CONDITION_IS_EMPTY             = "is_empty";
     const CONDITION_REGEX                = "regex";
 
@@ -71,15 +76,15 @@ class VerifyText extends AbstractCheck
     /**
      * VerifyText constructor.
      *
-     * @param string $initialContent
      * @param string $condition
      * @param string $conditionValue
+     * @param string $initialContent
      */
-    public function __construct(string $initialContent, string $condition, $conditionValue = "")
+    public function __construct(string $condition, $conditionValue = "", string $initialContent = "")
     {
-        $this->content        = $initialContent;
         $this->condition      = $condition;
         $this->conditionValue = $conditionValue;
+        $this->content        = $initialContent;
     }
 
     /**
@@ -131,6 +136,12 @@ class VerifyText extends AbstractCheck
             case self::CONDITION_CONTAINS:
                 $found = strpos($this->content, $this->conditionValue);
                 return ((!is_bool($found) && strpos($this->content, $this->conditionValue) >= 0) ? true : false);
+                break;
+            case self::CONDITION_STARTS_WITH:
+                return StringParser::startsWith($this->content, $this->conditionValue);
+                break;
+            case self::CONDITION_ENDS_WITH:
+                return StringParser::endsWith($this->content, $this->conditionValue);
                 break;
             case self::CONDITION_IS_EMPTY:
                 return empty($this->content);
@@ -196,70 +207,51 @@ class VerifyText extends AbstractCheck
     {
         switch ($this->condition) {
             case self::CONDITION_EQUAL_TO:
-                return sprintf(
-                    "Check if the given content '%s' is equal to the specified check value '%s'.",
-                    $this->content,
-                    $this->conditionValue
-                );
+                $actionDescription = "is equal to the specified check value '%s'";
                 break;
             case self::CONDITION_LESS_THAN:
-                return sprintf(
-                    "Check if the given content '%s' is less than the specified check value '%s'.",
-                    $this->content,
-                    $this->conditionValue
-                );
+                $actionDescription = "is less than the specified check value '%s'";
                 break;
             case self::CONDITION_LESS_EQUAL_THAN:
-                return sprintf(
-                    "Check if the given content '%s' is less than or equal to the specified check value '%s'.",
-                    $this->content,
-                    $this->conditionValue
-                );
+                $actionDescription = "is less than or equal to the specified check value '%s'";
                 break;
             case self::CONDITION_GREATER_THAN:
-                return sprintf(
-                    "Check if the given content '%s' is greater than the specified check value '%s'.",
-                    $this->content,
-                    $this->conditionValue
-                );
+                $actionDescription = "is greater than the specified check value '%s'";
                 break;
             case self::CONDITION_GREATER_EQUAL_THAN:
-                return sprintf(
-                    "Check if the given content '%s' is greater than or equal to the specified check value '%s'.",
-                    $this->content,
-                    $this->conditionValue
-                );
+                $actionDescription = "is greater than or equal to the specified check value '%s'";
                 break;
             case self::CONDITION_DIFFERENT_THAN:
-                return sprintf(
-                    "Check if the given content '%s' is different than the specified check value '%s'.",
-                    $this->content,
-                    $this->conditionValue
-                );
+                $actionDescription = "is different than the specified check value '%s'";
                 break;
             case self::CONDITION_CONTAINS:
-                return sprintf(
-                    "Check if the given content '%s' contains the specified check value '%s'.",
-                    $this->content,
-                    $this->conditionValue
-                );
+                $actionDescription = "contains the specified check value '%s'";
+                break;
+            case self::CONDITION_STARTS_WITH:
+                $actionDescription = "starts with the specified check value '%s'";
+                break;
+            case self::CONDITION_ENDS_WITH:
+                $actionDescription = "ends with the specified check value '%s'";
                 break;
             case self::CONDITION_IS_EMPTY:
-                return sprintf(
-                    "Check if the given content '%s' is empty.",
-                    $this->content
-                );
+                $actionDescription = "is empty";
                 break;
             case self::CONDITION_REGEX:
-                return sprintf(
-                    "Check if the given content '%s' respects the given regex \"%s\".",
-                    $this->content,
-                    $this->conditionValue
-                );
+                $actionDescription = "respects the given regex \"%s\"";
                 break;
             default:
-                return "Unsupported condition.";
+                $actionDescription = "";
         }
+
+        if ($actionDescription === "") {
+            return "Unsupported condition.";
+        }
+
+        return sprintf(
+            "Check if the given content '%s' $actionDescription.",
+            $this->content,
+            $this->conditionValue
+        );
     }
 
     /**
