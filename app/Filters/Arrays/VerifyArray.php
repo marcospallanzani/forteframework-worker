@@ -6,6 +6,7 @@ use Forte\Api\Generator\Exceptions\GeneratorException;
 use Forte\Api\Generator\Exceptions\MissingKeyException;
 use Forte\Api\Generator\Helpers\ClassAccessTrait;
 use Forte\Api\Generator\Helpers\FileParser;
+use Forte\Api\Generator\Helpers\StringParser;
 use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
 
 /**
@@ -314,11 +315,7 @@ class VerifyArray extends AbstractArray
     protected function endsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
-            $length = strlen($this->value);
-            if ($length == 0) {
-                return true;
-            }
-            return (substr($value, -$length) === $this->value);
+            return StringParser::endsWith($value, $this->value);
         }
         $this->throwGeneratorException(
             "It was not possible to verify if the value for key '%s' ends with the configured value. ".
@@ -340,8 +337,7 @@ class VerifyArray extends AbstractArray
     protected function startsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
-            $length = strlen($this->value);
-            return (substr($value, 0, $length) === $this->value);
+            return StringParser::startsWith($value, $this->value);
         }
         $this->throwGeneratorException(
             "It was not possible to verify if the value for key '%s' starts with the configured value. ".
