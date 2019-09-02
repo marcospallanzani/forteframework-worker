@@ -27,11 +27,14 @@ use PHPUnit\Framework\TestCase;
  */
 class RemoveTest extends TestCase
 {
-    const TEST_FILE_TMP   = __DIR__ . '/files/file-tests-template';
-    const TEST_DIR_TMP    = __DIR__ . '/files/todelete';
+    /**
+     * Temporary files constants.
+     */
+    const TEST_DIR_TMP    = __DIR__ . '/todelete';
     const TEST_FILE_TXT   = self::TEST_DIR_TMP . '/file-tests-template.txt';
     const TEST_FILE_JSON  = self::TEST_DIR_TMP . '/file-tests-template.json';
     const TEST_WRONG_FILE = "/path/to/non/existent/file.php";
+    const TEST_CONTENT    = "ANY CONTENT";
 
     /**
      * This method is called before each test.
@@ -44,8 +47,8 @@ class RemoveTest extends TestCase
         if (!is_dir(self::TEST_DIR_TMP)) {
             mkdir(self::TEST_DIR_TMP);
         }
-        copy(self::TEST_FILE_TMP, self::TEST_FILE_TXT);
-        copy(self::TEST_FILE_TMP, self::TEST_FILE_JSON);
+        @file_put_contents(self::TEST_FILE_TXT, self::TEST_CONTENT);
+        @file_put_contents(self::TEST_FILE_JSON, self::TEST_CONTENT);
     }
 
     /**
