@@ -399,7 +399,7 @@ class ModifyFile extends AbstractTransform
     {
         $message = "Apply the following transformations to the specified file '" . $this->filePath . "': " . PHP_EOL;
         if (!$this->actions) {
-            $message .= "No transformations configured.";
+            $message .= "No transformations configured." . PHP_EOL;
         } else {
             foreach ($this->actions as $key => $action) {
                 switch ($action['action']) {
