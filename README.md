@@ -53,7 +53,6 @@ have been downloaded:
 require __DIR__.'/vendor/autoload.php';
 
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Filters\Arrays\ModifyArray;
 use Forte\Worker\Transformers\Transforms\File\ModifyFile;
 
 try {
