@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Forte\Worker\Checkers\Checks\File;
+namespace Forte\Worker\Checkers\Checks\Files;
 
 use Forte\Worker\Checkers\Checks\AbstractCheck;
 use Forte\Worker\Exceptions\CheckException;
@@ -18,7 +18,7 @@ use Forte\Worker\Exceptions\WorkerException;
 /**
  * Class FileExists.
  *
- * @package Forte\Worker\Checkers\Checks\File
+ * @package Forte\Worker\Checkers\Checks\Files
  */
 class FileExists extends AbstractCheck
 {

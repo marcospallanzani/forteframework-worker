@@ -9,14 +9,14 @@
  *  with this source code.
  */
 
-namespace Forte\Worker\Checkers\Checks\File;
+namespace Forte\Worker\Checkers\Checks\Files;
 
 use Forte\Worker\Exceptions\WorkerException;
 
 /**
  * Class FileDoesNotExist.
  *
- * @package Forte\Worker\Checkers\Checks\File
+ * @package Forte\Worker\Checkers\Checks\Files
  */
 class FileDoesNotExist extends FileExists
 {

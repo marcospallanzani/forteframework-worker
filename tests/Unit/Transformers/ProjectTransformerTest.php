@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Transformers;
 
-use Forte\Worker\Checkers\Checks\File\FileExists;
+use Forte\Worker\Checkers\Checks\Files\FileExists;
 use Forte\Worker\Transformers\ProjectTransformer;
 use Forte\Worker\Transformers\Transforms\EmptyTransform;
 use PHPUnit\Framework\TestCase;

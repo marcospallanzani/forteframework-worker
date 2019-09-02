@@ -11,7 +11,7 @@
 
 namespace Tests\Unit\Checkers\Checks\File;
 
-use Forte\Worker\Checkers\Checks\File\FileExists;
+use Forte\Worker\Checkers\Checks\Files\FileExists;
 use Forte\Worker\Exceptions\CheckException;
 use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;

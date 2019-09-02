@@ -9,12 +9,12 @@
  *  with this source code.
  */
 
-namespace Forte\Worker\Checkers\Checks\File;
+namespace Forte\Worker\Checkers\Checks\Files;
 
 /**
  * Class DirectoryDoesNotExist.
  *
- * @package Forte\Worker\Checkers\Checks\File
+ * @package Forte\Worker\Checkers\Checks\Files
  */
 class DirectoryDoesNotExist extends FileDoesNotExist
 {

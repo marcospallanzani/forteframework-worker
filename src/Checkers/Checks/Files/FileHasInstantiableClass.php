@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Forte\Worker\Checkers\Checks\File;
+namespace Forte\Worker\Checkers\Checks\Files;
 
 use Forte\Worker\Exceptions\WorkerException;
 
@@ -17,7 +17,7 @@ use Forte\Worker\Exceptions\WorkerException;
  * Class FileHasInstantiableClass. This class checks if a given file
  * has an instantiable class.
  *
- * @package Forte\Worker\Checkers\Checks\File
+ * @package Forte\Worker\Checkers\Checks\Files
  */
 class FileHasInstantiableClass extends FileExists
 {

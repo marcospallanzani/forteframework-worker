@@ -11,10 +11,10 @@
 
 namespace Tests\Unit\Transformers\Transforms\File;
 
-use Forte\Worker\Checkers\Checks\File\DirectoryDoesNotExist;
-use Forte\Worker\Checkers\Checks\File\DirectoryExists;
-use Forte\Worker\Checkers\Checks\File\FileDoesNotExist;
-use Forte\Worker\Checkers\Checks\File\FileExists;
+use Forte\Worker\Checkers\Checks\Files\DirectoryDoesNotExist;
+use Forte\Worker\Checkers\Checks\Files\DirectoryExists;
+use Forte\Worker\Checkers\Checks\Files\FileDoesNotExist;
+use Forte\Worker\Checkers\Checks\Files\FileExists;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Transformers\Transforms\File\Remove;

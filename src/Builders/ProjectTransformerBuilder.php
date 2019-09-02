@@ -3,11 +3,11 @@
 namespace Forte\Worker\Builders;
 
 use Forte\Worker\Checkers\Checks\Arrays\VerifyArray;
-use Forte\Worker\Checkers\Checks\File\FileHasValidConfigEntries;
+use Forte\Worker\Checkers\Checks\Files\FileHasValidConfigEntries;
 use Forte\Worker\Transformers\ProjectTransformer;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
-use Forte\Worker\Checkers\Checks\File\FileExists;
-use Forte\Worker\Checkers\Checks\File\FileHasInstantiableClass;
+use Forte\Worker\Checkers\Checks\Files\FileExists;
+use Forte\Worker\Checkers\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Transformers\Transforms\EmptyTransform;
 use Forte\Worker\Transformers\Transforms\File\ChangeFileConfigEntries;
 use Forte\Worker\Transformers\Transforms\File\Copy;

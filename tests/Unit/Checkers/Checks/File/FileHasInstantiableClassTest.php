@@ -11,7 +11,7 @@
 
 namespace Tests\Unit\Checkers\Checks\File;
 
-use Forte\Worker\Checkers\Checks\File\FileHasInstantiableClass;
+use Forte\Worker\Checkers\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Exceptions\CheckException;
 use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
