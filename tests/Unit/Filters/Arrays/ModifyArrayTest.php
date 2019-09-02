@@ -82,6 +82,7 @@ class ModifyArrayTest extends TestCase
      * @return array
      *
      * @throws \ReflectionException
+     * @throws GeneratorException
      */
     public function validationWithErrorsProvider(): array
     {
@@ -125,7 +126,7 @@ class ModifyArrayTest extends TestCase
      * @param mixed  $value
      * @param string $expected
      */
-    public function testactionMessage(string $key, string $action, $value, string $expected): void
+    public function testActionMessage(string $key, string $action, $value, string $expected): void
     {
         $modifyArray = new ModifyArray($key, $action, $value);
         $this->assertEquals($expected, $modifyArray->getActionMessage());
