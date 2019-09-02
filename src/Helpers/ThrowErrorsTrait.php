@@ -23,7 +23,7 @@ trait ThrowErrorsTrait
      *
      * @throws WorkerException
      */
-    public function throwGeneratorException(string $message, string ...$parameters): void
+    public function throwWorkerException(string $message, string ...$parameters): void
     {
         throw new WorkerException(vsprintf($message, $parameters));
     }

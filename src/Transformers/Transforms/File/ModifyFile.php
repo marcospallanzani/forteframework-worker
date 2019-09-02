@@ -299,7 +299,7 @@ class ModifyFile extends AbstractTransform
             return true;
 
         } catch (\ReflectionException $reflectionException) {
-            $this->throwGeneratorException(
+            $this->throwWorkerException(
                 "A general error occurred while retrieving the actions list. Error message is: '%s'.",
                 $reflectionException->getMessage()
             );
@@ -489,7 +489,7 @@ class ModifyFile extends AbstractTransform
         try {
             return self::getClassConstants('MODIFY_FILE_');
         } catch (\ReflectionException $reflectionException) {
-            $this->throwGeneratorException(
+            $this->throwWorkerException(
                 "An error occurred while retrieving the list of supported actions. Error message is: '%s'.",
                 $reflectionException->getMessage()
             );

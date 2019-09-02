@@ -40,13 +40,13 @@ class ModifyArray extends AbstractArray
     public function isValid(): bool
     {
         if (empty($this->key)) {
-            $this->throwGeneratorException("You need to specify the 'key' for the following check: '%s'.", $this);
+            $this->throwWorkerException("You need to specify the 'key' for the following check: '%s'.", $this);
         }
 
         // If no action is specified OR an unsupported action is given, then we throw an error.
         $modifyConstants = $this->getSupportedActions();
         if (!in_array($this->action, $modifyConstants)) {
-            $this->throwGeneratorException(
+            $this->throwWorkerException(
                 "The action '%s' is not supported. Impacted filter is: '%s'. Supported actions are: '%s'",
                 $this->action,
                 $this,
@@ -195,7 +195,7 @@ class ModifyArray extends AbstractArray
         try {
             return self::getClassConstants('MODIFY_');
         } catch (\ReflectionException $reflectionException) {
-            $this->throwGeneratorException(
+            $this->throwWorkerException(
                 "An error occurred while retrieving the list of supported actions. Error message is: '%s'.",
                 $reflectionException->getMessage()
             );

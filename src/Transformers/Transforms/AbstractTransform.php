@@ -179,7 +179,7 @@ abstract class AbstractTransform implements ValidActionInterface
             }
 
             if ($throwException) {
-                $this->throwGeneratorException($message);
+                $this->throwWorkerException($message);
             }
         }
 
@@ -216,7 +216,7 @@ abstract class AbstractTransform implements ValidActionInterface
             }
 
             if ($throwException) {
-                $this->throwGeneratorException($message);
+                $this->throwWorkerException($message);
             }
         }
 
