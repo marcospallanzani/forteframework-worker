@@ -94,8 +94,8 @@ class ChangeFileConfigEntries extends AbstractTransform
                 try {
                     // We check if the current modification is valid; if not valid, an exception will be thrown
                     $modification->isValid();
-                } catch (WorkerException $generatorException) {
-                    $this->throwTransformException($this, $generatorException->getMessage());
+                } catch (WorkerException $workerException) {
+                    $this->throwTransformException($this, $workerException->getMessage());
                 }
             }
         } catch (\ReflectionException $reflectionException) {

@@ -276,7 +276,7 @@ class VerifyArrayTest extends TestCase
      * @param string $operation
      * @param mixed $value
      * @param bool $reverseAction
-     * @param bool $expectGeneratorException
+     * @param bool $expectException
      *
      * @throws WorkerException
      */
@@ -286,12 +286,12 @@ class VerifyArrayTest extends TestCase
         string $operation,
         $value,
         bool $reverseAction,
-        bool $expectGeneratorException
+        bool $expectException
     ): void
     {
         $verifyArray = new VerifyArray($key, $operation, $value, $reverseAction);
 
-        if ($expectGeneratorException) {
+        if ($expectException) {
             $this->expectException(CheckException::class);
             $isValid = $verifyArray->setCheckContent($checkContent)->isValid();
             $this->assertFalse($isValid);

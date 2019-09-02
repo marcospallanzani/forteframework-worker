@@ -3,7 +3,7 @@
 namespace Forte\Worker\Exceptions;
 
 /**
- * Class GeneratorException
+ * Class WorkerException
  *
  * @package Forte\Worker\Exceptions
  */

@@ -275,11 +275,11 @@ class ModifyFile extends AbstractTransform
 
                 try {
                     $condition->isValid();
-                } catch (WorkerException $generatorException) {
+                } catch (WorkerException $workerException) {
                     $wrongActionsAndConditions[] = sprintf(
                         "The condition '%s' is not valid. Error message is: '%s'.",
                         $condition,
-                        $generatorException->getMessage()
+                        $workerException->getMessage()
                     );
                 }
             }

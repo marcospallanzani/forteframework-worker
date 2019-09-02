@@ -55,8 +55,8 @@ class AbstractTransformer
                 if ($transform instanceof AbstractTransform && !$transform->run()) {
                     $failedTransforms[] = $transform;
                 }
-            } catch (WorkerException $generatorException) {
-                $failedTransforms[] = $generatorException->getMessage();
+            } catch (WorkerException $workerException) {
+                $failedTransforms[] = $workerException->getMessage();
             }
         }
         return $failedTransforms;

@@ -84,8 +84,8 @@ class FileHasValidConfigEntries extends FileExists
                 try {
                     // We check if the current check parameters are valid; if not valid, an exception will be thrown
                     $check->isValid();
-                } catch (WorkerException $generatorException) {
-                    $this->throwCheckException($this, $generatorException->getMessage());
+                } catch (WorkerException $workerException) {
+                    $this->throwCheckException($this, $workerException->getMessage());
                 }
             }
         } catch (\ReflectionException $reflectionException) {

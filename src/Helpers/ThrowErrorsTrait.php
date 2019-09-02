@@ -16,7 +16,7 @@ use Forte\Worker\Checkers\Checks\AbstractCheck;
 trait ThrowErrorsTrait
 {
     /**
-     * Throw a GeneratorException with the given message and parameters.
+     * Throw a WorkerException with the given message and parameters.
      *
      * @param string $message The exception message.
      * @param string[] $parameters The values to replace in the error message.

@@ -164,17 +164,17 @@ class ModifyArrayTest extends TestCase
      *
      * @param ModifyArray $modifyArray
      * @param string $exceptionMessage
-     * @param bool $expectGeneratorException
+     * @param bool $expectException
      *
      * @throws TransformException
      */
     public function testIsValidWithErrorMessage(
         ModifyArray $modifyArray,
         string $exceptionMessage,
-        bool $expectGeneratorException
+        bool $expectException
     ): void
     {
-        if ($expectGeneratorException) {
+        if ($expectException) {
             $this->expectException(TransformException::class);
             $this->expectExceptionMessage($exceptionMessage);
             $isValid = $modifyArray->setModifyContent([])->isValid();
@@ -213,7 +213,7 @@ class ModifyArrayTest extends TestCase
      *
      * @param ModifyArray $modifyArray
      * @param string $exceptionMessage
-     * @param bool $expectGeneratorException
+     * @param bool $expectException
      * @param mixed $expected
      *
      * @throws WorkerException
@@ -221,11 +221,11 @@ class ModifyArrayTest extends TestCase
     public function testFailRun(
         ModifyArray $modifyArray,
         string $exceptionMessage,
-        bool $expectGeneratorException,
+        bool $expectException,
         $expected
     ): void
     {
-        if ($expectGeneratorException) {
+        if ($expectException) {
             $this->expectException(TransformException::class);
             $modifyArray->setModifyContent([])->run();
         } else {

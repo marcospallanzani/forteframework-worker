@@ -55,8 +55,8 @@ class AbstractChecker
                 if ($check instanceof AbstractCheck && !$check->run()) {
                     $failedChecks[] = $check;
                 }
-            } catch (WorkerException $generatorException) {
-                $failedChecks[] = $generatorException->getMessage();
+            } catch (WorkerException $workerException) {
+                $failedChecks[] = $workerException->getMessage();
             }
         }
         return $failedChecks;

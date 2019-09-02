@@ -116,9 +116,9 @@ abstract class AbstractTransform implements ValidActionInterface
                 if ($check instanceof AbstractCheck && !$check->run()) {
                     $failedChecks[] = new CheckException($check, "Check failed.");
                 }
-            } catch (WorkerException $generatorException) {
+            } catch (WorkerException $workerException) {
                 $failedChecks[] = new CheckException($check,
-                    sprintf("Check failed with error '%s'.", $generatorException->getMessage())
+                    sprintf("Check failed with error '%s'.", $workerException->getMessage())
                 );
             }
         }
@@ -139,9 +139,9 @@ abstract class AbstractTransform implements ValidActionInterface
                 if ($check instanceof AbstractCheck && !$check->run()) {
                     $failedChecks[] = new CheckException($check, "Check failed.");
                 }
-            } catch (WorkerException $generatorException) {
+            } catch (WorkerException $workerException) {
                 $failedChecks[] = new CheckException($check,
-                    sprintf("Check failed with error '%s'.", $generatorException->getMessage())
+                    sprintf("Check failed with error '%s'.", $workerException->getMessage())
                 );
             }
         }
