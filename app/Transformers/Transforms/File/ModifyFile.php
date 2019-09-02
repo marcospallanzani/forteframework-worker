@@ -32,12 +32,13 @@ class ModifyFile extends AbstractTransform
     /**
      * Supported actions.
      */
-    const MODIFY_FILE_REPLACE_IN_LINE = "replace_content_in_line";
-    const MODIFY_FILE_REPLACE_LINE    = "replace_line";
-    const MODIFY_FILE_REMOVE_IN_LINE  = "remove_content_in_line";
-    const MODIFY_FILE_REMOVE_LINE     = "remove_line";
-    const MODIFY_FILE_APPEND_TO_LINE  = "append_content_to_line";
-//TODO INSERT A NEW ACTION: INSERT CONTENT FROM ANOTHER FILE
+    const MODIFY_FILE_REPLACE_IN_LINE       = "replace_content_in_line";
+    const MODIFY_FILE_REPLACE_LINE          = "replace_line";
+    const MODIFY_FILE_REMOVE_IN_LINE        = "remove_content_in_line";
+    const MODIFY_FILE_REMOVE_LINE           = "remove_line";
+    const MODIFY_FILE_APPEND_TO_LINE        = "append_content_to_line";
+    const MODIFY_FILE_APPEND_TEMPLATE       = "append_template";
+    const MODIFY_FILE_REPLACE_WITH_TEMPLATE = "replace_with_template";
 
     /**
      * @var string
@@ -50,24 +51,27 @@ class ModifyFile extends AbstractTransform
     protected $actions = [];
 
     /**
-     * ModifyFile constructor. This class performs different actions to
-     * modify a given file. The available actions are:
-     * - add content;
-     * - replace content;
-     * - remove content;
-     * - append content;
+     * ModifyFile constructor.
+     *
+     * This class performs different actions to modify a given file. The available
+     * actions are:
+     * 1. "replace_content_in_line": replace a content with a given replace content
+     *    in a line that matched the search condition;
+     * 2. "replace_line": replace a whole line, that matched the search condition,
+     *    with a given replace content;
+     * 3. "remove_content_in_line": remove a matched content in a line that matched
+     *    the search condition;
+     * 4. "remove_line": remove a whole line that matched the searched content;
+     * 5. "append_content_to_line": append a content to a line that matched the
+     *    search condition;
+     * 6. "append_template": append a given template (replace value) to a line that
+     *    matched the search condition;
+     * 7. "replace_with_template": replace a line, that matched the searc condition,
+     *   with a given template (replace value)
      *
      * These actions can be used with some conditional parameters, to
      * determine whether or not that action should be applied. The available
      * conditions are described by the object VerifyText.
-     *
-     * It is not required to specify a condition and a condition value in the
-     * following cases:
-     * - action is "add_content" or "append_content": in this case, the new content
-     * will be appended at the end of the file.
-     *
-     * For all other actions, a condition and a condition value are always required,
-     * except for the condition "is_empty", which does not require a condition value.
      *
      * @param string $filePath The file path of the file to be modified.
      */
@@ -142,7 +146,7 @@ class ModifyFile extends AbstractTransform
      * Remove each line, of the specified file, that starts with the given condition
      * value with the given replace value.
      *
-     * @param mixed $conditionValue
+     * @param mixed $conditionValue The condition value.
      *
      * @return ModifyFile
      */
@@ -152,6 +156,44 @@ class ModifyFile extends AbstractTransform
             self::MODIFY_FILE_REMOVE_LINE,
             VerifyText::CONDITION_STARTS_WITH,
             $conditionValue
+        );
+    }
+
+    /**
+     * Replace each line, of the specified file, that is equal to the given condition
+     * value, with the given template.
+     *
+     * @param string $templatePath The template path.
+     * @param mixed $conditionValue The condition value.
+     *
+     * @return ModifyFile
+     */
+    public function replaceWithTemplateIfLineEqualTo(string $templatePath, $conditionValue): self
+    {
+        return $this->addAction(
+            self::MODIFY_FILE_REPLACE_WITH_TEMPLATE,
+            VerifyText::CONDITION_EQUAL_TO,
+            $conditionValue,
+            $templatePath
+        );
+    }
+
+    /**
+     * Add the given template to each line, of the specified file, that is equal to the given
+     * condition value.
+     *
+     * @param string $templatePath The template path.
+     * @param mixed $conditionValue The condition value.
+     *
+     * @return ModifyFile
+     */
+    public function addTemplateIfLineEqualTo(string $templatePath, $conditionValue): self
+    {
+        return $this->addAction(
+            self::MODIFY_FILE_APPEND_TEMPLATE,
+            VerifyText::CONDITION_EQUAL_TO,
+            $conditionValue,
+            $templatePath
         );
     }
 
@@ -287,7 +329,7 @@ class ModifyFile extends AbstractTransform
             foreach ($this->actions as $key => $action) {
                 // We first check if the condition is met
                 $condition = $action['condition'];
-                if ($condition instanceof VerifyText && $condition->setContent($line)->run()) {
+                if ($condition instanceof VerifyText && $condition->setContent(trim($line, PHP_EOL))->run()) {
                     // We have to apply the configured change
                     switch ($action['action']) {
                         case self::MODIFY_FILE_APPEND_TO_LINE:
@@ -316,6 +358,16 @@ class ModifyFile extends AbstractTransform
                                 $newLine .= PHP_EOL;
                             }
                             $line = $newLine;
+                            break;
+                        case self::MODIFY_FILE_APPEND_TEMPLATE:
+                            // In this case, the replace value, should be a valid file name that we want to append
+                            // at the end of the current line
+                            $line .= $this->getFileContent($action['value']);
+                            break;
+                        case self::MODIFY_FILE_REPLACE_WITH_TEMPLATE:
+                            // In this case, the replace value, should be a valid file name that we want to replace
+                            // to the current line
+                            $line = $this->getFileContent($action['value']);
                             break;
                     }
                 }
@@ -389,6 +441,22 @@ class ModifyFile extends AbstractTransform
                                 (string) $action['condition']
                             ) . PHP_EOL;
                         break;
+                    case self::MODIFY_FILE_APPEND_TEMPLATE:
+                        $message .= sprintf(
+                                "%d. Append template '%s' to each line that meets the following condition: '%s';",
+                                $key,
+                                (string) $action['value'],
+                                (string) $action['condition']
+                            ) . PHP_EOL;
+                        break;
+                    case self::MODIFY_FILE_REPLACE_WITH_TEMPLATE:
+                        $message .= sprintf(
+                                "%d. Replace each line that meets the following condition, with template '%s': '%s';",
+                                $key,
+                                (string) $action['value'],
+                                (string) $action['condition']
+                            ) . PHP_EOL;
+                        break;
                 }
             }
         }
@@ -414,5 +482,21 @@ class ModifyFile extends AbstractTransform
                 $reflectionException->getMessage()
             );
         }
+    }
+
+    /**
+     * Read the given file and return its content as a string.
+     *
+     * @param string $filePath The file path to read.
+     *
+     * @return string The file content.
+     *
+     * @throws GeneratorException
+     */
+    protected function getFileContent(string $filePath): string
+    {
+        $this->checkFileExists($filePath);
+
+        return file_get_contents($filePath);
     }
 }
