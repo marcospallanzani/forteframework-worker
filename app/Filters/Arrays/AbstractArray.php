@@ -1,13 +1,13 @@
 <?php
 
-namespace Forte\Api\Generator\Filters\Arrays;
+namespace Forte\Worker\Filters\Arrays;
 
-use Forte\Api\Generator\Actions\ValidInterface;
+use Forte\Worker\Actions\ValidInterface;
 
 /**
  * Class AbstractArray. General class for all arrays related filters.
  *
- * @package Forte\Api\Generator\Filters\Arrays
+ * @package Forte\Worker\Filters\Arrays
  */
 abstract class AbstractArray implements ValidInterface
 {

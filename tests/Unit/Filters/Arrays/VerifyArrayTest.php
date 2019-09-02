@@ -3,9 +3,9 @@
 
 namespace Tests\Unit\Filters\Arrays;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\MissingKeyException;
-use Forte\Api\Generator\Filters\Arrays\VerifyArray;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\MissingKeyException;
+use Forte\Worker\Filters\Arrays\VerifyArray;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -273,7 +273,7 @@ class VerifyArrayTest extends TestCase
      * @param bool $reverseAction
      * @param bool $expectGeneratorException
      *
-     * @throws \Forte\Api\Generator\Exceptions\GeneratorException
+     * @throws GeneratorException
      */
     public function testIsValid(
         string $key,
@@ -335,7 +335,7 @@ class VerifyArrayTest extends TestCase
     }
 
     /**
-     * Check if MissingConfigkeyException is thrown when a non-existing key is given
+     * Check if MissingKeyException is thrown when a non-existing key is given
      * to a VerifyArray instance.
      *
      * @throws GeneratorException

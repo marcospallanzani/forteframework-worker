@@ -9,12 +9,12 @@
  *  with this source code.
  */
 
-namespace Forte\Api\Generator\Helpers;
+namespace Forte\Worker\Helpers;
 
 /**
  * Class Collection. A set of functions to handle collections.
  *
- * @package Forte\Api\Generator\Helpers
+ * @package Forte\Worker\Helpers
  */
 class Collection
 {

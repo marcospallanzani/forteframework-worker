@@ -11,12 +11,12 @@
 
 namespace Tests\Unit\Helpers;
 
-use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
-use Forte\Api\Generator\Exceptions\CheckException;
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\TransformException;
-use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
-use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
+use Forte\Worker\Checkers\Checks\AbstractCheck;
+use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Helpers\ThrowErrorsTrait;
+use Forte\Worker\Transformers\Transforms\AbstractTransform;
 use PHPUnit\Framework\TestCase;
 
 /**

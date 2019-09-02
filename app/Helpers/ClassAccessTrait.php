@@ -1,11 +1,11 @@
 <?php
 
-namespace Forte\Api\Generator\Helpers;
+namespace Forte\Worker\Helpers;
 
 /**
  * Trait ClassAccessTrait. A trait that identifies class constants.
  *
- * @package Forte\Api\Generator\Helpers
+ * @package Forte\Worker\Helpers
  */
 trait ClassAccessTrait
 {

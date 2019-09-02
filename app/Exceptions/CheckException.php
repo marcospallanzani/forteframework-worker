@@ -1,14 +1,14 @@
 <?php
 
-namespace Forte\Api\Generator\Exceptions;
+namespace Forte\Worker\Exceptions;
 
-use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
+use Forte\Worker\Checkers\Checks\AbstractCheck;
 use Throwable;
 
 /**
  * Class CheckException
  *
- * @package Forte\Api\Generator\Exceptions
+ * @package Forte\Worker\Exceptions
  */
 class CheckException extends GeneratorException
 {

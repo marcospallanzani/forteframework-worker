@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Helpers;
 
-use Forte\Api\Generator\Helpers\FileParser;
+use Forte\Worker\Helpers\FileParser;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -48,7 +48,7 @@ class FileParserTest extends TestCase
      * @param string $contentType
      * @param array $content
      *
-     * @throws \Forte\Api\Generator\Exceptions\GeneratorException
+     * @throws \Forte\Worker\Exceptions\GeneratorException
      */
     public function testWriteAndParseConfigFile(string $filePath, string $contentType, array $content): void
     {

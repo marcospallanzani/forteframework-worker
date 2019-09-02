@@ -9,15 +9,15 @@
  *  with this source code.
  */
 
-namespace Forte\Api\Generator\Checkers\Checks\File;
+namespace Forte\Worker\Checkers\Checks\File;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\GeneratorException;
 
 /**
  * Class FileHasInstantiableClass. This class checks if a given file
  * has an instantiable class.
  *
- * @package Forte\Api\Generator\Checkers\Checks\File
+ * @package Forte\Worker\Checkers\Checks\File
  */
 class FileHasInstantiableClass extends FileExists
 {

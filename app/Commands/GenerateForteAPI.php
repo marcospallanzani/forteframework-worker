@@ -1,9 +1,9 @@
 <?php
 
-namespace Forte\Api\Generator\Commands;
+namespace Forte\Worker\Commands;
 
-use Forte\Api\Generator\Config\ForteApi;
-use Forte\Api\Generator\Exceptions\MissingKeyException;
+use Forte\Worker\Config\ForteApi;
+use Forte\Worker\Exceptions\MissingKeyException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -15,7 +15,7 @@ use Zend\Text\Figlet\Figlet;
 /**
  * Class GenerateForteAPI
  *
- * @package Forte\Api\Generator\Commands
+ * @package Forte\Worker\Commands
  */
 class GenerateForteAPI extends Command
 {
@@ -139,13 +139,13 @@ class GenerateForteAPI extends Command
         $forteAPI = null;
         try {
             $forteAPI = new ForteApi($apiConfig);
-        } catch (MissingKeyException $missingConfigKeyException) {
+        } catch (MissingKeyException $missingKeyException) {
             $output->writeln(sprintf(
                 "The configuration key '%s' was not found in file '%s'.",
-                $missingConfigKeyException->getMissingKey(),
+                $missingKeyException->getMissingKey(),
                 $configFile
             ));
-            $this->logErrorMessageAndTrace($missingConfigKeyException);
+            $this->logErrorMessageAndTrace($missingKeyException);
         }
 
         /**************************************************************

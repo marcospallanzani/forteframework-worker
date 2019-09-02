@@ -1,18 +1,18 @@
 <?php
 
-namespace Forte\Api\Generator\Checkers\Checks;
+namespace Forte\Worker\Checkers\Checks;
 
-use Forte\Api\Generator\Actions\ValidActionInterface;
-use Forte\Api\Generator\Exceptions\CheckException;
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Helpers\ClassAccessTrait;
-use Forte\Api\Generator\Helpers\FileTrait;
-use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
+use Forte\Worker\Actions\ValidActionInterface;
+use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Helpers\ClassAccessTrait;
+use Forte\Worker\Helpers\FileTrait;
+use Forte\Worker\Helpers\ThrowErrorsTrait;
 
 /**
  * Class AbstractCheck
  *
- * @package Forte\Api\Generator\Checkers\Checks
+ * @package Forte\Worker\Checkers\Checks
  */
 abstract class AbstractCheck implements ValidActionInterface
 {

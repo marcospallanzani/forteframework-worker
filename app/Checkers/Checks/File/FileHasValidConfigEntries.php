@@ -9,17 +9,17 @@
  *  with this source code.
  */
 
-namespace Forte\Api\Generator\Checkers\Checks\File;
+namespace Forte\Worker\Checkers\Checks\File;
 
-use Forte\Api\Generator\Exceptions\CheckException;
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Filters\Arrays\VerifyArray;
-use Forte\Api\Generator\Helpers\FileParser;
+use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Filters\Arrays\VerifyArray;
+use Forte\Worker\Helpers\FileParser;
 
 /**
  * Class FileHasValidConfigEntries
  *
- * @package Forte\Api\Generator\Checkers\Checks\File
+ * @package Forte\Worker\Checkers\Checks\File
  */
 class FileHasValidConfigEntries extends FileExists
 {

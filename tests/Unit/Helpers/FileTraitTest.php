@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Helpers;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Helpers\FileTrait;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Helpers\FileTrait;
 use PHPUnit\Framework\TestCase;
 
 /**

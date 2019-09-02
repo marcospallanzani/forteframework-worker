@@ -1,14 +1,14 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers;
+namespace Forte\Worker\Transformers;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
  * Class AbstractTransformer. A base class for all transformer implementations.
  *
- * @package Forte\Api\Generator\Transformers
+ * @package Forte\Worker\Transformers
  */
 class AbstractTransformer
 {

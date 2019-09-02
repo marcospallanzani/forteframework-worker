@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Helpers;
 
-use Forte\Api\Generator\Helpers\ClassAccessTrait;
+use Forte\Worker\Helpers\ClassAccessTrait;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -9,13 +9,13 @@
  *  with this source code.
  */
 
-namespace Forte\Api\Generator\Actions;
+namespace Forte\Worker\Actions;
 
 /**
  * Interface ValidActionInterface. Basic behaviour of all classes that
  * perform an action, which needs a pre-run validation.
  *
- * @package Forte\Api\Generator\Actions
+ * @package Forte\Worker\Actions
  */
 interface ValidActionInterface extends ValidInterface, ActionInterface
 {

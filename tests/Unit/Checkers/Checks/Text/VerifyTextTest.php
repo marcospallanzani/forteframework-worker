@@ -11,9 +11,9 @@
 
 namespace Tests\Unit\Checkers\Checks\Text;
 
-use Forte\Api\Generator\Checkers\Checks\Text\VerifyText;
-use Forte\Api\Generator\Exceptions\CheckException;
-use Forte\Api\Generator\Exceptions\GeneratorException;
+use Forte\Worker\Checkers\Checks\Text\VerifyText;
+use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\GeneratorException;
 use PHPUnit\Framework\TestCase;
 
 /**

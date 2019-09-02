@@ -9,21 +9,21 @@
  *  with this source code.
  */
 
-namespace Forte\Api\Generator\Transformers\Transforms\File;
+namespace Forte\Worker\Transformers\Transforms\File;
 
-use Forte\Api\Generator\Checkers\Checks\Text\VerifyText;
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Helpers\ClassAccessTrait;
-use Forte\Api\Generator\Helpers\StringParser;
-use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
-use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
+use Forte\Worker\Checkers\Checks\Text\VerifyText;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Helpers\ClassAccessTrait;
+use Forte\Worker\Helpers\StringParser;
+use Forte\Worker\Helpers\ThrowErrorsTrait;
+use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
  * Class ModifyFile. This class is used to modify the content of a given
  * file. The content will be parsed line by line and the configured changes
  * will be applied.
  *
- * @package Forte\Api\Generator\Transformers\Transforms\File
+ * @package Forte\Worker\Transformers\Transforms\File
  */
 class ModifyFile extends AbstractTransform
 {

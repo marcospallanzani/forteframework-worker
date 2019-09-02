@@ -9,12 +9,12 @@
  *  with this source code.
  */
 
-namespace Forte\Api\Generator\Helpers;
+namespace Forte\Worker\Helpers;
 
 /**
  * Class StringParser. A set of methods to parse and handle strings.
  *
- * @package Forte\Api\Generator\Helpers
+ * @package Forte\Worker\Helpers
  */
 class StringParser
 {

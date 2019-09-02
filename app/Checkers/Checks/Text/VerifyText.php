@@ -9,11 +9,11 @@
  *  with this source code.
  */
 
-namespace Forte\Api\Generator\Checkers\Checks\Text;
+namespace Forte\Worker\Checkers\Checks\Text;
 
-use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
-use Forte\Api\Generator\Exceptions\CheckException;
-use Forte\Api\Generator\Helpers\StringParser;
+use Forte\Worker\Checkers\Checks\AbstractCheck;
+use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Helpers\StringParser;
 
 /**
  * Class VerifyText. This class describes a check condition to be executed
@@ -39,7 +39,7 @@ use Forte\Api\Generator\Helpers\StringParser;
  *
  * All of the above conditions, except for "is_empty", require a condition value.
  *
- * @package Forte\Api\Generator\Checkers\Checks\Text
+ * @package Forte\Worker\Checkers\Checks\Text
  */
 class VerifyText extends AbstractCheck
 {

@@ -11,7 +11,7 @@
 
 namespace Tests\Unit\Helpers;
 
-use Forte\Api\Generator\Helpers\Collection;
+use Forte\Worker\Helpers\Collection;
 use PHPUnit\Framework\TestCase;
 
 /**

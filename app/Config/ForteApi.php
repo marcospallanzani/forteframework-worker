@@ -1,9 +1,9 @@
 <?php
 
-namespace Forte\Api\Generator\Config;
+namespace Forte\Worker\Config;
 
-use Forte\Api\Generator\Exceptions\MissingKeyException;
-use Forte\Api\Generator\Helpers\FileParser;
+use Forte\Worker\Exceptions\MissingKeyException;
+use Forte\Worker\Helpers\FileParser;
 
 /**
  * Class ForteApi.
@@ -11,7 +11,7 @@ use Forte\Api\Generator\Helpers\FileParser;
  * This class wraps all required configuration keys, in order
  * to generate a new Forte API from the Forte API Skeleton.
  *
- * @package Forte\Api\Generator\Config
+ * @package Forte\Worker\Config
  */
 class ForteApi
 {

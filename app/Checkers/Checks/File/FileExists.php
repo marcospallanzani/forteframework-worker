@@ -9,16 +9,16 @@
  *  with this source code.
  */
 
-namespace Forte\Api\Generator\Checkers\Checks\File;
+namespace Forte\Worker\Checkers\Checks\File;
 
-use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
-use Forte\Api\Generator\Exceptions\CheckException;
-use Forte\Api\Generator\Exceptions\GeneratorException;
+use Forte\Worker\Checkers\Checks\AbstractCheck;
+use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\GeneratorException;
 
 /**
  * Class FileExists.
  *
- * @package Forte\Api\Generator\Checkers\Checks\File
+ * @package Forte\Worker\Checkers\Checks\File
  */
 class FileExists extends AbstractCheck
 {

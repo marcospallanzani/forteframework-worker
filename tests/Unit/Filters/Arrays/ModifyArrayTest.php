@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Filters\Arrays;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Filters\Arrays\ModifyArray;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Filters\Arrays\ModifyArray;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -228,7 +228,7 @@ class ModifyArrayTest extends TestCase
      * @param array  $array
      * @param array  $expected
      *
-     * @throws \Forte\Api\Generator\Exceptions\GeneratorException
+     * @throws \Forte\Worker\Exceptions\GeneratorException
      */
     public function testFilter(string $key, string $action, $value, array $array, array $expected): void
     {

@@ -9,14 +9,14 @@
  *  with this source code.
  */
 
-namespace Forte\Api\Generator\Actions;
+namespace Forte\Worker\Actions;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\GeneratorException;
 
 /**
  * Interface ValidInterface. Basic behaviour of all classes need a validation.
  *
- * @package Forte\Api\Generator\Actions
+ * @package Forte\Worker\Actions
  */
 interface ValidInterface
 {

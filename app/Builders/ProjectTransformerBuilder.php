@@ -1,22 +1,22 @@
 <?php
 
-namespace Forte\Api\Generator\Builders;
+namespace Forte\Worker\Builders;
 
-use Forte\Api\Generator\Filters\Arrays\VerifyArray;
-use Forte\Api\Generator\Checkers\Checks\File\FileHasValidConfigEntries;
-use Forte\Api\Generator\Transformers\ProjectTransformer;
-use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
-use Forte\Api\Generator\Checkers\Checks\File\FileExists;
-use Forte\Api\Generator\Checkers\Checks\File\FileHasInstantiableClass;
-use Forte\Api\Generator\Transformers\Transforms\EmptyTransform;
-use Forte\Api\Generator\Transformers\Transforms\File\ChangeFileConfigEntries;
-use Forte\Api\Generator\Transformers\Transforms\File\Copy;
-use Forte\Api\Generator\Transformers\Transforms\File\Unzip;
+use Forte\Worker\Filters\Arrays\VerifyArray;
+use Forte\Worker\Checkers\Checks\File\FileHasValidConfigEntries;
+use Forte\Worker\Transformers\ProjectTransformer;
+use Forte\Worker\Transformers\Transforms\AbstractTransform;
+use Forte\Worker\Checkers\Checks\File\FileExists;
+use Forte\Worker\Checkers\Checks\File\FileHasInstantiableClass;
+use Forte\Worker\Transformers\Transforms\EmptyTransform;
+use Forte\Worker\Transformers\Transforms\File\ChangeFileConfigEntries;
+use Forte\Worker\Transformers\Transforms\File\Copy;
+use Forte\Worker\Transformers\Transforms\File\Unzip;
 
 /**
  * Class ProjectTransformerBuilder
  *
- * @package Forte\Api\Generator\Builders
+ * @package Forte\Worker\Builders
  */
 class ProjectTransformerBuilder
 {

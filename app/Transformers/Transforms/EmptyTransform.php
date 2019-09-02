@@ -1,17 +1,12 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers\Transforms;
-
-
-use Forte\Api\Generator\Exceptions\CheckException;
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\TransformException;
+namespace Forte\Worker\Transformers\Transforms;
 
 /**
  * Class EmptyTransform. This class does not apply any transformation
  * and can be used as a support to run pre- and/or post-transform checks.
  *
- * @package Forte\Api\Generator\Transformers\Transforms
+ * @package Forte\Worker\Transformers\Transforms
  */
 class EmptyTransform extends AbstractTransform
 {

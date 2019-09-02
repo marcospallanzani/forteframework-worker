@@ -11,10 +11,10 @@
 
 namespace Tests\Unit\Transformers\Transforms\File;
 
-use Forte\Api\Generator\Checkers\Checks\Text\VerifyText;
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\TransformException;
-use Forte\Api\Generator\Transformers\Transforms\File\ModifyFile;
+use Forte\Worker\Checkers\Checks\Text\VerifyText;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Transformers\Transforms\File\ModifyFile;
 use PHPUnit\Framework\TestCase;
 
 /**

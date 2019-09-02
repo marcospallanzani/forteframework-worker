@@ -1,17 +1,17 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers\Transforms\File;
+namespace Forte\Worker\Transformers\Transforms\File;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\TransformException;
-use Forte\Api\Generator\Filters\Arrays\ModifyArray;
-use Forte\Api\Generator\Helpers\FileParser;
-use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Filters\Arrays\ModifyArray;
+use Forte\Worker\Helpers\FileParser;
+use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
  * Class ChangeFileConfigEntries
  *
- * @package Forte\Api\Generator\Transformers\Transforms\File
+ * @package Forte\Worker\Transformers\Transforms\File
  */
 class ChangeFileConfigEntries extends AbstractTransform
 {

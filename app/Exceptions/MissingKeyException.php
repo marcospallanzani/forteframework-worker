@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Api\Generator\Exceptions;
+namespace Forte\Worker\Exceptions;
 
 use Throwable;
 
@@ -9,7 +9,7 @@ use Throwable;
  *
  * Exception used to throw an error when a required configuration key is missing.
  *
- * @package Forte\Api\Generator\Exceptions
+ * @package Forte\Worker\Exceptions
  */
 class MissingKeyException extends GeneratorException
 {

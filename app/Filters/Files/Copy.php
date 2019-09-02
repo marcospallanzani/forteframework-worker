@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Api\Generator\Filters\Files;
+namespace Forte\Worker\Filters\Files;
 
 use Zend\Filter\Exception\RuntimeException;
 use Zend\Filter\File\Rename;
@@ -8,7 +8,7 @@ use Zend\Filter\File\Rename;
 /**
  * Class Copy. This class copies a source file to a given destination.
  *
- * @package Forte\Api\Generator\Filters\Files
+ * @package Forte\Worker\Filters\Files
  */
 class Copy extends Rename
 {

@@ -1,19 +1,19 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers\Transforms;
+namespace Forte\Worker\Transformers\Transforms;
 
-use Forte\Api\Generator\Actions\ValidActionInterface;
-use Forte\Api\Generator\Exceptions\CheckException;
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Helpers\ClassAccessTrait;
-use Forte\Api\Generator\Helpers\FileTrait;
-use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
-use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
+use Forte\Worker\Actions\ValidActionInterface;
+use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Helpers\ClassAccessTrait;
+use Forte\Worker\Helpers\FileTrait;
+use Forte\Worker\Helpers\ThrowErrorsTrait;
+use Forte\Worker\Checkers\Checks\AbstractCheck;
 
 /**
  * Class AbstractTransform
  *
- * @package Forte\Api\Generator\Transformers\Transforms
+ * @package Forte\Worker\Transformers\Transforms
  */
 abstract class AbstractTransform implements ValidActionInterface
 {

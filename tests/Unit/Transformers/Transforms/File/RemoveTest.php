@@ -11,13 +11,13 @@
 
 namespace Tests\Unit\Transformers\Transforms\File;
 
-use Forte\Api\Generator\Checkers\Checks\File\DirectoryDoesNotExist;
-use Forte\Api\Generator\Checkers\Checks\File\DirectoryExists;
-use Forte\Api\Generator\Checkers\Checks\File\FileDoesNotExist;
-use Forte\Api\Generator\Checkers\Checks\File\FileExists;
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\TransformException;
-use Forte\Api\Generator\Transformers\Transforms\File\Remove;
+use Forte\Worker\Checkers\Checks\File\DirectoryDoesNotExist;
+use Forte\Worker\Checkers\Checks\File\DirectoryExists;
+use Forte\Worker\Checkers\Checks\File\FileDoesNotExist;
+use Forte\Worker\Checkers\Checks\File\FileExists;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Transformers\Transforms\File\Remove;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -75,7 +75,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Api\Generator\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
      * for one single file.
      *
      * @dataProvider filesProvider
@@ -101,7 +101,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Api\Generator\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
      * for one single file without the pre- and post-transform checks.
      *
      * @dataProvider filesProvider
@@ -120,7 +120,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Api\Generator\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
      * in mode "single-file", but with a folder as a parameter.
      *
      * @throws GeneratorException
@@ -134,7 +134,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Api\Generator\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
      * in mode "directory-file", with a valid folder parameter.
      *
      * @throws GeneratorException
@@ -153,7 +153,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Api\Generator\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
      * in mode "directory-file", with a valid folder parameter.
      *
      * @throws GeneratorException
@@ -172,7 +172,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Api\Generator\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
      * in mode "directory-file", but with a wrong or non-existing folder as a parameter.
      *
      * @throws GeneratorException

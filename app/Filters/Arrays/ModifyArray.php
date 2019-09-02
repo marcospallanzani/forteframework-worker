@@ -1,15 +1,15 @@
 <?php
 
-namespace Forte\Api\Generator\Filters\Arrays;
+namespace Forte\Worker\Filters\Arrays;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Helpers\ClassAccessTrait;
-use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Helpers\ClassAccessTrait;
+use Forte\Worker\Helpers\ThrowErrorsTrait;
 
 /**
  * Class ModifyArray.
  *
- * @package Forte\Api\Generator\Filters\Arrays
+ * @package Forte\Worker\Filters\Arrays
  */
 class ModifyArray extends AbstractArray
 {

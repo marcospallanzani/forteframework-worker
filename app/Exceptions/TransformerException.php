@@ -1,14 +1,14 @@
 <?php
 
-namespace Forte\Api\Generator\Exceptions;
+namespace Forte\Worker\Exceptions;
 
-use Forte\Api\Generator\Transformers\AbstractTransformer;
+use Forte\Worker\Transformers\AbstractTransformer;
 use Throwable;
 
 /**
  * Class TransformerException
  *
- * @package Forte\Api\Generator\Exceptions
+ * @package Forte\Worker\Exceptions
  */
 class TransformerException extends GeneratorException
 {

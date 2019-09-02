@@ -9,15 +9,15 @@
  *  with this source code.
  */
 
-namespace Forte\Api\Generator\Actions;
+namespace Forte\Worker\Actions;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\GeneratorException;
 
 /**
  * Interface ActionInterface. Basic behaviour of all classes that
  * perform a given action.
  *
- * @package Forte\Api\Generator\Actions
+ * @package Forte\Worker\Actions
  */
 interface ActionInterface
 {

@@ -9,29 +9,9 @@
  *  with this source code.
  */
 
-/**
- * This file is part of the ForteFramework package.
- *
- * Copyright (c) 2019  Marco Spallanzani <marco@forteframework.com>
- *
- *  For the full copyright and license information,
- *  please view the LICENSE file that was distributed
- *  with this source code.
- */
-
-/**
- * This file is part of the ForteFramework package.
- *
- * Copyright (c) 2019  Marco Spallanzani <marco@forteframework.com>
- *
- *  For the full copyright and license information,
- *  please view the LICENSE file that was distributed
- *  with this source code.
- */
-
 namespace Tests\Unit\Checkers\Checks\File;
 
-use Forte\Api\Generator\Checkers\Checks\File\DirectoryExists;
+use Forte\Worker\Checkers\Checks\File\DirectoryExists;
 use PHPUnit\Framework\TestCase;
 
 /**

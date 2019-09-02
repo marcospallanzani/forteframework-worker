@@ -11,7 +11,7 @@
 
 namespace Tests\Unit\Helpers;
 
-use Forte\Api\Generator\Helpers\StringParser;
+use Forte\Worker\Helpers\StringParser;
 use PHPUnit\Framework\TestCase;
 
 /**

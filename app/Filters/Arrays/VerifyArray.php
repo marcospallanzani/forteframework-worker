@@ -1,18 +1,18 @@
 <?php
 
-namespace Forte\Api\Generator\Filters\Arrays;
+namespace Forte\Worker\Filters\Arrays;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\MissingKeyException;
-use Forte\Api\Generator\Helpers\ClassAccessTrait;
-use Forte\Api\Generator\Helpers\FileParser;
-use Forte\Api\Generator\Helpers\StringParser;
-use Forte\Api\Generator\Helpers\ThrowErrorsTrait;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\MissingKeyException;
+use Forte\Worker\Helpers\ClassAccessTrait;
+use Forte\Worker\Helpers\FileParser;
+use Forte\Worker\Helpers\StringParser;
+use Forte\Worker\Helpers\ThrowErrorsTrait;
 
 /**
  * Class VerifyArray. Class used to wrap all required check parameters.
  *
- * @package Forte\Api\Generator\Filters\Arrays
+ * @package Forte\Worker\Filters\Arrays
  */
 class VerifyArray extends AbstractArray
 {

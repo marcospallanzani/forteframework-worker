@@ -1,11 +1,11 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers;
+namespace Forte\Worker\Transformers;
 
 /**
  * Class ProjectTransformer. A class that applies a set of transformations to a Laravel project.
  *
- * @package Forte\Api\Generator\Transformers
+ * @package Forte\Worker\Transformers
  */
 class ProjectTransformer extends AbstractTransformer
 {

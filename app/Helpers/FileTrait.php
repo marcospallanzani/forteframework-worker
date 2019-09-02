@@ -1,14 +1,14 @@
 <?php
 
-namespace Forte\Api\Generator\Helpers;
+namespace Forte\Worker\Helpers;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\GeneratorException;
 use Zend\Validator\File\NotExists;
 
 /**
  * Trait FileTrait. Trait with helper methods for all file access actions.
  *
- * @package Forte\Api\Generator\Helpers
+ * @package Forte\Worker\Helpers
  */
 trait FileTrait
 {

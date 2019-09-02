@@ -1,14 +1,14 @@
 <?php
 
-namespace Forte\Api\Generator\Checkers;
+namespace Forte\Worker\Checkers;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Checkers\Checks\AbstractCheck;
 
 /**
  * Class AbstractChecker. A base class for all checker implementations.
  *
- * @package Forte\Api\Generator\Checkers
+ * @package Forte\Worker\Checkers
  */
 class AbstractChecker
 {

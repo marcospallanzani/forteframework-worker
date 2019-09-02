@@ -1,17 +1,17 @@
 <?php
 
-namespace Forte\Api\Generator\Helpers;
+namespace Forte\Worker\Helpers;
 
-use Forte\Api\Generator\Exceptions\CheckException;
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\TransformException;
-use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
-use Forte\Api\Generator\Checkers\Checks\AbstractCheck;
+use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Transformers\Transforms\AbstractTransform;
+use Forte\Worker\Checkers\Checks\AbstractCheck;
 
 /**
  * Trait ThrowErrorsTrait. Methods to easily throw application exceptions.
  *
- * @package Forte\Api\Generator\Helpers
+ * @package Forte\Worker\Helpers
  */
 trait ThrowErrorsTrait
 {

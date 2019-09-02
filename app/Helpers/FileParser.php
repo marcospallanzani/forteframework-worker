@@ -1,9 +1,9 @@
 <?php
 
-namespace Forte\Api\Generator\Helpers;
+namespace Forte\Worker\Helpers;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\MissingKeyException;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\MissingKeyException;
 use Symfony\Component\Yaml\Yaml as YamlReader;
 use Zend\Config\Reader\Ini as IniReader;
 use Zend\Config\Reader\Json as JsonReader;
@@ -16,7 +16,7 @@ use Zend\Config\Writer\Xml as XmlWriter;
 /**
  * Class FileParser
  *
- * @package Forte\Api\Generator\Helpers
+ * @package Forte\Worker\Helpers
  */
 class FileParser
 {

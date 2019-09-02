@@ -1,15 +1,15 @@
 <?php
 
-namespace Forte\Api\Generator\Transformers\Transforms\File;
+namespace Forte\Worker\Transformers\Transforms\File;
 
-use Forte\Api\Generator\Exceptions\GeneratorException;
-use Forte\Api\Generator\Exceptions\TransformException;
-use Forte\Api\Generator\Transformers\Transforms\AbstractTransform;
+use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
  * Class Unzip
  *
- * @package Forte\Api\Generator\Transformers\Transforms\File
+ * @package Forte\Worker\Transformers\Transforms\File
  */
 class Unzip extends AbstractTransform
 {

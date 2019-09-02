@@ -1,11 +1,11 @@
 <?php
 
-namespace Forte\Api\Generator\Exceptions;
+namespace Forte\Worker\Exceptions;
 
 /**
  * Class GeneratorException
  *
- * @package Forte\Api\Generator\Exceptions
+ * @package Forte\Worker\Exceptions
  */
 class GeneratorException extends \Exception
 {
