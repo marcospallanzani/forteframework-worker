@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Forte\Worker\Transformers\Transforms\File;
+namespace Forte\Worker\Transformers\Transforms\Files;
 
 use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
@@ -17,7 +17,7 @@ use Forte\Worker\Transformers\Transforms\AbstractTransform;
 /**
  * Class Remove.
  *
- * @package Forte\Worker\Transformers\Transforms\File
+ * @package Forte\Worker\Transformers\Transforms\Files
  */
 class Remove extends AbstractTransform
 {

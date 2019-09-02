@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Worker\Transformers\Transforms\File;
+namespace Forte\Worker\Transformers\Transforms\Files;
 
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
@@ -11,7 +11,7 @@ use Forte\Worker\Transformers\Transforms\AbstractTransform;
 /**
  * Class ChangeFileConfigEntries
  *
- * @package Forte\Worker\Transformers\Transforms\File
+ * @package Forte\Worker\Transformers\Transforms\Files
  */
 class ChangeFileConfigEntries extends AbstractTransform
 {

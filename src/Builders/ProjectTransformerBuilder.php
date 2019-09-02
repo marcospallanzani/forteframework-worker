@@ -9,9 +9,9 @@ use Forte\Worker\Transformers\Transforms\AbstractTransform;
 use Forte\Worker\Checkers\Checks\Files\FileExists;
 use Forte\Worker\Checkers\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Transformers\Transforms\EmptyTransform;
-use Forte\Worker\Transformers\Transforms\File\ChangeFileConfigEntries;
-use Forte\Worker\Transformers\Transforms\File\Copy;
-use Forte\Worker\Transformers\Transforms\File\Unzip;
+use Forte\Worker\Transformers\Transforms\Files\ChangeFileConfigEntries;
+use Forte\Worker\Transformers\Transforms\Files\Copy;
+use Forte\Worker\Transformers\Transforms\Files\Unzip;
 
 /**
  * Class ProjectTransformerBuilder

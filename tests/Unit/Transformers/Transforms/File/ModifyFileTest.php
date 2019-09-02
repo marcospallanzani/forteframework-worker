@@ -14,7 +14,7 @@ namespace Tests\Unit\Transformers\Transforms\File;
 use Forte\Worker\Checkers\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
-use Forte\Worker\Transformers\Transforms\File\ModifyFile;
+use Forte\Worker\Transformers\Transforms\Files\ModifyFile;
 use PHPUnit\Framework\TestCase;
 
 /**

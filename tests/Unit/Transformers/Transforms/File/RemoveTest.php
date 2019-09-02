@@ -17,7 +17,7 @@ use Forte\Worker\Checkers\Checks\Files\FileDoesNotExist;
 use Forte\Worker\Checkers\Checks\Files\FileExists;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
-use Forte\Worker\Transformers\Transforms\File\Remove;
+use Forte\Worker\Transformers\Transforms\Files\Remove;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -75,7 +75,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\Files\Remove::run() method
      * for one single file.
      *
      * @dataProvider filesProvider
@@ -101,7 +101,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\Files\Remove::run() method
      * for one single file without the pre- and post-transform checks.
      *
      * @dataProvider filesProvider
@@ -120,7 +120,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\Files\Remove::run() method
      * in mode "single-file", but with a folder as a parameter.
      *
      * @throws WorkerException
@@ -134,7 +134,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\Files\Remove::run() method
      * in mode "directory-file", with a valid folder parameter.
      *
      * @throws WorkerException
@@ -153,7 +153,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\Files\Remove::run() method
      * in mode "directory-file", with a valid folder parameter.
      *
      * @throws WorkerException
@@ -172,7 +172,7 @@ class RemoveTest extends TestCase
     }
 
     /**
-     * Test the Forte\Worker\Transformers\Transforms\File\Remove::run() method
+     * Test the Forte\Worker\Transformers\Transforms\Files\Remove::run() method
      * in mode "directory-file", but with a wrong or non-existing folder as a parameter.
      *
      * @throws WorkerException
