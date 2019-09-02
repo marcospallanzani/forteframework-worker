@@ -61,13 +61,13 @@ class ThrowErrorsTraitTest extends TestCase
     }
 
     /**
-     * Test ThrowErrorsTrait::throwGeneratorException() method.
+     * Test ThrowErrorsTrait::throwWorkerException() method.
      */
-    public function testThrowGeneratorException(): void
+    public function testThrowWorkerException(): void
     {
         $this->expectException(WorkerException::class);
         $this->expectExceptionMessage("error message test.");
-        $this->getAnonymousCheckClass()->throwGeneratorException(self::BASE_TEST_MESSAGE, "test");
+        $this->getAnonymousCheckClass()->throwWorkerException(self::BASE_TEST_MESSAGE, "test");
     }
 
     /**
