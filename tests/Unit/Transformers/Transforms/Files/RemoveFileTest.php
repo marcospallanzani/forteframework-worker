@@ -17,15 +17,15 @@ use Forte\Worker\Checkers\Checks\Files\FileDoesNotExist;
 use Forte\Worker\Checkers\Checks\Files\FileExists;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
-use Forte\Worker\Transformers\Transforms\Files\Remove;
+use Forte\Worker\Transformers\Transforms\Files\RemoveFile;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class RemoveTest.
+ * Class RemoveFileTest.
  *
  * @package Tests\Unit\Transformers\Transforms\Files
  */
-class RemoveTest extends TestCase
+class RemoveFileTest extends TestCase
 {
     /**
      * Temporary files constants.
@@ -70,10 +70,10 @@ class RemoveTest extends TestCase
     public function filesProvider(): array
     {
         return [
-            [self::TEST_FILE_TXT, true, Remove::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_TXT . "'."],
-            [self::TEST_FILE_JSON, true, Remove::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_JSON . "'."],
-            [self::TEST_WRONG_FILE, false, Remove::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
-            [self::TEST_DIR_TMP, false, Remove::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."]
+            [self::TEST_FILE_TXT, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_TXT . "'."],
+            [self::TEST_FILE_JSON, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_JSON . "'."],
+            [self::TEST_WRONG_FILE, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
+            [self::TEST_DIR_TMP, false, RemoveFile::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."]
         ];
     }
 
@@ -95,7 +95,7 @@ class RemoveTest extends TestCase
         }
         $this->assertEquals(
             $expected,
-            (new Remove())
+            (new RemoveFile())
                 ->removeFile($filePath)
                 ->addBeforeCheck(new FileExists($filePath))
                 ->addAfterCheck(new FileDoesNotExist($filePath))
@@ -119,7 +119,7 @@ class RemoveTest extends TestCase
         if (!$expected) {
             $this->expectException(TransformException::class);
         }
-        $this->assertEquals($expected, (new Remove())->removeFile($filePath)->run());
+        $this->assertEquals($expected, (new RemoveFile())->removeFile($filePath)->run());
     }
 
     /**
@@ -133,7 +133,7 @@ class RemoveTest extends TestCase
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->expectException(TransformException::class);
-        (new Remove())->removeFile(self::TEST_DIR_TMP)->run();
+        (new RemoveFile())->removeFile(self::TEST_DIR_TMP)->run();
     }
 
     /**
@@ -146,7 +146,7 @@ class RemoveTest extends TestCase
     {
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
-        $removeTransform = (new Remove())
+        $removeTransform = (new RemoveFile())
             ->removeDirectory(self::TEST_DIR_TMP)
             ->addBeforeCheck(new DirectoryExists(self::TEST_DIR_TMP))
             ->addAfterCheck(new DirectoryDoesNotExist(self::TEST_DIR_TMP))
@@ -165,7 +165,7 @@ class RemoveTest extends TestCase
     {
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
-        $removeTransform = (new Remove())
+        $removeTransform = (new RemoveFile())
             ->removeFilePattern(self::TEST_DIR_TMP . '/*json')
             ->addBeforeCheck(new FileExists(self::TEST_FILE_JSON))
             ->addAfterCheck(new FileDoesNotExist(self::TEST_FILE_JSON))
@@ -185,7 +185,7 @@ class RemoveTest extends TestCase
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->expectException(TransformException::class);
-        (new Remove())->removeFile(__DIR__ . '/files/xxx/')->run();
+        (new RemoveFile())->removeFile(__DIR__ . '/files/xxx/')->run();
     }
 
     /**
@@ -195,7 +195,7 @@ class RemoveTest extends TestCase
      */
     public function testStringify(string $filePath, bool $expected, string $mode, string $message): void
     {
-        $fileExists = (new Remove())->remove($filePath, $mode);
+        $fileExists = (new RemoveFile())->remove($filePath, $mode);
         $this->assertEquals($message, (string) $fileExists);
         $this->assertEquals($message, $fileExists->stringify());
     }

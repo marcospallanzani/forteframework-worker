@@ -15,11 +15,11 @@ use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
- * Class Remove.
+ * Class RemoveFile.
  *
  * @package Forte\Worker\Transformers\Transforms\Files
  */
-class Remove extends AbstractTransform
+class RemoveFile extends AbstractTransform
 {
     const REMOVE_SINGLE_FILE  = "remove_single_file";
     const REMOVE_FILE_PATTERN = "remove_file_pattern";
@@ -109,7 +109,7 @@ class Remove extends AbstractTransform
      * @param string $mode The delete mode (one of the class constants
      * that begin by "REMOVE_").
      *
-     * @return Remove
+     * @return RemoveFile
      */
     public function remove(string $filePath, string $mode): self
     {
@@ -125,7 +125,7 @@ class Remove extends AbstractTransform
      *
      * @param string $filePath The file path to be removed.
      *
-     * @return Remove
+     * @return RemoveFile
      */
     public function removeFile(string $filePath): self
     {
@@ -138,7 +138,7 @@ class Remove extends AbstractTransform
      *
      * @param string $filePattern The file pattern to be removed.
      *
-     * @return Remove
+     * @return RemoveFile
      */
     public function removeFilePattern(string $filePattern): self
     {
@@ -150,7 +150,7 @@ class Remove extends AbstractTransform
      *
      * @param string $directoryPath The directory path to be removed.
      *
-     * @return Remove
+     * @return RemoveFile
      */
     public function removeDirectory(string $directoryPath): self
     {
