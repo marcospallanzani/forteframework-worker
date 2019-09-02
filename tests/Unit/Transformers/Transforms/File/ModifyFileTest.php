@@ -11,7 +11,7 @@
 
 namespace Tests\Unit\Transformers\Transforms\File;
 
-use Forte\Worker\Checkers\Checks\Text\VerifyText;
+use Forte\Worker\Checkers\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Transformers\Transforms\File\ModifyFile;
@@ -243,7 +243,7 @@ class ModifyFileTest extends TestCase
             (new ModifyFile(self::TEST_FILE_MODIFY))
                 ->addAction(
                     ModifyFile::MODIFY_FILE_APPEND_TO_LINE,
-                    VerifyText::CONDITION_STARTS_WITH,
+                    VerifyString::CONDITION_STARTS_WITH,
                     'ANY',
                     'APPENDED CONTENT'
                 )
@@ -261,7 +261,7 @@ class ModifyFileTest extends TestCase
             (new ModifyFile(self::TEST_FILE_MODIFY))
                 ->addAction(
                     ModifyFile::MODIFY_FILE_APPEND_TEMPLATE,
-                    VerifyText::CONDITION_STARTS_WITH,
+                    VerifyString::CONDITION_STARTS_WITH,
                     'ANY',
                     self::TEST_FILE_TEMPLATE
                 )
@@ -279,7 +279,7 @@ class ModifyFileTest extends TestCase
             (new ModifyFile(self::TEST_FILE_MODIFY))
                 ->addAction(
                     ModifyFile::MODIFY_FILE_REPLACE_WITH_TEMPLATE,
-                    VerifyText::CONDITION_STARTS_WITH,
+                    VerifyString::CONDITION_STARTS_WITH,
                     'ANY',
                     self::TEST_FILE_TEMPLATE
                 )
@@ -310,7 +310,7 @@ class ModifyFileTest extends TestCase
             (new ModifyFile(self::TEST_FILE_MODIFY))
                 ->addAction(
                     'wrong_action',
-                    VerifyText::CONDITION_STARTS_WITH,
+                    VerifyString::CONDITION_STARTS_WITH,
                     'ANY',
                     self::TEST_FILE_TEMPLATE
                 )

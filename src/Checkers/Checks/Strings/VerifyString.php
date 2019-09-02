@@ -9,14 +9,14 @@
  *  with this source code.
  */
 
-namespace Forte\Worker\Checkers\Checks\Text;
+namespace Forte\Worker\Checkers\Checks\Strings;
 
 use Forte\Worker\Checkers\Checks\AbstractCheck;
 use Forte\Worker\Exceptions\CheckException;
 use Forte\Worker\Helpers\StringParser;
 
 /**
- * Class VerifyText. This class describes a check condition to be executed
+ * Class VerifyString. This class describes a check condition to be executed
  * on a given input text.
  *
  * The supported conditions are the class constants that begin with "CONDITION_XXX".
@@ -39,9 +39,9 @@ use Forte\Worker\Helpers\StringParser;
  *
  * All of the above conditions, except for "is_empty", require a condition value.
  *
- * @package Forte\Worker\Checkers\Checks\Text
+ * @package Forte\Worker\Checkers\Checks\Strings
  */
-class VerifyText extends AbstractCheck
+class VerifyString extends AbstractCheck
 {
     /**
      * Supported conditions.
@@ -74,7 +74,7 @@ class VerifyText extends AbstractCheck
     protected $conditionValue;
 
     /**
-     * VerifyText constructor.
+     * VerifyString constructor.
      *
      * @param string $condition
      * @param string $conditionValue
@@ -89,12 +89,12 @@ class VerifyText extends AbstractCheck
 
     /**
      * Set the content to be checked. This method is useful to update
-     * a VerifyText instance with a new content, to verify the configured
+     * a VerifyString instance with a new content, to verify the configured
      * condition against the new content.
      *
      * @param string $content The content to be checked.
      *
-     * @return VerifyText
+     * @return VerifyString
      */
     public function setContent(string $content): self
     {

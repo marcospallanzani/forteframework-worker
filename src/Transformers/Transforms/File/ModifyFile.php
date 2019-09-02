@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Transformers\Transforms\File;
 
-use Forte\Worker\Checkers\Checks\Text\VerifyText;
+use Forte\Worker\Checkers\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\StringParser;
@@ -71,7 +71,7 @@ class ModifyFile extends AbstractTransform
      *
      * These actions can be used with some conditional parameters, to
      * determine whether or not that action should be applied. The available
-     * conditions are described by the object VerifyText.
+     * conditions are described by the object VerifyString.
      *
      * @param string $filePath The file path of the file to be modified.
      */
@@ -94,7 +94,7 @@ class ModifyFile extends AbstractTransform
     {
         return $this->addAction(
             self::MODIFY_FILE_REPLACE_IN_LINE,
-            VerifyText::CONDITION_STARTS_WITH,
+            VerifyString::CONDITION_STARTS_WITH,
             $conditionValue,
             $replaceValue,
             $searchValue
@@ -114,7 +114,7 @@ class ModifyFile extends AbstractTransform
     {
         return $this->addAction(
             self::MODIFY_FILE_REPLACE_LINE,
-            VerifyText::CONDITION_STARTS_WITH,
+            VerifyString::CONDITION_STARTS_WITH,
             $conditionValue,
             $replaceValue
         );
@@ -135,7 +135,7 @@ class ModifyFile extends AbstractTransform
     {
         return $this->addAction(
             self::MODIFY_FILE_REMOVE_IN_LINE,
-            VerifyText::CONDITION_STARTS_WITH,
+            VerifyString::CONDITION_STARTS_WITH,
             $conditionValue,
             '',
             $searchValue
@@ -154,7 +154,7 @@ class ModifyFile extends AbstractTransform
     {
         return $this->addAction(
             self::MODIFY_FILE_REMOVE_LINE,
-            VerifyText::CONDITION_STARTS_WITH,
+            VerifyString::CONDITION_STARTS_WITH,
             $conditionValue
         );
     }
@@ -172,7 +172,7 @@ class ModifyFile extends AbstractTransform
     {
         return $this->addAction(
             self::MODIFY_FILE_REPLACE_WITH_TEMPLATE,
-            VerifyText::CONDITION_EQUAL_TO,
+            VerifyString::CONDITION_EQUAL_TO,
             $conditionValue,
             $templatePath
         );
@@ -191,7 +191,7 @@ class ModifyFile extends AbstractTransform
     {
         return $this->addAction(
             self::MODIFY_FILE_APPEND_TEMPLATE,
-            VerifyText::CONDITION_EQUAL_TO,
+            VerifyString::CONDITION_EQUAL_TO,
             $conditionValue,
             $templatePath
         );
@@ -202,7 +202,7 @@ class ModifyFile extends AbstractTransform
      *
      * @param string $actionType The action type (possible values are class constants
      * starting with prefix MODIFY_FILE_).
-     * @param string $conditionType The condition type (possible values are VerifyText
+     * @param string $conditionType The condition type (possible values are VerifyString
      * constants starting with prefix CONDITION_).
      * @param mixed $conditionValue The value to be used to run the action condition.
      * @param mixed $replaceValue The value to be used to perform the action specific
@@ -225,7 +225,7 @@ class ModifyFile extends AbstractTransform
             "action"    => $actionType,
             'search'    => $searchValue,
             "value"     => $replaceValue,
-            "condition" => new VerifyText($conditionType, $conditionValue)
+            "condition" => new VerifyString($conditionType, $conditionValue)
         ];
 
         return $this;
@@ -265,7 +265,7 @@ class ModifyFile extends AbstractTransform
                 }
 
                 $condition = $action['condition'];
-                if (!$condition instanceof VerifyText) {
+                if (!$condition instanceof VerifyString) {
                     $wrongActionsAndConditions[] = sprintf(
                         "The action '%s' has a non-recognized condition. Impacted transformation is: '%s'.",
                         $action['action'],
@@ -329,7 +329,7 @@ class ModifyFile extends AbstractTransform
             foreach ($this->actions as $key => $action) {
                 // We first check if the condition is met
                 $condition = $action['condition'];
-                if ($condition instanceof VerifyText && $condition->setContent(trim($line, PHP_EOL))->run()) {
+                if ($condition instanceof VerifyString && $condition->setContent(trim($line, PHP_EOL))->run()) {
                     // We have to apply the configured change
                     switch ($action['action']) {
                         case self::MODIFY_FILE_APPEND_TO_LINE:
