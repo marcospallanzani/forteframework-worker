@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Checkers\Checks\File;
+namespace Tests\Unit\Checkers\Checks\Files;
 
 use Forte\Worker\Checkers\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Exceptions\CheckException;
@@ -19,11 +19,33 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class FileHasInstantiableClassTest
  *
- * @package Tests\Unit\Checkers\Checks\File
+ * @package Tests\Unit\Checkers\Checks\Files
  */
 class FileHasInstantiableClassTest extends TestCase
 {
-    const TEST_FILE_TMP   = __DIR__ . '/data/file-tests-template';
+    /**
+     * Temporary files constants
+     */
+    const TEST_FILE_TMP = __DIR__ . '/file-tests';
+    const TEST_CONTENT  = "ANY CONTENT";
+
+    /**
+     * This method is called before each test.
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+        @file_put_contents(self::TEST_FILE_TMP, self::TEST_CONTENT);
+    }
+
+    /**
+     * This method is called after each test.
+     */
+    public function tearDown(): void
+    {
+        parent::tearDown();
+        @unlink(self::TEST_FILE_TMP);
+    }
 
     /**
      * Data provider for isValid() tests.
