@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class FileHasInstantiableClassTest extends TestCase
 {
-    const TEST_FILE_TMP   = __DIR__ . '/files/file-tests-template';
+    const TEST_FILE_TMP   = __DIR__ . '/data/file-tests-template';
 
     /**
      * Data provider for isValid() tests.
