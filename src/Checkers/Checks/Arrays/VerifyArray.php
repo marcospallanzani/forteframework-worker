@@ -204,16 +204,6 @@ class VerifyArray extends AbstractCheck
             }
         }
 
-        // Validate the check content
-        if (!$this->checkContent) {
-            $this->throwCheckException(
-                $this,
-                "It is not possible to check the current condition against an empty check content. " .
-                "Please set the check content before running this check action. Impacted check is: '%s'.",
-                $this
-            );
-        }
-
         return true;
     }
 
