@@ -9,11 +9,11 @@ use Forte\Worker\Transformers\Transforms\AbstractTransform;
 use Zend\Filter\Exception\RuntimeException;
 
 /**
- * Class Copy
+ * Class CopyFile
  *
  * @package Forte\Worker\Transformers\Transforms\Files
  */
-class Copy extends AbstractTransform
+class CopyFile extends AbstractTransform
 {
     /**
      * @var string
@@ -116,7 +116,7 @@ class Copy extends AbstractTransform
      *
      * @param string $originFilePath The full file path to be copied
      *
-     * @return Copy
+     * @return CopyFile
      */
     public function copy(string $originFilePath): self
     {
@@ -130,7 +130,7 @@ class Copy extends AbstractTransform
      *
      * @param string $destinationFolder The full destination directory path
      *
-     * @return Copy
+     * @return CopyFile
      */
     public function toFolder(string $destinationFolder): self
     {
@@ -144,7 +144,7 @@ class Copy extends AbstractTransform
      *
      * @param string $fileName The destination file name
      *
-     * @return Copy
+     * @return CopyFile
      */
     public function withName(string $fileName): self
     {

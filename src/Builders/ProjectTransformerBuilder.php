@@ -10,7 +10,7 @@ use Forte\Worker\Checkers\Checks\Files\FileExists;
 use Forte\Worker\Checkers\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Transformers\Transforms\EmptyTransform;
 use Forte\Worker\Transformers\Transforms\Files\ChangeFileConfigEntries;
-use Forte\Worker\Transformers\Transforms\Files\Copy;
+use Forte\Worker\Transformers\Transforms\Files\CopyFile;
 use Forte\Worker\Transformers\Transforms\Files\Unzip;
 
 /**
@@ -28,7 +28,7 @@ class ProjectTransformerBuilder
     /**
      * ProjectTransformerBuilder constructor.
      *
-     * @param string $projectRootFolder The project folder.
+     * @param string $projectRootFolder The project root folder.
      */
     public function __construct(string $projectRootFolder)
     {
@@ -86,7 +86,7 @@ class ProjectTransformerBuilder
         string $targetFolder = ''
     ): self
     {
-        $copy = new Copy();
+        $copy = new CopyFile();
         $this->addTransform(
             $copy
                 ->copy($sourceFilePath)
