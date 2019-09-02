@@ -144,6 +144,7 @@ class VerifyTextTest extends TestCase
             [(new VerifyText(VerifyText::CONDITION_IS_EMPTY))->setContent($longContent1), true, false, false, "Check if the given content '$longContent1' is empty."],
             [(new VerifyText(VerifyText::CONDITION_IS_EMPTY))->setContent($numericContent1), true, false, false, "Check if the given content '$numericContent1' is empty."],
             [new VerifyText(VerifyText::CONDITION_IS_EMPTY), true, true, false, "Check if the given content '' is empty."],
+            [new VerifyText(VerifyText::CONDITION_IS_EMPTY, 'condition-value'), true, true, false, "Check if the given content '' is empty."],
             /** CONDITION_REGEX tests */
             [new VerifyText(VerifyText::CONDITION_REGEX, $decimalValueRegex, $longContent3), true, false, false, "Check if the given content '$longContent3' respects the given regex \"$decimalValueRegex\"."],
             [new VerifyText(VerifyText::CONDITION_REGEX, $decimalValueRegex, $longContent1), true, true, false, "Check if the given content '$longContent1' respects the given regex \"$decimalValueRegex\"."],
