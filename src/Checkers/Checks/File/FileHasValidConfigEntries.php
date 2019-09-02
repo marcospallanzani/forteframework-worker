@@ -13,7 +13,7 @@ namespace Forte\Worker\Checkers\Checks\File;
 
 use Forte\Worker\Exceptions\CheckException;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Filters\Arrays\VerifyArray;
+use Forte\Worker\Checkers\Checks\Arrays\VerifyArray;
 use Forte\Worker\Helpers\FileParser;
 
 /**
@@ -129,7 +129,7 @@ class FileHasValidConfigEntries extends FileExists
             foreach ($this->checks as $check) {
                 try {
                     /** @var VerifyArray $check */
-                    if (!$check->checkCondition($parsedContent)) {
+                    if (!$check->setCheckContent($parsedContent)->run()) {
                         $failed[] = sprintf("Check failed: %s.", $check);
                     }
                 } catch (WorkerException $e) {
