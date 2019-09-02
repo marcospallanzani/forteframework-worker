@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Checkers\Checks\File;
+namespace Tests\Unit\Checkers\Checks\Files;
 
 use Forte\Worker\Checkers\Checks\Files\FileDoesNotExist;
 use Forte\Worker\Exceptions\CheckException;
@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class FileDoesNotExistTest.
  *
- * @package Tests\Unit\Checkers\Checks\File
+ * @package Tests\Unit\Checkers\Checks\Files
  */
 class FileDoesNotExistTest extends TestCase
 {
