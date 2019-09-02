@@ -1,11 +1,11 @@
-# FORTE API GENERATOR
+# FORTE FRAMEWORK: WORKER
 
-This application is in charge to generate a Forte API from the forte-api-skeleton project. 
-the base project is the `forteframework-api-skeleton` repository.
+This library consists of a set of classes that can be used to 
+analyze and modify the content of a configured set of files.
 
 ## REQUIREMENTS
 
-This application is built with PHP, ZendFramework and Symfony.
+This application is built on top of ZendFramework and Symfony.
 
 It also requires the following PHP modules to be installed:
 
@@ -35,6 +35,44 @@ RUN apt-get update && \
          && docker-php-ext-install zip
 ```
 
+## HOW TO INSTALL
+
+1. Download or clone this repository on your local machine on a desired 
+installation folder;
+2. Open a terminal on your pc, go to the folder where you just downloaded/cloned the repository and 
+ unpack it if necessary;
+3. From the same folder of step 2, run the following composer command and wait untill all dependencies 
+have been downloaded:
+    ```
+    composer update
+    ```
+4. Create a test script in the project base folder. Here follows an example:
+```php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Forte\Worker\Exceptions\WorkerException;
+use Forte\Worker\Filters\Arrays\ModifyArray;
+use Forte\Worker\Transformers\Transforms\File\ModifyFile;
+
+try {
+    $modifyFile = new ModifyFile('.env');
+    $modifyFile
+        ->replaceLineIfLineStartsWith('APP_NAME', 'APP_NAME=NEW NAME')
+        ->replaceValueIfLineStartsWith('APP_ENV', 'local', 'prod')
+        ->removeValueIfLineStartsWith('BROADCAST_DRIVER', 'log')
+        ->removeLineIfLineStartsWith('SESSION_LIFETIME')
+        ->replaceWithTemplateIfLineEqualTo('testtemplate.txt', 'REPLACE_TAG=1')
+        ->addTemplateIfLineEqualTo('testtemplate.txt', 'REPLACE_TAG2=2')
+        ->run()
+    ;
+} catch (WorkerException $e) {
+    exit;
+}
+
+die;
+```
 ## TESTS
 
 To run all tests, execute the following command from the base project folder:
