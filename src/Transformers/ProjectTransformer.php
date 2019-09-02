@@ -3,64 +3,59 @@
 namespace Forte\Worker\Transformers;
 
 /**
- * Class ProjectTransformer. A class that applies a set of transformations to a Laravel project.
+ * Class ProjectTransformer. A class that applies a set of transformations
+ * to a configured project.
  *
  * @package Forte\Worker\Transformers
  */
 class ProjectTransformer extends AbstractTransformer
 {
     /**
+     * The project root folder
+     * (e.g. /path/to/installation/folder/local/projects/my-project).
+     *
      * @var string
      */
-    protected $projectRootFolder;
+    protected $projectFolder;
 
     /**
+     * The folder where this project is installed
+     * (e.g. /path/to/installation/folder/local/projects).
+     *
      * @var string
      */
-    protected $deploymentParentFolder;
+    protected $installationFolder;
 
     /**
-     * ProjectTransformer constructor.
+     * ProjectTransformer constructor. This class allows to apply a given set of
+     * transformations to the configured project.
      *
-     * @param string $projectRootFolder The project root folder
-     * @param string $deploymentParentFolder
+     * @param string $projectFolder The project root folder
+     * (e.g. /path/to/installation/folder/local/projects/my-project)
      */
-    public function __construct(string $projectRootFolder, string $deploymentParentFolder)
+    public function __construct(string $projectFolder)
     {
-        $this->projectRootFolder = rtrim($projectRootFolder, DIRECTORY_SEPARATOR);
-        $this->deploymentParentFolder = rtrim($deploymentParentFolder, DIRECTORY_SEPARATOR);
+        $this->projectFolder      = rtrim($projectFolder, DIRECTORY_SEPARATOR);
+        $this->installationFolder = dirname($projectFolder);
     }
 
     /**
-     * Returns the project root folder.
+     * Returns the project folder.
      *
      * @return string
      */
-    public function getProjectRootFolder(): string
+    public function getProjectFolder(): string
     {
-        return $this->projectRootFolder;
+        return $this->projectFolder;
     }
 
     /**
-     * Returns the project deployment parent folder.
+     * Returns the project installation folder.
      *
      * @return string
      */
-    public function getDeploymentParentFolder(): string
+    public function getInstallationFolder(): string
     {
-        return $this->deploymentParentFolder;
-    }
-
-    /**
-     * Returns the full-path project folder.
-     *
-     * @return string
-     */
-    public function getFullPathProjectFolder(): string
-    {
-        return
-            $this->deploymentParentFolder .
-            DIRECTORY_SEPARATOR .
-            $this->projectRootFolder;
+        return $this->installationFolder;
     }
 }
