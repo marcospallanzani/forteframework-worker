@@ -38,7 +38,7 @@ class Copy extends Rename
         if ($result !== true) {
             throw new RuntimeException(
                 sprintf(
-                    "File '%s' could not be renamed. " .
+                    "File '%s' could not be copied. " .
                     "An error occurred while processing the file.",
                     $value
                 )
