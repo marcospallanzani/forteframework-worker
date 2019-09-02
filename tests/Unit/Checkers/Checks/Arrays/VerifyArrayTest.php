@@ -1,18 +1,16 @@
 <?php
 
-
-namespace Tests\Unit\Filters\Arrays;
+namespace Tests\Unit\Checkers\Checks\Arrays;
 
 use Forte\Worker\Exceptions\CheckException;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Exceptions\MissingKeyException;
 use Forte\Worker\Checkers\Checks\Arrays\VerifyArray;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class VerifyArrayTest
  *
- * @package Tests\Unit\Filters\Arrays
+ * @package Tests\Unit\Checkers\Checks\Arrays
  */
 class VerifyArrayTest extends TestCase
 {
