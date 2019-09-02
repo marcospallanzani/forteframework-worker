@@ -415,7 +415,7 @@ class ModifyFile extends AbstractTransform
                         $message .= sprintf(
                                 "%d. Remove content '%s' in each line that meets the following condition: '%s';",
                                 $key,
-                                $action['value'],
+                                $action['search'],
                                 (string) $action['condition']
                             ) . PHP_EOL;
                         break;
@@ -428,16 +428,18 @@ class ModifyFile extends AbstractTransform
                         break;
                     case self::MODIFY_FILE_REPLACE_IN_LINE:
                         $message .= sprintf(
-                                "%d. Replace content '%s' in each line that meets the following condition: '%s';",
+                                "%d. Replace content '%s' with '%s' in each line that meets the following condition: '%s';",
                                 $key,
+                                $action['search'],
                                 $action['value'],
                                 (string) $action['condition']
                             ) . PHP_EOL;
                         break;
                     case self::MODIFY_FILE_REPLACE_LINE:
                         $message .= sprintf(
-                                "%d. Replace each line that meets the following condition: '%s';",
+                                "%d. Replace each line that meets the following condition with '%s': '%s';",
                                 $key,
+                                $action['value'],
                                 (string) $action['condition']
                             ) . PHP_EOL;
                         break;
@@ -462,6 +464,16 @@ class ModifyFile extends AbstractTransform
         }
 
         return $message;
+    }
+
+    /**
+     * Return a list of configured actions.
+     *
+     * @return array
+     */
+    public function getActions(): array
+    {
+        return $this->actions;
     }
 
     /**
