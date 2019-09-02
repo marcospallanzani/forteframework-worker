@@ -11,7 +11,7 @@ use Forte\Worker\Checkers\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Transformers\Transforms\EmptyTransform;
 use Forte\Worker\Transformers\Transforms\Files\ChangeFileConfigEntries;
 use Forte\Worker\Transformers\Transforms\Files\CopyFile;
-use Forte\Worker\Transformers\Transforms\Files\Unzip;
+use Forte\Worker\Transformers\Transforms\Files\UnzipFile;
 
 /**
  * Class ProjectTransformerBuilder
@@ -55,12 +55,12 @@ class ProjectTransformerBuilder
      *
      * @param string $zipFilePath The zip file to unzip.
      *
-     * @return Unzip
+     * @return UnzipFile
      */
-    public function getUnzipFileTransform(string $zipFilePath): Unzip
+    public function getUnzipFileTransform(string $zipFilePath): UnzipFile
     {
         $fullProjectPath = $this->transformer->getProjectFolder();
-        return (new Unzip())
+        return (new UnzipFile())
             ->addBeforeCheck(new FileExists($zipFilePath))
             ->addAfterCheck(new FileExists($fullProjectPath))
             ->open($zipFilePath)

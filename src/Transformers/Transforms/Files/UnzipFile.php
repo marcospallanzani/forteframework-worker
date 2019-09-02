@@ -7,11 +7,11 @@ use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
- * Class Unzip
+ * Class UnzipFile
  *
  * @package Forte\Worker\Transformers\Transforms\Files
  */
-class Unzip extends AbstractTransform
+class UnzipFile extends AbstractTransform
 {
     /**
      * @var string
@@ -83,7 +83,7 @@ class Unzip extends AbstractTransform
      *
      * @param string $zipFilePath The zip file path.
      *
-     * @return Unzip
+     * @return UnzipFile
      */
     public function open(string $zipFilePath): self
     {
@@ -97,7 +97,7 @@ class Unzip extends AbstractTransform
      *
      * @param string $extractToPath The destination extraction path.
      *
-     * @return Unzip
+     * @return UnzipFile
      */
     public function extractTo(string $extractToPath): self
     {
