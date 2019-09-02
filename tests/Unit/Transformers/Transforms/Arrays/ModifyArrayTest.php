@@ -1,15 +1,16 @@
 <?php
 
-namespace Tests\Unit\Filters\Arrays;
+namespace Tests\Unit\Transformers\Transforms\Arrays;
 
+use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Filters\Arrays\ModifyArray;
+use Forte\Worker\Transformers\Transforms\Arrays\ModifyArray;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class ModifyArrayTest
  *
- * @package Tests\Unit\Filters\Arrays
+ * @package Tests\Unit\Transformers\Transforms\Arrays
  */
 class ModifyArrayTest extends TestCase
 {
@@ -35,23 +36,6 @@ class ModifyArrayTest extends TestCase
     }
 
     /**
-     * Data provider to test changes on a 1-level array.
-     *
-     * @return array
-     */
-    public function changesProvider(): array
-    {
-        $simpleArray = ['test1' => 'value1', 'test2' => 'value2'];
-        $simpleModifiedArray = ['test1' => 'value1', 'test2' => 'value2', 'key1' => 'value1'];
-        return [
-            ['key1', ModifyArray::MODIFY_ADD, 'value1', $simpleArray, $simpleModifiedArray],
-            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, 'value1', $simpleArray, $simpleModifiedArray],
-            ['key1', ModifyArray::MODIFY_REMOVE_KEY, 'value1', $simpleArray, $simpleArray],
-            ['test1', ModifyArray::MODIFY_REMOVE_KEY, 'value1', $simpleArray, ['test2' => 'value2']],
-        ];
-    }
-
-    /**
      * Data provider to test changes on a N-level array. .
      *
      * @return array
@@ -60,11 +44,14 @@ class ModifyArrayTest extends TestCase
     {
         $addArray = ['added' => 'value'];
         $array = ['test1' => ['test3' => ['test4' => ['test5' => 'value5']]], 'test2' => 'value2'];
+        $modifiedOneLevel = ['test1' => ['test3' => ['test4' => ['test5' => 'value5']]], 'test2' => 'value2', 'test6' => 'value6'];
         $modifiedArrayThreeLevels = ['test1' => ['test3' => ['test4' => ['key1' => $addArray, 'test5' => 'value5']]], 'test2' => 'value2'];
         $modifiedArrayFourLevels = ['test1' => ['test3' => ['test4' => ['test6' => ['key1' => $addArray], 'test5' => 'value5']]], 'test2' => 'value2'];
         return [
+            ['test6', ModifyArray::MODIFY_ADD, 'value6', $array, $modifiedOneLevel],
             ['test1.test3.test4.key1', ModifyArray::MODIFY_ADD, $addArray, $array, $modifiedArrayThreeLevels],
             ['test1.test3.test4.test6.key1', ModifyArray::MODIFY_ADD, $addArray, $array, $modifiedArrayFourLevels],
+            ['test6', ModifyArray::MODIFY_CHANGE_VALUE, 'value6', $array, $modifiedOneLevel],
             ['test1.test3.test4.key1', ModifyArray::MODIFY_CHANGE_VALUE, $addArray, $array, $modifiedArrayThreeLevels],
             ['test1.test3.test4.test6.key1', ModifyArray::MODIFY_CHANGE_VALUE, $addArray, $array, $modifiedArrayFourLevels],
             ['test2', ModifyArray::MODIFY_REMOVE_KEY, null, $array, ['test1' => ['test3' => ['test4' => ['test5' => 'value5']]]]],
@@ -81,8 +68,7 @@ class ModifyArrayTest extends TestCase
      *
      * @return array
      *
-     * @throws \ReflectionException
-     * @throws WorkerException
+     * @throws TransformException
      */
     public function validationWithErrorsProvider(): array
     {
@@ -101,9 +87,9 @@ class ModifyArrayTest extends TestCase
             ],
             [
                 $modifyWrongAction = new ModifyArray('key1', 'wrong_action'),
-                sprintf("The action 'wrong_action' is not supported. Impacted filter is: '%s'. Supported actions are: '%s'",
+                sprintf("The action 'wrong_action' is not supported. Impacted transform is: '%s'. Supported actions are: '%s'",
                     $modifyWrongAction,
-                    implode(',', $modifyWrongAction->getSupportedActions())),
+                    implode(', ', $modifyWrongAction->getSupportedActions())),
                 true,
                 null
             ],
@@ -117,7 +103,7 @@ class ModifyArrayTest extends TestCase
     }
 
     /**
-     * Tests the action message.
+     * Tests the ModifyArray::testStringify() method.
      *
      * @dataProvider modificationsProvider
      *
@@ -126,10 +112,10 @@ class ModifyArrayTest extends TestCase
      * @param mixed  $value
      * @param string $expected
      */
-    public function testActionMessage(string $key, string $action, $value, string $expected): void
+    public function testStringify(string $key, string $action, $value, string $expected): void
     {
         $modifyArray = new ModifyArray($key, $action, $value);
-        $this->assertEquals($expected, $modifyArray->getActionMessage());
+        $this->assertEquals($expected, $modifyArray->stringify());
         $this->assertEquals($expected, (string) $modifyArray);
         $this->assertEquals($key, $modifyArray->getKey());
         $this->assertEquals($action, $modifyArray->getAction());
@@ -151,24 +137,6 @@ class ModifyArrayTest extends TestCase
         $this->assertEquals($key, $modifyArray->getKey());
         $this->assertEquals($action, $modifyArray->getAction());
         $this->assertEquals($value, $modifyArray->getValue());
-    }
-
-    /**
-     * Tests the applyChangeByType() function.
-     *
-     * @dataProvider changesProvider
-     *
-     * @param string $key
-     * @param string $action
-     * @param mixed  $value
-     * @param array  $array
-     * @param array  $expected
-     */
-    public function testApplyChangeByType(string $key, string $action, $value, array $array, array $expected): void
-    {
-        $modifyArray = new ModifyArray($key, $action, $value);
-        $modifyArray->applyChangeByType($array, $key, $action, $value);
-        $this->assertEquals($expected, $array);
     }
 
     /**
@@ -198,7 +166,7 @@ class ModifyArrayTest extends TestCase
      * @param string $exceptionMessage
      * @param bool $expectGeneratorException
      *
-     * @throws WorkerException
+     * @throws TransformException
      */
     public function testIsValidWithErrorMessage(
         ModifyArray $modifyArray,
@@ -207,18 +175,18 @@ class ModifyArrayTest extends TestCase
     ): void
     {
         if ($expectGeneratorException) {
-            $this->expectException(WorkerException::class);
+            $this->expectException(TransformException::class);
             $this->expectExceptionMessage($exceptionMessage);
-            $isValid = $modifyArray->isValid();
+            $isValid = $modifyArray->setModifyContent([])->isValid();
             $this->assertFalse($isValid);
         } else {
-            $isValid = $modifyArray->isValid();
+            $isValid = $modifyArray->setModifyContent([])->isValid();
             $this->assertTrue($isValid);
         }
     }
 
     /**
-     * Tests the filter() function.
+     * Tests the run() function.
      *
      * @dataProvider complexChangesProvider
      *
@@ -230,15 +198,16 @@ class ModifyArrayTest extends TestCase
      *
      * @throws WorkerException
      */
-    public function testFilter(string $key, string $action, $value, array $array, array $expected): void
+    public function testRun(string $key, string $action, $value, array $array, array $expected): void
     {
         $modifyArray = new ModifyArray($key, $action, $value);
-        $modifiedArray = $modifyArray->filter($array);
+        $modifyArray->setModifyContent($array)->run();
+        $modifiedArray = $modifyArray->getModifiedContent();
         $this->assertEquals($expected, $modifiedArray);
     }
 
     /**
-     * Tests the filter() function failures.
+     * Tests the run() function failures.
      *
      * @dataProvider validationWithErrorsProvider
      *
@@ -249,7 +218,7 @@ class ModifyArrayTest extends TestCase
      *
      * @throws WorkerException
      */
-    public function testFailFilter(
+    public function testFailRun(
         ModifyArray $modifyArray,
         string $exceptionMessage,
         bool $expectGeneratorException,
@@ -257,11 +226,11 @@ class ModifyArrayTest extends TestCase
     ): void
     {
         if ($expectGeneratorException) {
-            $this->expectException(WorkerException::class);
-            $modifyArray->filter([]);
+            $this->expectException(TransformException::class);
+            $modifyArray->setModifyContent([])->run();
         } else {
-            $modifiedArray = $modifyArray->filter([]);
-            $this->assertEquals($expected, $modifiedArray);
+            $modifyArray->setModifyContent([])->run();
+            $this->assertEquals($expected, $modifyArray->getModifiedContent());
         }
     }
 }

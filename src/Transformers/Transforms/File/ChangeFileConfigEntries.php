@@ -4,7 +4,7 @@ namespace Forte\Worker\Transformers\Transforms\File;
 
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
-use Forte\Worker\Filters\Arrays\ModifyArray;
+use Forte\Worker\Transformers\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Helpers\FileParser;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
@@ -138,7 +138,8 @@ class ChangeFileConfigEntries extends AbstractTransform
         foreach ($this->modifications as $modification) {
             try {
                 /** @var ModifyArray $modification */
-                $parsedContent = $modification->filter($parsedContent);
+                $modification->setModifyContent($parsedContent)->run();
+                $parsedContent = $modification->getModifiedContent();
             } catch (WorkerException $e) {
                 $failed[] = sprintf("Modification failed: %s. Reason is: %s", $modification, $e->getMessage());
             }
