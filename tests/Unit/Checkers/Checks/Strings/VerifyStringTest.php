@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Checkers\Checks\Text;
+namespace Tests\Unit\Checkers\Checks\Strings;
 
 use Forte\Worker\Checkers\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\CheckException;
@@ -17,11 +17,11 @@ use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class VerifyTextTest.
+ * Class VerifyStringTest.
  *
- * @package Tests\Unit\Checkers\Checks\Text
+ * @package Tests\Unit\Checkers\Checks\Strings
  */
-class VerifyTextTest extends TestCase
+class VerifyStringTest extends TestCase
 {
     /**
      * Data provider for general check tests.
@@ -161,7 +161,7 @@ class VerifyTextTest extends TestCase
      *
      * @dataProvider conditionsProvider
      *
-     * @param VerifyString $verifyText
+     * @param VerifyString $verifyString
      * @param bool $isValid
      * @param bool $expected
      * @param bool $exceptionExpected
@@ -169,7 +169,7 @@ class VerifyTextTest extends TestCase
      * @throws CheckException
      */
     public function testIsValid(
-        VerifyString $verifyText,
+        VerifyString $verifyString,
         bool $isValid,
         bool $expected,
         bool $exceptionExpected
@@ -178,7 +178,7 @@ class VerifyTextTest extends TestCase
         if ($exceptionExpected) {
             $this->expectException(CheckException::class);
         }
-        $this->assertEquals($isValid, $verifyText->isValid());
+        $this->assertEquals($isValid, $verifyString->isValid());
     }
 
     /**
@@ -186,7 +186,7 @@ class VerifyTextTest extends TestCase
      *
      * @dataProvider conditionsProvider
      *
-     * @param VerifyString $verifyText
+     * @param VerifyString $verifyString
      * @param bool $isValid
      * @param bool $expected
      * @param bool $exceptionExpected
@@ -195,7 +195,7 @@ class VerifyTextTest extends TestCase
      * @throws WorkerException
      */
     public function testRun(
-        VerifyString $verifyText,
+        VerifyString $verifyString,
         bool $isValid,
         bool $expected,
         bool $exceptionExpected,
@@ -205,7 +205,7 @@ class VerifyTextTest extends TestCase
         if ($exceptionExpected) {
             $this->expectException(CheckException::class);
         }
-        $this->assertEquals($expected, $verifyText->run());
+        $this->assertEquals($expected, $verifyString->run());
     }
 
     /**
@@ -213,22 +213,22 @@ class VerifyTextTest extends TestCase
      *
      * @dataProvider conditionsProvider
      *
-     * @param VerifyString $verifyText
+     * @param VerifyString $verifyString
      * @param bool $isValid
      * @param bool $expected
      * @param bool $exceptionExpected
      * @param string $objectMessage
      */
     public function testStringify(
-        VerifyString $verifyText,
+        VerifyString $verifyString,
         bool $isValid,
         bool $expected,
         bool $exceptionExpected,
         string $objectMessage
     ): void
     {
-        $this->assertEquals($objectMessage, (string) $verifyText);
-        $this->assertEquals($objectMessage, $verifyText->stringify());
+        $this->assertEquals($objectMessage, (string) $verifyString);
+        $this->assertEquals($objectMessage, $verifyString->stringify());
     }
 
     /**
@@ -236,8 +236,8 @@ class VerifyTextTest extends TestCase
      */
     public function testSetContent(): void
     {
-        $verifyText = new VerifyString(VerifyString::CONDITION_IS_EMPTY, '', 'test1');
-        $this->assertInstanceOf(VerifyString::class, $verifyText->setContent('test2'));
-        $this->assertEquals("Check if the given content 'test2' is empty.", (string) $verifyText);
+        $verifyString = new VerifyString(VerifyString::CONDITION_IS_EMPTY, '', 'test1');
+        $this->assertInstanceOf(VerifyString::class, $verifyString->setContent('test2'));
+        $this->assertEquals("Check if the given content 'test2' is empty.", (string) $verifyString);
     }
 }
