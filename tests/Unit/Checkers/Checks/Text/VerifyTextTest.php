@@ -13,7 +13,7 @@ namespace Tests\Unit\Checkers\Checks\Text;
 
 use Forte\Worker\Checkers\Checks\Text\VerifyText;
 use Forte\Worker\Exceptions\CheckException;
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -191,7 +191,7 @@ class VerifyTextTest extends TestCase
      * @param bool $exceptionExpected
      * @param string $objectMessage
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function testRun(
         VerifyText $verifyText,

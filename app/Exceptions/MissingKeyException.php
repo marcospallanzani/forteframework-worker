@@ -11,7 +11,7 @@ use Throwable;
  *
  * @package Forte\Worker\Exceptions
  */
-class MissingKeyException extends GeneratorException
+class MissingKeyException extends WorkerException
 {
     /**
      * The missing key.

@@ -4,7 +4,7 @@ namespace Forte\Worker\Transformers\Transforms;
 
 use Forte\Worker\Actions\ValidActionInterface;
 use Forte\Worker\Exceptions\CheckException;
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\FileTrait;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
@@ -39,7 +39,7 @@ abstract class AbstractTransform implements ValidActionInterface
      * @return bool True if the action implemented by this AbstractTransform
      * subclass instance was successfully applied; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected abstract function apply(): bool;
 
@@ -50,7 +50,7 @@ abstract class AbstractTransform implements ValidActionInterface
      * @return bool True if this AbstractTransform subclass
      * instance has been successfully applied; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function run(): bool
     {
@@ -116,7 +116,7 @@ abstract class AbstractTransform implements ValidActionInterface
                 if ($check instanceof AbstractCheck && !$check->run()) {
                     $failedChecks[] = new CheckException($check, "Check failed.");
                 }
-            } catch (GeneratorException $generatorException) {
+            } catch (WorkerException $generatorException) {
                 $failedChecks[] = new CheckException($check,
                     sprintf("Check failed with error '%s'.", $generatorException->getMessage())
                 );
@@ -139,7 +139,7 @@ abstract class AbstractTransform implements ValidActionInterface
                 if ($check instanceof AbstractCheck && !$check->run()) {
                     $failedChecks[] = new CheckException($check, "Check failed.");
                 }
-            } catch (GeneratorException $generatorException) {
+            } catch (WorkerException $generatorException) {
                 $failedChecks[] = new CheckException($check,
                     sprintf("Check failed with error '%s'.", $generatorException->getMessage())
                 );
@@ -158,7 +158,7 @@ abstract class AbstractTransform implements ValidActionInterface
      * @return string A string representation of the failed checks, in case the
      * thrownException flag is true.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected function runAndReportBeforeChecks($throwException = false): string
     {
@@ -195,7 +195,7 @@ abstract class AbstractTransform implements ValidActionInterface
      * @return string A string representation of the failed checks, in case the
      * thrownException flag is true.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected function runAndReportAfterChecks($throwException = false): string
     {

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Helpers;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\FileTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -56,7 +56,7 @@ class FileTraitTest extends TestCase
     {
         $class = $this->getAnonymousTestClass();
         if ($exceptionExpected) {
-            $this->expectException(GeneratorException::class);
+            $this->expectException(WorkerException::class);
         }
         $this->assertEquals($expected, $class->checkFileExists($filePath, $raiseError));
     }

@@ -7,7 +7,7 @@ namespace Forte\Worker\Exceptions;
  *
  * @package Forte\Worker\Exceptions
  */
-class GeneratorException extends \Exception
+class WorkerException extends \Exception
 {
     //
 }

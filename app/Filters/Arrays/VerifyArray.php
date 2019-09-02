@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Filters\Arrays;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\MissingKeyException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\FileParser;
@@ -68,7 +68,7 @@ class VerifyArray extends AbstractArray
      * @return bool Returns true, if this check parameters are correctly
      * configured and consistent; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function isValid(): bool
     {
@@ -130,7 +130,7 @@ class VerifyArray extends AbstractArray
      *
      * @return bool
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      * @throws MissingKeyException
      */
     public function checkCondition(array $array): bool
@@ -231,7 +231,7 @@ class VerifyArray extends AbstractArray
      *
      * @return array
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function getSupportedActions(): array
     {
@@ -282,7 +282,7 @@ class VerifyArray extends AbstractArray
      *
      * @return bool
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected function contains($value): bool
     {
@@ -310,7 +310,7 @@ class VerifyArray extends AbstractArray
      *
      * @return bool
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected function endsWith($value): bool
     {
@@ -332,7 +332,7 @@ class VerifyArray extends AbstractArray
      *
      * @return bool
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected function startsWith($value): bool
     {

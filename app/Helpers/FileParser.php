@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Helpers;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\MissingKeyException;
 use Symfony\Component\Yaml\Yaml as YamlReader;
 use Zend\Config\Reader\Ini as IniReader;
@@ -81,7 +81,7 @@ class FileParser
      * @param string $contentType The content type (supported types are the
      * constants whose name starts with the prefix 'CONTENT_TYPE').
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public static function writeToConfigFile($content, string $filePath, string $contentType): void
     {
@@ -109,7 +109,7 @@ class FileParser
                     break;
             }
         } catch (\Exception $exception) {
-            throw new GeneratorException(sprintf(
+            throw new WorkerException(sprintf(
                 "It was not possible to save the given content to the specified file '%s'. Error message is: '%s",
                 $filePath,
                 $exception->getMessage()

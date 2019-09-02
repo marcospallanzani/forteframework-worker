@@ -4,7 +4,7 @@ namespace Forte\Worker\Checkers\Checks;
 
 use Forte\Worker\Actions\ValidActionInterface;
 use Forte\Worker\Exceptions\CheckException;
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\FileTrait;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
@@ -35,7 +35,7 @@ abstract class AbstractCheck implements ValidActionInterface
      * @return bool True if this AbstractCheck subclass instance
      * action ran successfully; false otherwise.
      *
-     * @throws GeneratorException If this AbstractCheck subclass instance
+     * @throws WorkerException If this AbstractCheck subclass instance
      * action did not run successfully.
      */
     public function run(): bool

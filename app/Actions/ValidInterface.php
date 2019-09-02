@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Actions;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 
 /**
  * Interface ValidInterface. Basic behaviour of all classes need a validation.
@@ -26,7 +26,7 @@ interface ValidInterface
      * @return bool True if the implementing class instance
      * was well configured; false otherwise.
      *
-     * @throws GeneratorException If the implementing class
+     * @throws WorkerException If the implementing class
      * instance was not well configured.
      */
     public function isValid(): bool;

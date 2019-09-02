@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Helpers;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Zend\Validator\File\NotExists;
 
 /**
@@ -22,7 +22,7 @@ trait FileTrait
      * @return bool Returns true if the given file path points to an
      * existing file; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function checkFileExists(string $filePath, bool $raiseError = true): bool
     {
@@ -30,7 +30,7 @@ trait FileTrait
         $notExists = new NotExists();
         if ($notExists->isValid($filePath)) {
             if ($raiseError) {
-                throw new GeneratorException(sprintf(
+                throw new WorkerException(sprintf(
                     "The file '%s' does not exist.",
                     $filePath
                 ));

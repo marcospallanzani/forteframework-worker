@@ -12,7 +12,7 @@
 namespace Forte\Worker\Checkers\Checks\File;
 
 use Forte\Worker\Exceptions\CheckException;
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Filters\Arrays\VerifyArray;
 use Forte\Worker\Helpers\FileParser;
 
@@ -84,7 +84,7 @@ class FileHasValidConfigEntries extends FileExists
                 try {
                     // We check if the current check parameters are valid; if not valid, an exception will be thrown
                     $check->isValid();
-                } catch (GeneratorException $generatorException) {
+                } catch (WorkerException $generatorException) {
                     $this->throwCheckException($this, $generatorException->getMessage());
                 }
             }
@@ -105,7 +105,7 @@ class FileHasValidConfigEntries extends FileExists
      * instance check was successful; false otherwise.
      *
      * @throws CheckException
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected function check(): bool
     {
@@ -132,7 +132,7 @@ class FileHasValidConfigEntries extends FileExists
                     if (!$check->checkCondition($parsedContent)) {
                         $failed[] = sprintf("Check failed: %s.", $check);
                     }
-                } catch (GeneratorException $e) {
+                } catch (WorkerException $e) {
                     $failed[] = sprintf("Check failed: %s. Reason is: %s", $check, $e->getMessage());
                 }
             }

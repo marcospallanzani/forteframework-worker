@@ -12,7 +12,7 @@
 namespace Forte\Worker\Transformers\Transforms\File;
 
 use Forte\Worker\Checkers\Checks\Text\VerifyText;
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\StringParser;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
@@ -237,7 +237,7 @@ class ModifyFile extends AbstractTransform
      * @return bool True if the implementing class instance
      * was well configured; false otherwise.
      *
-     * @throws GeneratorException If the implementing class
+     * @throws WorkerException If the implementing class
      * instance was not well configured.
      */
     public function isValid(): bool
@@ -275,7 +275,7 @@ class ModifyFile extends AbstractTransform
 
                 try {
                     $condition->isValid();
-                } catch (GeneratorException $generatorException) {
+                } catch (WorkerException $generatorException) {
                     $wrongActionsAndConditions[] = sprintf(
                         "The condition '%s' is not valid. Error message is: '%s'.",
                         $condition,
@@ -314,7 +314,7 @@ class ModifyFile extends AbstractTransform
      * @return bool True if the action implemented by this AbstractTransform
      * subclass instance was successfully applied; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected function apply(): bool
     {
@@ -482,7 +482,7 @@ class ModifyFile extends AbstractTransform
      *
      * @return array Actions list.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function getSupportedActions(): array
     {
@@ -503,7 +503,7 @@ class ModifyFile extends AbstractTransform
      *
      * @return string The file content.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected function getFileContent(string $filePath): string
     {

@@ -13,7 +13,7 @@ namespace Tests\Unit\Checkers\Checks\File;
 
 use Forte\Worker\Checkers\Checks\File\FileHasInstantiableClass;
 use Forte\Worker\Exceptions\CheckException;
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -99,7 +99,7 @@ class FileHasInstantiableClassTest extends TestCase
      * @param bool $expected
      * @param bool $exceptionExpected
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function testCheckFileHasClass(
         string $filePath,

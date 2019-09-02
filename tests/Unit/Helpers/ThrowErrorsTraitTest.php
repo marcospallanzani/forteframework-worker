@@ -13,7 +13,7 @@ namespace Tests\Unit\Helpers;
 
 use Forte\Worker\Checkers\Checks\AbstractCheck;
 use Forte\Worker\Exceptions\CheckException;
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
@@ -65,7 +65,7 @@ class ThrowErrorsTraitTest extends TestCase
      */
     public function testThrowGeneratorException(): void
     {
-        $this->expectException(GeneratorException::class);
+        $this->expectException(WorkerException::class);
         $this->expectExceptionMessage("error message test.");
         $this->getAnonymousCheckClass()->throwGeneratorException(self::BASE_TEST_MESSAGE, "test");
     }

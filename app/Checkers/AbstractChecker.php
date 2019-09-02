@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Checkers;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Checkers\Checks\AbstractCheck;
 
 /**
@@ -55,7 +55,7 @@ class AbstractChecker
                 if ($check instanceof AbstractCheck && !$check->run()) {
                     $failedChecks[] = $check;
                 }
-            } catch (GeneratorException $generatorException) {
+            } catch (WorkerException $generatorException) {
                 $failedChecks[] = $generatorException->getMessage();
             }
         }

@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Filters\Arrays;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
 
@@ -35,7 +35,7 @@ class ModifyArray extends AbstractArray
      *
      * @return bool
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function isValid(): bool
     {
@@ -64,7 +64,7 @@ class ModifyArray extends AbstractArray
      *
      * @return array
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function filter(array $array): array
     {
@@ -188,7 +188,7 @@ class ModifyArray extends AbstractArray
      *
      * @return array
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function getSupportedActions(): array
     {

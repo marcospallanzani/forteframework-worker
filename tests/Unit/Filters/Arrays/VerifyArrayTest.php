@@ -3,7 +3,7 @@
 
 namespace Tests\Unit\Filters\Arrays;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\MissingKeyException;
 use Forte\Worker\Filters\Arrays\VerifyArray;
 use PHPUnit\Framework\TestCase;
@@ -273,7 +273,7 @@ class VerifyArrayTest extends TestCase
      * @param bool $reverseAction
      * @param bool $expectGeneratorException
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function testIsValid(
         string $key,
@@ -286,7 +286,7 @@ class VerifyArrayTest extends TestCase
         $verifyArray = new VerifyArray($key, $operation, $value, $reverseAction);
 
         if ($expectGeneratorException) {
-            $this->expectException(GeneratorException::class);
+            $this->expectException(WorkerException::class);
             $isValid = $verifyArray->isValid();
             $this->assertFalse($isValid);
         } else {
@@ -309,7 +309,7 @@ class VerifyArrayTest extends TestCase
      * @param bool $expectedResult
      * @param bool $expectException
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function testCheckCondition(
         array $array,
@@ -324,7 +324,7 @@ class VerifyArrayTest extends TestCase
         $verifyArray = new VerifyArray($key, $operation, $value, $reverseAction);
 
         if ($expectException) {
-            $this->expectException(GeneratorException::class);
+            $this->expectException(WorkerException::class);
         }
 
         $checked = $verifyArray->checkCondition($array);
@@ -338,7 +338,7 @@ class VerifyArrayTest extends TestCase
      * Check if MissingKeyException is thrown when a non-existing key is given
      * to a VerifyArray instance.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      * @throws MissingKeyException
      */
     public function testMissingKey(): void

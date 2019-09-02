@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Transformers\Transforms\File;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Filters\Files\Copy as CopyFilter;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
@@ -36,7 +36,7 @@ class Copy extends AbstractTransform
      * @return bool True if this Copy instance was well configured;
      * false otherwise.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      * @throws TransformException
      */
     public function isValid(): bool
@@ -68,7 +68,7 @@ class Copy extends AbstractTransform
      * @return bool True if the transform action implemented by this
      * Copy instance was successfully applied; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      * @throws TransformException
      */
     protected function apply(): bool

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Filters\Arrays;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Filters\Arrays\ModifyArray;
 use PHPUnit\Framework\TestCase;
 
@@ -82,7 +82,7 @@ class ModifyArrayTest extends TestCase
      * @return array
      *
      * @throws \ReflectionException
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function validationWithErrorsProvider(): array
     {
@@ -198,7 +198,7 @@ class ModifyArrayTest extends TestCase
      * @param string $exceptionMessage
      * @param bool $expectGeneratorException
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function testIsValidWithErrorMessage(
         ModifyArray $modifyArray,
@@ -207,7 +207,7 @@ class ModifyArrayTest extends TestCase
     ): void
     {
         if ($expectGeneratorException) {
-            $this->expectException(GeneratorException::class);
+            $this->expectException(WorkerException::class);
             $this->expectExceptionMessage($exceptionMessage);
             $isValid = $modifyArray->isValid();
             $this->assertFalse($isValid);
@@ -228,7 +228,7 @@ class ModifyArrayTest extends TestCase
      * @param array  $array
      * @param array  $expected
      *
-     * @throws \Forte\Worker\Exceptions\GeneratorException
+     * @throws WorkerException
      */
     public function testFilter(string $key, string $action, $value, array $array, array $expected): void
     {
@@ -247,7 +247,7 @@ class ModifyArrayTest extends TestCase
      * @param bool $expectGeneratorException
      * @param mixed $expected
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function testFailFilter(
         ModifyArray $modifyArray,
@@ -257,7 +257,7 @@ class ModifyArrayTest extends TestCase
     ): void
     {
         if ($expectGeneratorException) {
-            $this->expectException(GeneratorException::class);
+            $this->expectException(WorkerException::class);
             $modifyArray->filter([]);
         } else {
             $modifiedArray = $modifyArray->filter([]);

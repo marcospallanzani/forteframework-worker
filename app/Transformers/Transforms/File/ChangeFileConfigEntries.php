@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Transformers\Transforms\File;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Filters\Arrays\ModifyArray;
 use Forte\Worker\Helpers\FileParser;
@@ -94,7 +94,7 @@ class ChangeFileConfigEntries extends AbstractTransform
                 try {
                     // We check if the current modification is valid; if not valid, an exception will be thrown
                     $modification->isValid();
-                } catch (GeneratorException $generatorException) {
+                } catch (WorkerException $generatorException) {
                     $this->throwTransformException($this, $generatorException->getMessage());
                 }
             }
@@ -115,7 +115,7 @@ class ChangeFileConfigEntries extends AbstractTransform
      * this AbstractTransform subclass instance has been successfully
      * applied; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      * @throws TransformException
      */
     protected function apply(): bool
@@ -139,7 +139,7 @@ class ChangeFileConfigEntries extends AbstractTransform
             try {
                 /** @var ModifyArray $modification */
                 $parsedContent = $modification->filter($parsedContent);
-            } catch (GeneratorException $e) {
+            } catch (WorkerException $e) {
                 $failed[] = sprintf("Modification failed: %s. Reason is: %s", $modification, $e->getMessage());
             }
         }

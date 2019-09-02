@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Transformers\Transforms\File;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
@@ -47,7 +47,7 @@ class Unzip extends AbstractTransform
      * @return bool True if the transform action implemented by this
      * Unzip instance was successfully applied; false otherwise.
      *
-     * @throws GeneratorException If a general or validation error occurred.
+     * @throws WorkerException If a general or validation error occurred.
      * @throws TransformException If the transformation action failed.
      */
     protected function apply(): bool

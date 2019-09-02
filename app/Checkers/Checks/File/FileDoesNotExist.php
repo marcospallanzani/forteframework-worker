@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Checkers\Checks\File;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 
 /**
  * Class FileDoesNotExist.
@@ -26,7 +26,7 @@ class FileDoesNotExist extends FileExists
      * @return bool True if this FileDoesNotExist instance
      * check was successful; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected function check(): bool
     {

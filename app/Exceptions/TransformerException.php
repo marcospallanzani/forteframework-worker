@@ -10,7 +10,7 @@ use Throwable;
  *
  * @package Forte\Worker\Exceptions
  */
-class TransformerException extends GeneratorException
+class TransformerException extends WorkerException
 {
     /**
      * @var AbstractTransformer

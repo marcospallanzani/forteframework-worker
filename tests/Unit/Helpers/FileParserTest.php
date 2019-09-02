@@ -48,7 +48,7 @@ class FileParserTest extends TestCase
      * @param string $contentType
      * @param array $content
      *
-     * @throws \Forte\Worker\Exceptions\GeneratorException
+     * @throws \Forte\Worker\Exceptions\WorkerException
      */
     public function testWriteAndParseConfigFile(string $filePath, string $contentType, array $content): void
     {

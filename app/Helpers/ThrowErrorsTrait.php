@@ -3,7 +3,7 @@
 namespace Forte\Worker\Helpers;
 
 use Forte\Worker\Exceptions\CheckException;
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
 use Forte\Worker\Checkers\Checks\AbstractCheck;
@@ -21,11 +21,11 @@ trait ThrowErrorsTrait
      * @param string $message The exception message.
      * @param string[] $parameters The values to replace in the error message.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     public function throwGeneratorException(string $message, string ...$parameters): void
     {
-        throw new GeneratorException(vsprintf($message, $parameters));
+        throw new WorkerException(vsprintf($message, $parameters));
     }
 
     /**

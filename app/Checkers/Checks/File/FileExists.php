@@ -13,7 +13,7 @@ namespace Forte\Worker\Checkers\Checks\File;
 
 use Forte\Worker\Checkers\Checks\AbstractCheck;
 use Forte\Worker\Exceptions\CheckException;
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 
 /**
  * Class FileExists.
@@ -61,7 +61,7 @@ class FileExists extends AbstractCheck
      * @return bool True if this FileExists instance
      * check was successful; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected function check(): bool
     {

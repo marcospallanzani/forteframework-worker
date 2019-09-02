@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Checkers\Checks\File;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 
 /**
  * Class FileHasInstantiableClass. This class checks if a given file
@@ -47,7 +47,7 @@ class FileHasInstantiableClass extends FileExists
      * @return bool Returns true if this FileHasInstantiableClass
      * instance check was successful; false otherwise.
      *
-     * @throws GeneratorException
+     * @throws WorkerException
      */
     protected function check(): bool
     {

@@ -10,7 +10,7 @@ use Throwable;
  *
  * @package Forte\Worker\Exceptions
  */
-class CheckException extends GeneratorException
+class CheckException extends WorkerException
 {
     /**
      * @var AbstractCheck

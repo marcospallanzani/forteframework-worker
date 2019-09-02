@@ -10,7 +10,7 @@ use Throwable;
  *
  * @package Forte\Worker\Exceptions
  */
-class TransformException extends GeneratorException
+class TransformException extends WorkerException
 {
     /**
      * @var AbstractTransform

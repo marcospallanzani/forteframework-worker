@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Transformers;
 
-use Forte\Worker\Exceptions\GeneratorException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
@@ -55,7 +55,7 @@ class AbstractTransformer
                 if ($transform instanceof AbstractTransform && !$transform->run()) {
                     $failedTransforms[] = $transform;
                 }
-            } catch (GeneratorException $generatorException) {
+            } catch (WorkerException $generatorException) {
                 $failedTransforms[] = $generatorException->getMessage();
             }
         }
