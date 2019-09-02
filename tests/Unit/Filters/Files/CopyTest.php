@@ -12,6 +12,9 @@ use PHPUnit\Framework\TestCase;
  */
 class CopyTest extends TestCase
 {
+    /**
+     * Temporary files constants
+     */
     const TEST_FILE_TMP      = __DIR__ . '/file-tests';
     const TEST_FILE_TMP_COPY = __DIR__ . '/file-tests_COPY';
     const TEST_CONTENT       = "ANY CONTENT";
