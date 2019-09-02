@@ -24,11 +24,17 @@ use PHPUnit\Framework\TestCase;
  */
 class ModifyFileTest extends TestCase
 {
-    const TEST_FILE_TMP      = __DIR__ . '/files/file-tests-template';
-    const TEST_FILE_MODIFY   = __DIR__ . '/files/file-tests-modify';
-    const TEST_FILE_TEMPLATE = __DIR__ . '/files/file-tests-template-to-add';
-    const TEST_WRONG_FILE    = "/path/to/non/existent/file.php";
-    const TEST_CONTENT       = "ANY CONTENT";
+    /**
+     * Temporary files constants.
+     */
+    const TEST_FILE_TMP         = __DIR__ . '/file-tests-template';
+    const TEST_FILE_MODIFY      = __DIR__ . '/file-tests-modify';
+    const TEST_FILE_TEMPLATE    = __DIR__ . '/file-tests-template-to-add';
+    const TEST_WRONG_FILE       = "/path/to/non/existent/file.php";
+    const TEST_CONTENT          = "ANY CONTENT";
+    const TEST_TEMPLATE_CONTENT = "CONTENT ADDED FROM TEMPLATE";
+    const TEST_APPENDED_CONTENT = "APPENDED CONTENT";
+    const TEST_REPLACED_CONTENT = "REPLACED CONTENT";
 
     /**
      * This method is called before each test.
@@ -36,6 +42,8 @@ class ModifyFileTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        @file_put_contents(self::TEST_FILE_TMP, self::TEST_CONTENT);
+        @file_put_contents(self::TEST_FILE_TEMPLATE, self::TEST_TEMPLATE_CONTENT);
         copy(self::TEST_FILE_TMP, self::TEST_FILE_MODIFY);
     }
 
@@ -45,7 +53,9 @@ class ModifyFileTest extends TestCase
     public function tearDown(): void
     {
         parent::tearDown();
+        @unlink(self::TEST_FILE_TMP);
         @unlink(self::TEST_FILE_MODIFY);
+        @unlink(self::TEST_FILE_TEMPLATE);
     }
 
     /**
@@ -84,9 +94,9 @@ class ModifyFileTest extends TestCase
         $this->applyContentToActions($replaceWithTemplateIfLineStartsWith);
 
         return [
-            [$replaceValueIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace content 'CONTENT' with 'REPLACED CONTENT' in each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
-            [$replaceLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace each line that meets the following condition with 'REPLACED CONTENT': 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
-            [$appendValueToLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Append content 'APPENDED CONTENT' to each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
+            [$replaceValueIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace content 'CONTENT' with '".self::TEST_REPLACED_CONTENT."' in each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
+            [$replaceLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace each line that meets the following condition with '".self::TEST_REPLACED_CONTENT."': 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
+            [$appendValueToLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Append content '".self::TEST_APPENDED_CONTENT."' to each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
             [$removeValueIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Remove content 'CONTENT' in each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
             [$removeLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Remove each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
             [$appendTemplateToLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Append template '".self::TEST_FILE_TEMPLATE."' to each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
@@ -105,12 +115,12 @@ class ModifyFileTest extends TestCase
     {
         return [
             [$this->getReplaceValueModifyFile(), true, false, true, 'ANY REPLACED CONTENT'],
-            [$this->getReplaceLineModifyFile(),true, false, true, 'REPLACED CONTENT'],
+            [$this->getReplaceLineModifyFile(),true, false, true, self::TEST_REPLACED_CONTENT],
             [$this->getRemoveValueModifyFile(), true, false, true, 'ANY '],
             [$this->getRemoveLineModifyFile(), true, false, true, ''],
-            [$this->getAppendValueModifyFile(), true, false, true, self::TEST_CONTENT . 'APPENDED CONTENT'],
-            [$this->getAppendTemplateModifyFile(), true, false, true, self::TEST_CONTENT . 'CONTENT ADDED FROM TEMPLATE'],
-            [$this->getReplaceWithTemplateModifyFile(), true, false, true, 'CONTENT ADDED FROM TEMPLATE'],
+            [$this->getAppendValueModifyFile(), true, false, true, self::TEST_CONTENT . self::TEST_APPENDED_CONTENT],
+            [$this->getAppendTemplateModifyFile(), true, false, true, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
+            [$this->getReplaceWithTemplateModifyFile(), true, false, true, self::TEST_TEMPLATE_CONTENT],
             [new ModifyFile(self::TEST_FILE_MODIFY), true, false, true, self::TEST_CONTENT],
             [new ModifyFile(''), false, true, false, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedAction(), false, true, false, self::TEST_CONTENT],
@@ -202,7 +212,7 @@ class ModifyFileTest extends TestCase
     {
         return
             (new ModifyFile(self::TEST_FILE_MODIFY))
-                ->replaceValueIfLineStartsWith('ANY', 'CONTENT', 'REPLACED CONTENT')
+                ->replaceValueIfLineStartsWith('ANY', 'CONTENT', self::TEST_REPLACED_CONTENT)
             ;
     }
 
@@ -245,7 +255,7 @@ class ModifyFileTest extends TestCase
                     ModifyFile::MODIFY_FILE_APPEND_TO_LINE,
                     VerifyString::CONDITION_STARTS_WITH,
                     'ANY',
-                    'APPENDED CONTENT'
+                    self::TEST_APPENDED_CONTENT
                 )
             ;
     }
@@ -295,7 +305,7 @@ class ModifyFileTest extends TestCase
     {
         return
             (new ModifyFile(self::TEST_FILE_MODIFY))
-                ->replaceLineIfLineStartsWith('ANY', 'REPLACED CONTENT')
+                ->replaceLineIfLineStartsWith('ANY', self::TEST_REPLACED_CONTENT)
             ;
     }
 
