@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Transformers\Transforms\File;
+namespace Tests\Unit\Transformers\Transforms\Files;
 
 use Forte\Worker\Checkers\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\WorkerException;
@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class ModifyFileTest.
  *
- * @package Tests\Unit\Transformers\Transforms\File
+ * @package Tests\Unit\Transformers\Transforms\Files
  */
 class ModifyFileTest extends TestCase
 {

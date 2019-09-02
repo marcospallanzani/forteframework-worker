@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Transformers\Transforms\File;
+namespace Tests\Unit\Transformers\Transforms\Files;
 
 use Forte\Worker\Checkers\Checks\Files\DirectoryDoesNotExist;
 use Forte\Worker\Checkers\Checks\Files\DirectoryExists;
@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class RemoveTest.
  *
- * @package Tests\Unit\Transformers\Transforms\File
+ * @package Tests\Unit\Transformers\Transforms\Files
  */
 class RemoveTest extends TestCase
 {
