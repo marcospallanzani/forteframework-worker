@@ -2,8 +2,7 @@
 
 namespace Forte\Worker\Transformers\Transforms\Files;
 
-use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
@@ -29,13 +28,13 @@ class UnzipFile extends AbstractTransform
      * @return bool True if an Unzip instance was well configured;
      * false otherwise.
      *
-     * @throws TransformException If an Unzip instance was not well configured.
+     * @throws ActionException If an Unzip instance was not well configured.
      */
     public function isValid(): bool
     {
         // The zip file path cannot be empty
         if (empty($this->zipFilePath)) {
-            $this->throwTransformException($this, "You must specify the zip file path.");
+            $this->throwActionException($this, "You must specify the zip file path.");
         }
 
         return true;
@@ -47,13 +46,12 @@ class UnzipFile extends AbstractTransform
      * @return bool True if the transform action implemented by this
      * Unzip instance was successfully applied; false otherwise.
      *
-     * @throws WorkerException If a general or validation error occurred.
-     * @throws TransformException If the transformation action failed.
+     * @throws ActionException If the transformation action failed.
      */
     protected function apply(): bool
     {
         // We check if the zip file exists
-        $this->fileExists($this->zipFilePath);
+        $this->checkFileExists($this->zipFilePath);
 
         $info = pathinfo($this->zipFilePath);
 
@@ -68,7 +66,7 @@ class UnzipFile extends AbstractTransform
             $zip->extractTo($this->extractToPath);
             $zip->close();
         } else {
-            $this->throwTransformException(
+            $this->throwActionException(
                 $this,
                 "Impossible to unzip the given ZIP file '%s'",
                 $this->zipFilePath

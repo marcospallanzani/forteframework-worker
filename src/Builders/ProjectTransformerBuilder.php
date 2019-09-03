@@ -61,8 +61,8 @@ class ProjectTransformerBuilder
     {
         $fullProjectPath = $this->transformer->getProjectFolder();
         return (new UnzipFile())
-            ->addBeforeCheck(new FileExists($zipFilePath))
-            ->addAfterCheck(new FileExists($fullProjectPath))
+            ->addBeforeAction(new FileExists($zipFilePath))
+            ->addAfterAction(new FileExists($fullProjectPath))
             ->open($zipFilePath)
             ->extractTo($fullProjectPath)
         ;
@@ -92,8 +92,8 @@ class ProjectTransformerBuilder
                 ->copy($sourceFilePath)
                 ->toFolder($targetFolder)
                 ->withName($targeFileName)
-                ->addBeforeCheck(new FileExists($sourceFilePath))
-                ->addAfterCheck(new FileExists($copy->getDestinationFilePath()))
+                ->addBeforeAction(new FileExists($sourceFilePath))
+                ->addAfterAction(new FileExists($copy->getDestinationFilePath()))
         );
         return $this;
     }
@@ -111,7 +111,7 @@ class ProjectTransformerBuilder
     {
         $this->addTransform(
             (new EmptyTransform())
-                ->addBeforeCheck(new FileHasInstantiableClass($classFilePath, $className))
+                ->addBeforeAction(new FileHasInstantiableClass($classFilePath, $className))
         );
 
         return $this;
@@ -136,7 +136,7 @@ class ProjectTransformerBuilder
         $this->addTransform(
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->modifyConfigKeyWithValue($key, $value)
-                ->addAfterCheck(
+                ->addAfterAction(
                     (new FileHasValidConfigEntries($filePath, $contentType))
                         ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
                 )
@@ -163,7 +163,7 @@ class ProjectTransformerBuilder
         $this->addTransform(
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->addConfigKeyWithValue($key, $value)
-                ->addAfterCheck(
+                ->addAfterAction(
                     (new FileHasValidConfigEntries($filePath, $contentType))
                         ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
                 )
@@ -189,7 +189,7 @@ class ProjectTransformerBuilder
         $this->addTransform(
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->removeConfigKey($key)
-                ->addAfterCheck(
+                ->addAfterAction(
                     (new FileHasValidConfigEntries($filePath, $contentType))
                         ->doesNotHaveKey($key)
                 )

@@ -15,8 +15,7 @@ use Forte\Worker\Checkers\Checks\Files\DirectoryDoesNotExist;
 use Forte\Worker\Checkers\Checks\Files\DirectoryExists;
 use Forte\Worker\Checkers\Checks\Files\FileDoesNotExist;
 use Forte\Worker\Checkers\Checks\Files\FileExists;
-use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Transformers\Transforms\Files\RemoveFile;
 use PHPUnit\Framework\TestCase;
 
@@ -86,19 +85,19 @@ class RemoveFileTest extends TestCase
      * @param string $filePath
      * @param bool $expected
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testRemoveFile(string $filePath, bool $expected): void
     {
         if (!$expected) {
-            $this->expectException(WorkerException::class);
+            $this->expectException(ActionException::class);
         }
         $this->assertEquals(
             $expected,
             (new RemoveFile())
                 ->removeFile($filePath)
-                ->addBeforeCheck(new FileExists($filePath))
-                ->addAfterCheck(new FileDoesNotExist($filePath))
+                ->addBeforeAction(new FileExists($filePath))
+                ->addAfterAction(new FileDoesNotExist($filePath))
                 ->run()
         );
     }
@@ -112,12 +111,12 @@ class RemoveFileTest extends TestCase
      * @param string $filePath
      * @param bool $expected
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testRemoveFileNoChecks(string $filePath, bool $expected): void
     {
         if (!$expected) {
-            $this->expectException(TransformException::class);
+            $this->expectException(ActionException::class);
         }
         $this->assertEquals($expected, (new RemoveFile())->removeFile($filePath)->run());
     }
@@ -126,13 +125,13 @@ class RemoveFileTest extends TestCase
      * Test the Forte\Worker\Transformers\Transforms\Files\Remove::run() method
      * in mode "single-file", but with a folder as a parameter.
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testRemoveFileDirectoryException(): void
     {
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
-        $this->expectException(TransformException::class);
+        $this->expectException(ActionException::class);
         (new RemoveFile())->removeFile(self::TEST_DIR_TMP)->run();
     }
 
@@ -140,7 +139,7 @@ class RemoveFileTest extends TestCase
      * Test the Forte\Worker\Transformers\Transforms\Files\Remove::run() method
      * in mode "directory-file", with a valid folder parameter.
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testRemoveDirectory(): void
     {
@@ -148,8 +147,8 @@ class RemoveFileTest extends TestCase
         // an exception should be thrown.
         $removeTransform = (new RemoveFile())
             ->removeDirectory(self::TEST_DIR_TMP)
-            ->addBeforeCheck(new DirectoryExists(self::TEST_DIR_TMP))
-            ->addAfterCheck(new DirectoryDoesNotExist(self::TEST_DIR_TMP))
+            ->addBeforeAction(new DirectoryExists(self::TEST_DIR_TMP))
+            ->addAfterAction(new DirectoryDoesNotExist(self::TEST_DIR_TMP))
             ->run();
 
         $this->assertTrue($removeTransform);
@@ -159,7 +158,7 @@ class RemoveFileTest extends TestCase
      * Test the Forte\Worker\Transformers\Transforms\Files\Remove::run() method
      * in mode "directory-file", with a valid folder parameter.
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testRemoveDirectoryWithFilePatter(): void
     {
@@ -167,8 +166,8 @@ class RemoveFileTest extends TestCase
         // an exception should be thrown.
         $removeTransform = (new RemoveFile())
             ->removeFilePattern(self::TEST_DIR_TMP . '/*json')
-            ->addBeforeCheck(new FileExists(self::TEST_FILE_JSON))
-            ->addAfterCheck(new FileDoesNotExist(self::TEST_FILE_JSON))
+            ->addBeforeAction(new FileExists(self::TEST_FILE_JSON))
+            ->addAfterAction(new FileDoesNotExist(self::TEST_FILE_JSON))
             ->run();
 
         $this->assertTrue($removeTransform);
@@ -178,13 +177,13 @@ class RemoveFileTest extends TestCase
      * Test the Forte\Worker\Transformers\Transforms\Files\Remove::run() method
      * in mode "directory-file", but with a wrong or non-existing folder as a parameter.
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testRemoveDirectoryExpectException(): void
     {
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
-        $this->expectException(TransformException::class);
+        $this->expectException(ActionException::class);
         (new RemoveFile())->removeFile(__DIR__ . '/files/xxx/')->run();
     }
 

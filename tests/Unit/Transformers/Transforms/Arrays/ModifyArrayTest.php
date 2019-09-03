@@ -2,8 +2,7 @@
 
 namespace Tests\Unit\Transformers\Transforms\Arrays;
 
-use Forte\Worker\Exceptions\TransformException;
-use Forte\Worker\Exceptions\WorkerException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Transformers\Transforms\Arrays\ModifyArray;
 use PHPUnit\Framework\TestCase;
 
@@ -68,7 +67,7 @@ class ModifyArrayTest extends TestCase
      *
      * @return array
      *
-     * @throws TransformException
+     * @throws ActionException
      */
     public function validationWithErrorsProvider(): array
     {
@@ -166,7 +165,7 @@ class ModifyArrayTest extends TestCase
      * @param string $exceptionMessage
      * @param bool $expectException
      *
-     * @throws TransformException
+     * @throws ActionException
      */
     public function testIsValidWithErrorMessage(
         ModifyArray $modifyArray,
@@ -175,7 +174,7 @@ class ModifyArrayTest extends TestCase
     ): void
     {
         if ($expectException) {
-            $this->expectException(TransformException::class);
+            $this->expectException(ActionException::class);
             $this->expectExceptionMessage($exceptionMessage);
             $isValid = $modifyArray->setModifyContent([])->isValid();
             $this->assertFalse($isValid);
@@ -196,7 +195,7 @@ class ModifyArrayTest extends TestCase
      * @param array  $array
      * @param array  $expected
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testRun(string $key, string $action, $value, array $array, array $expected): void
     {
@@ -216,7 +215,7 @@ class ModifyArrayTest extends TestCase
      * @param bool $expectException
      * @param mixed $expected
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testFailRun(
         ModifyArray $modifyArray,
@@ -226,7 +225,7 @@ class ModifyArrayTest extends TestCase
     ): void
     {
         if ($expectException) {
-            $this->expectException(TransformException::class);
+            $this->expectException(ActionException::class);
             $modifyArray->setModifyContent([])->run();
         } else {
             $modifyArray->setModifyContent([])->run();

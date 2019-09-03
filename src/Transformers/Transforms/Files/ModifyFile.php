@@ -12,7 +12,7 @@
 namespace Forte\Worker\Transformers\Transforms\Files;
 
 use Forte\Worker\Checkers\Checks\Strings\VerifyString;
-use Forte\Worker\Exceptions\WorkerException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\StringParser;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
@@ -237,75 +237,66 @@ class ModifyFile extends AbstractTransform
      * @return bool True if the implementing class instance
      * was well configured; false otherwise.
      *
-     * @throws WorkerException If the implementing class
+     * @throws ActionException If the implementing class
      * instance was not well configured.
      */
     public function isValid(): bool
     {
-        try {
-            if (empty($this->filePath)) {
-                $this->throwTransformException(
+        if (empty($this->filePath)) {
+            $this->throwActionException(
+                $this,
+                "You need to specify the 'filePath' for the following transformation: '%s'.",
+                $this
+            );
+        }
+
+        // If no action is specified OR an unsupported action is given, then we throw an error.
+        $modifyConstants = $this->getSupportedActions();
+        $wrongActionsAndConditions = array();
+        foreach ($this->actions as $action) {
+            if (!in_array($action['action'], $modifyConstants)) {
+                $wrongActionsAndConditions[] = sprintf(
+                    "The action '%s' is not supported. Impacted transformation is: '%s'. Supported actions are: '%s'.",
+                    $action['action'],
                     $this,
-                    "You need to specify the 'filePath' for the following transformation: '%s'.",
+                    implode(',', $modifyConstants)
+                );
+            }
+
+            $condition = $action['condition'];
+            if (!$condition instanceof VerifyString) {
+                $wrongActionsAndConditions[] = sprintf(
+                    "The action '%s' has a non-recognized condition. Impacted transformation is: '%s'.",
+                    $action['action'],
                     $this
                 );
             }
 
-            // If no action is specified OR an unsupported action is given, then we throw an error.
-            $modifyConstants = $this->getSupportedActions();
-            $wrongActionsAndConditions = array();
-            foreach ($this->actions as $action) {
-                if (!in_array($action['action'], $modifyConstants)) {
-                    $wrongActionsAndConditions[] = sprintf(
-                        "The action '%s' is not supported. Impacted transformation is: '%s'. Supported actions are: '%s'.",
-                        $action['action'],
-                        $this,
-                        implode(',', $modifyConstants)
-                    );
-                }
-
-                $condition = $action['condition'];
-                if (!$condition instanceof VerifyString) {
-                    $wrongActionsAndConditions[] = sprintf(
-                        "The action '%s' has a non-recognized condition. Impacted transformation is: '%s'.",
-                        $action['action'],
-                        $this
-                    );
-                }
-
-                try {
-                    $condition->isValid();
-                } catch (WorkerException $workerException) {
-                    $wrongActionsAndConditions[] = sprintf(
-                        "The condition '%s' is not valid. Error message is: '%s'.",
-                        $condition,
-                        $workerException->getMessage()
-                    );
-                }
-            }
-
-            if ($wrongActionsAndConditions) {
-                $message = "";
-                foreach ($wrongActionsAndConditions as $key => $errorMessage) {
-                    $message .= "$key. $errorMessage;";
-                }
-                $this->throwTransformException(
-                    $this,
-                    "This modify-file transformation is not well configured: '%s'. Error message is: '%s'.",
-                    $this,
-                    $message
+            try {
+                $condition->isValid();
+            } catch (ActionException $actionException) {
+//TODO WE SHOULD ADD THIS ActionException to the list of nested errors as an ActionException where the
+                $wrongActionsAndConditions[] = sprintf(
+                    "The condition '%s' is not valid. Error message is: '%s'.",
+                    $condition,
+                    $actionException->getMessage()
                 );
             }
-            return true;
-
-        } catch (\ReflectionException $reflectionException) {
-            $this->throwWorkerException(
-                "A general error occurred while retrieving the actions list. Error message is: '%s'.",
-                $reflectionException->getMessage()
-            );
         }
 
-        return false;
+        if ($wrongActionsAndConditions) {
+            $message = "";
+            foreach ($wrongActionsAndConditions as $key => $errorMessage) {
+                $message .= "$key. $errorMessage;";
+            }
+            $this->throwActionException(
+                $this,
+                "This modify-file transformation is not well configured: '%s'. Error message is: '%s'.",
+                $this,
+                $message
+            );
+        }
+        return true;
     }
 
     /**
@@ -314,12 +305,12 @@ class ModifyFile extends AbstractTransform
      * @return bool True if the action implemented by this AbstractTransform
      * subclass instance was successfully applied; false otherwise.
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     protected function apply(): bool
     {
         // We check if the origin file exists
-        $this->fileExists($this->filePath);
+        $this->checkFileExists($this->filePath);
 
         // We open the file. we read it line by line and we modify each line if the condition is met
         $fileHandler = fopen($this->filePath, "r");
@@ -466,6 +457,7 @@ class ModifyFile extends AbstractTransform
         return $message;
     }
 
+
     /**
      * Return a list of configured actions.
      *
@@ -482,14 +474,15 @@ class ModifyFile extends AbstractTransform
      *
      * @return array Actions list.
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function getSupportedActions(): array
     {
         try {
             return self::getClassConstants('MODIFY_FILE_');
         } catch (\ReflectionException $reflectionException) {
-            $this->throwWorkerException(
+            $this->throwActionException(
+                $this,
                 "An error occurred while retrieving the list of supported actions. Error message is: '%s'.",
                 $reflectionException->getMessage()
             );
@@ -503,11 +496,11 @@ class ModifyFile extends AbstractTransform
      *
      * @return string The file content.
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     protected function getFileContent(string $filePath): string
     {
-        $this->fileExists($filePath);
+        $this->checkFileExists($filePath);
 
         return file_get_contents($filePath);
     }

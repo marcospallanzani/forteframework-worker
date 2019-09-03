@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Transformers\Transforms\Arrays;
 
-use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
@@ -129,18 +129,18 @@ class ModifyArray extends AbstractTransform
      *
      * @return bool
      *
-     * @throws TransformException
+     * @throws ActionException
      */
     public function isValid(): bool
     {
         if (empty($this->key)) {
-            $this->throwTransformException($this, "You need to specify the 'key' for the following check: '%s'.", $this);
+            $this->throwActionException($this, "You need to specify the 'key' for the following check: '%s'.", $this);
         }
 
         // If no action is specified OR an unsupported action is given, then we throw an error.
         $modifyConstants = $this->getSupportedActions();
         if (!in_array($this->action, $modifyConstants)) {
-            $this->throwTransformException(
+            $this->throwActionException(
                 $this,
                 "The action '%s' is not supported. Impacted transform is: '%s'. Supported actions are: '%s'",
                 $this->action,
@@ -223,14 +223,14 @@ class ModifyArray extends AbstractTransform
      *
      * @return array
      *
-     * @throws TransformException
+     * @throws ActionException
      */
     public function getSupportedActions(): array
     {
         try {
             return self::getClassConstants('MODIFY_');
         } catch (\ReflectionException $reflectionException) {
-            $this->throwTransformException(
+            $this->throwActionException(
                 $this,
                 "An error occurred while retrieving the list of supported actions. Error message is: '%s'.",
                 $reflectionException->getMessage()

@@ -12,8 +12,7 @@
 namespace Tests\Unit\Transformers\Transforms\Files;
 
 use Forte\Worker\Checkers\Checks\Strings\VerifyString;
-use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Transformers\Transforms\Files\ModifyFile;
 use PHPUnit\Framework\TestCase;
 
@@ -139,7 +138,7 @@ class ModifyFileTest extends TestCase
      * @param bool $isValid
      * @param string $expectedContent
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testApply(
         ModifyFile $modifyFile,
@@ -150,7 +149,7 @@ class ModifyFileTest extends TestCase
     ): void
     {
         if ($expectedException) {
-            $this->expectException(WorkerException::class);
+            $this->expectException(ActionException::class);
         }
         $this->assertEquals($expected, $modifyFile->run());
         $this->assertTrue($this->checkFileContent(self::TEST_FILE_MODIFY, $expectedContent));
@@ -166,12 +165,12 @@ class ModifyFileTest extends TestCase
      * @param bool $expectedException
      * @param bool $isValid
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testIsValid(ModifyFile $modifyFile, bool $expected, bool $expectedException, bool $isValid): void
     {
         if ($expectedException) {
-            $this->expectException(TransformException::class);
+            $this->expectException(ActionException::class);
         }
         $this->assertEquals($isValid, $modifyFile->isValid());
     }

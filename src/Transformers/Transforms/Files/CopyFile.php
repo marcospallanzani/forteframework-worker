@@ -2,8 +2,7 @@
 
 namespace Forte\Worker\Transformers\Transforms\Files;
 
-use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Filters\Files\Copy as CopyFilter;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
 use Zend\Filter\Exception\RuntimeException;
@@ -36,14 +35,13 @@ class CopyFile extends AbstractTransform
      * @return bool True if this Copy instance was well configured;
      * false otherwise.
      *
-     * @throws WorkerException
-     * @throws TransformException
+     * @throws ActionException
      */
     public function isValid(): bool
     {
         // The origin file path cannot be empty
         if (empty($this->originFilePath)) {
-            $this->throwTransformException($this, "You must specify a file to be copied.");
+            $this->throwActionException($this, "You must specify a file to be copied.");
         }
 
         // If no destination folder is specified, or it is the same as the origin folder,
@@ -51,7 +49,7 @@ class CopyFile extends AbstractTransform
         // THEN we throw an error
         $destinationFilePath = $this->getDestinationFilePath();
         if (rtrim($this->originFilePath, DIRECTORY_SEPARATOR) === $destinationFilePath) {
-            $this->throwTransformException(
+            $this->throwActionException(
                 $this,
                 "The origin file '%s' and the specified destination file '%s' cannot be the same.",
                 $this->originFilePath,
@@ -68,14 +66,13 @@ class CopyFile extends AbstractTransform
      * @return bool True if the transform action implemented by this
      * Copy instance was successfully applied; false otherwise.
      *
-     * @throws WorkerException
-     * @throws TransformException
+     * @throws ActionException
      */
     protected function apply(): bool
     {
         try {
             // We check if the origin file exists
-            $this->fileExists($this->originFilePath);
+            $this->checkFileExists($this->originFilePath);
 
             $info = pathinfo($this->originFilePath);
 
@@ -99,7 +96,7 @@ class CopyFile extends AbstractTransform
 
             return true;
         } catch (RuntimeException $runtimeException) {
-            $this->throwTransformException(
+            $this->throwActionException(
                 $this,
                 "An error occurred while copying file '%s' to '%s'. Error message is: '%s'",
                 $this->originFilePath,

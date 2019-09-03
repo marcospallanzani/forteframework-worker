@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Transformers\Transforms\Files;
 
-use Forte\Worker\Exceptions\TransformException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
@@ -41,25 +41,25 @@ class RemoveFile extends AbstractTransform
      * @return bool True if this Remove instance was well configured;
      * false otherwise.
      *
-     * @throws TransformException
+     * @throws ActionException
      */
     public function isValid(): bool
     {
         try {
             // The file path cannot be empty
             if (empty($this->filePath)) {
-                $this->throwTransformException($this, "You must specify the file path.");
+                $this->throwActionException($this, "You must specify the file path.");
             }
 
             // The mode cannot be empty
             if (empty($this->mode)) {
-                $this->throwTransformException($this, "You must specify the remove mode.");
+                $this->throwActionException($this, "You must specify the remove mode.");
             }
 
             // Check if the given mode is supported
             $modesConstants = self::getClassConstants('REMOVE_');
             if (!in_array($this->mode, $modesConstants)) {
-                $this->throwTransformException(
+                $this->throwActionException(
                     $this,
                     "The specified mode '%s' is not supported. Supported modes are: '%s'",
                     $this->mode,
@@ -67,7 +67,7 @@ class RemoveFile extends AbstractTransform
                 );
             }
         } catch (\ReflectionException $reflectionException) {
-            $this->throwTransformException($this,
+            $this->throwActionException($this,
                 "A general error occurred while retrieving the modes list. Error message is: '%s'.",
                 $reflectionException->getMessage()
             );
@@ -82,7 +82,7 @@ class RemoveFile extends AbstractTransform
      * @return bool True if the action implemented by this Remove
      * instance was successfully applied; false otherwise.
      *
-     * @throws TransformException
+     * @throws ActionException
      */
     protected function apply(): bool
     {
@@ -185,7 +185,7 @@ class RemoveFile extends AbstractTransform
      * @return bool True if the given folder and its whole content
      * (sub-folders and files) were deleted; false otherwise.
      *
-     * @throws TransformException The given path is neither a directory, nor a file.
+     * @throws ActionException The given path is neither a directory, nor a file.
      */
     protected function deleteFolder(string $folderPath): bool
     {
@@ -204,7 +204,7 @@ class RemoveFile extends AbstractTransform
             }
             return @rmdir($folderPath);
         }
-        $this->throwTransformException(
+        $this->throwActionException(
             $this,
             "The given file path '%s' is neither a valid file, nor a directory, nor a file pattern.",
             $this->filePath
@@ -218,13 +218,13 @@ class RemoveFile extends AbstractTransform
      *
      * @return bool True if the file was deleted; false otherwise.
      *
-     * @throws TransformException If the given path is not a valid file path
+     * @throws ActionException If the given path is not a valid file path
      * (e.g. directory or file pattern).
      */
     protected function deleteFile(string $filePath): bool
     {
         if (!is_file($filePath)) {
-            $this->throwTransformException($this, "'%s' is not a valid file path.", $this->filePath);
+            $this->throwActionException($this, "'%s' is not a valid file path.", $this->filePath);
         }
         return @unlink($filePath);
     }

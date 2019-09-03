@@ -3,9 +3,9 @@
 namespace Forte\Worker\Transformers\Transforms\Files;
 
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Exceptions\TransformException;
-use Forte\Worker\Transformers\Transforms\Arrays\ModifyArray;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\FileParser;
+use Forte\Worker\Transformers\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
@@ -51,17 +51,17 @@ class ChangeFileConfigEntries extends AbstractTransform
      * @return bool Returns true if this AbstractTransform subclass
      * instance is correctly configured; false otherwise.
      *
-     * @throws TransformException
+     * @throws ActionException
      */
     public function isValid(): bool
     {
         // The file path cannot be empty
         if (empty($this->filePath)) {
-            $this->throwTransformException($this, "You must specify the file path.");
+            $this->throwActionException($this, "You must specify the file path.");
         }
 
         if (empty($this->contentType)) {
-            $this->throwTransformException($this, sprintf(
+            $this->throwActionException($this, sprintf(
                 "You must specify the content type for file '%s'.",
                 $this->filePath
             ));
@@ -72,7 +72,7 @@ class ChangeFileConfigEntries extends AbstractTransform
             $contentTypeConstants = FileParser::getSupportedContentTypes();
 
             if (!in_array($this->contentType, $contentTypeConstants)) {
-                $this->throwTransformException(
+                $this->throwActionException(
                     $this,
                     "The specified content type '%s' is not supported. Supported types are: '%s'",
                     $this->contentType,
@@ -84,7 +84,7 @@ class ChangeFileConfigEntries extends AbstractTransform
             foreach ($this->modifications as $modification) {
 
                 if (!$modification instanceof ModifyArray) {
-                    $this->throwTransformException(
+                    $this->throwActionException(
                         $this,
                         "Modifications should be registered as instances of class '%s'.",
                         ModifyArray::class
@@ -95,11 +95,12 @@ class ChangeFileConfigEntries extends AbstractTransform
                     // We check if the current modification is valid; if not valid, an exception will be thrown
                     $modification->isValid();
                 } catch (WorkerException $workerException) {
-                    $this->throwTransformException($this, $workerException->getMessage());
+                    $this->throwActionException($this, $workerException->getMessage());
                 }
             }
         } catch (\ReflectionException $reflectionException) {
-            $this->throwTransformException($this,
+            $this->throwActionException(
+                $this,
                 "A general error occurred while retrieving the content types list. Error message is: '%s'.",
                 $reflectionException->getMessage()
             );
@@ -115,18 +116,17 @@ class ChangeFileConfigEntries extends AbstractTransform
      * this AbstractTransform subclass instance has been successfully
      * applied; false otherwise.
      *
-     * @throws WorkerException
-     * @throws TransformException
+     * @throws ActionException
      */
     protected function apply(): bool
     {
         // We check if the specified file exists
-        $this->fileExists($this->filePath);
+        $this->checkFileExists($this->filePath);
 
         // We read the file and we convert it to an array, when possible.
         $parsedContent = FileParser::parseConfigFile($this->filePath, $this->contentType);
         if (!is_array($parsedContent)) {
-            $this->throwTransformException(
+            $this->throwActionException(
                 $this,
                 "It was not possible to convert the content of file '%s' to an array.",
                 $this->filePath
@@ -146,11 +146,15 @@ class ChangeFileConfigEntries extends AbstractTransform
         }
 
         if ($failed) {
-            $this->throwTransformException($this, implode(' | ', $failed));
+            $this->throwActionException($this, implode(' | ', $failed));
         }
 
         // We save the new content to the original file.
-        FileParser::writeToConfigFile($parsedContent, $this->filePath, $this->contentType);
+        try {
+            FileParser::writeToConfigFile($parsedContent, $this->filePath, $this->contentType);
+        } catch (WorkerException $workerException) {
+            $this->throwActionException($this, $workerException->getMessage());
+        }
 
         return true;
     }

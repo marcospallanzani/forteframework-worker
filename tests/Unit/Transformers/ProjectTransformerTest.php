@@ -48,7 +48,7 @@ class ProjectTransformerTest extends TestCase
     {
         $projectTransformer = new ProjectTransformer($dirPath);
         if (!is_null($transform) && !is_null($check)) {
-            $projectTransformer->addTransform($transform->addBeforeCheck($check));
+            $projectTransformer->addTransform($transform->addBeforeAction($check));
         }
         $this->assertCount($failedTransform, $projectTransformer->applyTransformations());
     }
