@@ -9,7 +9,7 @@ use Forte\Worker\Runners\ProjectRunner;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
-use Forte\Worker\Actions\Transforms\Files\ChangeFileConfigEntries;
+use Forte\Worker\Actions\Transforms\Files\ChangeFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 
@@ -134,8 +134,8 @@ class ProjectRunnerBuilder
     public function modifyConfigKey(string $filePath, string $contentType, string $key, $value): self
     {
         $this->addAction(
-            (new ChangeFileConfigEntries($filePath, $contentType))
-                ->modifyConfigKeyWithValue($key, $value)
+            (new ChangeFileEntries($filePath, $contentType))
+                ->modifyKeyWithValue($key, $value)
                 ->addAfterAction(
                     (new FileHasValidEntries($filePath, $contentType))
                         ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
@@ -161,8 +161,8 @@ class ProjectRunnerBuilder
     public function addConfigKey(string $filePath, string $contentType, string $key, $value): self
     {
         $this->addAction(
-            (new ChangeFileConfigEntries($filePath, $contentType))
-                ->addConfigKeyWithValue($key, $value)
+            (new ChangeFileEntries($filePath, $contentType))
+                ->addKeyWithValue($key, $value)
                 ->addAfterAction(
                     (new FileHasValidEntries($filePath, $contentType))
                         ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
@@ -187,8 +187,8 @@ class ProjectRunnerBuilder
     public function removeConfigKey(string $filePath, string $contentType, string $key): self
     {
         $this->addAction(
-            (new ChangeFileConfigEntries($filePath, $contentType))
-                ->removeConfigKey($key)
+            (new ChangeFileEntries($filePath, $contentType))
+                ->removeKey($key)
                 ->addAfterAction(
                     (new FileHasValidEntries($filePath, $contentType))
                         ->doesNotHaveKey($key)

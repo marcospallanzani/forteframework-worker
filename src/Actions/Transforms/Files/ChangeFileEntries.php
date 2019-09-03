@@ -9,11 +9,11 @@ use Forte\Worker\Helpers\FileParser;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 
 /**
- * Class ChangeFileConfigEntries
+ * Class ChangeFileEntries
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class ChangeFileConfigEntries extends AbstractAction
+class ChangeFileEntries extends AbstractAction
 {
     /**
      * The file to modify.
@@ -33,7 +33,7 @@ class ChangeFileConfigEntries extends AbstractAction
     protected $modifications = array();
 
     /**
-     * ChangeFileConfigEntries constructor.
+     * ChangeFileEntries constructor.
      *
      * @param string $filePath The file to modify.
      * @param string $contentType The content type (accepted values:
@@ -124,7 +124,7 @@ class ChangeFileConfigEntries extends AbstractAction
             );
         }
 
-        // We check all configured conditions for the configured file
+        // We check all conditions for the specified file
         $failed = array();
         foreach ($this->modifications as $modification) {
             try {
@@ -157,7 +157,7 @@ class ChangeFileConfigEntries extends AbstractAction
      * @param string $type The content type; accepted values are the FileParser
      * class constants with prefix "CONTENT_TYPE".
      *
-     * @return ChangeFileConfigEntries
+     * @return ChangeFileEntries
      */
     public function contentType(string $type): self
     {
@@ -167,18 +167,18 @@ class ChangeFileConfigEntries extends AbstractAction
     }
 
     /**
-     * Adds a new modification to this ChangeFileConfigEntries instance,
-     * to add the new configuration key with the given value in the specified
-     * file. The configuration key can have multiple nested levels, separated
-     * by the constant ModifyArray::ARRAY_LEVELS_SEPARATOR.
+     * Adds a new modification to this ChangeFileEntries instance,
+     * to add the new pair key-value in the specified file. The
+     * key can have multiple nested levels, separated by the constant
+     * ModifyArray::ARRAY_LEVELS_SEPARATOR.
      *
      * @param string $key The key to add (nested levels separated by
      * constant ModifyArray::ARRAY_LEVELS_SEPARATOR).
      * @param mixed $value The value to be added for the given key.
      *
-     * @return ChangeFileConfigEntries
+     * @return ChangeFileEntries
      */
-    public function addConfigKeyWithValue(string $key, $value): self
+    public function addKeyWithValue(string $key, $value): self
     {
         $this->modifications[] = new ModifyArray($key, ModifyArray::MODIFY_ADD, $value);
 
@@ -186,19 +186,19 @@ class ChangeFileConfigEntries extends AbstractAction
     }
 
     /**
-     * Adds a new modification to this ChangeFileConfigEntries instance,
-     * to modify the given configuration key with the given value in the
-     * specified file. The key can have multiple nested levels, separated
-     * by the constant ModifyArray::ARRAY_LEVELS_SEPARATOR. If the given
-     * key was not found in the specified file, a new entry will be created.
+     * Adds a new modification to this ChangeFileEntries instance,
+     * to modify the given pair key-value in the specified file.
+     * The key can have multiple nested levels, separated by the constant
+     * ModifyArray::ARRAY_LEVELS_SEPARATOR. If the given key was not found
+     * in the specified file, a new entry will be created.
      *
      * @param string $key The key to add (nested levels separated by
      * constant ModifyArray::ARRAY_LEVELS_SEPARATOR).
      * @param mixed $value The value to be added for the given key.
      *
-     * @return ChangeFileConfigEntries
+     * @return ChangeFileEntries
      */
-    public function modifyConfigKeyWithValue(string $key, $value): self
+    public function modifyKeyWithValue(string $key, $value): self
     {
         $this->modifications[] = new ModifyArray($key, ModifyArray::MODIFY_CHANGE_VALUE, $value);
 
@@ -206,17 +206,16 @@ class ChangeFileConfigEntries extends AbstractAction
     }
 
     /**
-     * Adds a new modification to this ChangeFileConfigEntries instance,
-     * to remove the given configuration key in the specified file. The
-     * key can have multiple nested levels, separated by the constant
-     * ModifyArray::ARRAY_LEVELS_SEPARATOR.
+     * Adds a new modification to this ChangeFileEntries instance, to remove
+     * the given key in the specified file. The key can have multiple nested
+     * levels, separated by the constant ModifyArray::ARRAY_LEVELS_SEPARATOR.
      *
      * @param string $key The key to add (nested levels separated by
      * constant ModifyArray::ARRAY_LEVELS_SEPARATOR).
      *
-     * @return ChangeFileConfigEntries
+     * @return ChangeFileEntries
      */
-    public function removeConfigKey(string $key): self
+    public function removeKey(string $key): self
     {
         $this->modifications[] = new ModifyArray($key, ModifyArray::MODIFY_REMOVE_KEY);
 
@@ -225,10 +224,10 @@ class ChangeFileConfigEntries extends AbstractAction
 
     /**
      * Return a human-readable string representation of this
-     * ChangeFileConfigEntries instance.
+     * ChangeFileEntries instance.
      *
      * @return string A human-readable string representation
-     * of this ChangeFileConfigEntries instance.
+     * of this ChangeFileEntries instance.
      */
     public function stringify(): string
     {
