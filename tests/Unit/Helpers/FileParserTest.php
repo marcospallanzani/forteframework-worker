@@ -108,8 +108,8 @@ class FileParserTest extends TestCase
         if ($expectException) {
             $this->expectException(WorkerException::class);
         }
-        FileParser::writeToConfigFile($content, $filePath, $contentType);
-        $parsedArray = FileParser::parseConfigFile($filePath, $contentType);
+        FileParser::writeToFile($content, $filePath, $contentType);
+        $parsedArray = FileParser::parseFile($filePath, $contentType);
         $this->assertEquals($content, $parsedArray);
     }
 

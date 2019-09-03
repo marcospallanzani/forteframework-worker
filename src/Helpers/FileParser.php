@@ -38,7 +38,7 @@ class FileParser
     const CONTENT_TYPE_ARRAY = "content_array";
 
     /**
-     * Parses the given file path and return its content as an array.
+     * Parse the given file path and return its content as an array.
      *
      * @param string $filePath The file to be parsed.
      * @param string $contentType The content type (supported types are the
@@ -46,7 +46,7 @@ class FileParser
      *
      * @return array An array representing the given file path.
      */
-    public static function parseConfigFile(string $filePath, string $contentType): array
+    public static function parseFile(string $filePath, string $contentType): array
     {
         $parsedContent = null;
         switch ($contentType) {
@@ -83,7 +83,7 @@ class FileParser
      *
      * @throws WorkerException
      */
-    public static function writeToConfigFile($content, string $filePath, string $contentType): void
+    public static function writeToFile($content, string $filePath, string $contentType): void
     {
         try {
             switch ($contentType) {
@@ -118,7 +118,7 @@ class FileParser
     }
 
     /**
-     * Returns the configuration value for the given key;
+     * Return the configuration value for the given key;
      * if not defined, an error will be thrown.
      *
      * @param string $key The configuration key
@@ -157,7 +157,7 @@ class FileParser
     }
 
     /**
-     * Returns an array containing all supported content types
+     * Return an array containing all supported content types
      * (class constants with prefix 'CONTENT_TYPE').
      *
      * @return array An array of supported content types.

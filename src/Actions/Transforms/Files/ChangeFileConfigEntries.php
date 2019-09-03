@@ -115,7 +115,7 @@ class ChangeFileConfigEntries extends AbstractAction
         $this->checkFileExists($this->filePath);
 
         // We read the file and we convert it to an array, when possible.
-        $parsedContent = FileParser::parseConfigFile($this->filePath, $this->contentType);
+        $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
         if (!is_array($parsedContent)) {
             $this->throwActionException(
                 $this,
@@ -142,7 +142,7 @@ class ChangeFileConfigEntries extends AbstractAction
 
         // We save the new content to the original file.
         try {
-            FileParser::writeToConfigFile($parsedContent, $this->filePath, $this->contentType);
+            FileParser::writeToFile($parsedContent, $this->filePath, $this->contentType);
         } catch (WorkerException $workerException) {
             $this->throwActionException($this, $workerException->getMessage());
         }
