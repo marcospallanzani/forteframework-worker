@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Forte\Worker\Transformers\Transforms\Files;
+namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
@@ -23,7 +23,7 @@ use Forte\Worker\Helpers\ThrowErrorsTrait;
  * file. The content will be parsed line by line and the configured changes
  * will be applied.
  *
- * @package Forte\Worker\Transformers\Transforms\Files
+ * @package Forte\Worker\Actions\Transforms\Files
  */
 class ModifyFile extends AbstractAction
 {

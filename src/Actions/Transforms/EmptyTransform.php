@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Worker\Transformers\Transforms;
+namespace Forte\Worker\Actions\Transforms;
 
 use Forte\Worker\Actions\AbstractAction;
 
@@ -8,7 +8,7 @@ use Forte\Worker\Actions\AbstractAction;
  * Class EmptyTransform. This class does not apply any transformation
  * and can be used as a support to run pre- and/or post-transform checks.
  *
- * @package Forte\Worker\Transformers\Transforms
+ * @package Forte\Worker\Actions\Transforms
  */
 class EmptyTransform extends AbstractAction
 {

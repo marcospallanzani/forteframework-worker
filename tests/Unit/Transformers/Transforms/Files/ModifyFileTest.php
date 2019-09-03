@@ -13,7 +13,7 @@ namespace Tests\Unit\Transformers\Transforms\Files;
 
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Transformers\Transforms\Files\ModifyFile;
+use Forte\Worker\Actions\Transforms\Files\ModifyFile;
 use PHPUnit\Framework\TestCase;
 
 /**

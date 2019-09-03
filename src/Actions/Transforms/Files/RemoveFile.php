@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Forte\Worker\Transformers\Transforms\Files;
+namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
@@ -17,7 +17,7 @@ use Forte\Worker\Exceptions\ActionException;
 /**
  * Class RemoveFile.
  *
- * @package Forte\Worker\Transformers\Transforms\Files
+ * @package Forte\Worker\Actions\Transforms\Files
  */
 class RemoveFile extends AbstractAction
 {

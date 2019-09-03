@@ -8,10 +8,10 @@ use Forte\Worker\Actions\Checks\Files\FileHasValidConfigEntries;
 use Forte\Worker\Transformers\ProjectTransformer;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
-use Forte\Worker\Transformers\Transforms\EmptyTransform;
-use Forte\Worker\Transformers\Transforms\Files\ChangeFileConfigEntries;
-use Forte\Worker\Transformers\Transforms\Files\CopyFile;
-use Forte\Worker\Transformers\Transforms\Files\UnzipFile;
+use Forte\Worker\Actions\Transforms\EmptyTransform;
+use Forte\Worker\Actions\Transforms\Files\ChangeFileConfigEntries;
+use Forte\Worker\Actions\Transforms\Files\CopyFile;
+use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 
 /**
  * Class ProjectTransformerBuilder

@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Worker\Transformers\Transforms\Arrays;
+namespace Forte\Worker\Actions\Transforms\Arrays;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
@@ -10,7 +10,7 @@ use Forte\Worker\Helpers\ThrowErrorsTrait;
 /**
  * Class ModifyArray.
  *
- * @package Forte\Worker\Transformers\Transforms\Arrays
+ * @package Forte\Worker\Actions\Transforms\Arrays
  */
 class ModifyArray extends AbstractAction
 {

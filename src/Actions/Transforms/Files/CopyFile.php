@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Worker\Transformers\Transforms\Files;
+namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
@@ -10,7 +10,7 @@ use Zend\Filter\Exception\RuntimeException;
 /**
  * Class CopyFile
  *
- * @package Forte\Worker\Transformers\Transforms\Files
+ * @package Forte\Worker\Actions\Transforms\Files
  */
 class CopyFile extends AbstractAction
 {

@@ -1,17 +1,17 @@
 <?php
 
-namespace Forte\Worker\Transformers\Transforms\Files;
+namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\FileParser;
-use Forte\Worker\Transformers\Transforms\Arrays\ModifyArray;
+use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 
 /**
  * Class ChangeFileConfigEntries
  *
- * @package Forte\Worker\Transformers\Transforms\Files
+ * @package Forte\Worker\Actions\Transforms\Files
  */
 class ChangeFileConfigEntries extends AbstractAction
 {

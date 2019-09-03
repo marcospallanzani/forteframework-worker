@@ -3,7 +3,7 @@
 namespace Tests\Unit\Transformers\Transforms\Arrays;
 
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Transformers\Transforms\Arrays\ModifyArray;
+use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use PHPUnit\Framework\TestCase;
 
 /**
