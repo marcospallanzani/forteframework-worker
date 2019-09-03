@@ -36,6 +36,7 @@ class StringParserTest extends TestCase
      */
     public function testEndsWith(): void
     {
+        $this->assertTrue(StringParser::endsWith("This is a test", ""));
         $this->assertTrue(StringParser::endsWith("This is a test", "test"));
         $this->assertFalse(StringParser::endsWith("This is a test", "Another string"));
         $this->assertFalse(StringParser::endsWith("This is a test", "Another longer string"));

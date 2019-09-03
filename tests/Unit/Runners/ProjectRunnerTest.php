@@ -48,9 +48,20 @@ class ProjectRunnerTest extends TestCase
     ): void
     {
         $projectRunner = new ProjectRunner($dirPath);
-        if (!is_null($action) && !is_null($beforeAction)) {
-            $projectRunner->addAction($action->addBeforeAction($beforeAction));
+
+        // We assert that the project paths have been correctly set
+        $this->assertEquals($dirPath, $projectRunner->getProjectFolder());
+        $this->assertEquals(dirname($dirPath), $projectRunner->getInstallationFolder());
+
+        if (!is_null($action)) {
+            if (!is_null($beforeAction)) {
+                $action->addBeforeAction($beforeAction);
+            }
+            $projectRunner->addAction($action);
+            // We assert that the action has been correctly added to this runner instance
+            $this->assertEquals([$action], $projectRunner->getActions());
         }
+        // We assert the number of failed actions
         $this->assertCount($failedActions, $projectRunner->applyActions());
     }
 }
