@@ -153,8 +153,12 @@ class FileParser
             try {
                 // If a value for the current key was found, we check
                 // if we need to iterate again through the given array;
-                if (count($keysTree) === 2 && is_array($value)) {
-                    $value = self::getRequiredNestedArrayValue($keysTree[1], $value);
+                if (count($keysTree) === 2) {
+                    if (is_array($value)) {
+                        $value = self::getRequiredNestedArrayValue($keysTree[1], $value);
+                    } else {
+                        throw new MissingKeyException($keysTree[1], "Array key '$keysTree[1]' not found.");
+                    }
                 }
             } catch (MissingKeyException $e) {
                 $composedKey = $currentKey . self::ARRAY_KEYS_LEVEL_SEPARATOR . $e->getMissingKey();
