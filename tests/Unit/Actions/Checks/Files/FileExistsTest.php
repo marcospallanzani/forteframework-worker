@@ -82,6 +82,7 @@ class FileExistsTest extends TestCase
     public function testCheckFileExists(string $filePath, bool $expected): void
     {
         $this->assertEquals($expected, (new FileExists($filePath))->run());
+        $this->assertEquals($expected, (new FileExists())->setPath($filePath)->run());
     }
 
     /**
