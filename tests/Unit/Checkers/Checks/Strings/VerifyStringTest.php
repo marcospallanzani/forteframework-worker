@@ -12,7 +12,7 @@
 namespace Tests\Unit\Checkers\Checks\Strings;
 
 use Forte\Worker\Checkers\Checks\Strings\VerifyString;
-use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
 
@@ -166,7 +166,7 @@ class VerifyStringTest extends TestCase
      * @param bool $expected
      * @param bool $exceptionExpected
      *
-     * @throws CheckException
+     * @throws ActionException
      */
     public function testIsValid(
         VerifyString $verifyString,
@@ -176,7 +176,7 @@ class VerifyStringTest extends TestCase
     ): void
     {
         if ($exceptionExpected) {
-            $this->expectException(CheckException::class);
+            $this->expectException(ActionException::class);
         }
         $this->assertEquals($isValid, $verifyString->isValid());
     }
@@ -203,7 +203,7 @@ class VerifyStringTest extends TestCase
     ): void
     {
         if ($exceptionExpected) {
-            $this->expectException(CheckException::class);
+            $this->expectException(ActionException::class);
         }
         $this->assertEquals($expected, $verifyString->run());
     }

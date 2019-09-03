@@ -12,7 +12,7 @@
 namespace Tests\Unit\Checkers\Checks\Files;
 
 use Forte\Worker\Checkers\Checks\Files\FileDoesNotExist;
-use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
 
@@ -58,12 +58,12 @@ class FileDoesNotExistTest extends TestCase
      * @param bool $expected
      * @param bool $exceptionExpected
      *
-     * @throws CheckException
+     * @throws ActionException
      */
     public function testIsValid(string $filePath, bool $expected, bool $exceptionExpected): void
     {
         if ($exceptionExpected) {
-            $this->expectException(CheckException::class);
+            $this->expectException(ActionException::class);
         }
         $this->assertEquals($expected, (new FileDoesNotExist($filePath))->isValid());
     }

@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Checkers\Checks\Files;
 
-use Forte\Worker\Exceptions\WorkerException;
+use Forte\Worker\Exceptions\ActionException;
 
 /**
  * Class FileDoesNotExist.
@@ -26,12 +26,12 @@ class FileDoesNotExist extends FileExists
      * @return bool True if this FileDoesNotExist instance
      * check was successful; false otherwise.
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
-    protected function check(): bool
+    protected function apply(): bool
     {
         // We check if the given file does not exist
-        return !$this->fileExists($this->filePath, false);
+        return !$this->checkFileExists($this->filePath, false);
     }
 
     /**

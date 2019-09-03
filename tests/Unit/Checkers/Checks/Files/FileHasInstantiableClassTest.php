@@ -12,7 +12,7 @@
 namespace Tests\Unit\Checkers\Checks\Files;
 
 use Forte\Worker\Checkers\Checks\Files\FileHasInstantiableClass;
-use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
 
@@ -99,12 +99,12 @@ class FileHasInstantiableClassTest extends TestCase
      * @param bool $expected
      * @param bool $exceptionExpected
      *
-     * @throws CheckException
+     * @throws ActionException
      */
     public function testIsValid(string $filePath, string $className, bool $expected, bool $exceptionExpected): void
     {
         if ($exceptionExpected) {
-            $this->expectException(CheckException::class);
+            $this->expectException(ActionException::class);
         }
         $this->assertEquals($expected, (new FileHasInstantiableClass($filePath, $className))->isValid());
     }
@@ -131,7 +131,7 @@ class FileHasInstantiableClassTest extends TestCase
     ): void
     {
         if ($exceptionExpected) {
-            $this->expectException(CheckException::class);
+            $this->expectException(ActionException::class);
         }
         $this->assertEquals($expected, (new FileHasInstantiableClass($filePath, $className))->run());
     }

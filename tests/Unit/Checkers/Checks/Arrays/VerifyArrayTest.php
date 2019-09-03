@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Checkers\Checks\Arrays;
 
-use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Checkers\Checks\Arrays\VerifyArray;
 use PHPUnit\Framework\TestCase;
@@ -292,7 +292,7 @@ class VerifyArrayTest extends TestCase
         $verifyArray = new VerifyArray($key, $operation, $value, $reverseAction);
 
         if ($expectException) {
-            $this->expectException(CheckException::class);
+            $this->expectException(ActionException::class);
             $isValid = $verifyArray->setCheckContent($checkContent)->isValid();
             $this->assertFalse($isValid);
         } else {
@@ -330,7 +330,7 @@ class VerifyArrayTest extends TestCase
         $verifyArray = new VerifyArray($key, $operation, $value, $reverseAction);
 
         if ($expectException) {
-            $this->expectException(CheckException::class);
+            $this->expectException(ActionException::class);
         }
 
         $checked = $verifyArray->setCheckContent($array)->run();
@@ -352,7 +352,7 @@ class VerifyArrayTest extends TestCase
             "test1" => "test2"
         ];
         $verifyArray = new VerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
-        $this->expectException(CheckException::class);
+        $this->expectException(ActionException::class);
         $verifyArray->setCheckContent($array)->run();
     }
 }

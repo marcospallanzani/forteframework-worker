@@ -12,8 +12,7 @@
 namespace Forte\Worker\Checkers\Checks\Files;
 
 use Forte\Worker\Checkers\Checks\AbstractCheck;
-use Forte\Worker\Exceptions\CheckException;
-use Forte\Worker\Exceptions\WorkerException;
+use Forte\Worker\Exceptions\ActionException;
 
 /**
  * Class FileExists.
@@ -43,13 +42,13 @@ class FileExists extends AbstractCheck
      * @return bool True if this FileExists instance
      * was well configured; false otherwise.
      *
-     * @throws CheckException
+     * @throws ActionException
      */
     public function isValid(): bool
     {
         // The file path cannot be empty
         if (empty($this->filePath)) {
-            $this->throwCheckException($this, "You must specify the file path.");
+            $this->throwActionException($this, "You must specify the file path.");
         }
 
         return true;
@@ -61,12 +60,12 @@ class FileExists extends AbstractCheck
      * @return bool True if this FileExists instance
      * check was successful; false otherwise.
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
-    protected function check(): bool
+    protected function apply(): bool
     {
         // We check if the origin file exists
-        return $this->fileExists($this->filePath, false);
+        return $this->checkFileExists($this->filePath, false);
     }
 
     /**

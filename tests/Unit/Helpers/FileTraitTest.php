@@ -58,6 +58,6 @@ class FileTraitTest extends TestCase
         if ($exceptionExpected) {
             $this->expectException(WorkerException::class);
         }
-        $this->assertEquals($expected, $class->checkFileExists($filePath, $raiseError));
+        $this->assertEquals($expected, $class->fileExists($filePath, $raiseError));
     }
 }

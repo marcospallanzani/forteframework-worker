@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Checkers\Checks\Files;
 
-use Forte\Worker\Exceptions\WorkerException;
+use Forte\Worker\Exceptions\ActionException;
 
 /**
  * Class FileHasInstantiableClass. This class checks if a given file
@@ -39,6 +39,36 @@ class FileHasInstantiableClass extends FileExists
     }
 
     /**
+     * Set the expected class to be searched in the configured file path.
+     *
+     * @param string $class The expected class
+     *
+     * @return FileHasInstantiableClass
+     */
+    public function setClass(string $class): self
+    {
+        $this->class = $class;
+
+        return $this;
+    }
+
+    /**
+     * Return a human-readable string representation of this
+     * FileHasInstantiableClass instance.
+     *
+     * @return string A human-readable string representation
+     * of this FileHasInstantiableClass instance.
+     */
+    public function stringify(): string
+    {
+        return sprintf(
+            "Check if file '%s' has %s",
+            $this->filePath,
+            (empty($this->class) ? "an instatiable class." : "the class '" . $this->class . "'.")
+        );
+    }
+
+    /**
      * Run the check. This method checks if the specified file has an
      * instantiable class. If the additional parameter "class" is specified,
      * then this method will also check if the class found in the file is
@@ -47,12 +77,12 @@ class FileHasInstantiableClass extends FileExists
      * @return bool Returns true if this FileHasInstantiableClass
      * instance check was successful; false otherwise.
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
-    protected function check(): bool
+    protected function apply(): bool
     {
         // We check if the specified file exists
-        $this->fileExists($this->filePath);
+        $this->checkFileExists($this->filePath);
 
         // Check to see whether the include declared the class
         $tokens = token_get_all(file_get_contents($this->filePath));
@@ -97,35 +127,5 @@ class FileHasInstantiableClass extends FileExists
         }
 
         return false;
-    }
-
-    /**
-     * Set the expected class to be searched in the configured file path.
-     *
-     * @param string $class The expected class
-     *
-     * @return FileHasInstantiableClass
-     */
-    public function setClass(string $class): self
-    {
-        $this->class = $class;
-
-        return $this;
-    }
-
-    /**
-     * Return a human-readable string representation of this
-     * FileHasInstantiableClass instance.
-     *
-     * @return string A human-readable string representation
-     * of this FileHasInstantiableClass instance.
-     */
-    public function stringify(): string
-    {
-        return sprintf(
-            "Check if file '%s' has %s",
-            $this->filePath,
-            (empty($this->class) ? "an instatiable class." : "the class '" . $this->class . "'.")
-        );
     }
 }

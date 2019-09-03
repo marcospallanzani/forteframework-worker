@@ -3,7 +3,7 @@
 namespace Forte\Worker\Checkers\Checks\Arrays;
 
 use Forte\Worker\Checkers\Checks\AbstractCheck;
-use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\MissingKeyException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\FileParser;
@@ -149,26 +149,26 @@ class VerifyArray extends AbstractCheck
      * @return bool Returns true, if this check parameters are correctly
      * configured and consistent; false otherwise.
      *
-     * @throws CheckException This VerifyArray instance is not valid
+     * @throws ActionException This VerifyArray instance is not valid
      * (i.e. not well configured).
      */
     public function isValid(): bool
     {
         // Validate the key
         if (empty($this->key)) {
-            $this->throwCheckException($this, "You need to specify the 'key' for check: '%s'.", $this);
+            $this->throwActionException($this, "You need to specify the 'key' for check: '%s'.", $this);
         }
 
         // Validate the action.
         $action = $this->getAction();
         if (empty($this->action)) {
-            $this->throwCheckException($this, "You need to specify the 'action' for check: '%s'.", $this);
+            $this->throwActionException($this, "You need to specify the 'action' for check: '%s'.", $this);
         }
 
         // If no action is specified OR an unsupported action is given, then we throw an error.
         $checkActionsConstants = $this->getSupportedActions();
         if (!in_array($action, $checkActionsConstants)) {
-            $this->throwCheckException(
+            $this->throwActionException(
                 $this,
                 "The check '%s' is not supported. Impacted check is: '%s'. Supported checks are: '%s'",
                 $action,
@@ -178,7 +178,7 @@ class VerifyArray extends AbstractCheck
         }
 
         if ($this->reverseAction && $action === self::CHECK_ANY) {
-            $this->throwCheckException(
+            $this->throwActionException(
                 $this,
                 "The check '%s' is not supported in the reverse mode. Use '%s' instead. Impacted check is: '%s'.",
                 $action,
@@ -193,7 +193,7 @@ class VerifyArray extends AbstractCheck
             // is 'check_equals', 'check_empty', 'check_non_empty' or 'check_any'.
             $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY, self::CHECK_MISSING_KEY];
             if (!in_array($action, $acceptsEmptyValue)) {
-                $this->throwCheckException(
+                $this->throwActionException(
                     $this,
                     "The action '%s' is not supported for empty values. Impacted check is: '%s'. " .
                     "Supported actions for empty values are: '%s'",
@@ -214,10 +214,10 @@ class VerifyArray extends AbstractCheck
      * @return bool True if this AbstractCheck subclass instance
      * ran successfully; false otherwise.
      *
-     * @throws CheckException If this AbstractCheck subclass instance
+     * @throws ActionException If this AbstractCheck subclass instance
      * check did not run successfully.
      */
-    protected function check(): bool
+    protected function apply(): bool
     {
         try {
             $value = FileParser::getRequiredNestedConfigValue($this->key, $this->checkContent);
@@ -263,7 +263,7 @@ class VerifyArray extends AbstractCheck
                     return true;
                     break;
                 default:
-                    $this->throwCheckException(
+                    $this->throwActionException(
                         $this,
                         "It was not possible to verify the configured check condition. Impacted check is: '%s'",
                         $this
@@ -274,7 +274,7 @@ class VerifyArray extends AbstractCheck
             if ($this->action === self::CHECK_MISSING_KEY) {
                 return true;
             }
-            $this->throwCheckException(
+            $this->throwActionException(
                 $this,
                 "It was not possible to verify the given check condition. Error message is: '%s'. Impacted check is: '%s'",
                 $missingKeyException->getMessage(),
@@ -341,14 +341,14 @@ class VerifyArray extends AbstractCheck
      *
      * @return array
      *
-     * @throws CheckException
+     * @throws ActionException
      */
     protected function getSupportedActions(): array
     {
         try {
             return self::getClassConstants('CHECK_');
         } catch (\ReflectionException $reflectionException) {
-            $this->throwCheckException(
+            $this->throwActionException(
                 $this,
                 "An error occurred while retrieving the list of supported actions. Error message is: '%s'.",
                 $reflectionException->getMessage()
@@ -393,7 +393,7 @@ class VerifyArray extends AbstractCheck
      *
      * @return bool
      *
-     * @throws CheckException
+     * @throws ActionException
      */
     protected function contains($value): bool
     {
@@ -406,7 +406,7 @@ class VerifyArray extends AbstractCheck
             return in_array($value, $this->value);
         }
 
-        $this->throwCheckException(
+        $this->throwActionException(
             $this,
             "It was not possible to verify if the value for key '%s' contains the configured value. ".
             "The check '%s' supports only strings and arrays for both the configured and expected values.",
@@ -422,14 +422,14 @@ class VerifyArray extends AbstractCheck
      *
      * @return bool
      *
-     * @throws CheckException
+     * @throws ActionException
      */
     protected function endsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
             return StringParser::endsWith($value, $this->value);
         }
-        $this->throwCheckException(
+        $this->throwActionException(
             $this,
             "It was not possible to verify if the value for key '%s' ends with the configured value. ".
             "The check '%s' supports only strings for both the configured and expected values.",
@@ -445,14 +445,14 @@ class VerifyArray extends AbstractCheck
      *
      * @return bool
      *
-     * @throws CheckException
+     * @throws ActionException
      */
     protected function startsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
             return StringParser::startsWith($value, $this->value);
         }
-        $this->throwCheckException(
+        $this->throwActionException(
             $this,
             "It was not possible to verify if the value for key '%s' starts with the configured value. ".
             "The check '%s' supports only strings for both the configured and expected values.",

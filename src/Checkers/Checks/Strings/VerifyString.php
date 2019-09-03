@@ -12,7 +12,7 @@
 namespace Forte\Worker\Checkers\Checks\Strings;
 
 use Forte\Worker\Checkers\Checks\AbstractCheck;
-use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\StringParser;
 
 /**
@@ -119,10 +119,10 @@ class VerifyString extends AbstractCheck
      * @return bool True if this AbstractCheck subclass instance
      * ran successfully; false otherwise.
      *
-     * @throws CheckException If this AbstractCheck subclass instance
-     * check did not run successfully OR the condition is notsupported.
+     * @throws ActionException If this AbstractCheck subclass instance
+     * check did not run successfully OR the condition is not supported.
      */
-    protected function check(): bool
+    protected function apply(): bool
     {
         switch ($this->condition) {
             case self::CONDITION_EQUAL_TO:
@@ -160,7 +160,7 @@ class VerifyString extends AbstractCheck
                 return  (bool) (preg_match($this->conditionValue, $this->content));
                 break;
             default:
-                $this->throwCheckException($this, "Unsupported condition '%s'", $this->condition);
+                $this->throwActionException($this, "Unsupported condition '%s'", $this->condition);
                 return "";
         }
     }
@@ -171,7 +171,7 @@ class VerifyString extends AbstractCheck
      * @return bool True if the implementing class instance
      * was well configured; false otherwise.
      *
-     * @throws CheckException If the implementing class
+     * @throws ActionException If the implementing class
      * instance was not well configured.
      */
     public function isValid(): bool
@@ -179,7 +179,7 @@ class VerifyString extends AbstractCheck
         // If no action is specified OR an unsupported action is given, then we throw an error.
         $supportedConditions = $this->getSupportedConditions();
         if (!in_array($this->condition, $supportedConditions)) {
-            $this->throwCheckException(
+            $this->throwActionException(
                 $this,
                 "The condition '%s' is not supported. Impacted check is: '%s'. Supported conditions are: '%s'",
                 $this->condition,
@@ -194,7 +194,7 @@ class VerifyString extends AbstractCheck
          * condition value (e.g. check if XXX is equal to YYY).
          */
         if ($this->condition !== self::CONDITION_IS_EMPTY && empty($this->conditionValue)) {
-            $this->throwCheckException(
+            $this->throwActionException(
                 $this,
                 "The condition '%s' requires a condition value. " .
                 "Condition value can be empty only for condition '%s'.",
@@ -270,14 +270,14 @@ class VerifyString extends AbstractCheck
      *
      * @return array Conditions list.
      *
-     * @throws CheckException
+     * @throws ActionException
      */
     public function getSupportedConditions(): array
     {
         try {
             return self::getClassConstants('CONDITION_');
         } catch (\ReflectionException $reflectionException) {
-            $this->throwCheckException(
+            $this->throwActionException(
                 $this,
                 "An error occurred while retrieving the list of supported conditions. Error message is: '%s'.",
                 $reflectionException->getMessage()

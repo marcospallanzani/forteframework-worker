@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Checkers\Checks\Files;
 
-use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Checkers\Checks\Arrays\VerifyArray;
 use Forte\Worker\Helpers\FileParser;
@@ -51,7 +51,7 @@ class FileHasValidConfigEntries extends FileExists
      * @return bool Returns true if this FileHasValidConfigEntries
      * instance was well configured; false otherwise.
      *
-     * @throws CheckException
+     * @throws ActionException
      */
     public function isValid(): bool
     {
@@ -62,7 +62,7 @@ class FileHasValidConfigEntries extends FileExists
             $contentTypeConstants = FileParser::getSupportedContentTypes();
 
             if (!in_array($this->contentType, $contentTypeConstants)) {
-                $this->throwCheckException(
+                $this->throwActionException(
                     $this,
                     "The specified content type '%s' is not supported. Supported types are: '%s'",
                     $this->contentType,
@@ -74,7 +74,7 @@ class FileHasValidConfigEntries extends FileExists
             foreach ($this->checks as $check) {
 
                 if (!$check instanceof VerifyArray) {
-                    $this->throwCheckException(
+                    $this->throwActionException(
                         $this,
                         "Check parameters should be registered as instances of class '%s'.",
                         VerifyArray::class
@@ -85,11 +85,12 @@ class FileHasValidConfigEntries extends FileExists
                     // We check if the current check parameters are valid; if not valid, an exception will be thrown
                     $check->isValid();
                 } catch (WorkerException $workerException) {
-                    $this->throwCheckException($this, $workerException->getMessage());
+                    $this->throwActionException($this, $workerException->getMessage());
                 }
             }
         } catch (\ReflectionException $reflectionException) {
-            $this->throwCheckException($this,
+            $this->throwActionException(
+                $this,
                 "A general error occurred while retrieving the content types list. Error message is: '%s'.",
                 $reflectionException->getMessage()
             );
@@ -104,13 +105,12 @@ class FileHasValidConfigEntries extends FileExists
      * @return bool Returns true if this FileHasValidConfigEntries
      * instance check was successful; false otherwise.
      *
-     * @throws CheckException
-     * @throws WorkerException
+     * @throws ActionException
      */
     protected function check(): bool
     {
         // We check if the specified file exists
-        $this->fileExists($this->filePath);
+        $this->checkFileExists($this->filePath);
 
         $failed = array();
 
@@ -118,7 +118,7 @@ class FileHasValidConfigEntries extends FileExists
             // We read the file and we convert it to an array, when possible.
             $parsedContent = FileParser::parseConfigFile($this->filePath, $this->contentType);
             if (!is_array($parsedContent)) {
-                $this->throwCheckException(
+                $this->throwActionException(
                     $this,
                     "It was not possible to convert the content of file '%s' to an array.",
                     $this->filePath
@@ -139,7 +139,8 @@ class FileHasValidConfigEntries extends FileExists
         }
 
         if ($failed) {
-            $this->throwCheckException($this, implode(' | ', $failed));
+//TODO WE SHOULD ADD THE FAILED ARRAY TO THE LIST OF NESTED ERROR MESSAGES IN THE ACTIONEXCEPTION CLASS
+            $this->throwActionException($this, implode(' | ', $failed));
         }
 
         return true;
