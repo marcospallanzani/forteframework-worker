@@ -219,6 +219,8 @@ class VerifyArray extends AbstractAction
      */
     protected function apply(): bool
     {
+        $matched = false;
+
         try {
             $value = FileParser::getRequiredNestedArrayValue($this->key, $this->checkContent);
 
@@ -226,15 +228,15 @@ class VerifyArray extends AbstractAction
             switch($this->action) {
                 case self::CHECK_CONTAINS:
                     $contains = $this->contains($value);
-                    return $this->reverseAction ? !$contains : $contains;
+                    $matched = $this->reverseAction ? !$contains : $contains;
                     break;
                 case self::CHECK_ENDS_WITH:
                     $endsWith = $this->endsWith($value);
-                    return $this->reverseAction ? !$endsWith : $endsWith;
+                    $matched = $this->reverseAction ? !$endsWith : $endsWith;
                     break;
                 case self::CHECK_STARTS_WITH:
                     $startsWith = $this->startsWith($value);
-                    return $this->reverseAction ? !$startsWith : $startsWith;
+                    $matched = $this->reverseAction ? !$startsWith : $startsWith;
                     break;
                 case self::CHECK_ANY:
                     /**
@@ -244,14 +246,14 @@ class VerifyArray extends AbstractAction
                      * a value only if the is define.
                      * REVERSE MODE IS NOT SUPPORTED FOR CHECK_ANY, SO WE DO NOT NEED TO REVERSE ITS ACTION.
                      */
-                    return true;
+                    $matched = true;
                     break;
                 case self::CHECK_EQUALS:
                     $equalsTo = $this->equalsTo($value);
-                    return $this->reverseAction ? !$equalsTo : $equalsTo;
+                    $matched = $this->reverseAction ? !$equalsTo : $equalsTo;
                     break;
                 case self::CHECK_EMPTY:
-                    return $this->reverseAction ? !empty($value) : empty($value);
+                    $matched = $this->reverseAction ? !empty($value) : empty($value);
                     break;
                 case self::CHECK_MISSING_KEY:
                     /**
@@ -260,7 +262,7 @@ class VerifyArray extends AbstractAction
                      * In this case, the key is defined in the given array, so we
                      * can return true, which means that the given key is not missing.
                      */
-                    return true;
+                    $matched = true;
                     break;
                 default:
                     $this->throwActionException(
@@ -268,7 +270,6 @@ class VerifyArray extends AbstractAction
                         "It was not possible to verify the configured check condition. Impacted check is: '%s'",
                         $this
                     );
-                    break;
             }
         } catch (MissingKeyException $missingKeyException) {
             if ($this->action === self::CHECK_MISSING_KEY) {
@@ -281,6 +282,8 @@ class VerifyArray extends AbstractAction
                 $this
             );
         }
+
+        return $matched;
     }
 
     /**
