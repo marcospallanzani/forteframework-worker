@@ -157,6 +157,7 @@ class VerifyArrayTest extends TestCase
         $anyException = ($reverse ? true : false);
 
         return [
+            // Array to check | key | operation | value | reverse action | expected | exception
             /** CHECK_ANY tests */
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, '', $reverse, true, $anyException],
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, 'value', $reverse, true, $anyException],
@@ -169,6 +170,7 @@ class VerifyArrayTest extends TestCase
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'lue2', $reverse, true, false],
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'value2', $reverse, true, false],
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'xxx', $reverse, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), $reverse, false, true],
             /** CHECK_STARTS_WITH tests */
             [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', $reverse, false, true],
             [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', $reverse, false, true],
@@ -177,7 +179,9 @@ class VerifyArrayTest extends TestCase
             [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value', $reverse, true, false],
             [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value15', $reverse, true, false],
             [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'xxx', $reverse, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), $reverse, false, true],
             /** CHECK_CONTAINS tests */
+            [$this->testArray, 'test1', VerifyArray::CHECK_CONTAINS, 'test2', $reverse, true, false],
             [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', $reverse, false, true],
             [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', $reverse, false, true],
             [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', $reverse, false, true],
@@ -185,6 +189,7 @@ class VerifyArrayTest extends TestCase
             [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long', $reverse, true, false],
             [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long test value', $reverse, true, false],
             [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'xxx', $reverse, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), $reverse, false, true],
             /** CHECK_EQUALS tests */
             [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', $reverse, false, true],
             [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', $reverse, false, true],
@@ -354,5 +359,34 @@ class VerifyArrayTest extends TestCase
         $verifyArray = new VerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
         $this->expectException(ActionException::class);
         $verifyArray->setCheckContent($array)->run();
+    }
+
+    /**
+     * Test the VerifyArray::apply() method, if a wrong action is defined.
+     */
+    public function testRunWithWrongType(): void
+    {
+        $this->expectException(WorkerException::class);
+        $verifyArrayMock = \Mockery::mock(VerifyArray::class, array('test1', 'wrong-action'))
+            ->makePartial()
+            ->shouldAllowMockingProtectedMethods()
+        ;
+        $verifyArrayMock
+            ->shouldReceive('isValid')
+            ->once()
+            ->andReturn(true)
+        ;
+        $verifyArrayMock
+            ->shouldReceive('runBeforeActions')
+            ->once()
+            ->andReturn([])
+        ;
+        $verifyArrayMock
+            ->shouldReceive('runAfterActions')
+            ->once()
+            ->andReturn([])
+        ;
+        $verifyArrayMock->setCheckContent($this->testArray);
+        $verifyArrayMock->run();
     }
 }
