@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Checkers\Checks\Files;
 
-use Forte\Worker\Checkers\Checks\AbstractCheck;
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
 
 /**
@@ -19,7 +19,7 @@ use Forte\Worker\Exceptions\ActionException;
  *
  * @package Forte\Worker\Checkers\Checks\Files
  */
-class FileExists extends AbstractCheck
+class FileExists extends AbstractAction
 {
     /**
      * @var string

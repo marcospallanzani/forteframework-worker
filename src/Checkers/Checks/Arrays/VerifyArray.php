@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Checkers\Checks\Arrays;
 
-use Forte\Worker\Checkers\Checks\AbstractCheck;
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\MissingKeyException;
 use Forte\Worker\Helpers\ClassAccessTrait;
@@ -15,7 +15,7 @@ use Forte\Worker\Helpers\ThrowErrorsTrait;
  *
  * @package Forte\Worker\Checkers\Checks
  */
-class VerifyArray extends AbstractCheck
+class VerifyArray extends AbstractAction
 {
     use ClassAccessTrait, ThrowErrorsTrait;
 
@@ -211,10 +211,10 @@ class VerifyArray extends AbstractCheck
      * Run the check. Check if the configured key has a value, in the previously
      * set "check-content", that respects the configured check action.
      *
-     * @return bool True if this AbstractCheck subclass instance
+     * @return bool True if this AbstractAction subclass instance
      * ran successfully; false otherwise.
      *
-     * @throws ActionException If this AbstractCheck subclass instance
+     * @throws ActionException If this AbstractAction subclass instance
      * check did not run successfully.
      */
     protected function apply(): bool

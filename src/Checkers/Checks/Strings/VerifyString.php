@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Checkers\Checks\Strings;
 
-use Forte\Worker\Checkers\Checks\AbstractCheck;
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\StringParser;
 
@@ -41,7 +41,7 @@ use Forte\Worker\Helpers\StringParser;
  *
  * @package Forte\Worker\Checkers\Checks\Strings
  */
-class VerifyString extends AbstractCheck
+class VerifyString extends AbstractAction
 {
     /**
      * Supported conditions.
@@ -116,10 +116,10 @@ class VerifyString extends AbstractCheck
     /**
      * Run the check.
      *
-     * @return bool True if this AbstractCheck subclass instance
+     * @return bool True if this AbstractAction subclass instance
      * ran successfully; false otherwise.
      *
-     * @throws ActionException If this AbstractCheck subclass instance
+     * @throws ActionException If this AbstractAction subclass instance
      * check did not run successfully OR the condition is not supported.
      */
     protected function apply(): bool
