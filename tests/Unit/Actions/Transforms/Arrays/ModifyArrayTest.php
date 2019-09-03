@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Transformers\Transforms\Arrays;
+namespace Tests\Unit\Actions\Transforms\Arrays;
 
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class ModifyArrayTest
  *
- * @package Tests\Unit\Transformers\Transforms\Arrays
+ * @package Tests\Unit\Actions\Transforms\Arrays
  */
 class ModifyArrayTest extends TestCase
 {
