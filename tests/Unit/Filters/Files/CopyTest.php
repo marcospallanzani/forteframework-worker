@@ -64,4 +64,16 @@ class CopyTest extends TestCase
         $copyFilter->filter(self::TEST_WRONG_FILE);
         $this->assertEquals(false, @file_get_contents(self::TEST_FILE_TMP_COPY));
     }
+
+    /**
+     * Test the method Forte\Worker\Filters\Files\Copy::filter() on failure.
+     */
+    public function testFilterScalarFail(): void
+    {
+        $copyFilter = new CopyFilter([
+            'target' => self::TEST_FILE_TMP_COPY,
+            'overwrite' => true
+        ]);
+        $this->assertEquals(null, $copyFilter->filter(null));
+    }
 }
