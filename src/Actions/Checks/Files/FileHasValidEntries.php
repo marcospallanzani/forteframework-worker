@@ -99,7 +99,7 @@ class FileHasValidEntries extends FileExists
      *
      * @throws ActionException
      */
-    protected function check(): bool
+    protected function apply(): bool
     {
         // We check if the specified file exists
         $this->checkFileExists($this->filePath);
@@ -121,6 +121,7 @@ class FileHasValidEntries extends FileExists
             foreach ($this->checks as $check) {
                 try {
                     /** @var VerifyArray $check */
+//TODO FATAL ACTION SHOULD GET OUT OF THIS LOOP AND TRIGGER THE SAME REACTION IN PARENT ACTIONS
                     if (!$check->setCheckContent($parsedContent)->run()) {
                         $failed[] = sprintf("Check failed: %s.", $check);
                     }
