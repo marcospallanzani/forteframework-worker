@@ -284,6 +284,16 @@ class VerifyArray extends AbstractAction
     }
 
     /**
+     * Return a list of all available actions.
+     *
+     * @return array
+     */
+    public function getSupportedActions(): array
+    {
+        return self::getClassConstants('CHECK_');
+    }
+
+    /**
      * Return a human-readable string representation of this
      * VerifyArray instance.
      *
@@ -334,26 +344,6 @@ class VerifyArray extends AbstractAction
             return json_encode($this->value);
         }
         return (string) $this->value;
-    }
-
-    /**
-     * Return a list of all available actions.
-     *
-     * @return array
-     *
-     * @throws ActionException
-     */
-    protected function getSupportedActions(): array
-    {
-        try {
-            return self::getClassConstants('CHECK_');
-        } catch (\ReflectionException $reflectionException) {
-            $this->throwActionException(
-                $this,
-                "An error occurred while retrieving the list of supported actions. Error message is: '%s'.",
-                $reflectionException->getMessage()
-            );
-        }
     }
 
     /**

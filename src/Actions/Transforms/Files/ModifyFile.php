@@ -473,20 +473,10 @@ class ModifyFile extends AbstractAction
      * are class constants, that begin by "MODIFY_FILE_".
      *
      * @return array Actions list.
-     *
-     * @throws ActionException
      */
     public function getSupportedActions(): array
     {
-        try {
-            return self::getClassConstants('MODIFY_FILE_');
-        } catch (\ReflectionException $reflectionException) {
-            $this->throwActionException(
-                $this,
-                "An error occurred while retrieving the list of supported actions. Error message is: '%s'.",
-                $reflectionException->getMessage()
-            );
-        }
+        return self::getClassConstants('MODIFY_FILE_');
     }
 
     /**

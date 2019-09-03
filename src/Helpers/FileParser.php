@@ -161,8 +161,6 @@ class FileParser
      * (class constants with prefix 'CONTENT_TYPE').
      *
      * @return array An array of supported content types.
-     *
-     * @throws \ReflectionException
      */
     public static function getSupportedContentTypes(): array
     {

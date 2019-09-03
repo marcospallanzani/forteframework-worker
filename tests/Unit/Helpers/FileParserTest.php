@@ -140,8 +140,6 @@ class FileParserTest extends TestCase
 
     /**
      * Check the supported list of content type.
-     *
-     * @throws \ReflectionException
      */
     public function testSupportedContentTypes(): void
     {

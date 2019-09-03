@@ -17,16 +17,22 @@ trait ClassAccessTrait
      *
      * @return array An array whose keys are class constant names,
      * and whose values are their values.
-     *
-     * @throws \ReflectionException
      */
     public static function getClassConstants(string $prefix = ''): array
     {
-        $reflectClass = new \ReflectionClass(static::class);
-        $constants = $reflectClass->getConstants();
-        if ($prefix !== '') {
-            // Filter constants by the given prefix
-            $constants = Collection::filterArrayByPrefixKey($constants, $prefix);
+        $constants = [];
+        try {
+            $reflectClass = new \ReflectionClass(static::class);
+            $constants = $reflectClass->getConstants();
+            if ($prefix !== '') {
+                // Filter constants by the given prefix
+                $constants = Collection::filterArrayByPrefixKey($constants, $prefix);
+            }
+            // @codeCoverageIgnoreStart
+        } catch (\ReflectionException $reflectionException) {
+            // In this case, as we use the static key work, a ReflectionException is never thrown.
+            ;
+            // @codeCoverageIgnoreEnd
         }
         return $constants;
     }
@@ -39,17 +45,23 @@ trait ClassAccessTrait
      *
      * @return array An array whose keys are class static property names,
      * and whose values are their values.
-     *
-     * @throws \ReflectionException
      */
     public static function getClassStaticProperties(string $prefix = ''): array
     {
-        $reflectClass = new \ReflectionClass(static::class);
-        $constants = $reflectClass->getStaticProperties();
-        if ($prefix !== '') {
-            // Filter constants by the given prefix
-            $constants = Collection::filterArrayByPrefixKey($constants, $prefix);
+        $properties = [];
+        try {
+            $reflectClass = new \ReflectionClass(static::class);
+            $properties = $reflectClass->getStaticProperties();
+            if ($prefix !== '') {
+                // Filter constants by the given prefix
+                $properties = Collection::filterArrayByPrefixKey($properties, $prefix);
+            }
+            // @codeCoverageIgnoreStart
+        } catch (\ReflectionException $reflectionException) {
+            // In this case, as we use the static key work, a ReflectionException is never thrown.
+            ;
+            // @codeCoverageIgnoreEnd
         }
-        return $constants;
+        return $properties;
     }
 }

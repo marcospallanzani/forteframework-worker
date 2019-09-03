@@ -222,20 +222,10 @@ class ModifyArray extends AbstractAction
      * Return a list of all available actions.
      *
      * @return array
-     *
-     * @throws ActionException
      */
     public function getSupportedActions(): array
     {
-        try {
-            return self::getClassConstants('MODIFY_');
-        } catch (\ReflectionException $reflectionException) {
-            $this->throwActionException(
-                $this,
-                "An error occurred while retrieving the list of supported actions. Error message is: '%s'.",
-                $reflectionException->getMessage()
-            );
-        }
+        return self::getClassConstants('MODIFY_');
     }
 
     /**

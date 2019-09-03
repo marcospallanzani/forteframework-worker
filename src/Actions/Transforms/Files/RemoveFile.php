@@ -45,31 +45,24 @@ class RemoveFile extends AbstractAction
      */
     public function isValid(): bool
     {
-        try {
-            // The file path cannot be empty
-            if (empty($this->filePath)) {
-                $this->throwActionException($this, "You must specify the file path.");
-            }
+        // The file path cannot be empty
+        if (empty($this->filePath)) {
+            $this->throwActionException($this, "You must specify the file path.");
+        }
 
-            // The mode cannot be empty
-            if (empty($this->mode)) {
-                $this->throwActionException($this, "You must specify the remove mode.");
-            }
+        // The mode cannot be empty
+        if (empty($this->mode)) {
+            $this->throwActionException($this, "You must specify the remove mode.");
+        }
 
-            // Check if the given mode is supported
-            $modesConstants = self::getClassConstants('REMOVE_');
-            if (!in_array($this->mode, $modesConstants)) {
-                $this->throwActionException(
-                    $this,
-                    "The specified mode '%s' is not supported. Supported modes are: '%s'",
-                    $this->mode,
-                    implode(',', $modesConstants)
-                );
-            }
-        } catch (\ReflectionException $reflectionException) {
-            $this->throwActionException($this,
-                "A general error occurred while retrieving the modes list. Error message is: '%s'.",
-                $reflectionException->getMessage()
+        // Check if the given mode is supported
+        $modesConstants = self::getClassConstants('REMOVE_');
+        if (!in_array($this->mode, $modesConstants)) {
+            $this->throwActionException(
+                $this,
+                "The specified mode '%s' is not supported. Supported modes are: '%s'",
+                $this->mode,
+                implode(',', $modesConstants)
             );
         }
 

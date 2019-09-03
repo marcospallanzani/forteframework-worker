@@ -58,42 +58,34 @@ class FileHasValidConfigEntries extends FileExists
         parent::isValid();
 
         // Check if the given type is supported
-        try {
-            $contentTypeConstants = FileParser::getSupportedContentTypes();
+        $contentTypeConstants = FileParser::getSupportedContentTypes();
 
-            if (!in_array($this->contentType, $contentTypeConstants)) {
+        if (!in_array($this->contentType, $contentTypeConstants)) {
+            $this->throwActionException(
+                $this,
+                "The specified content type '%s' is not supported. Supported types are: '%s'",
+                $this->contentType,
+                implode(',', $contentTypeConstants)
+            );
+        }
+
+        // Check if the specified checks are well configured
+        foreach ($this->checks as $check) {
+
+            if (!$check instanceof VerifyArray) {
                 $this->throwActionException(
                     $this,
-                    "The specified content type '%s' is not supported. Supported types are: '%s'",
-                    $this->contentType,
-                    implode(',', $contentTypeConstants)
+                    "Check parameters should be registered as instances of class '%s'.",
+                    VerifyArray::class
                 );
             }
 
-            // Check if the specified checks are well configured
-            foreach ($this->checks as $check) {
-
-                if (!$check instanceof VerifyArray) {
-                    $this->throwActionException(
-                        $this,
-                        "Check parameters should be registered as instances of class '%s'.",
-                        VerifyArray::class
-                    );
-                }
-
-                try {
-                    // We check if the current check parameters are valid; if not valid, an exception will be thrown
-                    $check->isValid();
-                } catch (WorkerException $workerException) {
-                    $this->throwActionException($this, $workerException->getMessage());
-                }
+            try {
+                // We check if the current check parameters are valid; if not valid, an exception will be thrown
+                $check->isValid();
+            } catch (WorkerException $workerException) {
+                $this->throwActionException($this, $workerException->getMessage());
             }
-        } catch (\ReflectionException $reflectionException) {
-            $this->throwActionException(
-                $this,
-                "A general error occurred while retrieving the content types list. Error message is: '%s'.",
-                $reflectionException->getMessage()
-            );
         }
 
         return true;

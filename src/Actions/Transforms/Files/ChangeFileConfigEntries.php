@@ -68,42 +68,33 @@ class ChangeFileConfigEntries extends AbstractAction
         }
 
         // Check if the given type is supported
-        try {
-            $contentTypeConstants = FileParser::getSupportedContentTypes();
+        $contentTypeConstants = FileParser::getSupportedContentTypes();
+        if (!in_array($this->contentType, $contentTypeConstants)) {
+            $this->throwActionException(
+                $this,
+                "The specified content type '%s' is not supported. Supported types are: '%s'",
+                $this->contentType,
+                implode(',', $contentTypeConstants)
+            );
+        }
 
-            if (!in_array($this->contentType, $contentTypeConstants)) {
+        // Check if the specified modifications are well configured
+        foreach ($this->modifications as $modification) {
+
+            if (!$modification instanceof ModifyArray) {
                 $this->throwActionException(
                     $this,
-                    "The specified content type '%s' is not supported. Supported types are: '%s'",
-                    $this->contentType,
-                    implode(',', $contentTypeConstants)
+                    "Modifications should be registered as instances of class '%s'.",
+                    ModifyArray::class
                 );
             }
 
-            // Check if the specified modifications are well configured
-            foreach ($this->modifications as $modification) {
-
-                if (!$modification instanceof ModifyArray) {
-                    $this->throwActionException(
-                        $this,
-                        "Modifications should be registered as instances of class '%s'.",
-                        ModifyArray::class
-                    );
-                }
-
-                try {
-                    // We check if the current modification is valid; if not valid, an exception will be thrown
-                    $modification->isValid();
-                } catch (WorkerException $workerException) {
-                    $this->throwActionException($this, $workerException->getMessage());
-                }
+            try {
+                // We check if the current modification is valid; if not valid, an exception will be thrown
+                $modification->isValid();
+            } catch (WorkerException $workerException) {
+                $this->throwActionException($this, $workerException->getMessage());
             }
-        } catch (\ReflectionException $reflectionException) {
-            $this->throwActionException(
-                $this,
-                "A general error occurred while retrieving the content types list. Error message is: '%s'.",
-                $reflectionException->getMessage()
-            );
         }
 
         return true;

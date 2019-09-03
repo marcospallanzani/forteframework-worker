@@ -269,19 +269,9 @@ class VerifyString extends AbstractAction
      * are class constants, that begin by "CONDITION_".
      *
      * @return array Conditions list.
-     *
-     * @throws ActionException
      */
     public function getSupportedConditions(): array
     {
-        try {
-            return self::getClassConstants('CONDITION_');
-        } catch (\ReflectionException $reflectionException) {
-            $this->throwActionException(
-                $this,
-                "An error occurred while retrieving the list of supported conditions. Error message is: '%s'.",
-                $reflectionException->getMessage()
-            );
-        }
+        return self::getClassConstants('CONDITION_');
     }
 }
