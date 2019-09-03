@@ -79,3 +79,11 @@ To run all tests, execute the following command from the base project folder:
 ```
 ./vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 ```
+
+### Test Coverage
+
+To generate the test converage report, run the following command:
+
+``` 
+./vendor/bin/phpunit --bootstrap vendor/autoload.php tests --coverage-html=./coverage
+```
