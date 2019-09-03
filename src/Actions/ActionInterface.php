@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Actions;
 
-use Forte\Worker\Exceptions\WorkerException;
+use Forte\Worker\Exceptions\ActionException;
 
 /**
  * Interface ActionInterface. Basic behaviour of all classes that
@@ -27,7 +27,7 @@ interface ActionInterface
      * @return bool True if the implementing class instance
      * action was successfully run; false otherwise.
      *
-     * @throws WorkerException If the action was not successfully run.
+     * @throws ActionException If the action was not successfully run.
      */
     public function run(): bool;
 
