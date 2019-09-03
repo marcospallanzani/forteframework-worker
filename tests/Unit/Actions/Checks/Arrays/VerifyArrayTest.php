@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Checkers\Checks\Arrays;
+namespace Tests\Unit\Actions\Checks\Arrays;
 
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class VerifyArrayTest
  *
- * @package Tests\Unit\Checkers\Checks\Arrays
+ * @package Tests\Unit\Actions\Checks\Arrays
  */
 class VerifyArrayTest extends TestCase
 {

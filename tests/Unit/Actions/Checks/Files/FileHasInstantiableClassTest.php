@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Checkers\Checks\Files;
+namespace Tests\Unit\Actions\Checks\Files;
 
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Exceptions\ActionException;
@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class FileHasInstantiableClassTest
  *
- * @package Tests\Unit\Checkers\Checks\Files
+ * @package Tests\Unit\Actions\Checks\Files
  */
 class FileHasInstantiableClassTest extends TestCase
 {

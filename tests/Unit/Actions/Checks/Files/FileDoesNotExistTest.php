@@ -9,30 +9,30 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Checkers\Checks\Files;
+namespace Tests\Unit\Actions\Checks\Files;
 
-use Forte\Worker\Actions\Checks\Files\FileExists;
+use Forte\Worker\Actions\Checks\Files\FileDoesNotExist;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class FileExistsTest.
+ * Class FileDoesNotExistTest.
  *
- * @package Tests\Unit\Checkers\Checks\Files
+ * @package Tests\Unit\Actions\Checks\Files
  */
-class FileExistsTest extends TestCase
+class FileDoesNotExistTest extends TestCase
 {
     /**
-     * Data provider for file-exists tests.
+     * Data provider for does-not-exist tests.
      *
      * @return array
      */
     public function filesProvider(): array
     {
         return [
-            ["/xxx/xxx/eee/www/test.not.exist", false],
-            [__FILE__, true]
+            ["/xxx/xxx/eee/www/test.not.exist", true],
+            [__FILE__, false]
         ];
     }
 
@@ -50,7 +50,7 @@ class FileExistsTest extends TestCase
     }
 
     /**
-     * Test method FileExists::isValid().
+     * Test method FileDoesNotExist::isValid().
      *
      * @dataProvider validationProvider
      *
@@ -65,11 +65,11 @@ class FileExistsTest extends TestCase
         if ($exceptionExpected) {
             $this->expectException(ActionException::class);
         }
-        $this->assertEquals($expected, (new FileExists($filePath))->isValid());
+        $this->assertEquals($expected, (new FileDoesNotExist($filePath))->isValid());
     }
 
     /**
-     * Test method FileExists::run().
+     * Test method FileDoesNotExist::run().
      *
      * @dataProvider filesProvider
      * @depends testIsValid
@@ -79,19 +79,19 @@ class FileExistsTest extends TestCase
      *
      * @throws WorkerException
      */
-    public function testCheckFileExists(string $filePath, bool $expected): void
+    public function testCheckFileDoesNotExist(string $filePath, bool $expected): void
     {
-        $this->assertEquals($expected, (new FileExists($filePath))->run());
+        $this->assertEquals($expected, (new FileDoesNotExist($filePath))->run());
     }
 
     /**
-     * Test method FileExists::stringify().
+     * Test method FileDoesNotExist::stringify().
      */
     public function testStringify(): void
     {
         $filePath = "/path/to/test/file.php";
-        $fileExists = new FileExists($filePath);
-        $this->assertEquals("Check if file '$filePath' exists.", (string) $fileExists);
-        $this->assertEquals("Check if file '$filePath' exists.", $fileExists->stringify());
+        $fileExists = new FileDoesNotExist($filePath);
+        $this->assertEquals("Check if file '$filePath' does not exist.", (string) $fileExists);
+        $this->assertEquals("Check if file '$filePath' does not exist.", $fileExists->stringify());
     }
 }

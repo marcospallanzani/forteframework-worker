@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Checkers\Checks\Strings;
+namespace Tests\Unit\Actions\Checks\Strings;
 
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\ActionException;
@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class VerifyStringTest.
  *
- * @package Tests\Unit\Checkers\Checks\Strings
+ * @package Tests\Unit\Actions\Checks\Strings
  */
 class VerifyStringTest extends TestCase
 {

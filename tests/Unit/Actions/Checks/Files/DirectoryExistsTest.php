@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Checkers\Checks\Files;
+namespace Tests\Unit\Actions\Checks\Files;
 
 use Forte\Worker\Actions\Checks\Files\DirectoryExists;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class DirectoryExistsTest.
  *
- * @package Tests\Unit\Checkers\Checks\Files
+ * @package Tests\Unit\Actions\Checks\Files
  */
 class DirectoryExistsTest extends TestCase
 {
