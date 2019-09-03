@@ -1,14 +1,14 @@
 <?php
 
-namespace Forte\Worker\Transformers;
+namespace Forte\Worker\Runners;
 
 /**
- * Class ProjectTransformer. A class that applies a set of transformations
+ * Class ProjectRunner. A class that applies a set of actions
  * to a configured project.
  *
- * @package Forte\Worker\Transformers
+ * @package Forte\Worker\Runners
  */
-class ProjectTransformer extends AbstractTransformer
+class ProjectRunner extends AbstractRunner
 {
     /**
      * The project root folder
@@ -27,8 +27,8 @@ class ProjectTransformer extends AbstractTransformer
     protected $installationFolder;
 
     /**
-     * ProjectTransformer constructor. This class allows to apply a given set of
-     * transformations to the configured project.
+     * ProjectRunner constructor. This class allows to apply a given set of
+     * actions to the configured project.
      *
      * @param string $projectFolder The project root folder
      * (e.g. /path/to/installation/folder/local/projects/my-project)

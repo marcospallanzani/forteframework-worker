@@ -1,16 +1,16 @@
 <?php
 
-namespace Forte\Worker\Transformers;
+namespace Forte\Worker\Runners;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
 
 /**
- * Class AbstractTransformer. A base class for all transformer implementations.
+ * Class AbstractRunner. A base class for all runner implementations.
  *
- * @package Forte\Worker\Transformers
+ * @package Forte\Worker\Runners
  */
-class AbstractTransformer
+class AbstractRunner
 {
     /**
      * Actions to apply.
@@ -20,7 +20,7 @@ class AbstractTransformer
     protected $actions = [];
 
     /**
-     * Get all of the the required actions to apply.
+     * Get a list of actions to be applied.
      *
      * @return array An array of AbstractAction subclass instances.
      */
@@ -40,12 +40,12 @@ class AbstractTransformer
     }
 
     /**
-     * Apply all configured transformations in the given sequence.
-     * This method returns a list of AbstractAction subclass
-     * that failed  or that did not execute correctly.
+     * Apply all configured actions in the given sequence. This method
+     * returns a list of AbstractAction subclass instances that failed
+     *  or that did not execute correctly.
      *
      * @return array A list of AbstractAction subclass instances
-     * that executed correctly, but failed.
+     * that failed.
      */
     public function applyActions(): array
     {

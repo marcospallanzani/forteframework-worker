@@ -5,7 +5,7 @@ namespace Forte\Worker\Builders;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Checks\Files\FileHasValidConfigEntries;
-use Forte\Worker\Transformers\ProjectTransformer;
+use Forte\Worker\Runners\ProjectRunner;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
@@ -14,30 +14,31 @@ use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 
 /**
- * Class ProjectTransformerBuilder
+ * Class ProjectRunnerBuilder
  *
  * @package Forte\Worker\Builders
  */
-class ProjectTransformerBuilder
+class ProjectRunnerBuilder
 {
     /**
-     * @var ProjectTransformer
+     * @var ProjectRunner
      */
-    protected $transformer;
+    protected $runner;
 
     /**
-     * ProjectTransformerBuilder constructor.
+     * ProjectRunnerBuilder constructor.
      *
      * @param string $projectRootFolder The project root folder.
      */
     public function __construct(string $projectRootFolder)
     {
-        $this->setTransformer(new ProjectTransformer($projectRootFolder));
+        $this->setRunner(new ProjectRunner($projectRootFolder));
     }
 
     /**
      * It initializes the project folder from the given zip file.
-     * It unzips the file in the base project folder specified in the constructor.
+     * It unzips the file in the base project folder specified in
+     * the constructor.
      *
      * @param string $zipFilePath The zip file to unzip.
      *
@@ -45,21 +46,21 @@ class ProjectTransformerBuilder
      */
     public function initFromZipFile(string $zipFilePath): self
     {
-        $this->addTransform($this->getUnzipFileTransform($zipFilePath));
+        $this->addAction($this->getUnzipFileAction($zipFilePath));
 
         return $this;
     }
 
     /**
-     * Returns an instance of the Unzip transform object.
+     * Returns an instance of the UnzipFile object.
      *
      * @param string $zipFilePath The zip file to unzip.
      *
      * @return UnzipFile
      */
-    public function getUnzipFileTransform(string $zipFilePath): UnzipFile
+    public function getUnzipFileAction(string $zipFilePath): UnzipFile
     {
-        $fullProjectPath = $this->transformer->getProjectFolder();
+        $fullProjectPath = $this->runner->getProjectFolder();
         return (new UnzipFile())
             ->addBeforeAction(new FileExists($zipFilePath))
             ->addAfterAction(new FileExists($fullProjectPath))
@@ -69,10 +70,9 @@ class ProjectTransformerBuilder
     }
 
     /**
-     * Add a Transform instance to copy the given source file.
-     * If no target folder is specified, the source file base folder will be used.
-     * If no target file name is specified, the source file name with the add of the
-     * suffix "_COPY" will be used.
+     * Add an action to copy the given source file. If no target folder is specified,
+     * the source file base folder will be used. If no target file name is specified,
+     * the source file name with the add of the suffix "_COPY" will be used.
      *
      * @param string $sourceFilePath The file full path to be copied.
      * @param string|null $targeFileName The destination file name.
@@ -87,7 +87,7 @@ class ProjectTransformerBuilder
     ): self
     {
         $copy = new CopyFile();
-        $this->addTransform(
+        $this->addAction(
             $copy
                 ->copy($sourceFilePath)
                 ->toFolder($targetFolder)
@@ -99,17 +99,17 @@ class ProjectTransformerBuilder
     }
 
     /**
-     * Add an empty Transform instance to only check if the given class file path contains
+     * Add an action, which only checks if the given class file path contains
      * an instantiable class, whose name is the given class name.
      *
      * @param string $classFilePath The class file path.
      * @param string $className The class name.
      *
-     * @return ProjectTransformerBuilder
+     * @return ProjectRunnerBuilder
      */
     public function hasInstantiableClass(string $classFilePath, string $className): self
     {
-        $this->addTransform(
+        $this->addAction(
             (new EmptyTransform())
                 ->addBeforeAction(new FileHasInstantiableClass($classFilePath, $className))
         );
@@ -118,22 +118,22 @@ class ProjectTransformerBuilder
     }
 
     /**
-     * Add the given config key with the given value to the specified file.
+     * Modify the given config key with the given value in the specified file.
      * If the file does not have the specified key, this method will add it
      * to the file. Multi-level configuration keys are supported (each level
      * separated by the constant FileParser::CONFIG_LEVEL_SEPARATOR - a dot).
-     * e.g. key1.key2.key3=value3
+     * (e.g. key1.key2.key3=value3)
      *
      * @param string $filePath The file to modify.
      * @param string $contentType The content type (accepted values -> constants FileParser::CONTENT_TYPE_XXX).
      * @param string $key The key to modify.
      * @param mixed $value The new key value.
      *
-     * @return ProjectTransformerBuilder
+     * @return ProjectRunnerBuilder
      */
     public function modifyConfigKey(string $filePath, string $contentType, string $key, $value): self
     {
-        $this->addTransform(
+        $this->addAction(
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->modifyConfigKeyWithValue($key, $value)
                 ->addAfterAction(
@@ -149,18 +149,18 @@ class ProjectTransformerBuilder
      * Add the given config key with the given value to the specified file.
      * Multi-level configuration keys are supported (each level separated
      * by the constant FileParser::CONFIG_LEVEL_SEPARATOR - a dot).
-     * e.g. key1.key2.key3=value3
+     * (e.g. key1.key2.key3=value3)
      *
      * @param string $filePath The file to modify.
      * @param string $contentType The content type (accepted values -> constants FileParser::CONTENT_TYPE_XXX).
      * @param string $key The key to add.
      * @param mixed $value The new key value.
      *
-     * @return ProjectTransformerBuilder
+     * @return ProjectRunnerBuilder
      */
     public function addConfigKey(string $filePath, string $contentType, string $key, $value): self
     {
-        $this->addTransform(
+        $this->addAction(
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->addConfigKeyWithValue($key, $value)
                 ->addAfterAction(
@@ -173,20 +173,20 @@ class ProjectTransformerBuilder
     }
 
     /**
-     * Add the given config key with the given value to the specified file.
-     * Multi-level configuration keys are supported (each level separated
-     * by the constant FileParser::CONFIG_LEVEL_SEPARATOR - a dot).
-     * e.g. key1.key2.key3=value3
+     * Remove the given config key with the given value from the specified file.
+     * Multi-level configuration keys are supported (each level separated by the
+     * constant FileParser::CONFIG_LEVEL_SEPARATOR - a dot).
+     * (e.g. key1.key2.key3=value3)
      *
      * @param string $filePath The file to modify.
      * @param string $contentType The content type (accepted values -> constants FileParser::CONTENT_TYPE_XXX).
      * @param string $key The key to remove.
      *
-     * @return ProjectTransformerBuilder
+     * @return ProjectRunnerBuilder
      */
     public function removeConfigKey(string $filePath, string $contentType, string $key): self
     {
-        $this->addTransform(
+        $this->addAction(
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->removeConfigKey($key)
                 ->addAfterAction(
@@ -199,54 +199,56 @@ class ProjectTransformerBuilder
     }
 
     /**
-     * Converts the given file name to a full-path file name, by using the configured
-     * transformer base project folder. (e.g. "base.php" -> "/base/project/folder/base.php")
+     * Convert the given file name to a full-path file name, by
+     * using the base project folder configured with this runner
+     * (e.g. "base.php" -> "/base/project/folder/base.php").
      *
-     * @param string $fileName The file name to be converted to a project full path.
+     * @param string $fileName The file name to be converted
+     * to a project full path.
      *
      * @return string
      */
     public function getFilePathInProject(string $fileName): string
     {
-        return $this->transformer->getProjectFolder() . DIRECTORY_SEPARATOR . $fileName;
+        return $this->runner->getProjectFolder() . DIRECTORY_SEPARATOR . $fileName;
     }
 
     /**
-     * Get the ProjectTransformer that represents all the
-     * transformations built by this instance.
+     * Get the ProjectRunner that represents all the actions
+     * built by this instance.
      *
-     * @return ProjectTransformer
+     * @return ProjectRunner
      */
-    public function getTransformer(): ProjectTransformer
+    public function getRunner(): ProjectRunner
     {
-        return $this->transformer;
+        return $this->runner;
     }
 
     /**
-     * Set the ProjectTransformer that represents all the
-     * transformations built by this instance.
+     * Set the ProjectRunner that represents all the actions
+     * built by this instance.
      *
-     * @param ProjectTransformer $transformer
+     * @param ProjectRunner $runner
      *
      * @return void
      */
-    protected function setTransformer(ProjectTransformer $transformer): void
+    protected function setRunner(ProjectRunner $runner): void
     {
-        $this->transformer = $transformer;
+        $this->runner = $runner;
     }
 
     /**
-     * Add a transformation to the project.
+     * Add an action to the project runner.
      *
-     * @param AbstractAction $transform the transform to add.
+     * @param AbstractAction $action the action to add.
      *
-     * @return AbstractAction The action added to the data
-     * (so methods can be chained on it).
+     * @return AbstractAction The action added to the list of
+     * runnable actions.
      */
-    protected function addTransform(AbstractAction $transform): AbstractAction
+    protected function addAction(AbstractAction $action): AbstractAction
     {
-        $this->getTransformer()->addAction($transform);
+        $this->getRunner()->addAction($action);
 
-        return $transform;
+        return $action;
     }
 }
