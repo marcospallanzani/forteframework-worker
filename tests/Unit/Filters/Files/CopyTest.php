@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Filters\Files;
 
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Filters\Files\Copy as CopyFilter;
 use PHPUnit\Framework\TestCase;
 
@@ -41,6 +42,8 @@ class CopyTest extends TestCase
 
     /**
      * Test the method Forte\Worker\Filters\Files\Copy::filter().
+     *
+     * @throws WorkerException
      */
     public function testFilter(): void
     {
@@ -54,6 +57,8 @@ class CopyTest extends TestCase
 
     /**
      * Test the method Forte\Worker\Filters\Files\Copy::filter() on failure.
+     *
+     * @throws WorkerException
      */
     public function testFilterFail(): void
     {
@@ -67,6 +72,8 @@ class CopyTest extends TestCase
 
     /**
      * Test the method Forte\Worker\Filters\Files\Copy::filter() on failure.
+     *
+     * @throws WorkerException
      */
     public function testFilterScalarFail(): void
     {
@@ -75,5 +82,26 @@ class CopyTest extends TestCase
             'overwrite' => true
         ]);
         $this->assertEquals(null, $copyFilter->filter(null));
+    }
+
+    /**
+     * Test the method Forte\Worker\Filters\Files\Copy::filter() on runtime failure.
+     */
+    public function testFilterRuntimeFail(): void
+    {
+        $this->expectException(WorkerException::class);
+        $copyFilterMock = \Mockery::mock(CopyFilter::class)->makePartial()->shouldAllowMockingProtectedMethods();
+        $copyFilterMock
+            ->shouldReceive('getNewName')
+            ->once()
+            ->andReturn([
+                'target' => self::TEST_FILE_TMP_COPY,
+                'source' => self::TEST_FILE_TMP_COPY
+            ])
+            ->shouldReceive('copyFileToDestination')
+            ->once()
+            ->andReturn(false)
+        ;
+        $copyFilterMock->filter(self::TEST_WRONG_FILE);
     }
 }
