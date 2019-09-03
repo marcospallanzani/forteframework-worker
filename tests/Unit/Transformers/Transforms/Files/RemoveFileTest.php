@@ -11,10 +11,10 @@
 
 namespace Tests\Unit\Transformers\Transforms\Files;
 
-use Forte\Worker\Checkers\Checks\Files\DirectoryDoesNotExist;
-use Forte\Worker\Checkers\Checks\Files\DirectoryExists;
-use Forte\Worker\Checkers\Checks\Files\FileDoesNotExist;
-use Forte\Worker\Checkers\Checks\Files\FileExists;
+use Forte\Worker\Actions\Checks\Files\DirectoryDoesNotExist;
+use Forte\Worker\Actions\Checks\Files\DirectoryExists;
+use Forte\Worker\Actions\Checks\Files\FileDoesNotExist;
+use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Transformers\Transforms\Files\RemoveFile;
 use PHPUnit\Framework\TestCase;

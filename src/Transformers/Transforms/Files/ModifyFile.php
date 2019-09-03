@@ -12,7 +12,7 @@
 namespace Forte\Worker\Transformers\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
-use Forte\Worker\Checkers\Checks\Strings\VerifyString;
+use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\StringParser;

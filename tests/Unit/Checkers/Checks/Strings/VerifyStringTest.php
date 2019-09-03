@@ -11,7 +11,7 @@
 
 namespace Tests\Unit\Checkers\Checks\Strings;
 
-use Forte\Worker\Checkers\Checks\Strings\VerifyString;
+use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;

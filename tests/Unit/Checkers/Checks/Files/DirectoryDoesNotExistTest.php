@@ -11,7 +11,7 @@
 
 namespace Tests\Unit\Checkers\Checks\Files;
 
-use Forte\Worker\Checkers\Checks\Files\DirectoryDoesNotExist;
+use Forte\Worker\Actions\Checks\Files\DirectoryDoesNotExist;
 use PHPUnit\Framework\TestCase;
 
 /**

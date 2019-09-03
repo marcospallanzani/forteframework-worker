@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Worker\Checkers\Checks\Arrays;
+namespace Forte\Worker\Actions\Checks\Arrays;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
@@ -13,7 +13,7 @@ use Forte\Worker\Helpers\ThrowErrorsTrait;
 /**
  * Class VerifyArray. Class used to wrap all required check parameters.
  *
- * @package Forte\Worker\Checkers\Checks
+ * @package Forte\Worker\Actions\Checks
  */
 class VerifyArray extends AbstractAction
 {

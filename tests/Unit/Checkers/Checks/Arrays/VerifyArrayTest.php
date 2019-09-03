@@ -4,7 +4,7 @@ namespace Tests\Unit\Checkers\Checks\Arrays;
 
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Checkers\Checks\Arrays\VerifyArray;
+use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use PHPUnit\Framework\TestCase;
 
 /**

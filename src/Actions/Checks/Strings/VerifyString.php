@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Forte\Worker\Checkers\Checks\Strings;
+namespace Forte\Worker\Actions\Checks\Strings;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
@@ -39,7 +39,7 @@ use Forte\Worker\Helpers\StringParser;
  *
  * All of the above conditions, except for "is_empty", require a condition value.
  *
- * @package Forte\Worker\Checkers\Checks\Strings
+ * @package Forte\Worker\Actions\Checks\Strings
  */
 class VerifyString extends AbstractAction
 {
