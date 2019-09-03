@@ -31,7 +31,7 @@ class FileDoesNotExist extends FileExists
     protected function check(): bool
     {
         // We check if the given file does not exist
-        return !$this->checkFileExists($this->filePath, false);
+        return !$this->fileExists($this->filePath, false);
     }
 
     /**

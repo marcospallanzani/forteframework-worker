@@ -110,7 +110,7 @@ class FileHasValidConfigEntries extends FileExists
     protected function check(): bool
     {
         // We check if the specified file exists
-        $this->checkFileExists($this->filePath);
+        $this->fileExists($this->filePath);
 
         $failed = array();
 

@@ -53,7 +53,7 @@ class UnzipFile extends AbstractTransform
     protected function apply(): bool
     {
         // We check if the zip file exists
-        $this->checkFileExists($this->zipFilePath);
+        $this->fileExists($this->zipFilePath);
 
         $info = pathinfo($this->zipFilePath);
 

@@ -121,7 +121,7 @@ class ChangeFileConfigEntries extends AbstractTransform
     protected function apply(): bool
     {
         // We check if the specified file exists
-        $this->checkFileExists($this->filePath);
+        $this->fileExists($this->filePath);
 
         // We read the file and we convert it to an array, when possible.
         $parsedContent = FileParser::parseConfigFile($this->filePath, $this->contentType);

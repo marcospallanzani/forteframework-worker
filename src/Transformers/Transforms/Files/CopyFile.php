@@ -75,7 +75,7 @@ class CopyFile extends AbstractTransform
     {
         try {
             // We check if the origin file exists
-            $this->checkFileExists($this->originFilePath);
+            $this->fileExists($this->originFilePath);
 
             $info = pathinfo($this->originFilePath);
 

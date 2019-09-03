@@ -24,7 +24,7 @@ trait FileTrait
      *
      * @throws WorkerException
      */
-    public function checkFileExists(string $filePath, bool $raiseError = true): bool
+    public function fileExists(string $filePath, bool $raiseError = true): bool
     {
         // We check if the given file exists
         $notExists = new NotExists();

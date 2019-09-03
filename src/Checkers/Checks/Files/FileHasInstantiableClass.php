@@ -52,7 +52,7 @@ class FileHasInstantiableClass extends FileExists
     protected function check(): bool
     {
         // We check if the specified file exists
-        $this->checkFileExists($this->filePath);
+        $this->fileExists($this->filePath);
 
         // Check to see whether the include declared the class
         $tokens = token_get_all(file_get_contents($this->filePath));
