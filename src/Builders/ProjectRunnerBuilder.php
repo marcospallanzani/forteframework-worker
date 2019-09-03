@@ -4,7 +4,7 @@ namespace Forte\Worker\Builders;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
-use Forte\Worker\Actions\Checks\Files\FileHasValidConfigEntries;
+use Forte\Worker\Actions\Checks\Files\FileHasValidEntries;
 use Forte\Worker\Runners\ProjectRunner;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
@@ -137,7 +137,7 @@ class ProjectRunnerBuilder
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->modifyConfigKeyWithValue($key, $value)
                 ->addAfterAction(
-                    (new FileHasValidConfigEntries($filePath, $contentType))
+                    (new FileHasValidEntries($filePath, $contentType))
                         ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
                 )
         );
@@ -164,7 +164,7 @@ class ProjectRunnerBuilder
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->addConfigKeyWithValue($key, $value)
                 ->addAfterAction(
-                    (new FileHasValidConfigEntries($filePath, $contentType))
+                    (new FileHasValidEntries($filePath, $contentType))
                         ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
                 )
         );
@@ -190,7 +190,7 @@ class ProjectRunnerBuilder
             (new ChangeFileConfigEntries($filePath, $contentType))
                 ->removeConfigKey($key)
                 ->addAfterAction(
-                    (new FileHasValidConfigEntries($filePath, $contentType))
+                    (new FileHasValidEntries($filePath, $contentType))
                         ->doesNotHaveKey($key)
                 )
         );

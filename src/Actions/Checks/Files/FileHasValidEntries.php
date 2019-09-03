@@ -17,11 +17,11 @@ use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Helpers\FileParser;
 
 /**
- * Class FileHasValidConfigEntries
+ * Class FileHasValidEntries
  *
  * @package Forte\Worker\Actions\Checks\Files
  */
-class FileHasValidConfigEntries extends FileExists
+class FileHasValidEntries extends FileExists
 {
     /**
      * @var string
@@ -34,7 +34,7 @@ class FileHasValidConfigEntries extends FileExists
     protected $checks = array();
 
     /**
-     * FileHasValidConfigEntries constructor.
+     * FileHasValidEntries constructor.
      *
      * @param string $filePath The file path to check.
      * @param string $contentType The file content type.
@@ -48,7 +48,7 @@ class FileHasValidConfigEntries extends FileExists
     /**
      * Whether this instance is in a valid state or not.
      *
-     * @return bool Returns true if this FileHasValidConfigEntries
+     * @return bool Returns true if this FileHasValidEntries
      * instance was well configured; false otherwise.
      *
      * @throws ActionException
@@ -94,7 +94,7 @@ class FileHasValidConfigEntries extends FileExists
     /**
      * Run the check.
      *
-     * @return bool Returns true if this FileHasValidConfigEntries
+     * @return bool Returns true if this FileHasValidEntries
      * instance check was successful; false otherwise.
      *
      * @throws ActionException
@@ -108,7 +108,7 @@ class FileHasValidConfigEntries extends FileExists
 
         if ($this->isValid()) {
             // We read the file and we convert it to an array, when possible.
-            $parsedContent = FileParser::parseConfigFile($this->filePath, $this->contentType);
+            $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
             if (!is_array($parsedContent)) {
                 $this->throwActionException(
                     $this,
@@ -145,7 +145,7 @@ class FileHasValidConfigEntries extends FileExists
      * @param string $type The content type; accepted values are the
      * FileParser class constants with prefix "CONTENT_TYPE".
      *
-     * @return FileHasValidConfigEntries
+     * @return FileHasValidEntries
      */
     public function contentType(string $type): self
     {
@@ -160,7 +160,7 @@ class FileHasValidConfigEntries extends FileExists
      *
      * @param string $key The expected key.
      *
-     * @return FileHasValidConfigEntries
+     * @return FileHasValidEntries
      */
     public function hasKey(string $key): self
     {
@@ -175,7 +175,7 @@ class FileHasValidConfigEntries extends FileExists
      *
      * @param string $key The expected key.
      *
-     * @return FileHasValidConfigEntries
+     * @return FileHasValidEntries
      */
     public function doesNotHaveKey(string $key): self
     {
@@ -190,7 +190,7 @@ class FileHasValidConfigEntries extends FileExists
      *
      * @param string $key The key with an expected empty value.
      *
-     * @return FileHasValidConfigEntries
+     * @return FileHasValidEntries
      */
     public function hasKeyWithEmptyValue(string $key): self
     {
@@ -205,7 +205,7 @@ class FileHasValidConfigEntries extends FileExists
      *
      * @param string $key The key with an expected non-empty value.
      *
-     * @return FileHasValidConfigEntries
+     * @return FileHasValidEntries
      */
     public function hasKeyWithNonEmptyValue(string $key): self
     {
@@ -225,7 +225,7 @@ class FileHasValidConfigEntries extends FileExists
      * @param string $action The comparison action to be performed. Accepted
      * values are the VerifyArray constants with prefix "CHECK_".
      *
-     * @return FileHasValidConfigEntries
+     * @return FileHasValidEntries
      */
     public function hasKeyWithValue(
         string $key,
@@ -240,10 +240,10 @@ class FileHasValidConfigEntries extends FileExists
 
     /**
      * Return a human-readable string representation of this
-     * FileHasValidConfigEntries instance.
+     * FileHasValidEntries instance.
      *
      * @return string A human-readable string representation
-     * of this FileHasValidConfigEntries instance.
+     * of this FileHasValidEntries instance.
      */
     public function stringify(): string
     {
