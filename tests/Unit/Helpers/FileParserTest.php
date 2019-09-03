@@ -135,7 +135,7 @@ class FileParserTest extends TestCase
         if ($expectException) {
             $this->expectException(MissingKeyException::class);
         }
-        $this->assertEquals($expectedValue, FileParser::getRequiredNestedConfigValue($key, $checkContent));
+        $this->assertEquals($expectedValue, FileParser::getRequiredNestedArrayValue($key, $checkContent));
     }
 
     /**

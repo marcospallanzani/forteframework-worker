@@ -23,10 +23,17 @@ class FileParser
     use ClassAccessTrait;
 
     /**
-     * The separator used in multi-level configuration keys
-     * (e.g. "config-level-1.config-level-2.config-final-level")
+     * The separator used in multi-level array keys.
+     *
+     * e.g. The multi-level key "level-1.level-2.final-level"
+     * corresponds to the following array:
+     * [
+     *    'level-1' => [
+     *        'level-2' => 'final-level',
+     *     ],
+     * ]
      */
-    const CONFIG_LEVEL_SEPARATOR = ".";
+    const ARRAY_KEYS_LEVEL_SEPARATOR = ".";
 
     /**
      * Supported content types.
@@ -118,39 +125,40 @@ class FileParser
     }
 
     /**
-     * Return the configuration value for the given key;
+     * Return the array value for the given key;
      * if not defined, an error will be thrown.
      *
-     * @param string $key The configuration key
-     * @param array $config The config array to use;
+     * @param string $key The multi-level array key.
+     * @param array $array The array to access with
+     * the given multi-level key.
      *
      * @return mixed
      *
      * @throws MissingKeyException
      */
-    public static function getRequiredNestedConfigValue(string $key, array $config)
+    public static function getRequiredNestedArrayValue(string $key, array $array)
     {
-        $keysTree = explode(self::CONFIG_LEVEL_SEPARATOR, $key, 2);
+        $keysTree = explode(self::ARRAY_KEYS_LEVEL_SEPARATOR, $key, 2);
         $value = null;
         if (count($keysTree) <= 2) {
-            // We check if a value for the current configuration key exists;
+            // We check if a value for the current array key exists;
             // If it does not exist, we throw an error.
             $currentKey = $keysTree[0];
-            if (array_key_exists($currentKey, $config)) {
-                $value = $config[$currentKey];
+            if (array_key_exists($currentKey, $array)) {
+                $value = $array[$currentKey];
             } else {
-                throw new MissingKeyException($key, "Configuration key '$key' not found.");
+                throw new MissingKeyException($key, "Array key '$key' not found.");
             }
 
             try {
                 // If a value for the current key was found, we check
-                // if we need to iterate again through the given config tree;
+                // if we need to iterate again through the given array;
                 if (count($keysTree) === 2 && is_array($value)) {
-                    $value = self::getRequiredNestedConfigValue($keysTree[1], $value);
+                    $value = self::getRequiredNestedArrayValue($keysTree[1], $value);
                 }
             } catch (MissingKeyException $e) {
-                $composedKey = $currentKey . self::CONFIG_LEVEL_SEPARATOR . $e->getMissingKey();
-                throw new MissingKeyException($composedKey, "Configuration key '$composedKey' not found.");
+                $composedKey = $currentKey . self::ARRAY_KEYS_LEVEL_SEPARATOR . $e->getMissingKey();
+                throw new MissingKeyException($composedKey, "Array key '$composedKey' not found.");
             }
         }
         return $value;

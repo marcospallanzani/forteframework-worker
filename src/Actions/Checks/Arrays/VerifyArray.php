@@ -220,7 +220,7 @@ class VerifyArray extends AbstractAction
     protected function apply(): bool
     {
         try {
-            $value = FileParser::getRequiredNestedConfigValue($this->key, $this->checkContent);
+            $value = FileParser::getRequiredNestedArrayValue($this->key, $this->checkContent);
 
             // If no exceptions are thrown, then the key was found in the given config array
             switch($this->action) {
