@@ -2,13 +2,15 @@
 
 namespace Forte\Worker\Transformers\Transforms;
 
+use Forte\Worker\Actions\AbstractAction;
+
 /**
  * Class EmptyTransform. This class does not apply any transformation
  * and can be used as a support to run pre- and/or post-transform checks.
  *
  * @package Forte\Worker\Transformers\Transforms
  */
-class EmptyTransform extends AbstractTransform
+class EmptyTransform extends AbstractAction
 {
     /**
      * Whether this instance is in a valid state or not.
@@ -33,7 +35,7 @@ class EmptyTransform extends AbstractTransform
     }
 
     /**
-     * Returns a string representation of this AbstractTransform subclass instance.
+     * Returns a string representation of this EmptyTransform instance.
      *
      * @return string
      */

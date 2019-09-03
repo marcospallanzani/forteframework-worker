@@ -2,15 +2,15 @@
 
 namespace Forte\Worker\Transformers\Transforms\Files;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
  * Class UnzipFile
  *
  * @package Forte\Worker\Transformers\Transforms\Files
  */
-class UnzipFile extends AbstractTransform
+class UnzipFile extends AbstractAction
 {
     /**
      * @var string

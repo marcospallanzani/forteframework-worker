@@ -2,10 +2,10 @@
 
 namespace Forte\Worker\Builders;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Checkers\Checks\Arrays\VerifyArray;
 use Forte\Worker\Checkers\Checks\Files\FileHasValidConfigEntries;
 use Forte\Worker\Transformers\ProjectTransformer;
-use Forte\Worker\Transformers\Transforms\AbstractTransform;
 use Forte\Worker\Checkers\Checks\Files\FileExists;
 use Forte\Worker\Checkers\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Transformers\Transforms\EmptyTransform;
@@ -238,14 +238,14 @@ class ProjectTransformerBuilder
     /**
      * Add a transformation to the project.
      *
-     * @param AbstractTransform $transform the transform to add.
+     * @param AbstractAction $transform the transform to add.
      *
-     * @return AbstractTransform The transformation added
-     * to the data (so methods can be chained on it).
+     * @return AbstractAction The action added to the data
+     * (so methods can be chained on it).
      */
-    protected function addTransform(AbstractTransform $transform): AbstractTransform
+    protected function addTransform(AbstractAction $transform): AbstractAction
     {
-        $this->getTransformer()->addTransform($transform);
+        $this->getTransformer()->addAction($transform);
 
         return $transform;
     }

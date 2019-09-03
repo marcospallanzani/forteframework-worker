@@ -2,18 +2,18 @@
 
 namespace Forte\Worker\Transformers\Transforms\Files;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\FileParser;
 use Forte\Worker\Transformers\Transforms\Arrays\ModifyArray;
-use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
  * Class ChangeFileConfigEntries
  *
  * @package Forte\Worker\Transformers\Transforms\Files
  */
-class ChangeFileConfigEntries extends AbstractTransform
+class ChangeFileConfigEntries extends AbstractAction
 {
     /**
      * The file to modify.
@@ -48,7 +48,7 @@ class ChangeFileConfigEntries extends AbstractTransform
     /**
      * Get whether this instance is in a valid state or not.
      *
-     * @return bool Returns true if this AbstractTransform subclass
+     * @return bool Returns true if this AbstractAction subclass
      * instance is correctly configured; false otherwise.
      *
      * @throws ActionException
@@ -113,7 +113,7 @@ class ChangeFileConfigEntries extends AbstractTransform
      * Apply the sub-class transformation action.
      *
      * @return bool Returns true if the transform action implemented by
-     * this AbstractTransform subclass instance has been successfully
+     * this AbstractAction subclass instance has been successfully
      * applied; false otherwise.
      *
      * @throws ActionException

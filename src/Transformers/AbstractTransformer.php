@@ -2,8 +2,8 @@
 
 namespace Forte\Worker\Transformers;
 
-use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Transformers\Transforms\AbstractTransform;
+use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Exceptions\ActionException;
 
 /**
  * Class AbstractTransformer. A base class for all transformer implementations.
@@ -13,52 +13,53 @@ use Forte\Worker\Transformers\Transforms\AbstractTransform;
 class AbstractTransformer
 {
     /**
-     * Transformations to apply.
+     * Actions to apply.
      *
-     * @var array An array of AbstractTransform subclass instances.
+     * @var array An array of AbstractAction subclass instances.
      */
-    protected $transforms = [];
+    protected $actions = [];
 
     /**
-     * Get all of the the required transformations to apply.
+     * Get all of the the required actions to apply.
      *
-     * @return array An array of AbstractTransform subclass instances.
+     * @return array An array of AbstractAction subclass instances.
      */
-    public function getTransforms(): array
+    public function getActions(): array
     {
-        return $this->transforms;
+        return $this->actions;
     }
 
     /**
-     * Add a transformation to apply.
+     * Add an action to apply.
      *
-     * @param AbstractTransform $transform
+     * @param AbstractAction $action
      */
-    public function addTransform(AbstractTransform $transform)
+    public function addAction(AbstractAction $action)
     {
-        $this->transforms[] = $transform;
+        $this->actions[] = $action;
     }
 
     /**
      * Apply all configured transformations in the given sequence.
-     * This method returns a list of AbstractTransform subclass
+     * This method returns a list of AbstractAction subclass
      * that failed  or that did not execute correctly.
      *
-     * @return array A list of AbstractTransform subclass instances
+     * @return array A list of AbstractAction subclass instances
      * that executed correctly, but failed.
      */
-    public function applyTransformations(): array
+    public function applyActions(): array
     {
-        $failedTransforms = array();
-        foreach ($this->transforms as $transform) {
+        $failedActions = array();
+        foreach ($this->actions as $action) {
             try {
-                if ($transform instanceof AbstractTransform && !$transform->run()) {
-                    $failedTransforms[] = $transform;
+                if ($action instanceof AbstractAction && !$action->run()) {
+                    $failedActions[] = $action;
                 }
-            } catch (WorkerException $workerException) {
-                $failedTransforms[] = $workerException->getMessage();
+            } catch (ActionException $actionException) {
+//TODO Error handling: how to return a chain of action exceptions?
+                $failedActions[] = $actionException->getMessage();
             }
         }
-        return $failedTransforms;
+        return $failedActions;
     }
 }

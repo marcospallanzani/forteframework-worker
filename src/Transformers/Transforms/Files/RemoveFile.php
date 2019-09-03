@@ -11,15 +11,15 @@
 
 namespace Forte\Worker\Transformers\Transforms\Files;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
  * Class RemoveFile.
  *
  * @package Forte\Worker\Transformers\Transforms\Files
  */
-class RemoveFile extends AbstractTransform
+class RemoveFile extends AbstractAction
 {
     const REMOVE_SINGLE_FILE  = "remove_single_file";
     const REMOVE_FILE_PATTERN = "remove_file_pattern";

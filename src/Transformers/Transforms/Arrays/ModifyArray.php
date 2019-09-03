@@ -2,17 +2,17 @@
 
 namespace Forte\Worker\Transformers\Transforms\Arrays;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
-use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
  * Class ModifyArray.
  *
  * @package Forte\Worker\Transformers\Transforms\Arrays
  */
-class ModifyArray extends AbstractTransform
+class ModifyArray extends AbstractAction
 {
     use ClassAccessTrait, ThrowErrorsTrait;
 
@@ -272,7 +272,7 @@ class ModifyArray extends AbstractTransform
     /**
      * Apply the sub-class transformation action.
      *
-     * @return bool True if the action implemented by this AbstractTransform
+     * @return bool True if the action implemented by this AbstractAction
      * subclass instance was successfully applied; false otherwise.
      */
     protected function apply(): bool

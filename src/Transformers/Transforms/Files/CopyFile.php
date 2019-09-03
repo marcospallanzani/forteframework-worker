@@ -2,9 +2,9 @@
 
 namespace Forte\Worker\Transformers\Transforms\Files;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Filters\Files\Copy as CopyFilter;
-use Forte\Worker\Transformers\Transforms\AbstractTransform;
 use Zend\Filter\Exception\RuntimeException;
 
 /**
@@ -12,7 +12,7 @@ use Zend\Filter\Exception\RuntimeException;
  *
  * @package Forte\Worker\Transformers\Transforms\Files
  */
-class CopyFile extends AbstractTransform
+class CopyFile extends AbstractAction
 {
     /**
      * @var string

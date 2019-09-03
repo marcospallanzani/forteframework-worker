@@ -11,12 +11,12 @@
 
 namespace Forte\Worker\Transformers\Transforms\Files;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Checkers\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\StringParser;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
-use Forte\Worker\Transformers\Transforms\AbstractTransform;
 
 /**
  * Class ModifyFile. This class is used to modify the content of a given
@@ -25,7 +25,7 @@ use Forte\Worker\Transformers\Transforms\AbstractTransform;
  *
  * @package Forte\Worker\Transformers\Transforms\Files
  */
-class ModifyFile extends AbstractTransform
+class ModifyFile extends AbstractAction
 {
     use ClassAccessTrait, ThrowErrorsTrait;
 
@@ -302,7 +302,7 @@ class ModifyFile extends AbstractTransform
     /**
      * Apply the sub-class transformation action.
      *
-     * @return bool True if the action implemented by this AbstractTransform
+     * @return bool True if the action implemented by this AbstractAction
      * subclass instance was successfully applied; false otherwise.
      *
      * @throws ActionException
