@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Filters\Files;
 
-use Zend\Filter\Exception\RuntimeException;
+use Forte\Worker\Exceptions\WorkerException;
 use Zend\Filter\File\Rename;
 
 /**
@@ -18,7 +18,7 @@ class Copy extends Rename
      *
      * @param  string|array $value Full path of file to change or $_FILES data array
      *
-     * @throws RuntimeException
+     * @throws WorkerException
      *
      * @return string|array The new filename which has been set
      */
@@ -33,18 +33,27 @@ class Copy extends Rename
             return $file;
         }
 
-        $result = copy($file['source'], $file['target']);
-
+        $result = $this->copyFileToDestination($file['source'], $file['target']);
         if ($result !== true) {
-            throw new RuntimeException(
-                sprintf(
-                    "File '%s' could not be copied. " .
-                    "An error occurred while processing the file.",
-                    $value
-                )
-            );
+            throw new WorkerException(sprintf(
+                "File '%s' could not be copied. An error occurred while processing the file.",
+                $value
+            ));
         }
 
         return $file['target'];
+    }
+
+    /**
+     * Copy the given source file to the give target.
+     *
+     * @param string $fileSource The file to copy.
+     * @param string $fileTarget The target file.
+     *
+     * @return bool True if the file was copied; false otherwise.
+     */
+    protected function copyFileToDestination(string $fileSource, string $fileTarget): bool
+    {
+        return copy($fileSource, $fileTarget);
     }
 }
