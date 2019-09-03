@@ -11,12 +11,10 @@
 
 namespace Tests\Unit\Helpers;
 
-use Forte\Worker\Checkers\Checks\AbstractCheck;
-use Forte\Worker\Exceptions\CheckException;
+use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Exceptions\TransformException;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
-use Forte\Worker\Transformers\Transforms\AbstractTransform;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -26,37 +24,21 @@ use PHPUnit\Framework\TestCase;
  */
 class ThrowErrorsTraitTest extends TestCase
 {
-    const CHECK_TEST_MESSAGE     = "check test";
-    const TRANSFORM_TEST_MESSAGE = "transform test";
-    const BASE_TEST_MESSAGE      = "error message %s.";
+    const ACTION_TEST_MESSAGE = "action test";
+    const BASE_TEST_MESSAGE   = "error message %s.";
 
     /**
-     * Returns an anonymous AbstractCheck subclass instance to test ThrowErrorsTrait.
+     * Returns an anonymous AbstractAction subclass instance to test ThrowErrorsTrait.
      *
      * @return object
      */
-    protected function getAnonymousCheckClass()
+    protected function getAnonymousActionClass()
     {
-        return new class extends AbstractCheck {
-            use ThrowErrorsTrait;
-            public function isValid(): bool { return true; }
-            protected function check(): bool { return true; }
-            public function stringify(): string { return ThrowErrorsTraitTest::CHECK_TEST_MESSAGE; }
-        };
-    }
-
-    /**
-     * Returns an anonymous AbstractTransform subclass instance to test ThrowErrorsTrait.
-     *
-     * @return object
-     */
-    protected function getAnonymousTransformClass()
-    {
-        return new class extends AbstractTransform {
+        return new class extends AbstractAction {
             use ThrowErrorsTrait;
             public function isValid(): bool { return true; }
             protected function apply(): bool { return true; }
-            public function stringify(): string { return ThrowErrorsTraitTest::TRANSFORM_TEST_MESSAGE; }
+            public function stringify(): string { return ThrowErrorsTraitTest::ACTION_TEST_MESSAGE; }
         };
     }
 
@@ -67,36 +49,21 @@ class ThrowErrorsTraitTest extends TestCase
     {
         $this->expectException(WorkerException::class);
         $this->expectExceptionMessage("error message test.");
-        $this->getAnonymousCheckClass()->throwWorkerException(self::BASE_TEST_MESSAGE, "test");
+        $this->getAnonymousActionClass()->throwWorkerException(self::BASE_TEST_MESSAGE, "test");
     }
 
     /**
-     * Test ThrowErrorsTrait::throwCheckException() method.
+     * Test ThrowErrorsTrait::throwActionException() method.
      */
-    public function testThrowCheckException(): void
+    public function testThrowActionException(): void
     {
-        $this->expectException(CheckException::class);
-        $this->expectExceptionMessage("error message check test.");
-        $anonymousCheckClass = $this->getAnonymousCheckClass();
-        $anonymousCheckClass->throwCheckException(
-            $anonymousCheckClass,
+        $this->expectException(ActionException::class);
+        $this->expectExceptionMessage("error message action test.");
+        $anonymousActionClass = $this->getAnonymousActionClass();
+        $anonymousActionClass->throwActionException(
+            $anonymousActionClass,
             self::BASE_TEST_MESSAGE,
-            self::CHECK_TEST_MESSAGE
-        );
-    }
-
-    /**
-     * Test ThrowErrorsTrait::throwTransformException() method.
-     */
-    public function testThrowTransformException(): void
-    {
-        $this->expectException(TransformException::class);
-        $this->expectExceptionMessage("error message transform test.");
-        $anonymousTransformClass = $this->getAnonymousTransformClass();
-        $anonymousTransformClass->throwTransformException(
-            $anonymousTransformClass,
-            self::BASE_TEST_MESSAGE,
-            self::TRANSFORM_TEST_MESSAGE
+            self::ACTION_TEST_MESSAGE
         );
     }
 }
