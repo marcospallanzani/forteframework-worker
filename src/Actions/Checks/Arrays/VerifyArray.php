@@ -379,21 +379,21 @@ class VerifyArray extends AbstractAction
      * Check if the configured value contains the given value.
      * Supported value types are strings and arrays.
      *
-     * @param mixed $value The value that should be contained in the class value.
+     * @param mixed $searchValue The value that should be contained in the class value.
      *
      * @return bool
      *
      * @throws ActionException
      */
-    protected function contains($value): bool
+    protected function contains($searchValue): bool
     {
-        if (is_string($this->value)) {
-            if (strpos($value, $this->value) !== false) {
+        if (is_string($searchValue) && is_string($this->value)) {
+            if (strpos($searchValue, $this->value) !== false) {
                 return true;
             }
             return false;
-        } elseif (is_array($this->value)) {
-            return in_array($value, $this->value);
+        } elseif (is_array($searchValue)) {
+            return array_key_exists($this->value, $searchValue);
         }
 
         $this->throwActionException(
