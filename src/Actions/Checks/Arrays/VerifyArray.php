@@ -262,7 +262,8 @@ class VerifyArray extends AbstractAction
                      * In this case, the key is defined in the given array, so we
                      * can return true, which means that the given key is not missing.
                      */
-                    $matched = true;
+                    // If reverse: Check missing -> Check NOT missing
+                    $matched = ($this->reverseAction ? true : false);
                     break;
                 default:
                     $this->throwActionException(
@@ -273,14 +274,15 @@ class VerifyArray extends AbstractAction
             }
         } catch (MissingKeyException $missingKeyException) {
             if ($this->action === self::CHECK_MISSING_KEY) {
-                return true;
+                $matched = ($this->reverseAction ? false : true);
+            } else {
+                $this->throwActionException(
+                    $this,
+                    "It was not possible to verify the given check condition. Error message is: '%s'. Impacted check is: '%s'",
+                    $missingKeyException->getMessage(),
+                    $this
+                );
             }
-            $this->throwActionException(
-                $this,
-                "It was not possible to verify the given check condition. Error message is: '%s'. Impacted check is: '%s'",
-                $missingKeyException->getMessage(),
-                $this
-            );
         }
 
         return $matched;
@@ -463,6 +465,12 @@ class VerifyArray extends AbstractAction
      */
     protected function equalsTo($value): bool
     {
+        if (is_numeric($this->value) && is_numeric($value)) {
+            if ($this->value == $value) {
+                return true;
+            }
+        }
+        // We check on type
         if ($this->value === $value) {
             return true;
         }
