@@ -11,6 +11,7 @@
 
 namespace Forte\Worker\Actions\Checks\Files;
 
+use Forte\Worker\Actions\ValidActionInterface;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
@@ -71,18 +72,11 @@ class FileHasValidEntries extends FileExists
 
         // Check if the specified checks are well configured
         foreach ($this->checks as $check) {
-
-            if (!$check instanceof VerifyArray) {
-                $this->throwActionException(
-                    $this,
-                    "Check parameters should be registered as instances of class '%s'.",
-                    VerifyArray::class
-                );
-            }
-
             try {
                 // We check if the current check parameters are valid; if not valid, an exception will be thrown
-                $check->isValid();
+                if ($check instanceof ValidActionInterface) {
+                    $check->isValid();
+                }
             } catch (WorkerException $workerException) {
                 $this->throwActionException($this, $workerException->getMessage());
             }
@@ -101,39 +95,49 @@ class FileHasValidEntries extends FileExists
      */
     protected function apply(): bool
     {
-        // We check if the specified file exists
-        $this->checkFileExists($this->filePath);
+        try {
+            // We check if the specified file exists
+            $this->checkFileExists($this->filePath);
 
-        $failed = array();
+            $failed = array();
 
-        if ($this->isValid()) {
-            // We read the file and we convert it to an array, when possible.
-            $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
-            if (!is_array($parsedContent)) {
-                $this->throwActionException(
-                    $this,
-                    "It was not possible to convert the content of file '%s' to an array.",
-                    $this->filePath
-                );
-            }
+            if ($this->isValid()) {
+                // We read the file and we convert it to an array, when possible.
+                $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
+                if (!is_array($parsedContent)) {
+                    $this->throwActionException(
+                        $this,
+                        "It was not possible to convert the content of file '%s' to an array.",
+                        $this->filePath
+                    );
+                }
 
-            // We check all configured conditions for the configured file
-            foreach ($this->checks as $check) {
-                try {
-                    /** @var VerifyArray $check */
+                // We check all configured conditions for the configured file
+                foreach ($this->checks as $check) {
+                    try {
+                        /** @var VerifyArray $check */
 //TODO FATAL ACTION SHOULD GET OUT OF THIS LOOP AND TRIGGER THE SAME REACTION IN PARENT ACTIONS
-                    if (!$check->setCheckContent($parsedContent)->run()) {
-                        $failed[] = sprintf("Check failed: %s.", $check);
+                        if (!$check->setCheckContent($parsedContent)->run()) {
+                            $failed[] = sprintf("Check failed: %s.", $check);
+                        }
+                    } catch (WorkerException $e) {
+                        $failed[] = sprintf("Check failed: %s. Reason is: %s", $check, $e->getMessage());
                     }
-                } catch (WorkerException $e) {
-                    $failed[] = sprintf("Check failed: %s. Reason is: %s", $check, $e->getMessage());
                 }
             }
-        }
 
-        if ($failed) {
+            if ($failed) {
 //TODO WE SHOULD ADD THE FAILED ARRAY TO THE LIST OF NESTED ERROR MESSAGES IN THE ACTIONEXCEPTION CLASS
-            $this->throwActionException($this, implode(' | ', $failed));
+                $this->throwActionException($this, implode(' | ', $failed));
+            }
+
+        } catch (WorkerException $workerException) {
+            $this->throwActionException(
+                $this,
+                "An error occurred while running the action '%s'. Error message is: '%s'.",
+                $this,
+                $workerException->getMessage()
+            );
         }
 
         return true;
