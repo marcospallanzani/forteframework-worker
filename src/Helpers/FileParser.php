@@ -5,6 +5,7 @@ namespace Forte\Worker\Helpers;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Exceptions\MissingKeyException;
 use Symfony\Component\Yaml\Yaml as YamlReader;
+use Zend\Config\Exception\RuntimeException;
 use Zend\Config\Reader\Ini as IniReader;
 use Zend\Config\Reader\Json as JsonReader;
 use Zend\Config\Reader\Xml as XmlReader;
@@ -52,32 +53,47 @@ class FileParser
      * constants whose name starts with the prefix 'CONTENT_TYPE').
      *
      * @return array An array representing the given file path.
+     *
+     * @throws WorkerException If an error occurred while parsing the file
+     * (e.g. json syntax not respected).
      */
     public static function parseFile(string $filePath, string $contentType): array
     {
-        $parsedContent = null;
-        switch ($contentType) {
-            case self::CONTENT_TYPE_INI:
-                $iniReader = new IniReader();
-                $parsedContent = $iniReader->fromFile($filePath);
-                break;
-            case self::CONTENT_TYPE_YAML:
-                $parsedContent = YamlReader::parseFile($filePath);
-                break;
-            case self::CONTENT_TYPE_JSON:
-                $jsonReader = new JsonReader();
-                $parsedContent = $jsonReader->fromFile($filePath);
-                break;
-            case self::CONTENT_TYPE_XML:
-                $xmlReader = new XmlReader();
-                $parsedContent = $xmlReader->fromFile($filePath);
-                break;
-            case self::CONTENT_TYPE_ARRAY:
-                $parsedContent = include ($filePath);
-                break;
-        }
+        try {
+            $parsedContent = null;
+            switch ($contentType) {
+                case self::CONTENT_TYPE_INI:
+                    $iniReader = new IniReader();
+                    $parsedContent = $iniReader->fromFile($filePath);
+                    break;
+                case self::CONTENT_TYPE_YAML:
+                    $parsedContent = YamlReader::parseFile($filePath);
+                    break;
+                case self::CONTENT_TYPE_JSON:
+                    $jsonReader = new JsonReader();
+                    $parsedContent = $jsonReader->fromFile($filePath);
+                    break;
+                case self::CONTENT_TYPE_XML:
+                    $xmlReader = new XmlReader();
+                    $parsedContent = $xmlReader->fromFile($filePath);
+                    break;
+                case self::CONTENT_TYPE_ARRAY:
+                    $parsedContent = include ($filePath);
+                    break;
+            }
 
-        return $parsedContent;
+            if (is_array($parsedContent)) {
+                return $parsedContent;
+            }
+            return [];
+        } catch (RuntimeException $runtimeException) {
+            throw new WorkerException(sprintf(
+                "An error occurred while parsing the given file '%s' and content '%s'. Error message is: '%s'.",
+                $filePath,
+                $contentType,
+                $runtimeException
+            ));
+        }
     }
 
     /**
