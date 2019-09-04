@@ -111,40 +111,45 @@ class ChangeFileEntries extends AbstractAction
      */
     protected function apply(): bool
     {
-        // We check if the specified file exists
-        $this->checkFileExists($this->filePath);
-
-        // We read the file and we convert it to an array, when possible.
-        $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
-        if (!is_array($parsedContent)) {
-            $this->throwActionException(
-                $this,
-                "It was not possible to convert the content of file '%s' to an array.",
-                $this->filePath
-            );
-        }
-
-        // We check all conditions for the specified file
-        $failed = array();
-        foreach ($this->modifications as $modification) {
-            try {
-                /** @var ModifyArray $modification */
-                $modification->setModifyContent($parsedContent)->run();
-                $parsedContent = $modification->getModifiedContent();
-            } catch (WorkerException $e) {
-                $failed[] = sprintf("Modification failed: %s. Reason is: %s", $modification, $e->getMessage());
-            }
-        }
-
-        if ($failed) {
-            $this->throwActionException($this, implode(' | ', $failed));
-        }
-
-        // We save the new content to the original file.
         try {
+            // We check if the specified file exists
+            $this->checkFileExists($this->filePath);
+
+            // We read the file and we convert it to an array, when possible.
+            $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
+            if (!is_array($parsedContent)) {
+                $this->throwActionException(
+                    $this,
+                    "It was not possible to convert the content of file '%s' to an array.",
+                    $this->filePath
+                );
+            }
+
+            // We check all conditions for the specified file
+            $failed = array();
+            foreach ($this->modifications as $modification) {
+                try {
+                    /** @var ModifyArray $modification */
+                    $modification->setModifyContent($parsedContent)->run();
+                    $parsedContent = $modification->getModifiedContent();
+                } catch (WorkerException $e) {
+                    $failed[] = sprintf("Modification failed: %s. Reason is: %s", $modification, $e->getMessage());
+                }
+            }
+
+            if ($failed) {
+                $this->throwActionException($this, implode(' | ', $failed));
+            }
+
+            // We save the new content to the original file.
             FileParser::writeToFile($parsedContent, $this->filePath, $this->contentType);
         } catch (WorkerException $workerException) {
-            $this->throwActionException($this, $workerException->getMessage());
+            $this->throwActionException(
+                $this,
+                "An error occurred while running the action '%s'. Error message is: '%s'.",
+                $this,
+                $workerException->getMessage()
+            );
         }
 
         return true;
