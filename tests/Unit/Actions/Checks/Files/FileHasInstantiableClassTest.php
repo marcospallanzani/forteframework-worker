@@ -155,7 +155,9 @@ class FileHasInstantiableClassTest extends TestCase
         string $stringified
     ): void
     {
-        $fileHasInstantiableClass = new FileHasInstantiableClass($filePath, $className);
+        $fileHasInstantiableClass = new FileHasInstantiableClass();
+        $fileHasInstantiableClass->setPath($filePath);
+        $fileHasInstantiableClass->setClass($className);
         $this->assertEquals($stringified, (string) $fileHasInstantiableClass);
         $this->assertEquals($stringified, $fileHasInstantiableClass->stringify());
     }

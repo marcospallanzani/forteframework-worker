@@ -87,6 +87,17 @@ class FileParserTest extends TestCase
     }
 
     /**
+     * @return array
+     */
+    public function emptyFilesProvider(): array
+    {
+        return [
+            [__DIR__ . '/data/empty_parsetest.json', FileParser::CONTENT_TYPE_JSON],
+            [__DIR__ . '/data/empty_parsetest.json', FileParser::CONTENT_TYPE_XML],
+        ];
+    }
+
+    /**
      * Test the FileParser::parseConfigFile() and FileParser::writeToConfigFile() functions.
      *
      * @dataProvider filesProvider
@@ -111,6 +122,22 @@ class FileParserTest extends TestCase
         FileParser::writeToFile($content, $filePath, $contentType);
         $parsedArray = FileParser::parseFile($filePath, $contentType);
         $this->assertEquals($content, $parsedArray);
+    }
+
+    /**
+     * If an empty json file is parsed, a Runtime exception should be thrown.
+     *
+     * @dataProvider emptyFilesProvider
+     *
+     * @param string $filePath
+     * @param string $contentType
+     *
+     * @throws WorkerException
+     */
+    public function testParseExpectRuntimeException(string $filePath, string $contentType): void
+    {
+        $this->expectException(WorkerException::class);
+        FileParser::parseFile($filePath, $contentType);
     }
 
     /**

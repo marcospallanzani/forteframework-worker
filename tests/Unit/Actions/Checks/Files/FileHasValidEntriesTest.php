@@ -24,6 +24,7 @@ class FileHasValidEntriesTest extends TestCase
     const TEST_FILE_TMP_YAML  = __DIR__ . '/file-tests.yml';
     const TEST_FILE_TMP_XML   = __DIR__ . '/file-tests.xml';
     const TEST_FILE_TMP_ARRAY = __DIR__ . '/file-tests.php';
+    const TEST_FILE_TMP_EMPTY = __DIR__ . '/file-tests-empty.json';
 
     protected $testArray = [];
 
@@ -52,6 +53,7 @@ class FileHasValidEntriesTest extends TestCase
         FileParser::writeToFile($this->testArray, self::TEST_FILE_TMP_INI, FileParser::CONTENT_TYPE_INI);
         FileParser::writeToFile($this->testArray, self::TEST_FILE_TMP_XML, FileParser::CONTENT_TYPE_XML);
         FileParser::writeToFile($this->testArray, self::TEST_FILE_TMP_YAML, FileParser::CONTENT_TYPE_YAML);
+        file_put_contents(self::TEST_FILE_TMP_EMPTY, '');
     }
 
     /**
@@ -65,6 +67,34 @@ class FileHasValidEntriesTest extends TestCase
         @unlink(self::TEST_FILE_TMP_INI);
         @unlink(self::TEST_FILE_TMP_XML);
         @unlink(self::TEST_FILE_TMP_YAML);
+        @unlink(self::TEST_FILE_TMP_EMPTY);
+    }
+
+    /**
+     * Data provider for isValid() tests.
+     *
+     * @return array
+     */
+    public function isValidProvider(): array
+    {
+        return [
+            // File path | content type | check | expected | exception
+            [self::TEST_FILE_TMP_JSON, FileParser::CONTENT_TYPE_JSON, null, true, false],
+            [self::TEST_FILE_TMP_ARRAY, FileParser::CONTENT_TYPE_ARRAY, null, true, false],
+            [self::TEST_FILE_TMP_INI, FileParser::CONTENT_TYPE_INI, null, true, false],
+            [self::TEST_FILE_TMP_XML, FileParser::CONTENT_TYPE_XML, null, true, false],
+            [self::TEST_FILE_TMP_YAML, FileParser::CONTENT_TYPE_YAML, null, true, false],
+            /** Negative cases */
+            ['', FileParser::CONTENT_TYPE_YAML, null, false, true],
+            ['', '', null, false, true],
+            [self::TEST_FILE_TMP_YAML, '', null, false, true],
+            [self::TEST_FILE_TMP_YAML, 'wrong-content-type', null, false, true],
+            [self::TEST_FILE_TMP_JSON, FileParser::CONTENT_TYPE_JSON, '', false, true],
+            [self::TEST_FILE_TMP_ARRAY, FileParser::CONTENT_TYPE_ARRAY, '', false, true],
+            [self::TEST_FILE_TMP_INI, FileParser::CONTENT_TYPE_INI, '', false, true],
+            [self::TEST_FILE_TMP_XML, FileParser::CONTENT_TYPE_XML, '', false, true],
+            [self::TEST_FILE_TMP_YAML, FileParser::CONTENT_TYPE_YAML, '', false, true],
+        ];
     }
 
     /**
@@ -319,8 +349,25 @@ class FileHasValidEntriesTest extends TestCase
         return $providedValues;
     }
 
-
-
+    /**
+     * Data provider for stringify tests.
+     *
+     * @return array
+     */
+    public function stringifyProvider(): array
+    {
+        $filePath = self::TEST_FILE_TMP_JSON;
+        $key = 'key';
+        $value = "value";
+        return [
+            [(new FileHasValidEntries($filePath, FileParser::CONTENT_TYPE_JSON)), "Check if configured keys meet the configured check actions in file '$filePath'."],
+            [(new FileHasValidEntries($filePath, FileParser::CONTENT_TYPE_JSON))->hasKey($key), "Check if configured keys meet the configured check actions in file '$filePath'. 0. Check if key '$key' is set and has any value"],
+            [(new FileHasValidEntries($filePath, FileParser::CONTENT_TYPE_JSON))->hasKeyWithNonEmptyValue($key), "Check if configured keys meet the configured check actions in file '$filePath'. 0. Check if key '$key' is set and is not empty (empty string or null)"],
+            [(new FileHasValidEntries($filePath, FileParser::CONTENT_TYPE_JSON))->hasKeyWithEmptyValue($key), "Check if configured keys meet the configured check actions in file '$filePath'. 0. Check if key '$key' is set and is empty (empty string or null)"],
+            [(new FileHasValidEntries($filePath, FileParser::CONTENT_TYPE_JSON))->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS), "Check if configured keys meet the configured check actions in file '$filePath'. 0. Check if key '$key' is set and is equal to value '$value'"],
+            [(new FileHasValidEntries($filePath, FileParser::CONTENT_TYPE_JSON))->hasKeyWithValue($key, $value, VerifyArray::CHECK_CONTAINS), "Check if configured keys meet the configured check actions in file '$filePath'. 0. Check if key '$key' is set and contains value '$value'"],
+        ];
+    }
 
     /**
      * Test the function FileHasValidEntries::run() with the HasKey check.
@@ -348,6 +395,48 @@ class FileHasValidEntriesTest extends TestCase
     }
 
     /**
+     * Test the function FileHasValidEntries::isValid().
+     *
+     * @dataProvider isValidProvider
+     *
+     * @param string $filePath
+     * @param string $contentType
+     * @param mixed $verifyKey
+     * @param bool $expected
+     * @param bool $exceptionExpected
+     *
+     * @throws ActionException
+     */
+    public function testIsValid(
+        string $filePath,
+        string $contentType,
+        $verifyKey,
+        bool $expected,
+        bool $exceptionExpected
+    ): void
+    {
+        $fileHasValidEntries = new FileHasValidEntries($filePath, $contentType);
+        if (is_string($verifyKey)) {
+            $fileHasValidEntries->hasKey($verifyKey);
+        }
+        if ($exceptionExpected) {
+            $this->expectException(ActionException::class);
+        }
+        $this->assertEquals($expected, $fileHasValidEntries->isValid());
+    }
+
+    /**
+     * If we try to parse an empty json file (created with wrong syntax use), we should get a RuntimeException.
+     */
+    public function testRunHasKeyWithEmptyFile(): void
+    {
+        // An exception should be thrown here because the file is empty and it is decoded to an empty string
+        $this->expectException(WorkerException::class);
+        $fileHasValidEntries = new FileHasValidEntries(self::TEST_FILE_TMP_EMPTY);
+        $fileHasValidEntries->contentType(FileParser::CONTENT_TYPE_JSON)->hasKey('test1')->run();
+    }
+
+    /**
      * Test the function FileHasValidEntries::run() with the DoesNotHasKey check.
      *
      * @dataProvider filesDoesNotHaveKeyProvider
@@ -355,7 +444,7 @@ class FileHasValidEntriesTest extends TestCase
      * @param FileHasValidEntries $fileHasValidEntries
      * @param string $key
      * @param bool $expected
-     * @param $exceptionExpected
+     * @param bool $exceptionExpected
      *
      * @throws ActionException
      */
@@ -363,7 +452,7 @@ class FileHasValidEntriesTest extends TestCase
         FileHasValidEntries $fileHasValidEntries,
         string $key,
         bool $expected,
-        $exceptionExpected
+        bool $exceptionExpected
     ): void
     {
         if ($exceptionExpected) {
@@ -380,7 +469,7 @@ class FileHasValidEntriesTest extends TestCase
      * @param FileHasValidEntries $fileHasValidEntries
      * @param string $key
      * @param bool $expected
-     * @param $exceptionExpected
+     * @param bool $exceptionExpected
      *
      * @throws ActionException
      */
@@ -388,7 +477,7 @@ class FileHasValidEntriesTest extends TestCase
         FileHasValidEntries $fileHasValidEntries,
         string $key,
         bool $expected,
-        $exceptionExpected
+        bool $exceptionExpected
     ): void
     {
         if ($exceptionExpected) {
@@ -405,7 +494,7 @@ class FileHasValidEntriesTest extends TestCase
      * @param FileHasValidEntries $fileHasValidEntries
      * @param string $key
      * @param bool $expected
-     * @param $exceptionExpected
+     * @param bool $exceptionExpected
      *
      * @throws ActionException
      */
@@ -413,7 +502,7 @@ class FileHasValidEntriesTest extends TestCase
         FileHasValidEntries $fileHasValidEntries,
         string $key,
         bool $expected,
-        $exceptionExpected
+        bool $exceptionExpected
     ): void
     {
         if ($exceptionExpected) {
@@ -432,7 +521,7 @@ class FileHasValidEntriesTest extends TestCase
      * @param mixed $value
      * @param string $compareActionType
      * @param bool $expected
-     * @param $exceptionExpected
+     * @param bool $exceptionExpected
      *
      * @throws ActionException
      */
@@ -442,13 +531,27 @@ class FileHasValidEntriesTest extends TestCase
         $value,
         string $compareActionType,
         bool $expected,
-        $exceptionExpected
+        bool $exceptionExpected
     ): void
     {
         if ($exceptionExpected) {
             $this->expectException(ActionException::class);
         }
         $this->assertEquals($expected, $fileHasValidEntries->hasKeyWithValue($key, $value, $compareActionType)->run());
+    }
+
+    /**
+     * Test method FileHasValidEntries::stringify().
+     *
+     * @dataProvider stringifyProvider
+     *
+     * @param FileHasValidEntries $fileHasValidEntries
+     * @param string $expected
+     */
+    public function testStringify(FileHasValidEntries $fileHasValidEntries, string $expected): void
+    {
+        $this->assertEquals($expected, (string) $fileHasValidEntries);
+        $this->assertEquals($expected, $fileHasValidEntries->stringify());
     }
 
     /**
