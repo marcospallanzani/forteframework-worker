@@ -147,89 +147,129 @@ class VerifyArrayTest extends TestCase
     /**
      * Data provider for check tests.
      *
-     * @param string $testName
-     * @param bool $reverse
-     *
      * @return array
      */
-    public function checkProvider(string $testName, $reverse = false): array
+    public function checkProvider(): array
     {
-        $anyException = ($reverse ? true : false);
-
         return [
             // Array to check | key | operation | value | reverse action | expected | exception
             /** CHECK_ANY tests */
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, '', $reverse, true, $anyException],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, 'value', $reverse, true, $anyException],
-            [$this->testArray, '', VerifyArray::CHECK_ANY, '', $reverse, false, true],
-            /** CHECK_ENDS_WITH tests */
-            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', $reverse, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, 'ue2', $reverse, false, true],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, '', $reverse, false, true],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'ue2', $reverse, true, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'lue2', $reverse, true, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'value2', $reverse, true, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'xxx', $reverse, false, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), $reverse, false, true],
-            /** CHECK_STARTS_WITH tests */
-            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', $reverse, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', $reverse, false, true],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, '', $reverse, false, true],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'val', $reverse, true, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value', $reverse, true, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value15', $reverse, true, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'xxx', $reverse, false, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), $reverse, false, true],
-            /** CHECK_CONTAINS tests */
-            [$this->testArray, 'test1', VerifyArray::CHECK_CONTAINS, 'test2', $reverse, true, false],
-            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', $reverse, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', $reverse, false, true],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', $reverse, false, true],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'long', $reverse, true, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long', $reverse, true, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long test value', $reverse, true, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'xxx', $reverse, false, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), $reverse, false, true],
-            /** CHECK_EQUALS tests */
-            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', $reverse, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', $reverse, false, true],
-            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, $reverse, true, false],
-            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, '66', $reverse, false, false],
-            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, true, $reverse, false, false],
-            /** CHECK_EMPTY tests */
-            [$this->testArray, '', VerifyArray::CHECK_EMPTY, '', $reverse, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_EMPTY, 'value', $reverse, false, true],
-            [$this->testArray, 'test16.test17', VerifyArray::CHECK_EMPTY, '', $reverse, true, false],
-            [$this->testArray, 'test16.test18', VerifyArray::CHECK_EMPTY, '', $reverse, false, false],
-            /** CHECK_MISSING_KEY tests */
-            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, '', $reverse, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, 'value', $reverse, false, true],
-            /**
-             * Missing key -> key not defined & not in reverse mode -> true
-             * Missing key -> key not defined & in reverse mode -> false
-             * Missing key -> key defined & not in reverse mode -> true
-             * Missing key -> key defined & in reverse mode -> false
-             * The above conditions correspond to !$reverse
-             */
-             [$this->testArray, 'test.notdefined', VerifyArray::CHECK_MISSING_KEY, '', $reverse, !$reverse, false],
-             [$this->testArray, 'test16.test18', VerifyArray::CHECK_MISSING_KEY, '', $reverse, !$reverse, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, '', false, true, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, 'value', false, true, false],
+            [$this->testArray, '', VerifyArray::CHECK_ANY, '', false, false, true],
+            /** CHECK_ENDS_WITH -> in reverse mode -> CHECK_NOT_ENDS_WITH tests */
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, 'ue2', false, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, '', false, false, true /** true because no value is specified */],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'ue2', false, true, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'lue2', false, true, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'value2', false, true, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'xxx', false, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), false, false, true],
+            /** CHECK_STARTS_WITH -> in reverse mode -> CHECK_NOT_STARTS_WITH tests */
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', false, true, true],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, '', false, false, true /** true because no value is specified */],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'val', false, true, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value', false, true, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value15', false, true, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'xxx', false, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), false, false, true],
+            /** CHECK_CONTAINS -> in reverse mode -> CHECK_NOT_CONTAINS tests */
+            [$this->testArray, 'test1', VerifyArray::CHECK_CONTAINS, 'test2', false, true, false],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', false, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', false, false, true /** true because no value is specified */],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'long', false, true, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long', false, true, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long test value', false, true, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'xxx', false, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), false, false, true],
+            /** CHECK_EQUALS -> in reverse mode -> CHECK_NOT_EQUALS tests */
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', false, true, true],
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', false, false, true],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, false, true, false],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, '66', false, true, false],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, true, false, false, false],
+            /** CHECK_EMPTY -> in reverse mode -> CHECK_NOT_EMPTY tests */
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, '', false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, 'value', false, false, true],
+            [$this->testArray, 'test16.test17', VerifyArray::CHECK_EMPTY, '', false, true, false],
+            [$this->testArray, 'test16.test18', VerifyArray::CHECK_EMPTY, '', false, false, false],
+            /** CHECK_MISSING_KEY -> in reverse mode -> CHECK_NOT_MISSING_KEY tests */
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, '', false, true, true],
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, 'value', false, true, true],
+            [$this->testArray, 'test16.test18', VerifyArray::CHECK_MISSING_KEY, '', false, false, false],
+            [$this->testArray, 'test.notdefined', VerifyArray::CHECK_MISSING_KEY, '', false, true, false],
             /** general fail tests */
-            [$this->testArray, 'key1', 'wrong_action', '', $reverse, false, true],
-            [$this->testArray, '', '', '', $reverse, false, true],
-            [$this->testArray, 'key', '', '', $reverse, false, true],
+            [$this->testArray, 'key1', 'wrong_action', '', false, false, true],
+            [$this->testArray, '', '', '', false, false, true],
+            [$this->testArray, 'key', '', '', false, false, true],
         ];
     }
 
     /**
-     * Data provider for reverse check tests.
-     *
-     * @param string $testName
+     * Data provider for check reverse tests.
      *
      * @return array
      */
-    public function reverseCheckProvider(string $testName): array
+    public function checkReverseProvider(): array
     {
-        return $this->checkProvider($testName, true);
+        return [
+            // Array to check | key | operation | value | reverse action | expected | exception
+            /** CHECK_ANY tests */
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, '', true, true, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, 'value', true, true, true],
+            [$this->testArray, '', VerifyArray::CHECK_ANY, '', true, false, true],
+            /** CHECK_ENDS_WITH -> in reverse mode -> CHECK_NOT_ENDS_WITH tests */
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', true, true, true],
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, 'ue2', true, true, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, '', true, true, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'ue2', true, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'lue2', true, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'value2', true, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'xxx', true, true, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), true, true, true],
+            /** CHECK_STARTS_WITH -> in reverse mode -> CHECK_NOT_STARTS_WITH tests */
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', true, true, true],
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', true, false, true],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, '', true, true, true],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'val', true, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value', true, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value15', true, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'xxx', true, true, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), true, true, true],
+            /** CHECK_CONTAINS -> in reverse mode -> CHECK_NOT_CONTAINS tests */
+            [$this->testArray, 'test1', VerifyArray::CHECK_CONTAINS, 'test2', true, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', true, true, true],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', true, true, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', true, true, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'long', true, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long', true, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long test value', true, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'xxx', true, true, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), true, true, true],
+            /** CHECK_EQUALS -> in reverse mode -> CHECK_NOT_EQUALS tests */
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', true, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', true, false, true],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, true, false /*they are equal*/, false],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, '66', true, false /*they are equal*/, false],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, true, true, true, false],
+            /** CHECK_EMPTY -> in reverse mode -> CHECK_NOT_EMPTY tests */
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, '', true, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, 'value', true, false, true],
+            [$this->testArray, 'test16.test17', VerifyArray::CHECK_EMPTY, '', true, false, false],
+            [$this->testArray, 'test16.test18', VerifyArray::CHECK_EMPTY, '', true, true, false],
+            /** CHECK_MISSING_KEY -> in reverse mode -> CHECK_NOT_MISSING_KEY tests */
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, '', true, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, 'value', true, false, true],
+            [$this->testArray, 'test16.test18', VerifyArray::CHECK_MISSING_KEY, '', true, true, false],
+            [$this->testArray, 'test.notdefined', VerifyArray::CHECK_MISSING_KEY, '', true, false, false],
+            /** general fail tests */
+            [$this->testArray, 'key1', 'wrong_action', '', true, false, true],
+            [$this->testArray, '', '', '', true, false, true],
+            [$this->testArray, 'key', '', '', true, false, true],
+        ];
     }
 
     /**
@@ -310,7 +350,7 @@ class VerifyArrayTest extends TestCase
      * Test for VerifyArray::run() function.
      *
      * @dataProvider checkProvider
-     * @dataProvider reverseCheckProvider
+     * @dataProvider checkReverseProvider
      *
      * @param array $array
      * @param string $key
@@ -333,16 +373,10 @@ class VerifyArrayTest extends TestCase
     ): void
     {
         $verifyArray = new VerifyArray($key, $operation, $value, $reverseAction);
-
         if ($expectException) {
             $this->expectException(ActionException::class);
         }
-
-        $checked = $verifyArray->setCheckContent($array)->run();
-        if ($reverseAction) {
-            $checked = !$checked;
-        }
-        $this->assertEquals($expectedResult, $checked);
+        $this->assertEquals($expectedResult, $verifyArray->setCheckContent($array)->run());
     }
 
     /**
