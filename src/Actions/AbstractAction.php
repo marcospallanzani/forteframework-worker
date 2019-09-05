@@ -120,12 +120,7 @@ abstract class AbstractAction implements ValidActionInterface
             if ($exception instanceof ActionException) {
                 throw $exception;
             }
-            $this->throwActionException(
-                new ActionResult($this),
-                "Action not valid: '%s'. Reason: '%s'.",
-                $this,
-                $exception->getMessage()
-            );
+            $this->throwActionException($this, $exception->getMessage());
         }
 
         return $isValid;
@@ -156,27 +151,36 @@ abstract class AbstractAction implements ValidActionInterface
             try {
                 $actionResult = $this->apply($actionResult);
             } catch (\Exception $exception) {
+
                 /**
                  * If the given exception is an instance of ActionException, we have to check
                  * if there are some fatal and/or success-required children failures: if so,
                  * then we throw the parent exception.
                  */
-                $actionHasCriticalFailures = false;
-                $caughtActionResult = new ActionResult($this);
+                $childCriticalError = false;
                 if ($exception instanceof ActionException) {
-                    $actionHasCriticalFailures = $exception->checkForCriticalFailures();
-                    $caughtActionResult = $exception->getActionResult();
+
+                    /**
+                     * We have caught a child-action failure. In this case, we add the caught
+                     * child-action exception to the list of failed children actions of the
+                     * current action failure object.
+                     */
+                    $actionFailure = $this->getActionException(
+                        $this, "Action failure caused by one failed child action."
+                    );
+                    $actionFailure->addChildFailure($exception);
+
+                    // We detected a child failure: in this case we check if it's critical: if yes,
+                    // it should trigger the exception for the parent action as well
+                    $childCriticalError = $exception->hasCriticalFailures();
+
+                } else {
+                    $actionFailure = $this->getActionException($this, $exception->getMessage());
                 }
 
-                $actionFailure = $this->getActionException(
-                    $caughtActionResult, "Action failed: '%s'. Reason: '%s'.", $this, $exception->getMessage()
-                );
-//TODO WE NEED TO HANDLE THE FAILED CHILDREN ACTIONS
-//                if ($caughtActionResult) {
-//                    $actionFailure->addFailedChildAction($caughtActionResult);
-//                }
-
-                if ($actionHasCriticalFailures || $this->isFatal || $this->isSuccessRequired) {
+                // If we caught a critical ActionException thrown by a child process
+                // OR the current action is critical, then we throw the exception
+                if ($childCriticalError || $this->isFatal || $this->isSuccessRequired) {
                     throw $actionFailure;
                 } else {
                     $actionResult->addActionFailure($actionFailure);
@@ -187,7 +191,8 @@ abstract class AbstractAction implements ValidActionInterface
             // in case this action is flagged as 'success required', we need to throw an exception
             if (!$this->validateResult($actionResult) && $this->isSuccessRequired) {
                 $this->throwActionException(
-                    $actionResult, "The following required action returned a negative result: '%s'.", $this
+                    $actionResult->getAction(),
+                    "Positive result expected (action marked as 'success-required')."
                 );
             }
 
@@ -294,6 +299,8 @@ abstract class AbstractAction implements ValidActionInterface
     protected function runBeforeActions(ActionResult &$actionResult): void
     {
         foreach ($this->beforeActions as $action) {
+            // We initialize the result object for the current pre-run action
+            $preActionResult = new ActionResult($action);
             try {
                 if ($action instanceof AbstractAction) {
                     // We run the pre-run action
@@ -309,15 +316,18 @@ abstract class AbstractAction implements ValidActionInterface
                     }
                 }
             } catch (ActionException $actionException) {
-                // We handle the caught ActionException for the just-run pre-run failed action
-                $this->handleActionException($actionResult, $actionException, "A pre-run action");
+                // We handle the child ActionException (check if critical  and add it
+                // to the list of action failures)
+                $this->handleChildActionException(
+                    $preActionResult,
+                    $actionResult,
+                    $actionException,
+                    "Action failure caused by a critical pre-run failed action."
+                );
 
-                /**
-                 * If no exception thrown at the previous line, it means that the just-run
-                 * pre-run action is NOT FATAL. In this case, we mark the just-run action
-                 * as failed and continue the execution of the foreach loop.
-                 */
-                $actionResult->addFailedPreRunActionResult($actionException->getActionResult());
+                // If no exception is thrown, we add the pre-run result object
+                // to the list of failed pre-run action results
+                $actionResult->addFailedPreRunActionResult($preActionResult);
             }
         }
     }
@@ -332,6 +342,8 @@ abstract class AbstractAction implements ValidActionInterface
     protected function runAfterActions(ActionResult &$actionResult): void
     {
         foreach ($this->afterActions as $action) {
+            // We initialize the result object for the current pre-run action
+            $postActionResult = new ActionResult($action);
             try {
                 if ($action instanceof AbstractAction) {
                     // We run the post-run action
@@ -347,49 +359,50 @@ abstract class AbstractAction implements ValidActionInterface
                     }
                 }
             } catch (ActionException $actionException) {
-                // We handle the caught ActionException for the just-run post-run failed action
-                $this->handleActionException($actionResult, $actionException, "A post-run action");
+                // We handle the child ActionException (check if critical and add it
+                // to the list of action failures)
+                $this->handleChildActionException(
+                    $postActionResult,
+                    $actionResult,
+                    $actionException,
+                    "Action failure caused by a critical post-run failed action."
+                );
 
-                /**
-                 * If no exception thrown at the previous line, it means that the just-run
-                 * post-run action is NOT FATAL. In this case, we mark the just-run action
-                 * as failed and continue the execution of the foreach loop.
-                 */
-                $actionResult->addFailedPostRunActionResult($actionException->getActionResult());
+                // If no exception is thrown, we add the post-run result object
+                // to the list of failed post-run action results
+                $actionResult->addFailedPreRunActionResult($postActionResult);
             }
         }
     }
 
     /**
-     * Handle the given ActionException instance for the given AbstractAction subclass
-     * instance. It also handles the "isFatal" and "isSuccessRequired" for the given
-     * AbstractAction subclass instance.
+     * Handle the given child ActionException instance. It also handles the "isFatal"
+     * and "isSuccessRequired" of the child AbstractAction subclass instance.
      *
-     * @param ActionResult $actionResult The AbstractAction subclass instance to handle.
-     * @param ActionException $actionException The ActionException instance to handle.
-     * @param string $actionDescription A prefix error description that will be
-     * appended at the beginning of the error message, which describes the given
-     * AbstractAction subclass instance.
+     * @param ActionResult $childActionResult
+     * @param ActionResult $parentActionResult
+     * @param ActionException $childActionException
+     * @param string $parentActionFailureMessage
      *
      * @throws ActionException
      */
-    protected function handleActionException(
-        ActionResult $actionResult,
-        ActionException $actionException,
-        string $actionDescription = ""
+    protected function handleChildActionException(
+        ActionResult &$childActionResult,
+        ActionResult &$parentActionResult,
+        ActionException $childActionException,
+        string $parentActionFailureMessage
     ): void
     {
-        // We set the caught error as a failure of the given just-run action
-        $actionResult->addActionFailure($actionException);
+        // We set the caught error as a failure of the given child action result
+        $childActionResult->addActionFailure($childActionException);
 
         // If FATAL action failed, we throw the error
         // so the action can be interrupted
-        if ($actionResult->getAction()->isFatal() || $actionResult->getAction()->isSuccessRequired()) {
+        if ($childActionResult->getAction()->isFatal() || $childActionResult->getAction()->isSuccessRequired()) {
             $this->throwActionExceptionWithChildren(
-                $actionResult,
-                [$actionException->getActionResult()],
-                (!empty($actionDescription) ? $actionDescription : "An action") . " failed with error '%s'.",
-                $actionException->getMessage()
+                $parentActionResult->getAction(),
+                [$childActionException],
+                $parentActionFailureMessage
             );
         }
     }
