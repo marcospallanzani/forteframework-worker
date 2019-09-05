@@ -72,6 +72,7 @@ class FileHasValidEntries extends FileExists
      */
     public function hasKey(string $key, bool $isFatal = false, bool $isSuccessRequired = false): self
     {
+//TODO REFACTOR AND ADD NEW PARAMETERS TO THE OTHER ACTIONS AS WELL
         $verifyArray = new VerifyArray($key, VerifyArray::CHECK_ANY);
         $verifyArray->setIsFatal($isFatal);
         $verifyArray->setIsSuccessRequired($isSuccessRequired);
@@ -90,6 +91,7 @@ class FileHasValidEntries extends FileExists
      */
     public function doesNotHaveKey(string $key): self
     {
+//TODO ADD NEW PARAMETERS isFatal AND isSuccessRequired
         $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_MISSING_KEY);
 
         return $this;
@@ -105,6 +107,7 @@ class FileHasValidEntries extends FileExists
      */
     public function hasKeyWithEmptyValue(string $key): self
     {
+//TODO ADD NEW PARAMETERS isFatal AND isSuccessRequired
         $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_EMPTY);
 
         return $this;
@@ -120,6 +123,7 @@ class FileHasValidEntries extends FileExists
      */
     public function hasKeyWithNonEmptyValue(string $key): self
     {
+//TODO ADD NEW PARAMETERS isFatal AND isSuccessRequired
         $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_EMPTY, null, true);
 
         return $this;
@@ -144,6 +148,7 @@ class FileHasValidEntries extends FileExists
         string $action = VerifyArray::CHECK_CONTAINS
     ): self
     {
+//TODO ADD NEW PARAMETERS isFatal AND isSuccessRequired
         $this->checks[] = new VerifyArray($key, $action, $value);
 
         return $this;
@@ -227,7 +232,7 @@ class FileHasValidEntries extends FileExists
         // We check if the specified file exists
         $this->fileExists($this->filePath);
 
-        $failed = array();
+        $failedNestedActions = array();
 
         // We read the file and we convert it to an array, when possible.
         $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
@@ -240,39 +245,48 @@ class FileHasValidEntries extends FileExists
 
         // We check all configured conditions for the configured file
         foreach ($this->checks as $check) {
+            // We create the action result object for the current check
+            $checkResult = new ActionResult($check);
             try {
                 /** @var VerifyArray $check */
                 $checkResult = $check->setCheckContent($parsedContent)->run();
-                if (!$checkResult->isSuccessfulRun() || !$action->validateResult($checkResult)) {
-                    $failed[] = $checkResult;
+                if (!$check->validateResult($checkResult)) {
+                    $failedNestedActions[] = $checkResult;
                 }
             } catch (ActionException $actionException) {
-                // We handle the caught ActionException for the just-run failed check
-                $this->handleActionException($actionException->getActionResult(), $actionException);
+                // We handle the caught ActionException for the just-run failed check: if critical,
+                // we throw it again so that it can be caught and handled in the run method
+                if ($check->isFatal() || $check->isSuccessRequired()) {
+                    throw $actionException;
+                }
 
                 /**
                  * If we get to this point, it means that the just-checked failed
                  * check is NOT FATAL; in this case, we add to the list of failed
                  * checks and we continue the execution of the current foreach loop.
                  */
-//TODO WHAT SHOULD WE DO HERE? SHOULD WE USE $actionException->getActionResult?
-                $failed[] = $check;
+                $checkResult->addActionFailure($actionException);
+                $failedNestedActions[] = $checkResult;
             }
         }
 
         $globalResult = true;
 
-        if ($failed) {
+        if ($failedNestedActions) {
+
             // We generate a failure instance to handle the fatal/success-required cases
-            $actionException = $this->getActionException(
-                $actionResult, "Action failed: '%s'. Reason: 'one or more nested checks failed'.", $this
-            );
-            $actionException->setFailedChildrenActionResults($failed);
+            $actionException = $this->getActionException($actionResult->getAction(), "One or more sub-checks failed.");
+            foreach ($failedNestedActions as $failedNestedAction) {
+                foreach ($failedNestedAction->getActionFailures() as $failure) {
+                    $actionException->addChildFailure($failure);
+                }
+            }
 
             // If fatal or success-required, we throw the exception
             if ($this->isFatal() || $this->isSuccessRequired()) {
                 throw $actionException;
             }
+
             // If not fatal, we add the current failure to the list of failures for this action
             $actionResult->addActionFailure($actionException);
 
