@@ -3,6 +3,7 @@
 namespace Forte\Worker\Exceptions;
 
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\ActionResult;
 
 /**
  * Class ActionException.
@@ -12,46 +13,90 @@ use Forte\Worker\Actions\AbstractAction;
 class ActionException extends WorkerException
 {
     /**
-     * @var AbstractAction
+     * @var ActionResult
      */
-    protected $action;
+    protected $actionResult;
 
     /**
-     * An array of AbstractAction instances that are linked to the
-     * main AbstractAction instance, as a pre- or post-run action.
+     * A list of ActionResult instances that are linked to the main ActionResult
+     * instance, as the result of a pre-, post-run or nested action.
      *
      * @var array
      */
-    protected $actionDependencies = [];
-//TODO SHOULD WE SAVE THE CHILDREN EXCEPTION? SO THAT WE WOULD HAVE A REFERENCE TO THE ACTION AND THE ERROR THAT THIS CHILD ACTION RAISED
+    protected $failedChildrenActionResults = [];
 
     /**
      * ActionException constructor.
      *
-     * @param AbstractAction $action The AbstractAction subclass
-     * instance that generated the error.
+     * @param AbstractAction $actionResult The ActionResult instance that represents the
+     * run status of the AbstractAction subclass instance that generated the error.
      * @param string $message The exception message.
      * @param int $code The exception code.
      * @param \Throwable|null $previous The previous error.
      */
     public function __construct(
-        AbstractAction $action,
+        ActionResult $actionResult,
         string $message = "",
         int $code = 0,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);
-        $this->action = $action;
+        $this->actionResult = $actionResult;
     }
 
     /**
      * Returns the AbstractAction subclass instance
      * that generated this error.
      *
-     * @return AbstractAction
+     * @return ActionResult
      */
-    public function getAction(): AbstractAction
+    public function getActionResult(): ActionResult
     {
-        return $this->action;
+        return $this->actionResult;
+    }
+
+    /**
+     * Return the list of failed children actions (i.e. pre- and
+     * post-run actions of the current failed action).
+     *
+     * @return array List of failed children actions.
+     */
+    public function getFailedChildrenActionResults(): array
+    {
+        return $this->failedChildrenActionResults;
+    }
+
+    /**
+     * Set the list of failed children actions (i.e. pre- and
+     * post-run actions of the current failed action).
+     *
+     * @param array $failedChildrenActionResults List of failed children actions to be set.
+     */
+    public function setFailedChildrenActionResults(array $failedChildrenActionResults): void
+    {
+        $this->failedChildrenActionResults = $failedChildrenActionResults;
+    }
+
+    /**
+     * Add the given ActionResult instance to the list of failed children action
+     * results (i.e. pre-, post- or nested-run actions).
+     *
+     * @param ActionResult $actionResult
+     */
+    public function addFailedChildAction(ActionResult $actionResult): void
+    {
+        $this->failedChildrenActionResults[] = $actionResult;
+    }
+
+    /**
+     * Check if some critical failures were found in the failures tree of the ActionResult
+     * instance, associated to this ActionException.
+     *
+     * @return bool True if some critical failures were found in the failures tree of the
+     * ActionResult instance, associated to this ActionException.
+     */
+    public function checkForCriticalFailures(): bool
+    {
+        return $this->actionResult->hasCriticalFailures();
     }
 }

@@ -3,7 +3,7 @@
 namespace Forte\Worker\Actions\Checks\Arrays;
 
 use Forte\Worker\Actions\AbstractAction;
-use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\MissingKeyException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\FileParser;
@@ -135,55 +135,116 @@ class VerifyArray extends AbstractAction
     }
 
     /**
-     * Validate the current VerifyArray instance. It returns true if this VerifyArray
-     * instance is well configured and respects the following rules:
-     * - the field key must be specified and not empty;
-     * - the field action must be specified and not empty;
-     * - if an empty value is specified (e.g. null, ""), the valid actions are
-     *   'check_equals', 'check_empty' or 'check_any';
+     * Return a list of all available actions.
+     *
+     * @return array
+     */
+    public function getSupportedActions(): array
+    {
+        return self::getClassConstants('CHECK_');
+    }
+
+    /**
+     * Return a human-readable string representation of this
+     * VerifyArray instance.
+     *
+     * @return string A human-readable string representation
+     * of this VerifyArray instance.
+     */
+    public function stringify(): string
+    {
+        $baseMessage = "Check if key '" . $this->key . "' is set";
+        $reverseAction = $this->getReverseActionTag();
+        switch($this->action) {
+            case self::CHECK_ANY:
+                return $baseMessage . " and has any value";
+            case self::CHECK_CONTAINS:
+                return $baseMessage . " and $reverseAction value '" . $this->stringifyValue() . "'";
+            case self::CHECK_ENDS_WITH:
+            case self::CHECK_STARTS_WITH:
+                return $baseMessage . " and $reverseAction with value '" . $this->stringifyValue() . "'";
+            case self::CHECK_EQUALS:
+                return $baseMessage . " and $reverseAction equal to value '" . $this->stringifyValue() . "'";
+            case self::CHECK_EMPTY:
+                return $baseMessage . " and $reverseAction empty (empty string or null)";
+            case self::CHECK_MISSING_KEY:
+                return "Check if key '" . $this->key . "' $reverseAction set";
+            default:
+                return $baseMessage;
+        }
+    }
+
+    /**
+     * Validate the current action result. This method returns true if the
+     * last execution of the apply() method executed correctly (i.e. the
+     * configured check condition was matched); false otherwise.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of this VerifyArray instance.
+     *
+     * @return bool True if the last execution of the apply() method
+     * executed correctly (i.e. the configured check condition was
+     * matched); false otherwise.
+     */
+    public function validateResult(ActionResult $actionResult): bool
+    {
+        return (bool) $actionResult->getResult();
+    }
+
+    /**
+     * Returns a string representation of this VerifyArray instance.
+     *
+     * @return false|string
+     */
+    public function __toString()
+    {
+        return $this->stringify();
+    }
+
+    /**
+     * Validate this VerifyArray instance using its specific validation logic.
+     * It returns true if this VerifyArray instance respects the following rules:
+     * - the field 'key' must be specified and not empty;
+     * - the field 'action' must be specified and not empty;
+     * - if an empty 'action' value is specified (e.g. null, ""), the valid actions
+     *   are 'check_equals', 'check_empty' or 'check_any';
      *
      * The check `check_any` with an empty value can be used to check if a key is set.
      * The check `check_empty` with an empty value can be used to check if a key is set
      * and its value is empty or null.
      *
-     * @return bool Returns true, if this check parameters are correctly
-     * configured and consistent; false otherwise.
+     * @return bool True if no validation breaches were found; false otherwise.
      *
-     * @throws ActionException This VerifyArray instance is not valid
-     * (i.e. not well configured).
+     * @throws \Exception If validation breaches were found.
      */
-    public function isValid(): bool
+    protected function validateInstance(): bool
     {
         // Validate the key
         if (empty($this->key)) {
-            $this->throwActionException($this, "You need to specify the 'key' for check: '%s'.", $this);
+            $this->throwWorkerException("You must specify the key to verify.");
         }
 
         // Validate the action.
         $action = $this->getAction();
         if (empty($this->action)) {
-            $this->throwActionException($this, "You need to specify the 'action' for check: '%s'.", $this);
+            $this->throwWorkerException("You must specify the action type.");
         }
 
         // If no action is specified OR an unsupported action is given, then we throw an error.
         $checkActionsConstants = $this->getSupportedActions();
         if (!in_array($action, $checkActionsConstants)) {
-            $this->throwActionException(
-                $this,
-                "The check '%s' is not supported. Impacted check is: '%s'. Supported checks are: '%s'",
+            $this->throwWorkerException(
+                "Action type %s not supported. Supported checks are [%s].",
                 $action,
-                $this,
-                implode(',', $checkActionsConstants)
+                implode(', ', $checkActionsConstants)
             );
         }
 
         if ($this->reverseAction && $action === self::CHECK_ANY) {
-            $this->throwActionException(
-                $this,
-                "The check '%s' is not supported in the reverse mode. Use '%s' instead. Impacted check is: '%s'.",
+            $this->throwWorkerException(
+                "Action type %s not supported in the reverse mode. Use %s instead.",
                 $action,
-                self::CHECK_EQUALS,
-                $this
+                self::CHECK_EQUALS
             );
         }
 
@@ -193,12 +254,10 @@ class VerifyArray extends AbstractAction
             // is 'check_equals', 'check_empty', 'check_non_empty' or 'check_any'.
             $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY, self::CHECK_MISSING_KEY];
             if (!in_array($action, $acceptsEmptyValue)) {
-                $this->throwActionException(
-                    $this,
-                    "The action '%s' is not supported for empty values. Impacted check is: '%s'. " .
-                    "Supported actions for empty values are: '%s'",
+                $this->throwWorkerException(
+                    "Action type %s not supported for empty values. " .
+                    "Supported actions for empty values are [%s]",
                     $action,
-                    $this,
                     implode(', ', $acceptsEmptyValue)
                 );
             }
@@ -208,16 +267,18 @@ class VerifyArray extends AbstractAction
     }
 
     /**
-     * Run the check. Check if the configured key has a value, in the previously
-     * set "check-content", that respects the configured check action.
+     * Run the check. Check if the configured key has a value, in the previously set
+     * "check-content", that respects the configured check action.
      *
-     * @return bool True if this AbstractAction subclass instance
-     * ran successfully; false otherwise.
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
      *
-     * @throws ActionException If this AbstractAction subclass instance
-     * check did not run successfully.
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     * @throws \Exception
      */
-    protected function apply(): bool
+    protected function apply(ActionResult $actionResult): ActionResult
     {
         $matched = false;
 
@@ -266,76 +327,19 @@ class VerifyArray extends AbstractAction
                     $matched = ($this->reverseAction ? true : false);
                     break;
                 default:
-                    $this->throwActionException(
-                        $this,
-                        "It was not possible to verify the configured check condition. Impacted check is: '%s'",
-                        $this
-                    );
+                    $this->throwWorkerException("Action type %s not supported.", $this->action);
             }
         } catch (MissingKeyException $missingKeyException) {
             if ($this->action === self::CHECK_MISSING_KEY) {
                 $matched = ($this->reverseAction ? false : true);
             } else {
-                $this->throwActionException(
-                    $this,
-                    "It was not possible to verify the given check condition. Error message is: '%s'. Impacted check is: '%s'",
-                    $missingKeyException->getMessage(),
-                    $this
-                );
+                // We throw an WorkerException that will be handled
+                // in the run method (fatal and success-required)
+                $this->throwWorkerException($missingKeyException->getMessage());
             }
         }
 
-        return $matched;
-    }
-
-    /**
-     * Return a list of all available actions.
-     *
-     * @return array
-     */
-    public function getSupportedActions(): array
-    {
-        return self::getClassConstants('CHECK_');
-    }
-
-    /**
-     * Return a human-readable string representation of this
-     * VerifyArray instance.
-     *
-     * @return string A human-readable string representation
-     * of this VerifyArray instance.
-     */
-    public function stringify(): string
-    {
-        $baseMessage = "Check if key '" . $this->key . "' is set";
-        $reverseAction = $this->getReverseActionTag();
-        switch($this->action) {
-            case self::CHECK_ANY:
-                return $baseMessage . " and has any value";
-            case self::CHECK_CONTAINS:
-                return $baseMessage . " and $reverseAction value '" . $this->stringifyValue() . "'";
-            case self::CHECK_ENDS_WITH:
-            case self::CHECK_STARTS_WITH:
-                return $baseMessage . " and $reverseAction with value '" . $this->stringifyValue() . "'";
-            case self::CHECK_EQUALS:
-                return $baseMessage . " and $reverseAction equal to value '" . $this->stringifyValue() . "'";
-            case self::CHECK_EMPTY:
-                return $baseMessage . " and $reverseAction empty (empty string or null)";
-            case self::CHECK_MISSING_KEY:
-                return "Check if key '" . $this->key . "' $reverseAction set";
-            default:
-                return $baseMessage;
-        }
-    }
-
-    /**
-     * Returns a string representation of this VerifyArray instance.
-     *
-     * @return false|string
-     */
-    public function __toString()
-    {
-        return $this->stringify();
+        return $actionResult->setResult($matched);
     }
 
     /**
@@ -388,7 +392,7 @@ class VerifyArray extends AbstractAction
      *
      * @return bool
      *
-     * @throws ActionException
+     * @throws \Exception
      */
     protected function contains($searchValue): bool
     {
@@ -400,12 +404,9 @@ class VerifyArray extends AbstractAction
         } elseif (is_array($searchValue)) {
             return array_key_exists($this->value, $searchValue);
         }
-
-        $this->throwActionException(
+        $this->throwWorkerException(
             $this,
-            "It was not possible to verify if the value for key '%s' contains the configured value. ".
-            "The check '%s' supports only strings and arrays for both the configured and expected values.",
-            $this->key,
+            "Check %s supports only strings and arrays for both the configured and expected values.",
             self::CHECK_CONTAINS
         );
     }
@@ -417,18 +418,15 @@ class VerifyArray extends AbstractAction
      *
      * @return bool
      *
-     * @throws ActionException
+     * @throws \Exception
      */
     protected function endsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
             return StringParser::endsWith($value, $this->value);
         }
-        $this->throwActionException(
-            $this,
-            "It was not possible to verify if the value for key '%s' ends with the configured value. ".
-            "The check '%s' supports only strings for both the configured and expected values.",
-            $this->key,
+        $this->throwWorkerException(
+            "Check %s supports only strings for both the configured and expected values.",
             self::CHECK_ENDS_WITH
         );
     }
@@ -440,18 +438,15 @@ class VerifyArray extends AbstractAction
      *
      * @return bool
      *
-     * @throws ActionException
+     * @throws \Exception
      */
     protected function startsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
             return StringParser::startsWith($value, $this->value);
         }
-        $this->throwActionException(
-            $this,
-            "It was not possible to verify if the value for key '%s' starts with the configured value. ".
-            "The check '%s' supports only strings for both the configured and expected values.",
-            $this->key,
+        $this->throwWorkerException(
+            "Check %s supports only strings for both the configured and expected values.",
             self::CHECK_STARTS_WITH
         );
     }

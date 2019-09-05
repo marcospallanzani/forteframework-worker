@@ -319,8 +319,10 @@ class ModifyFile extends AbstractAction
             $line = fgets($fileHandler);
             foreach ($this->actions as $key => $action) {
                 // We first check if the condition is met
+                /** @var VerifyString $condition */
                 $condition = $action['condition'];
-                if ($condition instanceof VerifyString && $condition->setContent(trim($line, PHP_EOL))->run()) {
+                $actionResult = $condition->setContent(trim($line, PHP_EOL))->run();
+                if ($condition instanceof VerifyString && $actionResult->isSuccessfulRun()) {
                     // We have to apply the configured change
                     switch ($action['action']) {
                         case self::MODIFY_FILE_APPEND_TO_LINE:

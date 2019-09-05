@@ -130,7 +130,8 @@ class ChangeFileEntries extends AbstractAction
             foreach ($this->modifications as $modification) {
                 try {
                     /** @var ModifyArray $modification */
-                    $modification->setModifyContent($parsedContent)->run();
+                    $actionResult = $modification->setModifyContent($parsedContent)->run();
+//TODO WE SHOULD GET THE MODIFED CONTENT FROM THE RESULT OBJECT
                     $parsedContent = $modification->getModifiedContent();
                 } catch (WorkerException $e) {
                     $failed[] = sprintf("Modification failed: %s. Reason is: %s", $modification, $e->getMessage());

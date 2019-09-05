@@ -12,7 +12,7 @@
 namespace Forte\Worker\Actions\Checks\Files;
 
 use Forte\Worker\Actions\AbstractAction;
-use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Actions\ActionResult;
 
 /**
  * Class FileExists.
@@ -34,38 +34,6 @@ class FileExists extends AbstractAction
     public function __construct(string $filePath = "")
     {
         $this->filePath = $filePath;
-    }
-
-    /**
-     * Whether this instance is in a valid state or not.
-     *
-     * @return bool True if this FileExists instance
-     * was well configured; false otherwise.
-     *
-     * @throws ActionException
-     */
-    public function isValid(): bool
-    {
-        // The file path cannot be empty
-        if (empty($this->filePath)) {
-            $this->throwActionException($this, "You must specify the file path.");
-        }
-
-        return true;
-    }
-
-    /**
-     * Run the check.
-     *
-     * @return bool True if this FileExists instance
-     * check was successful; false otherwise.
-     *
-     * @throws ActionException
-     */
-    protected function apply(): bool
-    {
-        // We check if the origin file exists
-        return $this->checkFileExists($this->filePath, false);
     }
 
     /**
@@ -91,5 +59,59 @@ class FileExists extends AbstractAction
     public function stringify(): string
     {
         return "Check if file '" . $this->filePath . "' exists.";
+    }
+
+    /**
+     * Validate the current action result. This method returns true if the
+     * last execution of the apply() method executed correctly (i.e. file
+     * exists); false otherwise.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of this FileExists instance.
+     *
+     * @return bool True if the last execution of the apply() method
+     * executed correctly (i.e. file exists); false otherwise.
+     */
+    public function validateResult(ActionResult $actionResult): bool
+    {
+        // The ActionResult->result field should be set with a boolean
+        // representing the last execution of the apply method.
+        return (bool) $actionResult->getResult();
+    }
+
+    /**
+     * Validate this FileExists instance using its specific validation logic.
+     * It returns true if this FileExists instance respects the following rules:
+     * - the field 'filePath' must be specified and not empty;
+     *
+     * @return bool True if no validation breaches were found; false otherwise.
+     *
+     * @throws \Exception If validation breaches were found.
+     */
+    protected function validateInstance(): bool
+    {
+        // The file path cannot be empty
+        if (empty($this->filePath)) {
+            $this->throwWorkerException("You must specify the file path.");
+        }
+
+        return true;
+    }
+
+    /**
+     * Run the check.
+     *
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
+     *
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     * @throws \Exception
+     */
+    protected function apply(ActionResult $actionResult): ActionResult
+    {
+        // We check if the origin file exists
+        return $actionResult->setResult($this->fileExists($this->filePath, false));
     }
 }

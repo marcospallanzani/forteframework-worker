@@ -12,7 +12,7 @@
 namespace Forte\Worker\Actions\Checks\Strings;
 
 use Forte\Worker\Actions\AbstractAction;
-use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Helpers\StringParser;
 
 /**
@@ -80,8 +80,11 @@ class VerifyString extends AbstractAction
      * @param string $conditionValue
      * @param string $initialContent
      */
-    public function __construct(string $condition, $conditionValue = "", string $initialContent = "")
-    {
+    public function __construct(
+        string $condition,
+        $conditionValue = "",
+        string $initialContent = ""
+    ) {
         $this->condition      = $condition;
         $this->conditionValue = $conditionValue;
         $this->content        = $initialContent;
@@ -111,99 +114,6 @@ class VerifyString extends AbstractAction
     public function getConditionValue()
     {
         return $this->conditionValue;
-    }
-
-    /**
-     * Run the check.
-     *
-     * @return bool True if this AbstractAction subclass instance
-     * ran successfully; false otherwise.
-     *
-     * @throws ActionException If this AbstractAction subclass instance
-     * check did not run successfully OR the condition is not supported.
-     */
-    protected function apply(): bool
-    {
-        switch ($this->condition) {
-            case self::CONDITION_EQUAL_TO:
-                return ($this->content === $this->conditionValue);
-                break;
-            case self::CONDITION_LESS_THAN:
-                return ($this->content < $this->conditionValue);
-                break;
-            case self::CONDITION_LESS_EQUAL_THAN:
-                return ($this->content <= $this->conditionValue);
-                break;
-            case self::CONDITION_GREATER_THAN:
-                return ($this->content > $this->conditionValue);
-                break;
-            case self::CONDITION_GREATER_EQUAL_THAN:
-                return ($this->content >= $this->conditionValue);
-                break;
-            case self::CONDITION_DIFFERENT_THAN:
-                return ($this->content !== $this->conditionValue);
-                break;
-            case self::CONDITION_CONTAINS:
-                $found = strpos($this->content, $this->conditionValue);
-                return ((!is_bool($found) && strpos($this->content, $this->conditionValue) >= 0) ? true : false);
-                break;
-            case self::CONDITION_STARTS_WITH:
-                return StringParser::startsWith($this->content, $this->conditionValue);
-                break;
-            case self::CONDITION_ENDS_WITH:
-                return StringParser::endsWith($this->content, $this->conditionValue);
-                break;
-            case self::CONDITION_IS_EMPTY:
-                return empty($this->content);
-                break;
-            case self::CONDITION_REGEX:
-                return  (bool) (preg_match($this->conditionValue, $this->content));
-                break;
-            default:
-                $this->throwActionException($this, "Unsupported condition '%s'", $this->condition);
-                return "";
-        }
-    }
-
-    /**
-     * Whether this instance is in a valid state or not.
-     *
-     * @return bool True if the implementing class instance
-     * was well configured; false otherwise.
-     *
-     * @throws ActionException If the implementing class
-     * instance was not well configured.
-     */
-    public function isValid(): bool
-    {
-        // If no action is specified OR an unsupported action is given, then we throw an error.
-        $supportedConditions = $this->getSupportedConditions();
-        if (!in_array($this->condition, $supportedConditions)) {
-            $this->throwActionException(
-                $this,
-                "The condition '%s' is not supported. Impacted check is: '%s'. Supported conditions are: '%s'",
-                $this->condition,
-                $this,
-                implode(',', $supportedConditions)
-            );
-        }
-
-        /**
-         * If condition is not CONDITION_IS_EMPTY, then we need to specify a condition
-         * value. It makes no sense to perform a check condition "equal_to" without a
-         * condition value (e.g. check if XXX is equal to YYY).
-         */
-        if ($this->condition !== self::CONDITION_IS_EMPTY && empty($this->conditionValue)) {
-            $this->throwActionException(
-                $this,
-                "The condition '%s' requires a condition value. " .
-                "Condition value can be empty only for condition '%s'.",
-                $this->condition,
-                self::CONDITION_IS_EMPTY
-            );
-        }
-
-        return true;
     }
 
     /**
@@ -265,6 +175,25 @@ class VerifyString extends AbstractAction
     }
 
     /**
+     * Validate the current action result. This method returns true if the last
+     * execution of the apply() method executed correctly (i.e. the configured
+     * check condition on the given string was met); false otherwise.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of this VerifyString instance.
+     *
+     * @return bool True if the last execution of the apply() method executed
+     * correctly (i.e. the configured check condition on the given string was
+     * met); false otherwise.
+     */
+    public function validateResult(ActionResult $actionResult): bool
+    {
+        // The ActionResult->result field should be set with a boolean
+        // representing the last execution of the apply method.
+        return (bool) $actionResult->getResult();
+    }
+
+    /**
      * Return an associative array of all available conditions. Possible values
      * are class constants, that begin by "CONDITION_".
      *
@@ -273,5 +202,98 @@ class VerifyString extends AbstractAction
     public function getSupportedConditions(): array
     {
         return self::getClassConstants('CONDITION_');
+    }
+
+    /**
+     * Run the check.
+     *
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
+     *
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     * @throws \Exception
+     */
+    protected function apply(ActionResult $actionResult): ActionResult
+    {
+        switch ($this->condition) {
+            case self::CONDITION_EQUAL_TO:
+                return $actionResult->setResult($this->content === $this->conditionValue);
+                break;
+            case self::CONDITION_LESS_THAN:
+                return $actionResult->setResult($this->content < $this->conditionValue);
+                break;
+            case self::CONDITION_LESS_EQUAL_THAN:
+                return $actionResult->setResult($this->content <= $this->conditionValue);
+                break;
+            case self::CONDITION_GREATER_THAN:
+                return $actionResult->setResult($this->content > $this->conditionValue);
+                break;
+            case self::CONDITION_GREATER_EQUAL_THAN:
+                return $actionResult->setResult($this->content >= $this->conditionValue);
+                break;
+            case self::CONDITION_DIFFERENT_THAN:
+                return $actionResult->setResult($this->content !== $this->conditionValue);
+                break;
+            case self::CONDITION_CONTAINS:
+                $found = strpos($this->content, $this->conditionValue);
+                $conditionMet = ((!is_bool($found) && strpos($this->content, $this->conditionValue) >= 0) ? true : false);
+                return $actionResult->setResult($conditionMet);
+                break;
+            case self::CONDITION_STARTS_WITH:
+                return $actionResult->setResult(StringParser::startsWith($this->content, $this->conditionValue));
+                break;
+            case self::CONDITION_ENDS_WITH:
+                return $actionResult->setResult(StringParser::endsWith($this->content, $this->conditionValue));
+                break;
+            case self::CONDITION_IS_EMPTY:
+                return $actionResult->setResult(empty($this->content));
+                break;
+            case self::CONDITION_REGEX:
+                return $actionResult->setResult((bool) (preg_match($this->conditionValue, $this->content)));
+                break;
+            default:
+                $this->throwWorkerException("Condition type %s not supported.", $this->condition);
+        }
+        return $actionResult->setResult(false);
+    }
+
+    /**
+     * Whether this instance is in a valid state or not.
+     *
+     * @return bool True if the implementing class instance
+     * was well configured; false otherwise.
+     *
+     * @throws \Exception If the implementing class instance
+     * was not well configured.
+     */
+    protected function validateInstance(): bool
+    {
+        // If no action is specified OR an unsupported action is given, then we throw an error.
+        $supportedConditions = $this->getSupportedConditions();
+        if (!in_array($this->condition, $supportedConditions)) {
+            $this->throwWorkerException(
+                "Condition %s not supported. Supported conditions are [%s]",
+                $this->condition,
+                implode(', ', $supportedConditions)
+            );
+        }
+
+        /**
+         * If condition is not CONDITION_IS_EMPTY, then we need to specify a condition
+         * value. It makes no sense to perform a check condition "equal_to" without a
+         * condition value (e.g. check if XXX is equal to YYY).
+         */
+        if ($this->condition !== self::CONDITION_IS_EMPTY && empty($this->conditionValue)) {
+            $this->throwWorkerException(
+                "Condition %s requires a condition value. " .
+                "Empty value accepted only for condition %s.",
+                $this->condition,
+                self::CONDITION_IS_EMPTY
+            );
+        }
+
+        return true;
     }
 }

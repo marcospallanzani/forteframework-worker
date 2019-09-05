@@ -11,9 +11,9 @@
 
 namespace Forte\Worker\Actions\Checks\Files;
 
+use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\ValidActionInterface;
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Helpers\FileParser;
 
@@ -47,103 +47,6 @@ class FileHasValidEntries extends FileExists
     }
 
     /**
-     * Whether this instance is in a valid state or not.
-     *
-     * @return bool Returns true if this FileHasValidEntries
-     * instance was well configured; false otherwise.
-     *
-     * @throws ActionException
-     */
-    public function isValid(): bool
-    {
-        parent::isValid();
-
-        // Check if the given type is supported
-        $contentTypeConstants = FileParser::getSupportedContentTypes();
-
-        if (!in_array($this->contentType, $contentTypeConstants)) {
-            $this->throwActionException(
-                $this,
-                "The specified content type '%s' is not supported. Supported types are: '%s'",
-                $this->contentType,
-                implode(',', $contentTypeConstants)
-            );
-        }
-
-        // Check if the specified checks are well configured
-        foreach ($this->checks as $check) {
-            try {
-                // We check if the current check parameters are valid; if not valid, an exception will be thrown
-                if ($check instanceof ValidActionInterface) {
-                    $check->isValid();
-                }
-            } catch (WorkerException $workerException) {
-                $this->throwActionException($this, $workerException->getMessage());
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Run the check.
-     *
-     * @return bool Returns true if this FileHasValidEntries
-     * instance check was successful; false otherwise.
-     *
-     * @throws ActionException
-     */
-    protected function apply(): bool
-    {
-        try {
-            // We check if the specified file exists
-            $this->checkFileExists($this->filePath);
-
-            $failed = array();
-
-            if ($this->isValid()) {
-                // We read the file and we convert it to an array, when possible.
-                $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
-                if (!is_array($parsedContent)) {
-                    $this->throwActionException(
-                        $this,
-                        "It was not possible to convert the content of file '%s' to an array.",
-                        $this->filePath
-                    );
-                }
-
-                // We check all configured conditions for the configured file
-                foreach ($this->checks as $check) {
-                    try {
-                        /** @var VerifyArray $check */
-//TODO FATAL ACTION SHOULD GET OUT OF THIS LOOP AND TRIGGER THE SAME REACTION IN PARENT ACTIONS
-                        if (!$check->setCheckContent($parsedContent)->run()) {
-                            $failed[] = sprintf("Check failed: %s.", $check);
-                        }
-                    } catch (WorkerException $e) {
-                        $failed[] = sprintf("Check failed: %s. Reason is: %s", $check, $e->getMessage());
-                    }
-                }
-            }
-
-            if ($failed) {
-//TODO WE SHOULD ADD THE FAILED ARRAY TO THE LIST OF NESTED ERROR MESSAGES IN THE ACTIONEXCEPTION CLASS
-                $this->throwActionException($this, implode(' | ', $failed));
-            }
-
-        } catch (WorkerException $workerException) {
-            $this->throwActionException(
-                $this,
-                "An error occurred while running the action '%s'. Error message is: '%s'.",
-                $this,
-                $workerException->getMessage()
-            );
-        }
-
-        return true;
-    }
-
-    /**
      * Set the file content type. Accepted values are the FileParser
      * class constants with prefix "CONTENT_TYPE".
      *
@@ -167,9 +70,12 @@ class FileHasValidEntries extends FileExists
      *
      * @return FileHasValidEntries
      */
-    public function hasKey(string $key): self
+    public function hasKey(string $key, bool $isFatal = false, bool $isSuccessRequired = false): self
     {
-        $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_ANY);
+        $verifyArray = new VerifyArray($key, VerifyArray::CHECK_ANY);
+        $verifyArray->setIsFatal($isFatal);
+        $verifyArray->setIsSuccessRequired($isSuccessRequired);
+        $this->checks[] = $verifyArray;
 
         return $this;
     }
@@ -258,5 +164,122 @@ class FileHasValidEntries extends FileExists
         }
 
         return $message;
+    }
+
+    /**
+     * Whether this instance is in a valid state or not.
+     *
+     * @return bool Returns true if this FileHasValidEntries
+     * instance was well configured; false otherwise.
+     *
+     * @throws ActionException
+     */
+
+    /**
+     * Validate this FileHasValidEntries instance using its specific validation logic.
+     * It returns true if this FileHasValidEntries instance respects the following rules:
+     * - the field 'filePath' must be specified and not empty;
+     * - the field 'contentType' is not empty and has an accepted value;
+     * - the configured checks are in a valid state too;
+     *
+     * @return bool True if no validation breaches were found; false otherwise.
+     *
+     * @throws \Exception If validation breaches were found.
+     */
+    protected function validateInstance(): bool
+    {
+        parent::validateInstance();
+
+        // Check if the given type is supported
+        $contentTypeConstants = FileParser::getSupportedContentTypes();
+        if (!in_array($this->contentType, $contentTypeConstants)) {
+            $this->throwWorkerException(
+                "Content type %s not supported. Supported types are [%s].",
+                $this->contentType,
+                implode(', ', $contentTypeConstants)
+            );
+        }
+
+        // Check if the specified checks are well configured
+        foreach ($this->checks as $check) {
+            // We check if the current check parameters are valid; if not valid, an exception will be thrown
+            if ($check instanceof ValidActionInterface) {
+                $check->isValid();
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Run the check.
+     *
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
+     *
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     * @throws \Exception
+     */
+    protected function apply(ActionResult $actionResult): ActionResult
+    {
+        // We check if the specified file exists
+        $this->fileExists($this->filePath);
+
+        $failed = array();
+
+        // We read the file and we convert it to an array, when possible.
+        $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
+        if (!is_array($parsedContent)) {
+            $this->throwWorkerException(
+                "File content of '%s' cannot be converted to an array.",
+                $this->filePath
+            );
+        }
+
+        // We check all configured conditions for the configured file
+        foreach ($this->checks as $check) {
+            try {
+                /** @var VerifyArray $check */
+                $checkResult = $check->setCheckContent($parsedContent)->run();
+                if (!$checkResult->isSuccessfulRun() || !$action->validateResult($checkResult)) {
+                    $failed[] = $checkResult;
+                }
+            } catch (ActionException $actionException) {
+                // We handle the caught ActionException for the just-run failed check
+                $this->handleActionException($actionException->getActionResult(), $actionException);
+
+                /**
+                 * If we get to this point, it means that the just-checked failed
+                 * check is NOT FATAL; in this case, we add to the list of failed
+                 * checks and we continue the execution of the current foreach loop.
+                 */
+//TODO WHAT SHOULD WE DO HERE? SHOULD WE USE $actionException->getActionResult?
+                $failed[] = $check;
+            }
+        }
+
+        $globalResult = true;
+
+        if ($failed) {
+            // We generate a failure instance to handle the fatal/success-required cases
+            $actionException = $this->getActionException(
+                $actionResult, "Action failed: '%s'. Reason: 'one or more nested checks failed'.", $this
+            );
+            $actionException->setFailedChildrenActionResults($failed);
+
+            // If fatal or success-required, we throw the exception
+            if ($this->isFatal() || $this->isSuccessRequired()) {
+                throw $actionException;
+            }
+            // If not fatal, we add the current failure to the list of failures for this action
+            $actionResult->addActionFailure($actionException);
+
+            $globalResult = false;
+        }
+
+        // The action executed without failures
+        return $actionResult->setResult($globalResult);
     }
 }

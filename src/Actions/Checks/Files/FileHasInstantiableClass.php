@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Actions\Checks\Files;
 
-use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Actions\ActionResult;
 
 /**
  * Class FileHasInstantiableClass. This class checks if a given file
@@ -74,15 +74,18 @@ class FileHasInstantiableClass extends FileExists
      * then this method will also check if the class found in the file is
      * equal to the one that was given as a parameter.
      *
-     * @return bool Returns true if this FileHasInstantiableClass
-     * instance check was successful; false otherwise.
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
      *
-     * @throws ActionException
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     * @throws \Exception
      */
-    protected function apply(): bool
+    protected function apply(ActionResult $actionResult): ActionResult
     {
         // We check if the specified file exists
-        $this->checkFileExists($this->filePath);
+        $this->fileExists($this->filePath);
 
         // Check to see whether the include declared the class
         $tokens = token_get_all(file_get_contents($this->filePath));
@@ -122,10 +125,10 @@ class FileHasInstantiableClass extends FileExists
                 }
             }
             if ($openTagFound && $classNameFound) {
-                return true;
+                return $actionResult->setResult(true);
             }
         }
 
-        return false;
+        return $actionResult->setResult(false);
     }
 }

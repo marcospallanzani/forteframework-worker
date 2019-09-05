@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Actions\Checks\Files;
 
-use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Actions\ActionResult;
 
 /**
  * Class FileDoesNotExist.
@@ -23,15 +23,18 @@ class FileDoesNotExist extends FileExists
     /**
      * Run the check.
      *
-     * @return bool True if this FileDoesNotExist instance
-     * check was successful; false otherwise.
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
      *
-     * @throws ActionException
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     * @throws \Exception
      */
-    protected function apply(): bool
+    protected function apply(ActionResult $actionResult): ActionResult
     {
-        // We check if the given file does not exist
-        return !$this->checkFileExists($this->filePath, false);
+        // We check if the origin file exists
+        return $actionResult->setResult(!$this->fileExists($this->filePath, false));
     }
 
     /**
