@@ -183,7 +183,6 @@ class CopyFile extends AbstractAction
         return true;
     }
 
-
     /**
      * Apply the sub-class transformation action.
      *
