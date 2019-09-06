@@ -162,7 +162,7 @@ class FileHasValidEntries extends FileExists
      */
     public function stringify(): string
     {
-        $message = "Run the following checks in file '" . $this->filePath . "': ";
+        $message = "Run the following checks in file '" . $this->filePath . "':";
         foreach ($this->checks as $key => $check) {
             $message .= " $key. " . (string) $check;
         }
