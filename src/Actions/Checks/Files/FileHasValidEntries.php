@@ -206,11 +206,23 @@ class FileHasValidEntries extends FileExists
         }
 
         // Check if the specified checks are well configured
+        $wrongChecks = array();
         foreach ($this->checks as $check) {
-            // We check if the current check parameters are valid; if not valid, an exception will be thrown
-            if ($check instanceof ValidActionInterface) {
+            // We validate all the nested checks
+            try {
                 $check->isValid();
+            } catch (ActionException $actionException) {
+                $wrongChecks[] = $actionException;
             }
+        }
+
+        // We check if some nested checks are not valid: if so, we throw an exception
+        if ($wrongChecks) {
+            $this->throwActionExceptionWithChildren(
+                $this,
+                [$wrongChecks],
+                "One or more nested checks are not valid."
+            );
         }
 
         return true;
