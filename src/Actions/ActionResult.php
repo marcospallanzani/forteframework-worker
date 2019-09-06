@@ -277,7 +277,11 @@ class ActionResult
         $array['execution_status'] = $this->getStatus();
 
         // The result
-        $array['result'] = StringParser::stringifyResult($this->result);
+        if ($this->result instanceof AbstractAction) {
+            $array['result'] = $this->result->toArray();
+        } else {
+            $array['result'] = $this->result;
+        }
 
         // The main action failures
         $array['main_action_failures'] = [];
