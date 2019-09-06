@@ -128,7 +128,7 @@ class ModifyFileTest extends TestCase
     }
 
     /**
-     * Test for method ModifyFile::apply().
+     * Test for method ModifyFile::run().
      *
      * @dataProvider applyProvider
      *
@@ -140,7 +140,7 @@ class ModifyFileTest extends TestCase
      *
      * @throws ActionException
      */
-    public function testApply(
+    public function testRun(
         ModifyFile $modifyFile,
         bool $expected,
         bool $expectedException,
@@ -151,7 +151,7 @@ class ModifyFileTest extends TestCase
         if ($expectedException) {
             $this->expectException(ActionException::class);
         }
-        $this->assertEquals($expected, $modifyFile->run());
+        $this->assertEquals($expected, $modifyFile->run()->getResult());
         $this->assertTrue($this->checkFileContent(self::TEST_FILE_MODIFY, $expectedContent));
     }
 

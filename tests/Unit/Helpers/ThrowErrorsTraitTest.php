@@ -12,6 +12,7 @@
 namespace Tests\Unit\Helpers;
 
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
@@ -36,9 +37,10 @@ class ThrowErrorsTraitTest extends TestCase
     {
         return new class extends AbstractAction {
             use ThrowErrorsTrait;
-            public function isValid(): bool { return true; }
-            protected function apply(): bool { return true; }
+            protected function validateInstance(): bool { return true; }
+            protected function apply(ActionResult $actionResult): ActionResult { return $actionResult; }
             public function stringify(): string { return ThrowErrorsTraitTest::ACTION_TEST_MESSAGE; }
+            public function validateResult(ActionResult $actionResult): bool { return true; }
         };
     }
 
@@ -65,5 +67,56 @@ class ThrowErrorsTraitTest extends TestCase
             self::BASE_TEST_MESSAGE,
             self::ACTION_TEST_MESSAGE
         );
+    }
+
+    /**
+     * Test ThrowErrorsTrait::getActionException() method.
+     */
+    public function testGetActionException(): void
+    {
+        $anonymousActionClass = $this->getAnonymousActionClass();
+        $actionException = $anonymousActionClass->getActionException(
+            $anonymousActionClass,
+            self::BASE_TEST_MESSAGE,
+            self::ACTION_TEST_MESSAGE
+        );
+        $this->assertInstanceOf(ActionException::class, $actionException);
+        $this->assertEquals('error message action test.', $actionException->getMessage());
+    }
+
+    /**
+     * Test ThrowErrorsTrait::throwActionExceptionWithChildren() method.
+     */
+    public function testThrowActionExceptionWithChildre(): void
+    {
+        $this->expectException(ActionException::class);
+        $this->expectExceptionMessage("error message action test.");
+        $anonymousActionClass = $this->getAnonymousActionClass();
+        $anonymousActionClass->throwActionExceptionWithChildren(
+            $anonymousActionClass,
+            [new ActionException($anonymousActionClass, 'children error message action test.')],
+            self::BASE_TEST_MESSAGE,
+            self::ACTION_TEST_MESSAGE
+        );
+    }
+
+    /**
+     * Test ThrowErrorsTrait::getActionExceptionWithChildren() method.
+     */
+    public function testGetActionExceptionWithChildre(): void
+    {
+        $anonymousActionClass = $this->getAnonymousActionClass();
+        /** @var ActionException $actionException */
+        $actionException = $anonymousActionClass->getActionExceptionWithChildren(
+            $anonymousActionClass,
+            [new ActionException($anonymousActionClass, 'children error message action test.')],
+            self::BASE_TEST_MESSAGE,
+            self::ACTION_TEST_MESSAGE
+        );
+        $this->assertInstanceOf(ActionException::class, $actionException);
+        $this->assertCount(1, $actionException->getChildrenFailures());
+        $childFailure = current($actionException->getChildrenFailures());
+        $this->assertInstanceOf(ActionException::class, $childFailure);
+        $this->assertEquals('children error message action test.', $childFailure->getMessage());
     }
 }

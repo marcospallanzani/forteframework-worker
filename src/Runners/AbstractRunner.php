@@ -52,8 +52,11 @@ class AbstractRunner
         $failedActions = array();
         foreach ($this->actions as $action) {
             try {
-                if ($action instanceof AbstractAction && !$action->run()) {
-                    $failedActions[] = $action;
+                if ($action instanceof AbstractAction) {
+                    $actionResult = $action->run();
+                    if (!$actionResult->isSuccessfulRun() || !$action->validateResult($actionResult)) {
+                        $failedActions[] = $action;
+                    }
                 }
             } catch (ActionException $actionException) {
 //TODO Error handling: how to return a chain of action exceptions?

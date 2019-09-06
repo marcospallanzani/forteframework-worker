@@ -13,7 +13,6 @@ namespace Tests\Unit\Actions\Checks\Files;
 
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -80,12 +79,12 @@ class FileHasInstantiableClassTest extends TestCase
         $selfClass = (new \ReflectionClass(get_called_class()))->getShortName();
 
         return [
-            ["", "", false, true],
-            ["", $selfClass, false, true],
-            [__FILE__, "", true, false],
-            [__FILE__, $selfClass, true, false],
-            [self::TEST_FILE_TMP, $selfClass, false, false],
-            [__FILE__, "test", false, false],
+            ["", "", true, false, false, true],
+            ["", $selfClass, true, false, false, true],
+            [__FILE__, "", false, false, true, false],
+            [__FILE__, $selfClass, false, false, true, false],
+            [self::TEST_FILE_TMP, $selfClass, false, false, false, false],
+            [__FILE__, "test", false, false, false, false],
         ];
     }
 
@@ -118,14 +117,18 @@ class FileHasInstantiableClassTest extends TestCase
      *
      * @param string $filePath
      * @param string $className
+     * @param bool $isFatal
+     * @param bool $isSuccessRequired
      * @param bool $expected
      * @param bool $exceptionExpected
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testCheckFileHasClass(
         string $filePath,
         string $className,
+        bool $isFatal,
+        bool $isSuccessRequired,
         bool $expected,
         bool $exceptionExpected
     ): void
@@ -133,7 +136,14 @@ class FileHasInstantiableClassTest extends TestCase
         if ($exceptionExpected) {
             $this->expectException(ActionException::class);
         }
-        $this->assertEquals($expected, (new FileHasInstantiableClass($filePath, $className))->run());
+        $this->assertEquals(
+            $expected,
+            (new FileHasInstantiableClass($filePath, $className))
+                ->setIsFatal($isFatal)
+                ->setIsSuccessRequired($isSuccessRequired)
+                ->run()
+                ->getResult()
+        );
     }
 
     /**

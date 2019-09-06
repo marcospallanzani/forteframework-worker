@@ -11,6 +11,7 @@
 
 namespace Tests\Unit\Actions\Transforms\Files;
 
+use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Checks\Files\DirectoryDoesNotExist;
 use Forte\Worker\Actions\Checks\Files\DirectoryExists;
 use Forte\Worker\Actions\Checks\Files\FileDoesNotExist;
@@ -69,10 +70,11 @@ class RemoveFileTest extends TestCase
     public function filesProvider(): array
     {
         return [
-            [self::TEST_FILE_TXT, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_TXT . "'."],
-            [self::TEST_FILE_JSON, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_JSON . "'."],
-            [self::TEST_WRONG_FILE, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
-            [self::TEST_DIR_TMP, false, RemoveFile::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."]
+            // File path | expected result | is fatal | is success required | exception expected | remove mode | expected stringify message
+            [self::TEST_FILE_TXT, true, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_TXT . "'."],
+            [self::TEST_FILE_JSON, true, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_JSON . "'."],
+            [self::TEST_WRONG_FILE, false, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
+            [self::TEST_DIR_TMP, false, false, false, false, RemoveFile::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."]
         ];
     }
 
@@ -84,12 +86,21 @@ class RemoveFileTest extends TestCase
      *
      * @param string $filePath
      * @param bool $expected
+     * @param bool $isFatal
+     * @param bool $isSuccessRequired
+     * @param bool $exceptionExpected
      *
      * @throws ActionException
      */
-    public function testRemoveFile(string $filePath, bool $expected): void
+    public function testRemoveFile(
+        string $filePath,
+        bool $expected,
+        bool $isFatal,
+        bool $isSuccessRequired,
+        bool $exceptionExpected
+    ): void
     {
-        if (!$expected) {
+        if ($exceptionExpected) {
             $this->expectException(ActionException::class);
         }
         $this->assertEquals(
@@ -98,7 +109,10 @@ class RemoveFileTest extends TestCase
                 ->removeFile($filePath)
                 ->addBeforeAction(new FileExists($filePath))
                 ->addAfterAction(new FileDoesNotExist($filePath))
+                ->setIsFatal($isFatal)
+                ->setIsSuccessRequired($isSuccessRequired)
                 ->run()
+                ->getResult()
         );
     }
 
@@ -110,20 +124,38 @@ class RemoveFileTest extends TestCase
      *
      * @param string $filePath
      * @param bool $expected
+     * @param bool $isFatal
+     * @param bool $isSuccessRequired
+     * @param bool $exceptionExpected
      *
      * @throws ActionException
      */
-    public function testRemoveFileNoChecks(string $filePath, bool $expected): void
+    public function testRemoveFileNoChecks(
+        string $filePath,
+        bool $expected,
+        bool $isFatal,
+        bool $isSuccessRequired,
+        bool $exceptionExpected
+    ): void
     {
-        if (!$expected) {
+        if ($exceptionExpected) {
             $this->expectException(ActionException::class);
         }
-        $this->assertEquals($expected, (new RemoveFile())->removeFile($filePath)->run());
+        $this->assertEquals(
+            $expected,
+            (new RemoveFile())
+                ->removeFile($filePath)
+                ->setIsFatal($isFatal)
+                ->setIsSuccessRequired($isSuccessRequired)
+                ->run()
+                ->getResult()
+        );
     }
 
     /**
      * Test the Forte\Worker\Actions\Transforms\Files\Remove::run() method
-     * in mode "single-file", but with a folder as a parameter.
+     * in mode "single-file", but with a folder as a parameter, in "FATAL"
+     * mode.
      *
      * @throws ActionException
      */
@@ -132,7 +164,25 @@ class RemoveFileTest extends TestCase
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->expectException(ActionException::class);
-        (new RemoveFile())->removeFile(self::TEST_DIR_TMP)->run();
+        (new RemoveFile())->removeFile(self::TEST_DIR_TMP)->setIsFatal(true)->run();
+    }
+
+    /**
+     * Test the Forte\Worker\Actions\Transforms\Files\Remove::run() method
+     * in mode "single-file", but with a folder as a parameter, in "NON FATAL"
+     * mode.
+     *
+     * @throws ActionException
+     */
+    public function testRemoveFileDirectoryNegativeResult(): void
+    {
+        // If we try to call the removeFile() method for a directory,
+        // an exception should be thrown.
+        $actionResult = (new RemoveFile())->removeFile(self::TEST_DIR_TMP)->run();
+        $this->assertInstanceOf(ActionResult::class, $actionResult);
+        $this->assertEmpty($actionResult->getResult());
+        $this->assertCount(1, $actionResult->getActionFailures());
+        $this->assertInstanceOf(ActionException::class, current($actionResult->getActionFailures()));
     }
 
     /**
@@ -149,7 +199,9 @@ class RemoveFileTest extends TestCase
             ->removeDirectory(self::TEST_DIR_TMP)
             ->addBeforeAction(new DirectoryExists(self::TEST_DIR_TMP))
             ->addAfterAction(new DirectoryDoesNotExist(self::TEST_DIR_TMP))
-            ->run();
+            ->run()
+            ->getResult()
+        ;
 
         $this->assertTrue($removeTransform);
     }
@@ -168,14 +220,17 @@ class RemoveFileTest extends TestCase
             ->removeFilePattern(self::TEST_DIR_TMP . '/*json')
             ->addBeforeAction(new FileExists(self::TEST_FILE_JSON))
             ->addAfterAction(new FileDoesNotExist(self::TEST_FILE_JSON))
-            ->run();
+            ->run()
+            ->getResult()
+        ;
 
         $this->assertTrue($removeTransform);
     }
 
     /**
      * Test the Forte\Worker\Actions\Transforms\Files\Remove::run() method
-     * in mode "directory-file", but with a wrong or non-existing folder as a parameter.
+     * in mode "directory-file", but with a wrong or non-existing folder as
+     * a parameter, and in "FATAL" mode.
      *
      * @throws ActionException
      */
@@ -184,15 +239,50 @@ class RemoveFileTest extends TestCase
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->expectException(ActionException::class);
-        (new RemoveFile())->removeFile(__DIR__ . '/files/xxx/')->run();
+        (new RemoveFile())->removeFile(__DIR__ . '/files/xxx/')->setIsFatal(true)->run();
+    }
+
+    /**
+     * Test the Forte\Worker\Actions\Transforms\Files\Remove::run() method
+     * in mode "directory-file", but with a wrong or non-existing folder as
+     * a parameter, and in "NON FATAL" mode.
+     *
+     * @throws ActionException
+     */
+    public function testRemoveDirectoryNegativeResult(): void
+    {
+        // If we try to call the removeFile() method for a directory,
+        // an exception should be thrown.
+        $actionResult = (new RemoveFile())->removeFile(__DIR__ . '/files/xxx/')->run();
+        $this->assertInstanceOf(ActionResult::class, $actionResult);
+        $this->assertEmpty($actionResult->getResult());
+        $this->assertCount(1, $actionResult->getActionFailures());
+        $this->assertInstanceOf(ActionException::class, current($actionResult->getActionFailures()));
+
     }
 
     /**
      * Test method Remove::stringify().
      *
      * @dataProvider filesProvider
+     *
+     * @param string $filePath
+     * @param bool $expected
+     * @param bool $isFatal
+     * @param bool $isSuccessRequired
+     * @param bool $exceptionExpected
+     * @param string $mode
+     * @param string $message
      */
-    public function testStringify(string $filePath, bool $expected, string $mode, string $message): void
+    public function testStringify(
+        string $filePath,
+        bool $expected,
+        bool $isFatal,
+        bool $isSuccessRequired,
+        bool $exceptionExpected,
+        string $mode,
+        string $message
+    ): void
     {
         $fileExists = (new RemoveFile())->remove($filePath, $mode);
         $this->assertEquals($message, (string) $fileExists);

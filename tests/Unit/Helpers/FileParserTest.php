@@ -179,4 +179,17 @@ class FileParserTest extends TestCase
         $this->assertArrayHasKey('CONTENT_TYPE_XML', $constants);
         $this->assertArrayHasKey('CONTENT_TYPE_ARRAY', $constants);
     }
+
+    /**
+     * Test function FileParser::getFileExtensionByContentType().
+     */
+    public function testFileExtensions(): void
+    {
+        $this->assertEquals('ini', FileParser::getFileExtensionByContentType(FileParser::CONTENT_TYPE_INI));
+        $this->assertEquals('json', FileParser::getFileExtensionByContentType(FileParser::CONTENT_TYPE_JSON));
+        $this->assertEquals('php', FileParser::getFileExtensionByContentType(FileParser::CONTENT_TYPE_ARRAY));
+        $this->assertEquals('yml', FileParser::getFileExtensionByContentType(FileParser::CONTENT_TYPE_YAML));
+        $this->assertEquals('xml', FileParser::getFileExtensionByContentType(FileParser::CONTENT_TYPE_XML));
+        $this->assertEquals('', FileParser::getFileExtensionByContentType('wrong_content_type'));
+    }
 }

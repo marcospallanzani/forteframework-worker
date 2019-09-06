@@ -12,8 +12,10 @@
 namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\StringParser;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
@@ -232,151 +234,23 @@ class ModifyFile extends AbstractAction
     }
 
     /**
-     * Whether this instance is in a valid state or not.
+     * Validate the given action result. This method returns true if the
+     * given ActionResult instance has a result value that is considered
+     * as a positive case by this AbstractAction subclass instance.
      *
-     * @return bool True if the implementing class instance
-     * was well configured; false otherwise.
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of the current AbstractAction subclass
+     * instance.
      *
-     * @throws ActionException If the implementing class
-     * instance was not well configured.
+     * @return bool True if the given ActionResult instance has a result value
+     * that is considered as a positive case by this AbstractAction subclass
+     * instance; false otherwise.
      */
-    public function isValid(): bool
+    public function validateResult(ActionResult $actionResult): bool
     {
-        if (empty($this->filePath)) {
-            $this->throwActionException(
-                $this,
-                "You need to specify the 'filePath' for the following transformation: '%s'.",
-                $this
-            );
-        }
-
-        // If no action is specified OR an unsupported action is given, then we throw an error.
-        $modifyConstants = $this->getSupportedActions();
-        $wrongActionsAndConditions = array();
-        foreach ($this->actions as $action) {
-            if (!in_array($action['action'], $modifyConstants)) {
-                $wrongActionsAndConditions[] = sprintf(
-                    "The action '%s' is not supported. Impacted transformation is: '%s'. Supported actions are: '%s'.",
-                    $action['action'],
-                    $this,
-                    implode(',', $modifyConstants)
-                );
-            }
-
-            $condition = $action['condition'];
-            if (!$condition instanceof VerifyString) {
-                $wrongActionsAndConditions[] = sprintf(
-                    "The action '%s' has a non-recognized condition. Impacted transformation is: '%s'.",
-                    $action['action'],
-                    $this
-                );
-            }
-
-            try {
-                $condition->isValid();
-            } catch (ActionException $actionException) {
-//TODO WE SHOULD ADD THIS ActionException to the list of nested errors as an ActionException where the
-                $wrongActionsAndConditions[] = sprintf(
-                    "The condition '%s' is not valid. Error message is: '%s'.",
-                    $condition,
-                    $actionException->getMessage()
-                );
-            }
-        }
-
-        if ($wrongActionsAndConditions) {
-            $message = "";
-            foreach ($wrongActionsAndConditions as $key => $errorMessage) {
-                $message .= "$key. $errorMessage;";
-            }
-            $this->throwActionException(
-                $this,
-                "This modify-file transformation is not well configured: '%s'. Error message is: '%s'.",
-                $this,
-                $message
-            );
-        }
-        return true;
-    }
-
-    /**
-     * Apply the sub-class transformation action.
-     *
-     * @return bool True if the action implemented by this AbstractAction
-     * subclass instance was successfully applied; false otherwise.
-     *
-     * @throws ActionException
-     */
-    protected function apply(): bool
-    {
-        // We check if the origin file exists
-        $this->checkFileExists($this->filePath);
-
-        // We open the file. we read it line by line and we modify each line if the condition is met
-        $fileHandler = fopen($this->filePath, "r");
-        $modifiedContent = [];
-        while(! feof($fileHandler))  {
-            $line = fgets($fileHandler);
-            foreach ($this->actions as $key => $action) {
-                // We first check if the condition is met
-                $condition = $action['condition'];
-                if ($condition instanceof VerifyString && $condition->setContent(trim($line, PHP_EOL))->run()) {
-                    // We have to apply the configured change
-                    switch ($action['action']) {
-                        case self::MODIFY_FILE_APPEND_TO_LINE:
-                            if (StringParser::endsWith($line, PHP_EOL)) {
-                                $line = trim($line, PHP_EOL) . $action['value'] . PHP_EOL;
-                            } else {
-                                $line .= $action['value'];
-                            }
-                            break;
-                        case self::MODIFY_FILE_REMOVE_IN_LINE:
-                            $line = str_replace($action['search'], "", $line);
-                            break;
-                        case self::MODIFY_FILE_REMOVE_LINE:
-                            if (StringParser::endsWith($line, PHP_EOL)) {
-                                $line = PHP_EOL;
-                            } else {
-                                $line = null;
-                            }
-                            break;
-                        case self::MODIFY_FILE_REPLACE_IN_LINE:
-                            $line = str_replace($action['search'], $action['value'], $line);
-                            break;
-                        case self::MODIFY_FILE_REPLACE_LINE:
-                            $newLine = $action['value'];
-                            if (StringParser::endsWith($line, PHP_EOL)) {
-                                $newLine .= PHP_EOL;
-                            }
-                            $line = $newLine;
-                            break;
-                        case self::MODIFY_FILE_APPEND_TEMPLATE:
-                            // In this case, the replace value, should be a valid file name that we want to append
-                            // at the end of the current line
-                            $line .= $this->getFileContent($action['value']);
-                            break;
-                        case self::MODIFY_FILE_REPLACE_WITH_TEMPLATE:
-                            // In this case, the replace value, should be a valid file name that we want to replace
-                            // to the current line
-                            $line = $this->getFileContent($action['value']);
-                            break;
-                    }
-                }
-            }
-            if (!is_null($line)) {
-                $modifiedContent[] = $line;
-            }
-        }
-        fclose($fileHandler);
-
-        // We write the modified content line by line to the same file
-        $fileHandler = fopen($this->filePath, 'w+') or die("Can't open file.");
-        foreach ($modifiedContent as $line) {
-            fwrite($fileHandler, $line);
-        }
-        fclose($fileHandler);
-
-        return true;
+        // The ActionResult->result field should be set with a boolean
+        // representing the last execution of the apply method.
+        return (bool) $actionResult->getResult();
     }
 
     /**
@@ -457,7 +331,6 @@ class ModifyFile extends AbstractAction
         return $message;
     }
 
-
     /**
      * Return a list of configured actions.
      *
@@ -480,18 +353,230 @@ class ModifyFile extends AbstractAction
     }
 
     /**
+     * Validate this ModifyFile instance using its specific validation logic.
+     * It returns true if this ModifyFile instance is well configured, i.e. if:
+     * - key cannot be an empty string;
+     * - action must equal to one of the class constants starting with prefix 'MODIFY_FILE_';
+     *
+     * @return bool True if no validation breaches were found; false otherwise.
+     *
+     * @throws \Exception If validation breaches were found.
+     */
+    protected function validateInstance(): bool
+    {
+        if (empty($this->filePath)) {
+            $this->throwActionException(
+                $this,
+                "You need to specify the 'filePath' for the following transformation: '%s'.",
+                $this
+            );
+        }
+
+        // If no action is specified OR an unsupported action is given, then we throw an error.
+        $modifyConstants = $this->getSupportedActions();
+        $wrongActionsAndConditions = array();
+        foreach ($this->actions as $action) {
+            // We check if the condition object is valid
+            $condition = $action['condition'];
+            if (!$condition instanceof VerifyString) {
+                $wrongActionsAndConditions[] = $this->getActionException(
+                    new VerifyString(''),
+                    "Unsupported condition type given [%s]. Supported types are [%s]",
+                    (is_object($condition) ? get_class($condition) : gettype($condition)),
+                    VerifyString::class
+                );
+            }
+
+            // We check if the action is supported
+            if (!in_array($action['action'], $modifyConstants)) {
+                $wrongActionsAndConditions[] = $this->getActionException(
+                    $this,
+                    "Action %s not supported. Supported actions are [%s].",
+                    $action['action'],
+                    implode(', ', $modifyConstants)
+                );
+            }
+
+            // We validate all the nested actions
+            try {
+                $condition->isValid();
+            } catch (ActionException $actionException) {
+                $wrongActionsAndConditions[] = $actionException;
+            }
+        }
+
+        // We check if some nested actions are not valid: if so, we throw an exception
+        if ($wrongActionsAndConditions) {
+            $this->throwActionExceptionWithChildren(
+                $this,
+                [$wrongActionsAndConditions],
+                "One or more nested actions are not valid."
+            );
+        }
+        return true;
+    }
+
+    /**
+     * Apply the sub-class transformation action.
+     *
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
+     *
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     * @throws \Exception
+     */
+    protected function apply(ActionResult $actionResult): ActionResult
+    {
+        // We check if the origin file exists
+        $this->fileExists($this->filePath);
+
+        // We open the file. we read it line by line and we modify each line if the condition is met
+        $fileHandler = fopen($this->filePath, "r");
+        $modifiedContent = [];
+        $failedNestedActions = [];
+        while(! feof($fileHandler))  {
+            $line = fgets($fileHandler);
+
+            // We check all configured conditions for the configured file
+            foreach ($this->actions as $action) {
+                // We create the action result object for the current modification action
+                $modifyCondition = $action['condition'];
+                $modifyResult = new ActionResult($modifyCondition);
+                try {
+                    /** @var VerifyString $action */
+                    $modifyResult = $modifyCondition->setContent(trim($line, PHP_EOL))->run();
+                    if (!$modifyCondition->validateResult($modifyResult)) {
+                        $failedNestedActions[] = $modifyResult;
+                    } else {
+                        $line = $this->applyActionToLine($action['action'], $action['search'], $action['value'], $line);
+                    }
+                } catch (ActionException $actionException) {
+                    // We handle the caught ActionException for the just-run failed action: if critical,
+                    // we throw it again so that it can be caught and handled in the run method
+                    if ($action->isFatal() || $action->isSuccessRequired()) {
+                        throw $actionException;
+                    }
+
+                    /**
+                     * If we get to this point, it means that the just-checked failed
+                     * check is NOT FATAL; in this case, we add to the list of failed
+                     * checks and we continue the execution of the current foreach loop.
+                     */
+                    $modifyResult->addActionFailure($actionException);
+                    $failedNestedActions[] = $modifyResult;
+                }
+            }
+
+            if (!is_null($line)) {
+                $modifiedContent[] = $line;
+            }
+        }
+        fclose($fileHandler);
+
+        // Before writing the new content, we check if all the actions run successfully
+        $globalResult = true;
+        if ($failedNestedActions) {
+            // We generate a failure instance to handle the fatal/success-required cases
+            $actionException = $this->getActionException($actionResult->getAction(), "One or more sub-actions failed.");
+            foreach ($failedNestedActions as $failedNestedAction) {
+                foreach ($failedNestedAction->getActionFailures() as $failure) {
+                    $actionException->addChildFailure($failure);
+                }
+            }
+
+            // If fatal or success-required, we throw the exception
+            if ($this->isFatal() || $this->isSuccessRequired()) {
+                throw $actionException;
+            }
+
+            // If not fatal, we add the current failure to the list of failures for this action
+            $actionResult->addActionFailure($actionException);
+
+            $globalResult = false;
+        } else {
+            // We write the modified content line by line to the same file
+            $fileHandler = fopen($this->filePath, 'w+') or die("Can't open file.");
+            foreach ($modifiedContent as $line) {
+                fwrite($fileHandler, $line);
+            }
+            fclose($fileHandler);
+
+        }
+
+        return $actionResult->setResult($globalResult);
+    }
+
+    /**
      * Read the given file and return its content as a string.
      *
      * @param string $filePath The file path to read.
      *
      * @return string The file content.
      *
-     * @throws ActionException
+     * @throws WorkerException
      */
     protected function getFileContent(string $filePath): string
     {
-        $this->checkFileExists($filePath);
+        $this->fileExists($filePath);
 
         return file_get_contents($filePath);
+    }
+
+    /**
+     * Apply the given action to the given line.
+     *
+     * @param string $action The action to be applied to the given line.
+     * @param string $searchValue The value to be matched and modified.
+     * @param string $replaceValue The value to be used by the modification action.
+     * @param string $line The line to be modified.
+     *
+     * @return mixed|string|null
+     *
+     * @throws WorkerException
+     */
+    protected function applyActionToLine(string $action, string $searchValue, string $replaceValue, string $line)
+    {
+        switch ($action) {
+            case self::MODIFY_FILE_APPEND_TO_LINE:
+                if (StringParser::endsWith($line, PHP_EOL)) {
+                    $line = trim($line, PHP_EOL) . $replaceValue . PHP_EOL;
+                } else {
+                    $line .= $replaceValue;
+                }
+                break;
+            case self::MODIFY_FILE_REMOVE_IN_LINE:
+                $line = str_replace($searchValue, "", $line);
+                break;
+            case self::MODIFY_FILE_REMOVE_LINE:
+                if (StringParser::endsWith($line, PHP_EOL)) {
+                    $line = PHP_EOL;
+                } else {
+                    $line = null;
+                }
+                break;
+            case self::MODIFY_FILE_REPLACE_IN_LINE:
+                $line = str_replace($searchValue, $replaceValue, $line);
+                break;
+            case self::MODIFY_FILE_REPLACE_LINE:
+                $newLine = $replaceValue;
+                if (StringParser::endsWith($line, PHP_EOL)) {
+                    $newLine .= PHP_EOL;
+                }
+                $line = $newLine;
+                break;
+            case self::MODIFY_FILE_APPEND_TEMPLATE:
+                // In this case, the replace value, should be a valid file name that we want to append
+                // at the end of the current line
+                $line .= $this->getFileContent($replaceValue);
+                break;
+            case self::MODIFY_FILE_REPLACE_WITH_TEMPLATE:
+                // In this case, the replace value, should be a valid file name that we want to replace
+                // to the current line
+                $line = $this->getFileContent($replaceValue);
+                break;
+        }
+        return $line;
     }
 }

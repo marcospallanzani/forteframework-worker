@@ -194,4 +194,38 @@ class FileParser
     {
         return self::getClassConstants('CONTENT_TYPE');
     }
+
+    /**
+     * Return a file extension for the given content type. The only content types
+     * supported are the class constants starting with "CONTENT_TYPE_".
+     *
+     * @param string $contentType The file content type (supported content types
+     * -> class constants starting "CONTENT_TYPE_" ).
+     *
+     * @return string The file extension for the given content type (only works with
+     * supported content types -> class constants starting "CONTENT_TYPE_").
+     */
+    public static function getFileExtensionByContentType(string $contentType): string
+    {
+        $fileExtension = "";
+        switch ($contentType) {
+            case self::CONTENT_TYPE_INI:
+                $fileExtension = "ini";
+                break;
+            case self::CONTENT_TYPE_YAML:
+                $fileExtension = "yml";
+                break;
+            case self::CONTENT_TYPE_JSON:
+                $fileExtension = "json";
+                break;
+            case self::CONTENT_TYPE_XML:
+                $fileExtension = "xml";
+                break;
+            case self::CONTENT_TYPE_ARRAY:
+                $fileExtension = "php";
+                break;
+        }
+
+        return $fileExtension;
+    }
 }

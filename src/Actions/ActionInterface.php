@@ -24,12 +24,12 @@ interface ActionInterface
     /**
      * Run the action.
      *
-     * @return bool True if the implementing class instance
-     * action was successfully run; false otherwise.
+     * @return ActionResult The ActionResult instance representing
+     * the result of the just-run action.
      *
      * @throws ActionException If the action was not successfully run.
      */
-    public function run(): bool;
+    public function run(): ActionResult;
 
     /**
      * Return a human-readable string representation of this

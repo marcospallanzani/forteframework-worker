@@ -34,40 +34,177 @@ abstract class AbstractAction implements ValidActionInterface
     protected $afterActions = array();
 
     /**
-     * Apply the subclass action.
+     * When this flag is set to true, all errors raised by this action
+     * should stop the execution of the main process. This logic is
+     * implemented in the runner class (instances of AbstractRunner).
      *
-     * @return bool True if the action implemented by this AbstractAction
-     * subclass instance was successfully applied; false otherwise.
-     *
-     * @throws ActionException
+     * @var bool
      */
-    protected abstract function apply(): bool;
+    protected $isFatal = false;
 
     /**
-     * Run the subclass action with pre-validation
-     * AND with pre- and post-run actions too.
+     * When this flag is set to true, the system will check the result of
+     * the action. If it is successful (no errors and successful result),
+     * then the execution will continue. If not successful, an exception
+     * will be thrown. This flag can be used to express complex condition
+     * where one action is executed only if a previous action executed
+     * correctly and returned its positive case result.
+     * E.g. modify a configuration key X in a file Y, if file Y exists.
+     * If the pre-check on file Y existence executed with no errors but
+     * returned false (i.e. the file does not exist), we shouldn't run
+     * the dependent action "modify configuration key X2.
      *
-     * @return bool True if this AbstractAction subclass
-     * instance has been successfully applied; false otherwise.
+     * @var bool
+     */
+    protected $isSuccessRequired = false;
+
+    /**
+     * Validate the given action result. This method returns true if the
+     * given ActionResult instance has a result value that is considered
+     * as a positive case by this AbstractAction subclass instance.
+     * E.g. if the aim of the current action is to check that a given key X
+     * is defined in a given array Y, then the expected positive result is a
+     * boolean flag equal to true if the key X exists in the array Y.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of the current AbstractAction subclass
+     * instance.
+     *
+     * @return bool True if the given ActionResult instance has a result value
+     * that is considered as a positive case by this AbstractAction subclass
+     * instance; false otherwise.
+     */
+    public abstract function validateResult(ActionResult $actionResult): bool;
+
+    /**
+     * Apply the subclass action.
+     *
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
+     *
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     */
+    protected abstract function apply(ActionResult $actionResult): ActionResult;
+
+    /**
+     * Validate this AbstractAction subclass instance using a validation logic
+     * specific to the current instance.
+     *
+     * @return bool True if no validation breaches were found; false otherwise.
+     *
+     * @throws \Exception If validation breaches were found.
+     */
+    protected abstract function validateInstance(): bool;
+
+    /**
+     * Whether this AbstractAction subclass instance is valid or not.
+     *
+     * @return bool True if this AbstractAction subclass instance was
+     * well configured; false otherwise.
+     *
+     * @throws ActionException If this AbstractAction subclass instance
+     * was not well configured.
+     */
+    public final function isValid(): bool
+    {
+        // By catching here all exceptions, we are sure that the
+        // isValid method only throws ActionException instances.
+        $isValid = false;
+        try {
+            $isValid = $this->validateInstance();
+        } catch (\Exception $exception) {
+            // We catch any exception coming from the child class
+            // And we convert them to an ActionException
+            if ($exception instanceof ActionException) {
+                throw $exception;
+            }
+            $this->throwActionException($this, $exception->getMessage());
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * Run the subclass action with pre-validation AND with
+     * pre- and post-run actions too.
+     *
+     * @return ActionResult The ActionResult instance representing
+     * the result of the just-run action.
      *
      * @throws ActionException
      */
-    public function run(): bool
+    public final function run(): ActionResult
     {
-        $result = false;
+        $actionResult = new ActionResult($this);
 
+        $actionResult->setStartTimestamp();
+
+        // We don't catch here the exceptions thrown by the isValid() method.
+        // A bad configured action should always be considered as FATAL.
         if ($this->isValid()) {
 
             // We run the pre-run actions
-            $this->runAndReportBeforeActions(true);
+            $this->runBeforeActions($actionResult);
 
-            $result = $this->apply();
+            // We run the logic specific to this AbstractAction subclass instance
+            // AND we save its result in the ActionResult wrapper object
+            try {
+                $actionResult = $this->apply($actionResult);
+            } catch (\Exception $exception) {
+
+                /**
+                 * If the given exception is an instance of ActionException, we have to check
+                 * if there are some fatal and/or success-required children failures: if so,
+                 * then we throw the parent exception.
+                 */
+                $childCriticalError = false;
+                if ($exception instanceof ActionException) {
+
+                    /**
+                     * We have caught a child-action failure. In this case, we add the caught
+                     * child-action exception to the list of failed children actions of the
+                     * current action failure object.
+                     */
+                    $actionFailure = $this->getActionException(
+                        $this, "Action failure caused by one failed child action."
+                    );
+                    $actionFailure->addChildFailure($exception);
+
+                    // We detected a child failure: in this case we check if it's critical: if yes,
+                    // it should trigger the exception for the parent action as well
+                    $childCriticalError = $exception->hasCriticalFailures();
+
+                } else {
+                    $actionFailure = $this->getActionException($this, $exception->getMessage());
+                }
+
+                // If we caught a critical ActionException thrown by a child process
+                // OR the current action is critical, then we throw the exception
+                if ($childCriticalError || $this->isFatal || $this->isSuccessRequired) {
+                    throw $actionFailure;
+                } else {
+                    $actionResult->addActionFailure($actionFailure);
+                }
+            }
+
+            // If the result of the last execution of the run method returned a negative case,
+            // in case this action is flagged as 'success required', we need to throw an exception
+            if (!$this->validateResult($actionResult) && $this->isSuccessRequired) {
+                $this->throwActionException(
+                    $actionResult->getAction(),
+                    "Positive result expected (action marked as 'success-required')."
+                );
+            }
 
             // We run the post-run actions
-            $this->runAndReportAfterActions(true);
+            $this->runAfterActions($actionResult);
         }
 
-        return $result;
+        $actionResult->setEndTimestamp();
+
+        return $actionResult;
     }
 
     /**
@@ -103,154 +240,61 @@ abstract class AbstractAction implements ValidActionInterface
     }
 
     /**
-     * Run the pre-run actions and return a list failed
-     * AbstractAction instances.
-     *
-     * @return array List of failed pre-run actions.
+     * Ree
+     * @return bool True if this AbstractAction subclass instance is fatal; false otherwise.
      */
-    protected function runBeforeActions(): array
+    public function isFatal(): bool
     {
-        $failedActions = array();
-        foreach ($this->beforeActions as $action) {
-            try {
-                if ($action instanceof AbstractAction && !$action->run()) {
-                    $failedActions[] = new ActionException($action, "Action not successful.");
-                }
-            } catch (WorkerException $workerException) {
-//TODO CHECK HERE IF ACTION IS MARKED AS FATAL OR NON-FATAL: IF FATAL, THROW EXCEPTION, IF NON-FATAL, THEN SAVE THE EXCEPTION AND CONTINUE THE EXECUTION
-                $failedActions[] = new ActionException($action, sprintf(
-                    "Action failed with error '%s'.",
-                    $workerException->getMessage()
-                ));
-            }
-        }
-        return $failedActions;
+        return $this->isFatal;
     }
 
     /**
-     * Run the post-run actions and return a list failed
-     * AbstractAction instances.
+     * Set the fatal flag with the desired value.
      *
-     * @return array List of failed post-run actions.
+     * @param bool $isFatal The desired fatal flag value.
+     *
+     * @return AbstractAction
      */
-    protected function runAfterActions(): array
+    public function setIsFatal(bool $isFatal): self
     {
-        $failedActions = array();
-        foreach ($this->afterActions as $action) {
-            try {
-                if ($action instanceof AbstractAction && !$action->run()) {
-                    $failedActions[] = new ActionException($action, "Action not successful.");
-                }
-            } catch (WorkerException $workerException) {
-//TODO CHECK HERE IF ACTION IS MARKED AS FATAL OR NON-FATAL: IF FATAL, THROW EXCEPTION, IF NON-FATAL, THEN SAVE THE EXCEPTION AND CONTINUE THE EXECUTION
-                $failedActions[] = new ActionException($action, sprintf(
-                    "Action failed with error '%s'.",
-                    $workerException->getMessage()
-                ));
-            }
-        }
+        $this->isFatal = $isFatal;
 
-        return $failedActions;
+        return $this;
     }
 
     /**
-     * Run the configured pre-run actions and report all the occurred errors.
-     *
-     * @param bool $throwException Whether an exception, for failed actions,
-     * should be thrown OR a string representation of them should be returned.
-     *
-     * @return string A string representation of the failed actions, in case the
-     * thrownException flag is true.
-     *
-     * @throws ActionException
+     * @return bool
      */
-    protected function runAndReportBeforeActions($throwException = false): string
+    public function isSuccessRequired(): bool
     {
-        // We run the pre-run actions
-        $failedActions = $this->runBeforeActions();
-//TODO REFACTOR THE WAY WE RENDER THIS ERROR MESSAGE.. WE SHOULD ADD A LIST OF FAILED CHILDREN ACTIONS TO THE ActionException class
-        $message = "";
-        if ($failedActions) {
-            $message = "The following pre-run actions have failed: ";
-            foreach ($failedActions as $failedAction) {
-                if ($failedAction instanceof ActionException) {
-                    $message .= sprintf(
-                        "%s. FAILED ACTIONS INFO: %s. |||| ",
-                        $failedAction->getAction(),
-                        $failedAction->getMessage()
-                    );
-                }
-            }
-//TODO SET HERE THE ACTION DEPENDENCIES THAT FAILED FOR THE CURRENT ACTION
-            if ($throwException) {
-                $this->throwActionException($this, $message);
-            }
-        }
-//TODO RETURN THE EXCEPTION INSTEAD?
-        return $message;
+        return $this->isSuccessRequired;
     }
 
     /**
-     * Run the configured post-run actions and report all the occurred errors.
+     * @param bool $isSuccessRequired
      *
-     * @param bool $throwException Whether we should throw an exception for the failed
-     * actions OR return a string representation of them.
-     *
-     * @return string A string representation of the failed actions, in case the
-     * thrownException flag is true.
-     *
-     * @throws ActionException
+     * @return AbstractAction
      */
-    protected function runAndReportAfterActions($throwException = false): string
+    public function setIsSuccessRequired(bool $isSuccessRequired): self
     {
-        // We run the post-run actions
-        $failedActions = $this->runAfterActions();
-//TODO REFACTOR THE WAY WE RENDER THIS ERROR MESSAGE.. WE SHOULD ADD A LIST OF FAILED CHILDREN ACTIONS TO THE ActionException class
-        $message = "";
-        if ($failedActions) {
-            $message = "The following post-run actions have failed: ";
-            foreach ($failedActions as $failedAction) {
-                if ($failedAction instanceof ActionException) {
-                    $message .= sprintf(
-                        "%s. FAILED ACTIONS INFO: %s. |||| ",
-                        $failedAction->getAction(),
-                        $failedAction->getMessage()
-                    );
-                }
-            }
-//TODO SET HERE THE ACTION DEPENDENCIES THAT FAILED FOR THE CURRENT ACTION
-            if ($throwException) {
-                $this->throwActionException($this, $message);
-            }
-        }
-//TODO RETURN THE EXCEPTION INSTEAD?
-        return $message;
+        $this->isSuccessRequired = $isSuccessRequired;
+
+        return $this;
     }
 
-
-
     /**
-     * Check if the given file path exists or not; if it does not exist,
-     * an ActionException will be thrown.
+     * Return an array representation of this AbstractAction subclass instance.
      *
-     * @param string $filePath The file path to be checked.
-     * @param bool $raiseError Whether an exception should be thrown if
-     * the file does not exist.
-     *
-     * @return bool Returns true if the given file path points to an
-     * existing file; false otherwise.
-     *
-     * @throws ActionException If the file does not exist,
-     * an ActionException will be thrown.
+     * @return array An array representation of this AbstractAction subclass instance.
      */
-    protected function checkFileExists(string $filePath, bool $raiseError = true): bool
+    public function toArray(): array
     {
-        try {
-            // We check if the origin file exists
-            return $this->fileExists($filePath, $raiseError);
-        } catch (WorkerException $workerException) {
-            $this->throwActionException($this, $workerException->getMessage());
-        }
+        $variables['action_type'] = get_class($this);
+        $variables['action_description'] = $this->stringify();
+        return array_merge(
+            $variables,
+            $this->objectVariablesToArray(get_object_vars($this))
+        );
     }
 
     /**
@@ -262,5 +306,146 @@ abstract class AbstractAction implements ValidActionInterface
     public function __toString()
     {
         return static::stringify();
+    }
+
+    /**
+     * Run the pre-run actions and return a list failed AbstractAction instances.
+     *
+     * @param ActionResult $actionResult The parent ActionResult instance.
+     *
+     * @throws ActionException A fatal pre-run action has failed.
+     */
+    protected function runBeforeActions(ActionResult &$actionResult): void
+    {
+        foreach ($this->beforeActions as $action) {
+            // We initialize the result object for the current pre-run action
+            $preActionResult = new ActionResult($action);
+            try {
+                if ($action instanceof AbstractAction) {
+                    // We run the pre-run action
+                    $preActionResult = $action->run();
+
+                    /**
+                     * If it was not run successfully OR the result was negative
+                     * (e.g. condition not met, change not applied), then we add
+                     * its result to the list of pre-run failed action results.
+                     */
+                    if (!$preActionResult->isSuccessfulRun() || !$action->validateResult($preActionResult)) {
+                        $actionResult->addFailedPreRunActionResult($preActionResult);
+                    }
+                }
+            } catch (ActionException $actionException) {
+                // We handle the child ActionException (check if critical  and add it
+                // to the list of action failures)
+                $this->handleChildActionException(
+                    $preActionResult,
+                    $actionResult,
+                    $actionException,
+                    "Action failure caused by a critical pre-run failed action."
+                );
+
+                // If no exception is thrown, we add the pre-run result object
+                // to the list of failed pre-run action results
+                $actionResult->addFailedPreRunActionResult($preActionResult);
+            }
+        }
+    }
+
+    /**
+     * Run the post-run actions and return a list failed AbstractAction instances.
+     *
+     * @param ActionResult $actionResult The parent ActionResult instance.
+     *
+     * @throws ActionException A fatal post-run action has failed.
+     */
+    protected function runAfterActions(ActionResult &$actionResult): void
+    {
+        foreach ($this->afterActions as $action) {
+            // We initialize the result object for the current pre-run action
+            $postActionResult = new ActionResult($action);
+            try {
+                if ($action instanceof AbstractAction) {
+                    // We run the post-run action
+                    $postActionResult = $action->run();
+
+                    /**
+                     * If it was not run successfully OR the result was negative
+                     * (e.g. condition not met, change not applied), then we add
+                     * its result to the list of post-run failed action results.
+                     */
+                    if (!$postActionResult->isSuccessfulRun() || !$action->validateResult($postActionResult)) {
+                        $actionResult->addFailedPostRunActionResult($postActionResult);
+                    }
+                }
+            } catch (ActionException $actionException) {
+                // We handle the child ActionException (check if critical and add it
+                // to the list of action failures)
+                $this->handleChildActionException(
+                    $postActionResult,
+                    $actionResult,
+                    $actionException,
+                    "Action failure caused by a critical post-run failed action."
+                );
+
+                // If no exception is thrown, we add the post-run result object
+                // to the list of failed post-run action results
+                $actionResult->addFailedPreRunActionResult($postActionResult);
+            }
+        }
+    }
+
+    /**
+     * Handle the given child ActionException instance. It also handles the "isFatal"
+     * and "isSuccessRequired" of the child AbstractAction subclass instance.
+     *
+     * @param ActionResult $childActionResult
+     * @param ActionResult $parentActionResult
+     * @param ActionException $childActionException
+     * @param string $parentActionFailureMessage
+     *
+     * @throws ActionException
+     */
+    protected function handleChildActionException(
+        ActionResult &$childActionResult,
+        ActionResult &$parentActionResult,
+        ActionException $childActionException,
+        string $parentActionFailureMessage
+    ): void
+    {
+        // We set the caught error as a failure of the given child action result
+        $childActionResult->addActionFailure($childActionException);
+
+        // If FATAL action failed, we throw the error
+        // so the action can be interrupted
+        if ($childActionResult->getAction()->isFatal() || $childActionResult->getAction()->isSuccessRequired()) {
+            $this->throwActionExceptionWithChildren(
+                $parentActionResult->getAction(),
+                [$childActionException],
+                $parentActionFailureMessage
+            );
+        }
+    }
+
+    /**
+     * Convert all elements in the given variables list to an array.
+     *
+     * @param array $variables
+     *
+     * @return array
+     */
+    protected function objectVariablesToArray(array $variables): array
+    {
+        $toArray = [];
+        foreach ($variables as $key => $variable) {
+            if ($variable instanceof AbstractAction) {
+                $toArray[$key] = $variable->toArray();
+            } elseif (is_array($variable)) {
+                $toArray[$key] = $this->objectVariablesToArray($variable);
+            } else {
+                $toArray[$key] = $variable;
+            }
+        }
+
+        return $toArray;
     }
 }
