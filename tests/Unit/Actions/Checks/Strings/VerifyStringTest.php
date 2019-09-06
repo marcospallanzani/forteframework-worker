@@ -13,7 +13,6 @@ namespace Tests\Unit\Actions\Checks\Strings;
 
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -53,106 +52,106 @@ class VerifyStringTest extends TestCase
 
         return [
             /** CONDITION_EQUAL_TO tests */
-            [new VerifyString(VerifyString::CONDITION_EQUAL_TO, $conditionValue1, $content1), true, true, false, "Check if the given content '$content1' is equal to the specified check value '$conditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_EQUAL_TO, $conditionValue2, $content1), true, false, false, "Check if the given content '$content1' is equal to the specified check value '$conditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_EQUAL_TO, $conditionValue1, $content2), true, false, false, "Check if the given content '$content2' is equal to the specified check value '$conditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_EQUAL_TO, $conditionValue2, $content2), true, true, false, "Check if the given content '$content2' is equal to the specified check value '$conditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_EQUAL_TO, $versionConditionValue1, $versionContent1), true, true, false, "Check if the given content '$versionContent1' is equal to the specified check value '$versionConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_EQUAL_TO, $versionConditionValue2, $versionContent1), true, false, false, "Check if the given content '$versionContent1' is equal to the specified check value '$versionConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_EQUAL_TO), false, false, true, "Check if the given content '' is equal to the specified check value ''."],
-            [new VerifyString(VerifyString::CONDITION_EQUAL_TO, '', $content1), false, false, true, "Check if the given content '$content1' is equal to the specified check value ''."],
+            [VerifyString::CONDITION_EQUAL_TO, $conditionValue1, $content1, true, false, false, true, false, "Check if the given content '$content1' is equal to the specified check value '$conditionValue1'."],
+            [VerifyString::CONDITION_EQUAL_TO, $conditionValue2, $content1, true, false, false, false, false, "Check if the given content '$content1' is equal to the specified check value '$conditionValue2'."],
+            [VerifyString::CONDITION_EQUAL_TO, $conditionValue1, $content2, true, false, false, false, false, "Check if the given content '$content2' is equal to the specified check value '$conditionValue1'."],
+            [VerifyString::CONDITION_EQUAL_TO, $conditionValue2, $content2, true, false, false, true, false, "Check if the given content '$content2' is equal to the specified check value '$conditionValue2'."],
+            [VerifyString::CONDITION_EQUAL_TO, $versionConditionValue1, $versionContent1, true, false, false, true, false, "Check if the given content '$versionContent1' is equal to the specified check value '$versionConditionValue1'."],
+            [VerifyString::CONDITION_EQUAL_TO, $versionConditionValue2, $versionContent1, true, false, false, false, false, "Check if the given content '$versionContent1' is equal to the specified check value '$versionConditionValue2'."],
+            [VerifyString::CONDITION_EQUAL_TO, "", "", false, true, false, false, true, "Check if the given content '' is equal to the specified check value ''."],
+            [VerifyString::CONDITION_EQUAL_TO, '', $content1, false, true, false, false, true, "Check if the given content '$content1' is equal to the specified check value ''."],
             /** CONDITION_LESS_THAN tests */
-            [new VerifyString(VerifyString::CONDITION_LESS_THAN, $numericConditionValue1, $numericContent1), true, false, false, "Check if the given content '$numericContent1' is less than the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_THAN, $numericConditionValue2, $numericContent1), true, true, false, "Check if the given content '$numericContent1' is less than the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_THAN, $numericConditionValue1, $numericContent2), true, false, false, "Check if the given content '$numericContent2' is less than the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_THAN, $numericConditionValue2, $numericContent2), true, false, false, "Check if the given content '$numericContent2' is less than the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_THAN, $versionConditionValue1, $versionContent1), true, false, false, "Check if the given content '$versionContent1' is less than the specified check value '$versionConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_THAN, $versionConditionValue2, $versionContent1), true, true, false, "Check if the given content '$versionContent1' is less than the specified check value '$versionConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_THAN), false, false, true, "Check if the given content '' is less than the specified check value ''."],
-            [new VerifyString(VerifyString::CONDITION_LESS_THAN, '', $content1), false, false, true, "Check if the given content '$content1' is less than the specified check value ''."],
+            [VerifyString::CONDITION_LESS_THAN, $numericConditionValue1, $numericContent1, true, false, false, false, false, "Check if the given content '$numericContent1' is less than the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_LESS_THAN, $numericConditionValue2, $numericContent1, true, false, false, true, false, "Check if the given content '$numericContent1' is less than the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_LESS_THAN, $numericConditionValue1, $numericContent2, true, false, false, false, false, "Check if the given content '$numericContent2' is less than the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_LESS_THAN, $numericConditionValue2, $numericContent2, true, false, false, false, false, "Check if the given content '$numericContent2' is less than the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_LESS_THAN, $versionConditionValue1, $versionContent1, true, false, false, false, false, "Check if the given content '$versionContent1' is less than the specified check value '$versionConditionValue1'."],
+            [VerifyString::CONDITION_LESS_THAN, $versionConditionValue2, $versionContent1, true, false, false, true, false, "Check if the given content '$versionContent1' is less than the specified check value '$versionConditionValue2'."],
+            [VerifyString::CONDITION_LESS_THAN, "", "", false, true, false, false, true, "Check if the given content '' is less than the specified check value ''."],
+            [VerifyString::CONDITION_LESS_THAN, '', $content1, false, true, false, false, true, "Check if the given content '$content1' is less than the specified check value ''."],
             /** CONDITION_LESS_EQUAL_THAN tests */
-            [new VerifyString(VerifyString::CONDITION_LESS_EQUAL_THAN, $numericConditionValue1, $numericContent1), true, true, false, "Check if the given content '$numericContent1' is less than or equal to the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_EQUAL_THAN, $numericConditionValue2, $numericContent1), true, true, false, "Check if the given content '$numericContent1' is less than or equal to the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_EQUAL_THAN, $numericConditionValue1, $numericContent2), true, false, false, "Check if the given content '$numericContent2' is less than or equal to the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_EQUAL_THAN, $numericConditionValue2, $numericContent2), true, true, false, "Check if the given content '$numericContent2' is less than or equal to the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_EQUAL_THAN, $versionConditionValue1, $versionContent1), true, true, false, "Check if the given content '$versionContent1' is less than or equal to the specified check value '$versionConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_EQUAL_THAN, $versionConditionValue1, $versionContent2), true, false, false, "Check if the given content '$versionContent2' is less than or equal to the specified check value '$versionConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_LESS_EQUAL_THAN), false, false, true, "Check if the given content '' is less than or equal to the specified check value ''."],
-            [new VerifyString(VerifyString::CONDITION_LESS_EQUAL_THAN, '', $content1), false, false, true, "Check if the given content '$content1' is less than or equal to the specified check value ''."],
+            [VerifyString::CONDITION_LESS_EQUAL_THAN, $numericConditionValue1, $numericContent1, true, false, false, true, false, "Check if the given content '$numericContent1' is less than or equal to the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_LESS_EQUAL_THAN, $numericConditionValue2, $numericContent1, true, false, false, true, false, "Check if the given content '$numericContent1' is less than or equal to the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_LESS_EQUAL_THAN, $numericConditionValue1, $numericContent2, true, false, false, false, false, "Check if the given content '$numericContent2' is less than or equal to the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_LESS_EQUAL_THAN, $numericConditionValue2, $numericContent2, true, false, false, true, false, "Check if the given content '$numericContent2' is less than or equal to the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_LESS_EQUAL_THAN, $versionConditionValue1, $versionContent1, true, false, false, true, false, "Check if the given content '$versionContent1' is less than or equal to the specified check value '$versionConditionValue1'."],
+            [VerifyString::CONDITION_LESS_EQUAL_THAN, $versionConditionValue1, $versionContent2, true, false, false, false, false, "Check if the given content '$versionContent2' is less than or equal to the specified check value '$versionConditionValue1'."],
+            [VerifyString::CONDITION_LESS_EQUAL_THAN, "", "", false, true, false, false, true, "Check if the given content '' is less than or equal to the specified check value ''."],
+            [VerifyString::CONDITION_LESS_EQUAL_THAN, '', $content1, false, true, false, false, true, "Check if the given content '$content1' is less than or equal to the specified check value ''."],
             /** CONDITION_GREATER_THAN tests */
-            [new VerifyString(VerifyString::CONDITION_GREATER_THAN, $numericConditionValue1, $numericContent1), true, false, false, "Check if the given content '$numericContent1' is greater than the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_THAN, $numericConditionValue2, $numericContent1), true, false, false, "Check if the given content '$numericContent1' is greater than the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_THAN, $numericConditionValue1, $numericContent2), true, true, false, "Check if the given content '$numericContent2' is greater than the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_THAN, $numericConditionValue2, $numericContent2), true, false, false, "Check if the given content '$numericContent2' is greater than the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_THAN, $versionConditionValue2, $versionContent2), true, false, false, "Check if the given content '$versionContent2' is greater than the specified check value '$versionConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_THAN, $versionConditionValue1, $versionContent2), true, true, false, "Check if the given content '$versionContent2' is greater than the specified check value '$versionConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_THAN), false, false, true, "Check if the given content '' is greater than the specified check value ''."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_THAN, '', $content1), false, false, true, "Check if the given content '$content1' is greater than the specified check value ''."],
+            [VerifyString::CONDITION_GREATER_THAN, $numericConditionValue1, $numericContent1, true, false, false, false, false, "Check if the given content '$numericContent1' is greater than the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_GREATER_THAN, $numericConditionValue2, $numericContent1, true, false, false, false, false, "Check if the given content '$numericContent1' is greater than the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_GREATER_THAN, $numericConditionValue1, $numericContent2, true, false, false, true, false, "Check if the given content '$numericContent2' is greater than the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_GREATER_THAN, $numericConditionValue2, $numericContent2, true, false, false, false, false, "Check if the given content '$numericContent2' is greater than the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_GREATER_THAN, $versionConditionValue2, $versionContent2, true, false, false, false, false, "Check if the given content '$versionContent2' is greater than the specified check value '$versionConditionValue2'."],
+            [VerifyString::CONDITION_GREATER_THAN, $versionConditionValue1, $versionContent2, true, false, false, true, false, "Check if the given content '$versionContent2' is greater than the specified check value '$versionConditionValue1'."],
+            [VerifyString::CONDITION_GREATER_THAN, "", "", false, true, false, false, true, "Check if the given content '' is greater than the specified check value ''."],
+            [VerifyString::CONDITION_GREATER_THAN, '', $content1, false, true, false, false, true, "Check if the given content '$content1' is greater than the specified check value ''."],
             /** CONDITION_GREATER_EQUAL_THAN tests */
-            [new VerifyString(VerifyString::CONDITION_GREATER_EQUAL_THAN, $numericConditionValue1, $numericContent1), true, true, false, "Check if the given content '$numericContent1' is greater than or equal to the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_EQUAL_THAN, $numericConditionValue2, $numericContent1), true, false, false, "Check if the given content '$numericContent1' is greater than or equal to the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_EQUAL_THAN, $numericConditionValue1, $numericContent2), true, true, false, "Check if the given content '$numericContent2' is greater than or equal to the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_EQUAL_THAN, $numericConditionValue2, $numericContent2), true, true, false, "Check if the given content '$numericContent2' is greater than or equal to the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_EQUAL_THAN, $versionConditionValue1, $versionContent1), true, true, false, "Check if the given content '$versionContent1' is greater than or equal to the specified check value '$versionConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_EQUAL_THAN, $versionConditionValue2, $versionContent1), true, false, false, "Check if the given content '$versionContent1' is greater than or equal to the specified check value '$versionConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_EQUAL_THAN, $versionConditionValue2, $versionContent2), true, true, false, "Check if the given content '$versionContent2' is greater than or equal to the specified check value '$versionConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_EQUAL_THAN, $versionConditionValue1, $versionContent2), true, true, false, "Check if the given content '$versionContent2' is greater than or equal to the specified check value '$versionConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_EQUAL_THAN), false, false, true, "Check if the given content '' is greater than or equal to the specified check value ''."],
-            [new VerifyString(VerifyString::CONDITION_GREATER_EQUAL_THAN, '', $content1), false, false, true, "Check if the given content '$content1' is greater than or equal to the specified check value ''."],
+            [VerifyString::CONDITION_GREATER_EQUAL_THAN, $numericConditionValue1, $numericContent1, true, false, false, true, false, "Check if the given content '$numericContent1' is greater than or equal to the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_GREATER_EQUAL_THAN, $numericConditionValue2, $numericContent1, true, false, false, false, false, "Check if the given content '$numericContent1' is greater than or equal to the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_GREATER_EQUAL_THAN, $numericConditionValue1, $numericContent2, true, false, false, true, false, "Check if the given content '$numericContent2' is greater than or equal to the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_GREATER_EQUAL_THAN, $numericConditionValue2, $numericContent2, true, false, false, true, false, "Check if the given content '$numericContent2' is greater than or equal to the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_GREATER_EQUAL_THAN, $versionConditionValue1, $versionContent1, true, false, false, true, false, "Check if the given content '$versionContent1' is greater than or equal to the specified check value '$versionConditionValue1'."],
+            [VerifyString::CONDITION_GREATER_EQUAL_THAN, $versionConditionValue2, $versionContent1, true, false, false, false, false, "Check if the given content '$versionContent1' is greater than or equal to the specified check value '$versionConditionValue2'."],
+            [VerifyString::CONDITION_GREATER_EQUAL_THAN, $versionConditionValue2, $versionContent2, true, false, false, true, false, "Check if the given content '$versionContent2' is greater than or equal to the specified check value '$versionConditionValue2'."],
+            [VerifyString::CONDITION_GREATER_EQUAL_THAN, $versionConditionValue1, $versionContent2, true, false, false, true, false, "Check if the given content '$versionContent2' is greater than or equal to the specified check value '$versionConditionValue1'."],
+            [VerifyString::CONDITION_GREATER_EQUAL_THAN, "", "", false, true, false, false, true, "Check if the given content '' is greater than or equal to the specified check value ''."],
+            [VerifyString::CONDITION_GREATER_EQUAL_THAN, '', $content1, false, true, false, false, true, "Check if the given content '$content1' is greater than or equal to the specified check value ''."],
             /** CONDITION_DIFFERENT_THAN tests */
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue1, $numericContent1), true, false, false, "Check if the given content '$numericContent1' is different than the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue2, $numericContent1), true, true, false, "Check if the given content '$numericContent1' is different than the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue1, $numericContent2), true, true, false, "Check if the given content '$numericContent2' is different than the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue2, $numericContent2), true, false, false, "Check if the given content '$numericContent2' is different than the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue1, $content1), true, true, false, "Check if the given content '$content1' is different than the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue2, $content1), true, true, false, "Check if the given content '$content1' is different than the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $conditionValue1, $numericContent2), true, true, false, "Check if the given content '$numericContent2' is different than the specified check value '$conditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $conditionValue2, $numericContent2), true, true, false, "Check if the given content '$numericContent2' is different than the specified check value '$conditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $conditionValue1, $content1), true, false, false, "Check if the given content '$content1' is different than the specified check value '$conditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $conditionValue2, $content2), true, false, false, "Check if the given content '$content2' is different than the specified check value '$conditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $versionConditionValue2, $versionContent1), true, true, false, "Check if the given content '$versionContent1' is different than the specified check value '$versionConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, $versionConditionValue1, $versionContent1), true, false, false, "Check if the given content '$versionContent1' is different than the specified check value '$versionConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN), false, false, true, "Check if the given content '' is different than the specified check value ''."],
-            [new VerifyString(VerifyString::CONDITION_DIFFERENT_THAN, '', $content1), false, false, true, "Check if the given content '$content1' is different than the specified check value ''."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue1, $numericContent1, true, false, false, false, false, "Check if the given content '$numericContent1' is different than the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue2, $numericContent1, true, false, false, true, false, "Check if the given content '$numericContent1' is different than the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue1, $numericContent2, true, false, false, true, false, "Check if the given content '$numericContent2' is different than the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue2, $numericContent2, true, false, false, false, false, "Check if the given content '$numericContent2' is different than the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue1, $content1, true, false, false, true, false, "Check if the given content '$content1' is different than the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $numericConditionValue2, $content1, true, false, false, true, false, "Check if the given content '$content1' is different than the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $conditionValue1, $numericContent2, true, false, false, true, false, "Check if the given content '$numericContent2' is different than the specified check value '$conditionValue1'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $conditionValue2, $numericContent2, true, false, false, true, false, "Check if the given content '$numericContent2' is different than the specified check value '$conditionValue2'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $conditionValue1, $content1, true, false, false, false, false, "Check if the given content '$content1' is different than the specified check value '$conditionValue1'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $conditionValue2, $content2, true, false, false, false, false, "Check if the given content '$content2' is different than the specified check value '$conditionValue2'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $versionConditionValue2, $versionContent1, true, false, false, true, false, "Check if the given content '$versionContent1' is different than the specified check value '$versionConditionValue2'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, $versionConditionValue1, $versionContent1, true, false, false, false, false, "Check if the given content '$versionContent1' is different than the specified check value '$versionConditionValue1'."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, "", "", false, true, false, false, true, "Check if the given content '' is different than the specified check value ''."],
+            [VerifyString::CONDITION_DIFFERENT_THAN, '', $content1, false, true, false, false, true, "Check if the given content '$content1' is different than the specified check value ''."],
             /** CONDITION_CONTAINS tests */
-            [new VerifyString(VerifyString::CONDITION_CONTAINS, $conditionValue1, $longContent1), true, true, false, "Check if the given content '$longContent1' contains the specified check value '$conditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_CONTAINS, $numericConditionValue1, $longContent1), true, true, false, "Check if the given content '$longContent1' contains the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_CONTAINS, $conditionValue2, $longContent1), true, false, false, "Check if the given content '$longContent1' contains the specified check value '$conditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_CONTAINS, $numericConditionValue2, $longContent1), true, false, false, "Check if the given content '$longContent1' contains the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_CONTAINS, $conditionValue2, $longContent2), true, true, false, "Check if the given content '$longContent2' contains the specified check value '$conditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_CONTAINS, $numericConditionValue2, $longContent2), true, true, false, "Check if the given content '$longContent2' contains the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_CONTAINS, $conditionValue1, $longContent2), true, false, false, "Check if the given content '$longContent2' contains the specified check value '$conditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_CONTAINS, $numericConditionValue2, $longContent2), true, true, false, "Check if the given content '$longContent2' contains the specified check value '$numericConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_CONTAINS, $versionConditionValue1, $longContent4), true, true, false, "Check if the given content '$longContent4' contains the specified check value '$versionConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_CONTAINS, $versionConditionValue2, $longContent4), true, false, false, "Check if the given content '$longContent4' contains the specified check value '$versionConditionValue2'."],
-            [new VerifyString(VerifyString::CONDITION_CONTAINS), false, false, true, "Check if the given content '' contains the specified check value ''."],
-            [new VerifyString(VerifyString::CONDITION_CONTAINS, '', $content1), false, false, true, "Check if the given content '$content1' contains the specified check value ''."],
+            [VerifyString::CONDITION_CONTAINS, $conditionValue1, $longContent1, true, false, false, true, false, "Check if the given content '$longContent1' contains the specified check value '$conditionValue1'."],
+            [VerifyString::CONDITION_CONTAINS, $numericConditionValue1, $longContent1, true, false, false, true, false, "Check if the given content '$longContent1' contains the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_CONTAINS, $conditionValue2, $longContent1, true, false, false, false, false, "Check if the given content '$longContent1' contains the specified check value '$conditionValue2'."],
+            [VerifyString::CONDITION_CONTAINS, $numericConditionValue2, $longContent1, true, false, false, false, false, "Check if the given content '$longContent1' contains the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_CONTAINS, $conditionValue2, $longContent2, true, false, false, true, false, "Check if the given content '$longContent2' contains the specified check value '$conditionValue2'."],
+            [VerifyString::CONDITION_CONTAINS, $numericConditionValue2, $longContent2, true, false, false, true, false, "Check if the given content '$longContent2' contains the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_CONTAINS, $conditionValue1, $longContent2, true, false, false, false, false, "Check if the given content '$longContent2' contains the specified check value '$conditionValue1'."],
+            [VerifyString::CONDITION_CONTAINS, $numericConditionValue2, $longContent2, true, false, false, true, false, "Check if the given content '$longContent2' contains the specified check value '$numericConditionValue2'."],
+            [VerifyString::CONDITION_CONTAINS, $versionConditionValue1, $longContent4, true, false, false, true, false, "Check if the given content '$longContent4' contains the specified check value '$versionConditionValue1'."],
+            [VerifyString::CONDITION_CONTAINS, $versionConditionValue2, $longContent4, true, false, false, false, false, "Check if the given content '$longContent4' contains the specified check value '$versionConditionValue2'."],
+            [VerifyString::CONDITION_CONTAINS, "", "", false, true, false, false, true, "Check if the given content '' contains the specified check value ''."],
+            [VerifyString::CONDITION_CONTAINS, '', $content1, false, true, false, false, true, "Check if the given content '$content1' contains the specified check value ''."],
             /** CONDITION_STARTS_WITH tests */
-            [new VerifyString(VerifyString::CONDITION_STARTS_WITH, "test", $content1), true, true, false, "Check if the given content '$content1' starts with the specified check value 'test'."],
-            [new VerifyString(VerifyString::CONDITION_STARTS_WITH, $conditionValue1, $content1), true, true, false, "Check if the given content '$content1' starts with the specified check value '$conditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_STARTS_WITH, $numericConditionValue1, $content1), true, false, false, "Check if the given content '$content1' starts with the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_STARTS_WITH), false, false, true, "Check if the given content '' starts with the specified check value ''."],
-            [new VerifyString(VerifyString::CONDITION_STARTS_WITH, '', $content1), false, false, true, "Check if the given content '$content1' starts with the specified check value ''."],
+            [VerifyString::CONDITION_STARTS_WITH, "test", $content1, true, false, false, true, false, "Check if the given content '$content1' starts with the specified check value 'test'."],
+            [VerifyString::CONDITION_STARTS_WITH, $conditionValue1, $content1, true, false, false, true, false, "Check if the given content '$content1' starts with the specified check value '$conditionValue1'."],
+            [VerifyString::CONDITION_STARTS_WITH, $numericConditionValue1, $content1, true, false, false, false, false, "Check if the given content '$content1' starts with the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_STARTS_WITH, "", "", false, true, false, false, true, "Check if the given content '' starts with the specified check value ''."],
+            [VerifyString::CONDITION_STARTS_WITH, '', $content1, false, true, false, false, true, "Check if the given content '$content1' starts with the specified check value ''."],
             /** CONDITION_ENDS_WITH tests */
-            [new VerifyString(VerifyString::CONDITION_ENDS_WITH, "1", $content1), true, true, false, "Check if the given content '$content1' ends with the specified check value '1'."],
-            [new VerifyString(VerifyString::CONDITION_ENDS_WITH, $conditionValue1, $content1), true, true, false, "Check if the given content '$content1' ends with the specified check value '$conditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_ENDS_WITH, $numericConditionValue1, $content1), true, false, false, "Check if the given content '$content1' ends with the specified check value '$numericConditionValue1'."],
-            [new VerifyString(VerifyString::CONDITION_ENDS_WITH), false, false, true, "Check if the given content '' ends with the specified check value ''."],
-            [new VerifyString(VerifyString::CONDITION_ENDS_WITH, '', $content1), false, false, true, "Check if the given content '$content1' ends with the specified check value ''."],
+            [VerifyString::CONDITION_ENDS_WITH, "1", $content1, true, false, false, true, false, "Check if the given content '$content1' ends with the specified check value '1'."],
+            [VerifyString::CONDITION_ENDS_WITH, $conditionValue1, $content1, true, false, false, true, false, "Check if the given content '$content1' ends with the specified check value '$conditionValue1'."],
+            [VerifyString::CONDITION_ENDS_WITH, $numericConditionValue1, $content1, true, false, false, false, false, "Check if the given content '$content1' ends with the specified check value '$numericConditionValue1'."],
+            [VerifyString::CONDITION_ENDS_WITH, "", "", false, true, false, false, true, "Check if the given content '' ends with the specified check value ''."],
+            [VerifyString::CONDITION_ENDS_WITH, '', $content1, false, true, false, false, true, "Check if the given content '$content1' ends with the specified check value ''."],
             /** CONDITION_IS_EMPTY tests */
-            [(new VerifyString(VerifyString::CONDITION_IS_EMPTY))->setContent($content1), true, false, false, "Check if the given content '$content1' is empty."],
-            [(new VerifyString(VerifyString::CONDITION_IS_EMPTY))->setContent($longContent1), true, false, false, "Check if the given content '$longContent1' is empty."],
-            [(new VerifyString(VerifyString::CONDITION_IS_EMPTY))->setContent($numericContent1), true, false, false, "Check if the given content '$numericContent1' is empty."],
-            [new VerifyString(VerifyString::CONDITION_IS_EMPTY), true, true, false, "Check if the given content '' is empty."],
-            [new VerifyString(VerifyString::CONDITION_IS_EMPTY, 'condition-value'), true, true, false, "Check if the given content '' is empty."],
+            [VerifyString::CONDITION_IS_EMPTY, '', $content1, true, false, false, false, false, "Check if the given content '$content1' is empty."],
+            [VerifyString::CONDITION_IS_EMPTY, '', $longContent1, true, false, false, false, false, "Check if the given content '$longContent1' is empty."],
+            [VerifyString::CONDITION_IS_EMPTY, '', $numericContent1, true, false, false, false, false, "Check if the given content '$numericContent1' is empty."],
+            [VerifyString::CONDITION_IS_EMPTY, "", "", true, false, false, true, false, "Check if the given content '' is empty."],
+            [VerifyString::CONDITION_IS_EMPTY, 'condition-value', "", true, false, false, true, false, "Check if the given content '' is empty."],
             /** CONDITION_REGEX tests */
-            [new VerifyString(VerifyString::CONDITION_REGEX, $decimalValueRegex, $longContent3), true, false, false, "Check if the given content '$longContent3' respects the given regex \"$decimalValueRegex\"."],
-            [new VerifyString(VerifyString::CONDITION_REGEX, $decimalValueRegex, $longContent1), true, true, false, "Check if the given content '$longContent1' respects the given regex \"$decimalValueRegex\"."],
-            [new VerifyString(VerifyString::CONDITION_REGEX, $decimalValueRegex), true, false, false, "Check if the given content '' respects the given regex \"$decimalValueRegex\"."],
-            [new VerifyString(VerifyString::CONDITION_REGEX), false, false, true, "Check if the given content '' respects the given regex \"\"."],
-            [new VerifyString(VerifyString::CONDITION_REGEX), false, false, true, "Check if the given content '' respects the given regex \"\"."],
+            [VerifyString::CONDITION_REGEX, $decimalValueRegex, $longContent3, true, false, false, false, false, "Check if the given content '$longContent3' respects the given regex \"$decimalValueRegex\"."],
+            [VerifyString::CONDITION_REGEX, $decimalValueRegex, $longContent1, true, false, false, true, false, "Check if the given content '$longContent1' respects the given regex \"$decimalValueRegex\"."],
+            [VerifyString::CONDITION_REGEX, $decimalValueRegex, "", true, false, false, false, false, "Check if the given content '' respects the given regex \"$decimalValueRegex\"."],
+            [VerifyString::CONDITION_REGEX, "", "", false, true, false, false, true, "Check if the given content '' respects the given regex \"\"."],
+            [VerifyString::CONDITION_REGEX, "", "", false, true, false, false, true, "Check if the given content '' respects the given regex \"\"."],
             /** Wrong condition */
-            [new VerifyString('wrong_condition'), false, false, true, "Unsupported condition."],
+            ['wrong_condition', "", "", false, true, false, false, true, "Unsupported condition."],
         ];
     }
 
@@ -161,23 +160,32 @@ class VerifyStringTest extends TestCase
      *
      * @dataProvider conditionsProvider
      *
-     * @param VerifyString $verifyString
+     * @param string $condition
+     * @param $conditionValue
+     * @param string $initialContent
      * @param bool $isValid
+     * @param bool $isFatal
+     * @param bool $isSuccessRequired
      * @param bool $expected
      * @param bool $exceptionExpected
      *
      * @throws ActionException
      */
     public function testIsValid(
-        VerifyString $verifyString,
+        string $condition,
+        $conditionValue,
+        string $initialContent,
         bool $isValid,
-        bool $expected,
+        bool $isFatal,
+        bool $isSuccessRequired,
+        $expected,
         bool $exceptionExpected
     ): void
     {
         if ($exceptionExpected) {
             $this->expectException(ActionException::class);
         }
+        $verifyString = new VerifyString($condition, $conditionValue, $initialContent);
         $this->assertEquals($isValid, $verifyString->isValid());
     }
 
@@ -186,26 +194,37 @@ class VerifyStringTest extends TestCase
      *
      * @dataProvider conditionsProvider
      *
-     * @param VerifyString $verifyString
+     * @param string $condition
+     * @param $conditionValue
+     * @param string $initialContent
      * @param bool $isValid
-     * @param bool $expected
+     * @param bool $isFatal
+     * @param bool $isSuccessRequired
+     * @param mixed $expected
      * @param bool $exceptionExpected
-     * @param string $objectMessage
      *
-     * @throws WorkerException
+     * @throws ActionException
      */
     public function testRun(
-        VerifyString $verifyString,
+        string $condition,
+        $conditionValue,
+        string $initialContent,
         bool $isValid,
-        bool $expected,
-        bool $exceptionExpected,
-        string $objectMessage
+        bool $isFatal,
+        bool $isSuccessRequired,
+        $expected,
+        bool $exceptionExpected
     ): void
     {
+        $verifyString =
+            (new VerifyString($condition, $conditionValue, $initialContent))
+                ->setIsFatal($isFatal)
+                ->setIsSuccessRequired($isSuccessRequired)
+        ;
         if ($exceptionExpected) {
             $this->expectException(ActionException::class);
         }
-        $this->assertEquals($expected, $verifyString->run());
+        $this->assertEquals($expected, $verifyString->run()->getResult());
     }
 
     /**
@@ -213,20 +232,30 @@ class VerifyStringTest extends TestCase
      *
      * @dataProvider conditionsProvider
      *
-     * @param VerifyString $verifyString
+     * @param string $condition
+     * @param $conditionValue
+     * @param string $initialContent
      * @param bool $isValid
+     * @param bool $isFatal
+     * @param bool $isSuccessRequired
      * @param bool $expected
      * @param bool $exceptionExpected
      * @param string $objectMessage
      */
     public function testStringify(
-        VerifyString $verifyString,
+        string $condition,
+        $conditionValue,
+        string $initialContent,
         bool $isValid,
-        bool $expected,
+        bool $isFatal,
+        bool $isSuccessRequired,
+        $expected,
         bool $exceptionExpected,
         string $objectMessage
     ): void
     {
+        $verifyString = new VerifyString($condition, $conditionValue);
+        $verifyString->setContent($initialContent);
         $this->assertEquals($objectMessage, (string) $verifyString);
         $this->assertEquals($objectMessage, $verifyString->stringify());
     }
