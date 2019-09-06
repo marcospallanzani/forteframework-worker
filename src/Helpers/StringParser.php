@@ -50,4 +50,31 @@ class StringParser
         }
         return (substr($check, -$length) === $endsWith);
     }
+
+    /**
+     * Returns a string version of the given value.
+     * (arrays are converted to a json string).
+     *
+     * @param mixed $value The value to be converted to a string.
+     *
+     * @return string
+     */
+    public static function stringifyResult($value): string
+    {
+        if (is_array($value)) {
+            return json_encode($value);
+        } elseif (is_object($value)) {
+            return sprintf(
+                "Class type: %s. Object value: %s.",
+                get_class($value),
+                (string) $value
+            );
+        } elseif (is_bool($value)) {
+            return (boolval($value) ? 'true' : 'false');
+        } elseif (is_null($value)) {
+            return "NULL";
+        } else {
+            return (string) $value;
+        }
+    }
 }
