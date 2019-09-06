@@ -12,6 +12,8 @@
 namespace Tests\Unit\Actions\Checks\Files;
 
 use Forte\Worker\Actions\Checks\Files\DirectoryExists;
+use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,13 +24,60 @@ use PHPUnit\Framework\TestCase;
 class DirectoryExistsTest extends TestCase
 {
     /**
+     * Data provider for isValid() tests.
+     *
+     * @return array
+     */
+    public function validationProvider(): array
+    {
+        return [
+            ["", false, true],
+            [__DIR__, true, false]
+        ];
+    }
+
+    /**
+     * Test method DirectoryExists::isValid().
+     *
+     * @dataProvider validationProvider
+     *
+     * @param string $dirPath
+     * @param bool $expected
+     * @param bool $exceptionExpected
+     *
+     * @throws ActionException
+     */
+    public function testIsValid(string $dirPath, bool $expected, bool $exceptionExpected): void
+    {
+        if ($exceptionExpected) {
+            $this->expectException(ActionException::class);
+        }
+        $this->assertEquals($expected, (new DirectoryExists($dirPath))->isValid());
+    }
+
+    /**
      * Test method DirectoryExists::stringify().
      */
     public function testStringify(): void
     {
-        $directoryPath = "/path/to/test/file.php";
+        $directoryPath = "/path/to/test";
         $directoryExists = new DirectoryExists($directoryPath);
         $this->assertEquals("Check if directory '$directoryPath' exists.", (string) $directoryExists);
         $this->assertEquals("Check if directory '$directoryPath' exists.", $directoryExists->stringify());
+    }
+
+
+    /**
+     * Test method DirectoryExists::run().
+     *
+     * @depends testIsValid
+     *
+     * @throws WorkerException
+     */
+    public function testCheckDirectoryExists(): void
+    {
+        $directoryPath = "/path/to/test";
+        $this->assertEquals(false, (new DirectoryExists($directoryPath))->run()->getResult());
+        $this->assertEquals(false, (new DirectoryExists())->setPath($directoryPath)->run()->getResult());
     }
 }

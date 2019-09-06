@@ -12,6 +12,8 @@
 namespace Tests\Unit\Actions\Checks\Files;
 
 use Forte\Worker\Actions\Checks\Files\DirectoryDoesNotExist;
+use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\WorkerException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,6 +23,52 @@ use PHPUnit\Framework\TestCase;
  */
 class DirectoryDoesNotExistTest extends TestCase
 {
+    /**
+     * Data provider for isValid() tests.
+     *
+     * @return array
+     */
+    public function validationProvider(): array
+    {
+        return [
+            ["", false, true],
+            [__DIR__, true, false]
+        ];
+    }
+
+    /**
+     * Test method DirectoryDoesNotExist::isValid().
+     *
+     * @dataProvider validationProvider
+     *
+     * @param string $dirPath
+     * @param bool $expected
+     * @param bool $exceptionExpected
+     *
+     * @throws ActionException
+     */
+    public function testIsValid(string $dirPath, bool $expected, bool $exceptionExpected): void
+    {
+        if ($exceptionExpected) {
+            $this->expectException(ActionException::class);
+        }
+        $this->assertEquals($expected, (new DirectoryDoesNotExist($dirPath))->isValid());
+    }
+
+    /**
+     * Test method DirectoryDoesNotExist::run().
+     *
+     * @depends testIsValid
+     *
+     * @throws WorkerException
+     */
+    public function testCheckDirectoryExists(): void
+    {
+        $directoryPath = "/path/to/test";
+        $this->assertEquals(true, (new DirectoryDoesNotExist($directoryPath))->run()->getResult());
+        $this->assertEquals(true, (new DirectoryDoesNotExist())->setPath($directoryPath)->run()->getResult());
+    }
+
     /**
      * Test method DirectoryDoesNotExist::stringify().
      */
