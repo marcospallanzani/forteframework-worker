@@ -405,7 +405,6 @@ class VerifyArray extends AbstractAction
             return array_key_exists($this->value, $searchValue);
         }
         $this->throwWorkerException(
-            $this,
             "Check %s supports only strings and arrays for both the configured and expected values.",
             self::CHECK_CONTAINS
         );
