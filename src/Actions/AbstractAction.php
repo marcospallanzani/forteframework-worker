@@ -406,35 +406,4 @@ abstract class AbstractAction implements ValidActionInterface
             );
         }
     }
-
-    /**
-     * Check if the given file path exists or not; if it does not exist,
-     * an ActionException will be thrown.
-     *
-     * @param string $filePath The file path to be checked.
-     * @param bool $raiseError Whether an exception should be thrown if
-     * the file does not exist.
-     *
-     * @return bool Returns true if the given file path points to an
-     * existing file; false otherwise.
-     *
-     * @throws ActionException If the file does not exist,
-     * an ActionException will be thrown.
-     *
-     * @deprecated Should we deprecate this function?
-     */
-//TODO REMOVE THIS FUNCTION
-    protected function checkFileExists(string $filePath, bool $raiseError = true): bool
-    {
-        $fileExists = false;
-
-        try {
-            // We check if the origin file exists
-            $fileExists = $this->fileExists($filePath, $raiseError);
-        } catch (WorkerException $workerException) {
-            $this->throwActionException($this, $workerException->getMessage());
-        }
-
-        return $fileExists;
-    }
 }

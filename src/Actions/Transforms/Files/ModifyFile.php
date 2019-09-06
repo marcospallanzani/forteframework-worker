@@ -430,7 +430,7 @@ class ModifyFile extends AbstractAction
     protected function apply(ActionResult $actionResult): ActionResult
     {
         // We check if the origin file exists
-        $this->checkFileExists($this->filePath);
+        $this->fileExists($this->filePath);
 
         // We open the file. we read it line by line and we modify each line if the condition is met
         $fileHandler = fopen($this->filePath, "r");
