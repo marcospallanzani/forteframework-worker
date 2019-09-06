@@ -107,7 +107,7 @@ abstract class AbstractAction implements ValidActionInterface
      * @throws ActionException If this AbstractAction subclass instance
      * was not well configured.
      */
-    public function isValid(): bool
+    public final function isValid(): bool
     {
         // By catching here all exceptions, we are sure that the
         // isValid method only throws ActionException instances.
@@ -135,7 +135,7 @@ abstract class AbstractAction implements ValidActionInterface
      *
      * @throws ActionException
      */
-    public function run(): ActionResult
+    public final function run(): ActionResult
     {
         $actionResult = new ActionResult($this);
 
