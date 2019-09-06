@@ -3,7 +3,6 @@
 namespace Forte\Worker\Exceptions;
 
 use Forte\Worker\Actions\AbstractAction;
-use Forte\Worker\Actions\ActionResult;
 
 /**
  * Class ActionException.
@@ -68,17 +67,6 @@ class ActionException extends WorkerException
     }
 
     /**
-     * Set the list of children failures.
-     *
-     * @param array $childrenFailures List of children
-     * failures to be set.
-     */
-    public function setChildrenFailures(array $childrenFailures): void
-    {
-        $this->childrenFailures = $childrenFailures;
-    }
-
-    /**
      * Add the given ActionException instance to the list of
      * children action failures.
      *
@@ -87,6 +75,35 @@ class ActionException extends WorkerException
     public function addChildFailure(ActionException $actionException): void
     {
         $this->childrenFailures[] = $actionException;
+    }
+
+    /**
+     * Return an array representation of this ActionException instance.
+     *
+     * @return array Array representation of this ActionException instance.
+     */
+    public function toArray(): array
+    {
+        $array = [];
+
+        // The action
+        $array['action'] = $this->action->stringify();
+
+        // The error message
+        $array['error_message'] = $this->message;
+
+        // The error code
+        $array['error_code'] = $this->code;
+
+        // The children failures
+        $array['children_failures'] = [];
+        foreach ($this->childrenFailures as $childrenFailure) {
+            if ($childrenFailure instanceof ActionException) {
+                $array['children_failures'][] = $childrenFailure->toArray();
+            }
+        }
+
+        return $array;
     }
 
     /**
