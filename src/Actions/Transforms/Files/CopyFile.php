@@ -3,9 +3,8 @@
 namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
-use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Filters\Files\Copy as CopyFilter;
-use Zend\Filter\Exception\RuntimeException;
 
 /**
  * Class CopyFile
@@ -28,85 +27,6 @@ class CopyFile extends AbstractAction
      * @var string
      */
     protected $destinationFileName;
-
-    /**
-     * Whether this instance is in a valid state or not.
-     *
-     * @return bool True if this Copy instance was well configured;
-     * false otherwise.
-     *
-     * @throws ActionException
-     */
-    public function isValid(): bool
-    {
-        // The origin file path cannot be empty
-        if (empty($this->originFilePath)) {
-            $this->throwActionException($this, "You must specify a file to be copied.");
-        }
-
-        // If no destination folder is specified, or it is the same as the origin folder,
-        // AND the destination file name is the same as the original file name,
-        // THEN we throw an error
-        $destinationFilePath = $this->getDestinationFilePath();
-        if (rtrim($this->originFilePath, DIRECTORY_SEPARATOR) === $destinationFilePath) {
-            $this->throwActionException(
-                $this,
-                "The origin file '%s' and the specified destination file '%s' cannot be the same.",
-                $this->originFilePath,
-                $destinationFilePath
-            );
-        }
-
-        return true;
-    }
-
-    /**
-     * Apply the sub-class transformation action.
-     *
-     * @return bool True if the transform action implemented by this
-     * Copy instance was successfully applied; false otherwise.
-     *
-     * @throws ActionException
-     */
-    protected function apply(): bool
-    {
-        try {
-            // We check if the origin file exists
-            $this->checkFileExists($this->originFilePath);
-
-            $info = pathinfo($this->originFilePath);
-
-            // We check if a destination folder is set:
-            // if empty, we use the same origin file folder
-            if (empty($this->destinationFolder)) {
-                $this->destinationFolder = $info['dirname'];
-            }
-
-            // We check if the destination file name is set:
-            // if empty, we use the origin file name with a "_Copy" suffix
-            if (empty($this->destinationFileName)) {
-                $this->destinationFileName = $info['filename'] . "_COPY" . $info['extension'];
-            }
-
-            $copyFilter = new CopyFilter([
-                'target' => $this->getDestinationFilePath(),
-                'overwrite' => true
-            ]);
-            $copyFilter->filter($this->originFilePath);
-
-            return true;
-        } catch (RuntimeException $runtimeException) {
-            $this->throwActionException(
-                $this,
-                "An error occurred while copying file '%s' to '%s'. Error message is: '%s'",
-                $this->originFilePath,
-                $this->destinationFolder,
-                $runtimeException->getMessage()
-            );
-        }
-
-        return false;
-    }
 
     /**
      * Set the origin file path.
@@ -187,6 +107,26 @@ class CopyFile extends AbstractAction
     }
 
     /**
+     * Validate the given action result. This method returns true if the
+     * given ActionResult instance has a result value that is considered
+     * as a positive case by this AbstractAction subclass instance.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of the current AbstractAction subclass
+     * instance.
+     *
+     * @return bool True if the given ActionResult instance has a result value
+     * that is considered as a positive case by this AbstractAction subclass
+     * instance; false otherwise.
+     */
+    public function validateResult(ActionResult $actionResult): bool
+    {
+        // The ActionResult->result field should be set with a boolean
+        // representing the last execution of the apply method.
+        return (bool) $actionResult->getResult();
+    }
+
+    /**
      * Return the default destination folder (i.e. same folder as
      * the original file path).
      *
@@ -209,5 +149,77 @@ class CopyFile extends AbstractAction
     public function stringify(): string
     {
         return sprintf("Copy file '%s' to '%s'.", $this->originFilePath, $this->getDestinationFilePath());
+    }
+
+    /**
+     * Validate this CopyFile instance using its specific validation logic.
+     * It returns true if this CopyFile instance is well configured, i.e. if:
+     * - originFilePath is not be an empty string;
+     *
+     * @return bool True if no validation breaches were found; false otherwise.
+     *
+     * @throws \Exception If validation breaches were found.
+     */
+    protected function validateInstance(): bool
+    {
+        // The origin file path cannot be empty
+        if (empty($this->originFilePath)) {
+            $this->throwActionException($this, "You must specify a file to be copied.");
+        }
+
+        // If no destination folder is specified, or it is the same as the origin folder,
+        // AND the destination file name is the same as the original file name,
+        // THEN we throw an error
+        $destinationFilePath = $this->getDestinationFilePath();
+        if (rtrim($this->originFilePath, DIRECTORY_SEPARATOR) === $destinationFilePath) {
+            $this->throwActionException(
+                $this,
+                "The origin file '%s' and the specified destination file '%s' cannot be the same.",
+                $this->originFilePath,
+                $destinationFilePath
+            );
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Apply the sub-class transformation action.
+     *
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
+     *
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     * @throws \Exception
+     */
+    protected function apply(ActionResult $actionResult): ActionResult
+    {
+        // We check if the origin file exists
+        $this->fileExists($this->originFilePath);
+
+        $info = pathinfo($this->originFilePath);
+
+        // We check if a destination folder is set:
+        // if empty, we use the same origin file folder
+        if (empty($this->destinationFolder)) {
+            $this->destinationFolder = $info['dirname'];
+        }
+
+        // We check if the destination file name is set:
+        // if empty, we use the origin file name with a "_Copy" suffix
+        if (empty($this->destinationFileName)) {
+            $this->destinationFileName = $info['filename'] . "_COPY." . $info['extension'];
+        }
+
+        $copyFilter = new CopyFilter([
+            'target' => $this->getDestinationFilePath(),
+            'overwrite' => true
+        ]);
+        $copyFilter->filter($this->originFilePath);
+
+        return $actionResult->setResult(true);
     }
 }
