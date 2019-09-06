@@ -1,0 +1,25 @@
+vendor/
+node_modules/
+npm-debug.log
+.phpunit.result.cache
+yarn-error.log
+.buildpath
+.project
+.settings
+.svn
+simple-config*
+
+# Storage - Logs
+storage
+
+# Build APIs
+build/*
+skeleton/*
+*config.json
+
+# macOS and Windows files
+.DS_Store
+Thumbs.db
+
+# JetBrains
+.idea

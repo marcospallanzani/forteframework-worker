@@ -1,0 +1,22 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Monolog\Logger;
+use Monolog\Handler\RotatingFileHandler;
+use Symfony\Component\Console\Application;
+
+// Setting up the logger
+$logger = new Logger('forte-api-generator');
+$logger->pushHandler(new RotatingFileHandler('./storage/logs/forte-api-generator.log', Logger::WARNING));
+
+// Creating the application
+$application = new Application();
+
+// Registering all commands here
+$command = new \Forte\Generator\Api\Commands\GenerateForteAPI($logger, './config/app.yml');
+$application->add($command);
+
+// Running the application
+$application->run();

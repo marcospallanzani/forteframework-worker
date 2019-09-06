@@ -1,0 +1,74 @@
+<?php
+
+namespace Forte\Generator\Api\Config;
+
+use Forte\Worker\Exceptions\MissingKeyException;
+use Forte\Worker\Helpers\FileParser;
+
+/**
+ * Class ForteApi.
+ *
+ * This class wraps all required configuration keys, in order
+ * to generate a new Forte API from the Forte API Skeleton.
+ *
+ * @package Forte\Generator\Api\Config
+ */
+class ForteApi
+{
+    /**
+     * API Config Keys Constants
+     */
+    const CONFIG_PROJECT_NAME        = "name";
+    const CONFIG_PROJECT_DESCRIPTION = "description";
+
+    /**
+     * The generation parameters.
+     *
+     * @var array
+     */
+    protected $config = array();
+
+    /**
+     * The project name (e.g. "Your Company API").
+     *
+     * @var string
+     */
+    protected $projectName;
+
+    /**
+     * The project description (e.g."Your Company API Description with more details").
+     *
+     * @var string
+     */
+    protected $projectDescription;
+
+    /**
+     * ForteApi constructor.
+     *
+     * @param array $config List of all required and optional parameters required for the API generation
+     *
+     * @throws MissingKeyException
+     */
+    public function __construct(array $config)
+    {
+        $this->config = $config;
+
+        $this->projectName        = $this->getRequiredParameter(self::CONFIG_PROJECT_NAME);
+        $this->projectDescription = $this->getRequiredParameter(self::CONFIG_PROJECT_DESCRIPTION);
+    }
+
+    /**
+     * Returns the API configuration value for the given key;
+     * if not defined, an error will be thrown;
+     *
+     * @param string $key The configuration key
+     *
+     * @return mixed
+     *
+     * @throws MissingKeyException
+     */
+    public function getRequiredParameter(string $key)
+    {
+        return FileParser::getRequiredNestedArrayValue($key, $this->config);
+    }
+}
