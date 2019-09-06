@@ -86,8 +86,6 @@ class ActionResult
     public function __construct(AbstractAction $action)
     {
         $this->action = clone $action;
-
-        $this->setStartTimestamp();
     }
 
     /**
