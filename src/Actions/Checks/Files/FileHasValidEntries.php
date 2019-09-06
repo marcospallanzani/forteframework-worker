@@ -12,7 +12,6 @@
 namespace Forte\Worker\Actions\Checks\Files;
 
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Actions\ValidActionInterface;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Helpers\FileParser;
