@@ -11,6 +11,8 @@
 
 namespace Forte\Worker\Helpers;
 
+use Forte\Worker\Actions\AbstractAction;
+
 /**
  * Class StringParser. A set of methods to parse and handle strings.
  *
@@ -52,29 +54,34 @@ class StringParser
     }
 
     /**
-     * Returns a string version of the given value.
-     * (arrays are converted to a json string).
+     * Return a string version of the given variable (arrays are converted to a json string).
      *
-     * @param mixed $value The value to be converted to a string.
+     * @param mixed $variable The variable to be converted to a string.
      *
-     * @return string
+     * @return string String representation of the given variable
      */
-    public static function stringifyResult($value): string
+    public static function stringifyVariable($variable): string
     {
-        if (is_array($value)) {
-            return json_encode($value);
-        } elseif (is_object($value)) {
+        if (is_array($variable)) {
+            return json_encode($variable);
+        } elseif ($variable instanceof AbstractAction) {
             return sprintf(
                 "Class type: %s. Object value: %s.",
-                get_class($value),
-                (string) $value
+                get_class($variable),
+                $variable
             );
-        } elseif (is_bool($value)) {
-            return (boolval($value) ? 'true' : 'false');
-        } elseif (is_null($value)) {
-            return "NULL";
+        } elseif (is_object($variable)) {
+            return sprintf(
+                "Class type: %s. Object value: %s.",
+                get_class($variable),
+                self::stringifyVariable(get_object_vars($variable))
+            );
+        } elseif (is_bool($variable)) {
+            return (boolval($variable) ? 'true' : 'false');
+        } elseif (is_null($variable)) {
+            return "null";
         } else {
-            return (string) $value;
+            return (string) $variable;
         }
     }
 }
