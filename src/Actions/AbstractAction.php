@@ -139,6 +139,8 @@ abstract class AbstractAction implements ValidActionInterface
     {
         $actionResult = new ActionResult($this);
 
+        $actionResult->setStartTimestamp();
+
         // We don't catch here the exceptions thrown by the isValid() method.
         // A bad configured action should always be considered as FATAL.
         if ($this->isValid()) {
@@ -199,6 +201,8 @@ abstract class AbstractAction implements ValidActionInterface
             // We run the post-run actions
             $this->runAfterActions($actionResult);
         }
+
+        $actionResult->setEndTimestamp();
 
         return $actionResult;
     }
