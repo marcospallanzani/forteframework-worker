@@ -283,6 +283,21 @@ abstract class AbstractAction implements ValidActionInterface
     }
 
     /**
+     * Return an array representation of this AbstractAction subclass instance.
+     *
+     * @return array An array representation of this AbstractAction subclass instance.
+     */
+    public function toArray(): array
+    {
+        $variables['action_type'] = get_class($this);
+        $variables['action_description'] = $this->stringify();
+        return array_merge(
+            $variables,
+            $this->objectVariablesToArray(get_object_vars($this))
+        );
+    }
+
+    /**
      * Return a string representation of this AbstractAction subclass instance.
      *
      * @return false|string A string representation of this AbstractAction
@@ -409,5 +424,28 @@ abstract class AbstractAction implements ValidActionInterface
                 $parentActionFailureMessage
             );
         }
+    }
+
+    /**
+     * Convert all elements in the given variables list to an array.
+     *
+     * @param array $variables
+     *
+     * @return array
+     */
+    protected function objectVariablesToArray(array $variables): array
+    {
+        $toArray = [];
+        foreach ($variables as $key => $variable) {
+            if ($variable instanceof AbstractAction) {
+                $toArray[$key] = $variable->toArray();
+            } elseif (is_array($variable)) {
+                $toArray[$key] = $this->objectVariablesToArray($variable);
+            } else {
+                $toArray[$key] = $variable;
+            }
+        }
+
+        return $toArray;
     }
 }

@@ -260,10 +260,6 @@ class ActionResult
     {
         $array = [];
 
-        // We add the action
-        $array['action'] = $this->action->stringify();
-        $array['action'] = $this->action->stringify();
-
         // Start and end timestamp
         if ($this->startTimestamp) {
             $array['start_timestamp'] = $this->startTimestamp;
@@ -273,6 +269,9 @@ class ActionResult
             $array['end_timestamp'] = $this->endTimestamp;
             $array['end_date'] = date('Y-m-d H:i:s', $this->endTimestamp);
         }
+
+        // We add the action
+        $array['action'] = $this->action->toArray();
 
         // The global status
         $array['execution_status'] = $this->getStatus();
