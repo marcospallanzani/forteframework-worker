@@ -3,7 +3,7 @@
 namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
-use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Actions\ActionResult;
 
 /**
  * Class UnzipFile
@@ -21,60 +21,6 @@ class UnzipFile extends AbstractAction
      * @var string
      */
     protected $extractToPath;
-
-    /**
-     * Whether this instance is in a valid state or not.
-     *
-     * @return bool True if an Unzip instance was well configured;
-     * false otherwise.
-     *
-     * @throws ActionException If an Unzip instance was not well configured.
-     */
-    public function isValid(): bool
-    {
-        // The zip file path cannot be empty
-        if (empty($this->zipFilePath)) {
-            $this->throwActionException($this, "You must specify the zip file path.");
-        }
-
-        return true;
-    }
-
-    /**
-     * Apply the sub-class transformation action.
-     *
-     * @return bool True if the transform action implemented by this
-     * Unzip instance was successfully applied; false otherwise.
-     *
-     * @throws ActionException If the transformation action failed.
-     */
-    protected function apply(): bool
-    {
-        // We check if the zip file exists
-        $this->fileExists($this->zipFilePath);
-
-        $info = pathinfo($this->zipFilePath);
-
-        // We check if an extraction folder is set:
-        // if empty, we use the folder of the set zip file.
-        if (empty($this->extractToPath)) {
-            $this->extractToPath = $info['dirname'];
-        }
-
-        $zip = new \ZipArchive();
-        if ($zip->open($this->zipFilePath) === TRUE) {
-            $zip->extractTo($this->extractToPath);
-            $zip->close();
-        } else {
-            $this->throwActionException(
-                $this,
-                "Impossible to unzip the given ZIP file '%s'",
-                $this->zipFilePath
-            );
-        }
-
-        return true;
-    }
 
     /**
      * Open the specified zip file.
@@ -105,6 +51,26 @@ class UnzipFile extends AbstractAction
     }
 
     /**
+     * Validate the given action result. This method returns true if the
+     * given ActionResult instance has a result value that is considered
+     * as a positive case by this AbstractAction subclass instance.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of the current AbstractAction subclass
+     * instance.
+     *
+     * @return bool True if the given ActionResult instance has a result value
+     * that is considered as a positive case by this AbstractAction subclass
+     * instance; false otherwise.
+     */
+    public function validateResult(ActionResult $actionResult): bool
+    {
+        // The ActionResult->result field should be set with a boolean
+        // representing the last execution of the apply method.
+        return (bool) $actionResult->getResult();
+    }
+
+    /**
      * Return a human-readable string representation of this Unzip instance.
      *
      * @return string A human-readable string representation of this Unzip instance.
@@ -112,5 +78,68 @@ class UnzipFile extends AbstractAction
     public function stringify(): string
     {
         return sprintf("Unzip file '%s' to '%s'.", $this->zipFilePath, $this->extractToPath);
+    }
+
+    /**
+     * Validate this UnzipFile instance using its specific validation logic.
+     * It returns true if this UnzipFile instance is well configured, i.e. if:
+     * - zipFilePath is not be an empty string;
+     *
+     * @return bool True if no validation breaches were found; false otherwise.
+     *
+     * @throws \Exception If validation breaches were found.
+     */
+    protected function validateInstance(): bool
+    {
+        // The zip file path cannot be empty
+        if (empty($this->zipFilePath)) {
+            $this->throwActionException($this, "You must specify the zip file path.");
+        }
+
+        return true;
+    }
+
+    /**
+     * Apply the sub-class transformation action.
+     *
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
+     *
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     * @throws \Exception
+     */
+    protected function apply(ActionResult $actionResult): ActionResult
+    {
+        // We check if the zip file exists
+        $this->fileExists($this->zipFilePath);
+
+        $info = pathinfo($this->zipFilePath);
+
+        // We check if an extraction folder is set:
+        // if empty, we use the folder of the set zip file.
+        if (empty($this->extractToPath)) {
+            $this->extractToPath = $info['dirname'];
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($this->zipFilePath) === TRUE) {
+            $unzipped = $zip->extractTo($this->extractToPath);
+            $zip->close();
+            if ($unzipped) {
+                return $actionResult->setResult(true);
+            }
+        }
+
+        /**
+         * If file not unzipped (e.g. the user does not have the right to either
+         * read the zip file or to write to the destination folder), we throw an
+         * exception with a general error message.
+         */
+        $this->throwWorkerException(
+            "Impossible to unzip the given ZIP file '%s'",
+            $this->zipFilePath
+        );
     }
 }
