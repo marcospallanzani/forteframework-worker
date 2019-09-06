@@ -3,7 +3,7 @@
 namespace Forte\Worker\Actions\Transforms\Arrays;
 
 use Forte\Worker\Actions\AbstractAction;
-use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
 
@@ -42,6 +42,11 @@ class ModifyArray extends AbstractAction
      * @var string
      */
     protected $action;
+
+    /**
+     * @var bool
+     */
+    protected $modificationApplied = false;
 
     /**
      * The content to be modified.
@@ -122,19 +127,82 @@ class ModifyArray extends AbstractAction
     }
 
     /**
-     * Returns true if this ModifyArray instance is well configured:
+     * Validate the given action result. This method returns true if the
+     * given ActionResult instance has a result value that is considered
+     * as a positive case by this AbstractAction subclass instance.
+     * E.g. if the aim of the current action is to check that a given key X
+     * is defined in a given array Y, then the expected positive result is a
+     * boolean flag equal to true if the key X exists in the array Y.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of the current AbstractAction subclass
+     * instance.
+     *
+     * @return bool True if the given ActionResult instance has a result value
+     * that is considered as a positive case by this AbstractAction subclass
+     * instance; false otherwise.
+     */
+    public function validateResult(ActionResult $actionResult): bool
+    {
+        return ($this->modificationApplied && is_array($actionResult->getResult()));
+    }
+
+    /**
+     * Return a list of all available actions.
+     *
+     * @return array
+     */
+    public function getSupportedActions(): array
+    {
+        return self::getClassConstants('MODIFY_');
+    }
+
+    /**
+     * Return a human-readable string representation of this
+     * ModifyArray instance.
+     *
+     * @return string A human-readable string representation
+     * of this ModifyArray instance.
+     */
+    public function stringify(): string
+    {
+        switch($this->action) {
+            case self::MODIFY_ADD:
+                return sprintf("Add value '%s' with key '%s'", $this->stringifyValue(), $this->key);
+            case self::MODIFY_CHANGE_VALUE:
+                return sprintf("Modify key '%s' and set it to '%s'", $this->key, $this->stringifyValue());
+            case self::MODIFY_REMOVE_KEY:
+                return sprintf("Remove key '%s'", $this->key);
+            default:
+                return "Unsupported action";
+        }
+    }
+
+    /**
+     * Returns a string representation of this ModifyArray instance.
+     *
+     * @return false|string
+     */
+    public function __toString()
+    {
+        return $this->stringify();
+    }
+
+    /**
+     * Validate this ModifyArray instance using its specific validation logic.
+     * It returns true if this ModifyArray instance is well configured, i.e. if:
      * - key cannot be an empty string;
      * - action must equal to one of the class constants
      *   starting with prefix 'MODIFY_';
      *
-     * @return bool
+     * @return bool True if no validation breaches were found; false otherwise.
      *
-     * @throws ActionException
+     * @throws \Exception If validation breaches were found.
      */
-    public function isValid(): bool
+    protected function validateInstance(): bool
     {
         if (empty($this->key)) {
-            $this->throwActionException($this, "You need to specify the 'key' for the following check: '%s'.", $this);
+            $this->throwActionException($this, "No key specified.");
         }
 
         // If no action is specified OR an unsupported action is given, then we throw an error.
@@ -142,14 +210,30 @@ class ModifyArray extends AbstractAction
         if (!in_array($this->action, $modifyConstants)) {
             $this->throwActionException(
                 $this,
-                "The action '%s' is not supported. Impacted transform is: '%s'. Supported actions are: '%s'",
+                "Action %s not supported. Supported actions are [%s]",
                 $this->action,
-                $this,
                 implode(', ', $modifyConstants)
             );
         }
 
         return true;
+    }
+
+    /**
+     * Apply the configured modifications to the given array (modifyContent field).
+     *
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
+     *
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     * @throws \Exception
+     */
+    protected function apply(ActionResult $actionResult): ActionResult
+    {
+        $this->applyChangeToArray($this->modifyContent, $this->key, $this->action, $this->value);
+        return $actionResult->setResult($this->modifyContent);
     }
 
     /**
@@ -163,7 +247,7 @@ class ModifyArray extends AbstractAction
      *
      * @return array|mixed|null
      */
-    public function applyChangeToArray(array &$array, string $key, string $action, $modifiedValue): array
+    protected function applyChangeToArray(array &$array, string $key, string $action, $modifiedValue): array
     {
         $keysTree = explode(self::ARRAY_LEVELS_SEPARATOR, $key, 2);
         $value = null;
@@ -219,60 +303,6 @@ class ModifyArray extends AbstractAction
     }
 
     /**
-     * Return a list of all available actions.
-     *
-     * @return array
-     */
-    public function getSupportedActions(): array
-    {
-        return self::getClassConstants('MODIFY_');
-    }
-
-    /**
-     * Return a human-readable string representation of this
-     * ModifyArray instance.
-     *
-     * @return string A human-readable string representation
-     * of this ModifyArray instance.
-     */
-    public function stringify(): string
-    {
-        switch($this->action) {
-            case self::MODIFY_ADD:
-                return sprintf("Add value '%s' with key '%s'", $this->stringifyValue(), $this->key);
-            case self::MODIFY_CHANGE_VALUE:
-                return sprintf("Modify key '%s' and set it to '%s'", $this->key, $this->stringifyValue());
-            case self::MODIFY_REMOVE_KEY:
-                return sprintf("Remove key '%s'", $this->key);
-            default:
-                return "Unsupported action";
-        }
-    }
-
-    /**
-     * Returns a string representation of this ModifyArray instance.
-     *
-     * @return false|string
-     */
-    public function __toString()
-    {
-        return $this->stringify();
-    }
-
-    /**
-     * Apply the sub-class transformation action.
-     *
-     * @return bool True if the action implemented by this AbstractAction
-     * subclass instance was successfully applied; false otherwise.
-     */
-    protected function apply(): bool
-    {
-        $this->applyChangeToArray($this->modifyContent, $this->key, $this->action, $this->value);
-
-        return true;
-    }
-
-    /**
      * Applies the given action to the given array for the given key and value.
      *
      * @param array  $array
@@ -287,9 +317,11 @@ class ModifyArray extends AbstractAction
         switch($action) {
             case self::MODIFY_ADD:
             case self::MODIFY_CHANGE_VALUE:
+                $this->modificationApplied = true;
                 $array[$key] = $value;
                 break;
             case self::MODIFY_REMOVE_KEY:
+                $this->modificationApplied = true;
                 unset($array[$key]);
                 break;
         }

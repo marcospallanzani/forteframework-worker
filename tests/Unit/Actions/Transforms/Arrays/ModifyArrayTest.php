@@ -80,21 +80,22 @@ class ModifyArrayTest extends TestCase
             ],
             [
                 $modify = new ModifyArray('', ModifyArray::MODIFY_ADD),
-                sprintf("You need to specify the 'key' for the following check: '%s'.", $modify),
+                "No key specified",
                 true,
                 null
             ],
             [
                 $modifyWrongAction = new ModifyArray('key1', 'wrong_action'),
-                sprintf("The action 'wrong_action' is not supported. Impacted transform is: '%s'. Supported actions are: '%s'",
-                    $modifyWrongAction,
-                    implode(', ', $modifyWrongAction->getSupportedActions())),
+                sprintf(
+                    "Action wrong_action not supported. Supported actions are [%s]",
+                    implode(', ', $modifyWrongAction->getSupportedActions())
+                ),
                 true,
                 null
             ],
             [
                 $emptyModify = new ModifyArray('', ''),
-                sprintf("You need to specify the 'key' for the following check: '%s'.", $emptyModify),
+                "No key specified",
                 true,
                 null
             ],
@@ -139,21 +140,24 @@ class ModifyArrayTest extends TestCase
     }
 
     /**
-     * Tests the applyChangeToArray() function.
+     * Tests the run() function.
      *
      * @dataProvider complexChangesProvider
      *
      * @param string $key
      * @param string $action
-     * @param mixed  $value
-     * @param array  $array
-     * @param array  $expected
+     * @param mixed $value
+     * @param array $array
+     * @param array $expected
+     *
+     * @throws ActionException
      */
-    public function testApplyChangeToArray(string $key, string $action, $value, array $array, array $expected): void
+    public function testRun(string $key, string $action, $value, array $array, array $expected): void
     {
         $modifyArray = new ModifyArray($key, $action, $value);
-        $modifyArray->applyChangeToArray($array, $key, $action, $value);
-        $this->assertEquals($expected, $array);
+        $result = $modifyArray->setModifyContent($array)->run();
+        $this->assertTrue($modifyArray->validateResult($result));
+        $this->assertEquals($expected, $result->getResult());
     }
 
     /**
@@ -185,27 +189,6 @@ class ModifyArrayTest extends TestCase
     }
 
     /**
-     * Tests the run() function.
-     *
-     * @dataProvider complexChangesProvider
-     *
-     * @param string $key
-     * @param string $action
-     * @param mixed  $value
-     * @param array  $array
-     * @param array  $expected
-     *
-     * @throws ActionException
-     */
-    public function testRun(string $key, string $action, $value, array $array, array $expected): void
-    {
-        $modifyArray = new ModifyArray($key, $action, $value);
-        $modifyArray->setModifyContent($array)->run();
-        $modifiedArray = $modifyArray->getModifiedContent();
-        $this->assertEquals($expected, $modifiedArray);
-    }
-
-    /**
      * Tests the run() function failures.
      *
      * @dataProvider validationWithErrorsProvider
@@ -228,8 +211,8 @@ class ModifyArrayTest extends TestCase
             $this->expectException(ActionException::class);
             $modifyArray->setModifyContent([])->run();
         } else {
-            $modifyArray->setModifyContent([])->run();
-            $this->assertEquals($expected, $modifyArray->getModifiedContent());
+            $result = $modifyArray->setModifyContent([])->run();
+            $this->assertEquals($expected, $result->getResult());
         }
     }
 }
