@@ -12,7 +12,8 @@
 namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
-use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Actions\ActionResult;
+use Forte\Worker\Exceptions\WorkerException;
 
 /**
  * Class RemoveFile.
@@ -34,65 +35,6 @@ class RemoveFile extends AbstractAction
      * @var string
      */
     protected $mode;
-
-    /**
-     * Whether this instance is in a valid state or not.
-     *
-     * @return bool True if this Remove instance was well configured;
-     * false otherwise.
-     *
-     * @throws ActionException
-     */
-    public function isValid(): bool
-    {
-        // The file path cannot be empty
-        if (empty($this->filePath)) {
-            $this->throwActionException($this, "You must specify the file path.");
-        }
-
-        // The mode cannot be empty
-        if (empty($this->mode)) {
-            $this->throwActionException($this, "You must specify the remove mode.");
-        }
-
-        // Check if the given mode is supported
-        $modesConstants = self::getClassConstants('REMOVE_');
-        if (!in_array($this->mode, $modesConstants)) {
-            $this->throwActionException(
-                $this,
-                "The specified mode '%s' is not supported. Supported modes are: '%s'",
-                $this->mode,
-                implode(',', $modesConstants)
-            );
-        }
-
-        return true;
-    }
-
-    /**
-     * Apply the Remove action.
-     *
-     * @return bool True if the action implemented by this Remove
-     * instance was successfully applied; false otherwise.
-     *
-     * @throws ActionException
-     */
-    protected function apply(): bool
-    {
-        switch ($this->mode) {
-            case self::REMOVE_SINGLE_FILE:
-                return $this->deleteFile($this->filePath);
-                break;
-            case self::REMOVE_DIRECTORY:
-                return $this->deleteFolder($this->filePath);
-                break;
-            case self::REMOVE_FILE_PATTERN:
-                return (bool) $this->deleteFilePattern($this->filePath);
-                break;
-        }
-
-        return false;
-    }
 
     /**
      * Set the file path to be removed with a specific delete mode.
@@ -151,6 +93,26 @@ class RemoveFile extends AbstractAction
     }
 
     /**
+     * Validate the given action result. This method returns true if the
+     * given ActionResult instance has a result value that is considered
+     * as a positive case by this AbstractAction subclass instance.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of the current AbstractAction subclass
+     * instance.
+     *
+     * @return bool True if the given ActionResult instance has a result value
+     * that is considered as a positive case by this AbstractAction subclass
+     * instance; false otherwise.
+     */
+    public function validateResult(ActionResult $actionResult): bool
+    {
+        // The ActionResult->result field should be set with a boolean
+        // representing the last execution of the apply method.
+        return (bool) $actionResult->getResult();
+    }
+
+    /**
      * Return a human-readable string representation of this Remove instance.
      *
      * @return string A human-readable string representation of this Remove instance.
@@ -173,12 +135,79 @@ class RemoveFile extends AbstractAction
     }
 
     /**
+     * Validate this CopyFile instance using its specific validation logic.
+     * It returns true if this CopyFile instance is well configured, i.e. if:
+     * - filePath is not be an empty string;
+     * - mode is not be an empty string;
+     * - mode is an accepted value (class constants starting with REMOVE_);
+     *
+     * @return bool True if no validation breaches were found; false otherwise.
+     *
+     * @throws \Exception If validation breaches were found.
+     */
+    protected function validateInstance(): bool
+    {
+        // The file path cannot be empty
+        if (empty($this->filePath)) {
+            $this->throwActionException($this, "You must specify the file path.");
+        }
+
+        // The mode cannot be empty
+        if (empty($this->mode)) {
+            $this->throwActionException($this, "You must specify the remove mode.");
+        }
+
+        // Check if the given mode is supported
+        $modesConstants = self::getClassConstants('REMOVE_');
+        if (!in_array($this->mode, $modesConstants)) {
+            $this->throwActionException(
+                $this,
+                "The specified mode '%s' is not supported. Supported modes are: '%s'",
+                $this->mode,
+                implode(',', $modesConstants)
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Apply the sub-class transformation action.
+     *
+     * @param ActionResult $actionResult The action result object to register
+     * all failures and successful results.
+     *
+     * @return ActionResult The ActionResult instance with updated fields
+     * regarding failures and result content.
+     *
+     * @throws \Exception
+     */
+    protected function apply(ActionResult $actionResult): ActionResult
+    {
+        $removed = false;
+        switch ($this->mode) {
+            case self::REMOVE_SINGLE_FILE:
+                $removed = $this->deleteFile($this->filePath);
+                break;
+            case self::REMOVE_DIRECTORY:
+                $removed = $this->deleteFolder($this->filePath);
+                break;
+            case self::REMOVE_FILE_PATTERN:
+                $removed = (bool) $this->deleteFilePattern($this->filePath);
+                break;
+        }
+
+        return $actionResult->setResult($removed);
+    }
+
+    /**
      * @param string $folderPath The folder path to be deleted.
      *
      * @return bool True if the given folder and its whole content
      * (sub-folders and files) were deleted; false otherwise.
      *
-     * @throws ActionException The given path is neither a directory, nor a file.
+     * @throws WorkerException The given path is neither a directory,
+     * nor a file.
      */
     protected function deleteFolder(string $folderPath): bool
     {
@@ -197,8 +226,7 @@ class RemoveFile extends AbstractAction
             }
             return @rmdir($folderPath);
         }
-        $this->throwActionException(
-            $this,
+        $this->throwWorkerException(
             "The given file path '%s' is neither a valid file, nor a directory, nor a file pattern.",
             $this->filePath
         );
@@ -211,13 +239,13 @@ class RemoveFile extends AbstractAction
      *
      * @return bool True if the file was deleted; false otherwise.
      *
-     * @throws ActionException If the given path is not a valid file path
+     * @throws WorkerException If the given path is not a valid file path
      * (e.g. directory or file pattern).
      */
     protected function deleteFile(string $filePath): bool
     {
         if (!is_file($filePath)) {
-            $this->throwActionException($this, "'%s' is not a valid file path.", $this->filePath);
+            $this->throwWorkerException("'%s' is not a valid file path.", $this->filePath);
         }
         return @unlink($filePath);
     }
