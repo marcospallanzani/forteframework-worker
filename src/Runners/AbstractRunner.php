@@ -3,6 +3,7 @@
 namespace Forte\Worker\Runners;
 
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ActionException;
 
 /**
@@ -41,28 +42,39 @@ class AbstractRunner
 
     /**
      * Apply all configured actions in the given sequence. This method
-     * returns a list of AbstractAction subclass instances that failed
-     *  or that did not execute correctly.
+     * returns a list of ActionResult instances, where each entry
+     * represents the result of each run action.
      *
-     * @return array A list of AbstractAction subclass instances
-     * that failed.
+     * @return array A list of ActionResult instances, where each entry
+     * represents the result of each run action.
+     *
+     * @throws ActionException A critical error was found.
      */
     public function applyActions(): array
     {
-        $failedActions = array();
+        $actionResults = array();
         foreach ($this->actions as $action) {
+            $actionResult = new ActionResult($action);
             try {
                 if ($action instanceof AbstractAction) {
                     $actionResult = $action->run();
-                    if (!$actionResult->isSuccessfulRun() || !$action->validateResult($actionResult)) {
-                        $failedActions[] = $action;
-                    }
                 }
             } catch (ActionException $actionException) {
-//TODO Error handling: how to return a chain of action exceptions?
-                $failedActions[] = $actionException->getMessage();
+
+                // If failure is critical (i.e. fatal or success required), we throw it again
+                if ($actionException->hasCriticalFailures()) {
+                    throw $actionException;
+                }
+
+                // If not critical, we add the failure to the current result
+                $actionResult->addActionFailure($actionException);
             }
+
+            // We add the current action result to the global list of action results
+            $actionResults[] = $actionResult;
+
         }
-        return $failedActions;
+
+        return $actionResults;
     }
 }

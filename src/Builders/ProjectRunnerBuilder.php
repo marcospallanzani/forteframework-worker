@@ -32,7 +32,7 @@ class ProjectRunnerBuilder
      */
     public function __construct(string $projectRootFolder)
     {
-        $this->setRunner(new ProjectRunner($projectRootFolder));
+        $this->runner = new ProjectRunner($projectRootFolder);
     }
 
     /**
@@ -46,27 +46,18 @@ class ProjectRunnerBuilder
      */
     public function initFromZipFile(string $zipFilePath): self
     {
-        $this->addAction($this->getUnzipFileAction($zipFilePath));
+        $fullProjectPath = $this->runner->getProjectFolder();
+
+        $this->addAction(
+            /** main action */
+            (new UnzipFile())->open($zipFilePath)->extractTo($fullProjectPath),
+            /** pre-run actions */
+            [new FileExists($zipFilePath)],
+            /** post-run actions */
+            [new FileExists($fullProjectPath)]
+        );
 
         return $this;
-    }
-
-    /**
-     * Returns an instance of the UnzipFile object.
-     *
-     * @param string $zipFilePath The zip file to unzip.
-     *
-     * @return UnzipFile
-     */
-    public function getUnzipFileAction(string $zipFilePath): UnzipFile
-    {
-        $fullProjectPath = $this->runner->getProjectFolder();
-        return (new UnzipFile())
-            ->addBeforeAction(new FileExists($zipFilePath))
-            ->addAfterAction(new FileExists($fullProjectPath))
-            ->open($zipFilePath)
-            ->extractTo($fullProjectPath)
-        ;
     }
 
     /**
@@ -75,26 +66,32 @@ class ProjectRunnerBuilder
      * the source file name with the add of the suffix "_COPY" will be used.
      *
      * @param string $sourceFilePath The file full path to be copied.
-     * @param string|null $targeFileName The destination file name.
+     * @param string|null $targetFileName The destination file name.
      * @param string|null $targetFolder The destination folder.
      *
      * @return self
      */
     public function copyFileTo(
         string $sourceFilePath,
-        string $targeFileName = '',
+        string $targetFileName = '',
         string $targetFolder = ''
     ): self
     {
-        $copy = new CopyFile();
+        $copy = (new CopyFile())
+            ->copy($sourceFilePath)
+            ->toFolder($targetFolder)
+            ->withName($targetFileName)
+        ;
+
         $this->addAction(
-            $copy
-                ->copy($sourceFilePath)
-                ->toFolder($targetFolder)
-                ->withName($targeFileName)
-                ->addBeforeAction(new FileExists($sourceFilePath))
-                ->addAfterAction(new FileExists($copy->getDestinationFilePath()))
+            /** main action */
+            $copy,
+            /** pre-run actions */
+            [new FileExists($sourceFilePath)],
+            /** post-run actions */
+            [new FileExists($copy->getDestinationFilePath())]
         );
+
         return $this;
     }
 
@@ -110,8 +107,10 @@ class ProjectRunnerBuilder
     public function hasInstantiableClass(string $classFilePath, string $className): self
     {
         $this->addAction(
-            (new EmptyTransform())
-                ->addBeforeAction(new FileHasInstantiableClass($classFilePath, $className))
+        /** main action */
+            new EmptyTransform(),
+            /** pre-run actions */
+            [new FileHasInstantiableClass($classFilePath, $className)]
         );
 
         return $this;
@@ -134,12 +133,12 @@ class ProjectRunnerBuilder
     public function modifyConfigKey(string $filePath, string $contentType, string $key, $value): self
     {
         $this->addAction(
-            (new ChangeFileEntries($filePath, $contentType))
-                ->modifyKeyWithValue($key, $value)
-                ->addAfterAction(
-                    (new FileHasValidEntries($filePath, $contentType))
-                        ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
-                )
+            /** main action */
+            (new ChangeFileEntries($filePath, $contentType))->modifyKeyWithValue($key, $value),
+            /** pre-run actions */
+            [],
+            /** post-run actions */
+            [(new FileHasValidEntries($filePath, $contentType))->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)]
         );
 
         return $this;
@@ -161,12 +160,12 @@ class ProjectRunnerBuilder
     public function addConfigKey(string $filePath, string $contentType, string $key, $value): self
     {
         $this->addAction(
-            (new ChangeFileEntries($filePath, $contentType))
-                ->addKeyWithValue($key, $value)
-                ->addAfterAction(
-                    (new FileHasValidEntries($filePath, $contentType))
-                        ->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)
-                )
+            /** main action */
+            (new ChangeFileEntries($filePath, $contentType))->addKeyWithValue($key, $value),
+            /** pre-run actions */
+            [],
+            /** post-run actions */
+            [(new FileHasValidEntries($filePath, $contentType))->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)]
         );
 
         return $this;
@@ -187,15 +186,51 @@ class ProjectRunnerBuilder
     public function removeConfigKey(string $filePath, string $contentType, string $key): self
     {
         $this->addAction(
-            (new ChangeFileEntries($filePath, $contentType))
-                ->removeKey($key)
-                ->addAfterAction(
-                    (new FileHasValidEntries($filePath, $contentType))
-                        ->doesNotHaveKey($key)
-                )
+            /** main action */
+            (new ChangeFileEntries($filePath, $contentType))->removeKey($key),
+            /** pre-run actions */
+            [],
+            /** post-run actions */
+            [(new FileHasValidEntries($filePath, $contentType))->doesNotHaveKey($key)]
         );
 
         return $this;
+    }
+
+    /**
+     * Add an action to the project runner.
+     *
+     * @param AbstractAction $action The action to add.
+     * @param array $preRunActions A list of pre-run actions for the given action.
+     * @param array $postRunActions A list of post-run actions for the given action.
+     *
+     * @return AbstractAction The action added to the list of
+     * runnable actions.
+     */
+    public function addAction(
+        AbstractAction $action,
+        array $preRunActions = array(),
+        array $postRunActions = array()
+    ): AbstractAction
+    {
+        // Add the pre-run actions
+        foreach ($preRunActions as $preRunAction) {
+            if ($preRunAction instanceof AbstractAction) {
+                $action->addBeforeAction($preRunAction);
+            }
+        }
+
+        // Add the post-run actions
+        foreach ($postRunActions as $postRunAction) {
+            if ($postRunAction instanceof AbstractAction) {
+                $action->addAfterAction($postRunAction);
+            }
+        }
+
+        // Add the main action
+        $this->getRunner()->addAction($action);
+
+        return $action;
     }
 
     /**
@@ -222,33 +257,5 @@ class ProjectRunnerBuilder
     public function getRunner(): ProjectRunner
     {
         return $this->runner;
-    }
-
-    /**
-     * Set the ProjectRunner that represents all the actions
-     * built by this instance.
-     *
-     * @param ProjectRunner $runner
-     *
-     * @return void
-     */
-    protected function setRunner(ProjectRunner $runner): void
-    {
-        $this->runner = $runner;
-    }
-
-    /**
-     * Add an action to the project runner.
-     *
-     * @param AbstractAction $action the action to add.
-     *
-     * @return AbstractAction The action added to the list of
-     * runnable actions.
-     */
-    protected function addAction(AbstractAction $action): AbstractAction
-    {
-        $this->getRunner()->addAction($action);
-
-        return $action;
     }
 }
