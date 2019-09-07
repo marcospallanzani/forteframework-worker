@@ -22,6 +22,11 @@
         "Forte\\Worker\\": ["src"]
       }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "require-dev": {
         "phpunit/phpunit": "^8",
         "mockery/mockery": "^1.2"
