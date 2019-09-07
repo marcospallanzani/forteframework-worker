@@ -4,6 +4,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
+use Zend\Filter\Decompress;
 
 /**
  * Class UnzipFile
@@ -123,23 +124,27 @@ class UnzipFile extends AbstractAction
             $this->extractToPath = $info['dirname'];
         }
 
-        $zip = new \ZipArchive();
-        if ($zip->open($this->zipFilePath) === TRUE) {
-            $unzipped = $zip->extractTo($this->extractToPath);
-            $zip->close();
-            if ($unzipped) {
-                return $actionResult->setResult(true);
-            }
+        try {
+            $filter = new Decompress(array(
+                'adapter' => 'Zip',
+                'options' => array(
+                    'target' => $this->extractToPath,
+                )
+            ));
+            return $actionResult->setResult(
+                (bool) $filter->filter($this->zipFilePath)
+            );
+        } catch (\Exception $exception) {
+            /**
+             * If file not unzipped (e.g. the user does not have the right to either
+             * read the zip file or to write to the destination folder), we throw an
+             * exception with a general error message.
+             */
+            $this->throwWorkerException(
+                "Impossible to unzip the ZIP file %s. Reason: %s",
+                $this->zipFilePath,
+                $exception->getMessage()
+            );
         }
-
-        /**
-         * If file not unzipped (e.g. the user does not have the right to either
-         * read the zip file or to write to the destination folder), we throw an
-         * exception with a general error message.
-         */
-        $this->throwWorkerException(
-            "Impossible to unzip the given ZIP file '%s'",
-            $this->zipFilePath
-        );
     }
 }
