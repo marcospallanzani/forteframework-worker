@@ -104,9 +104,12 @@ class FileParser
      * @param string $contentType The content type (supported types are the
      * constants whose name starts with the prefix 'CONTENT_TYPE').
      *
+     * @return bool True if the content was successfully written to the
+     * given file path.
+     *
      * @throws WorkerException
      */
-    public static function writeToFile($content, string $filePath, string $contentType): void
+    public static function writeToFile($content, string $filePath, string $contentType): bool
     {
         try {
             switch ($contentType) {
@@ -138,6 +141,8 @@ class FileParser
                 $exception->getMessage()
             ));
         }
+
+        return true;
     }
 
     /**
@@ -227,5 +232,75 @@ class FileParser
         }
 
         return $fileExtension;
+    }
+
+    /**
+     * Export the given array to the given destination full file path. If no destination
+     * full file path is specified, a default path will be generated as follows:
+     * - use the $defaultNamePrefix parameter concatenated with the execution timestamp
+     *   to generate the destination file name;
+     * - use the $exportDirPath parameter to define the export directory; if this parameter
+     *   is empty, the execution directory will be used.
+     *
+     * @param array $content The array to write to the destination file.
+     * @param string $contentType The file content type (accepted values are
+     * FileParser constants starting with "CONTENT_TYPE_").
+     * @param string $destinationFullFilePath The destination file path. If not given,
+     * a default file name will be created.
+     * @param string $defaultNamePrefix In case no destination file is specified,
+     * this prefix will be used to generate a default file name (this prefix
+     * concatenated with the execution timestamp).
+     * @param string $exportDirPath In case no destination file is specified,
+     * this field will be used to generated the default file name full path;
+     * if empty, the execution directory will be used.
+     *
+     * @return string The export full file path.
+     *
+     * @throws WorkerException An error occurred while writing the
+     * given array content to the export file.
+     */
+    public static function exportArrayReportToFile(
+        array $content,
+        string $contentType = self::CONTENT_TYPE_JSON,
+        string $destinationFullFilePath = "",
+        string $defaultNamePrefix = "export_data",
+        string $exportDirPath = ""
+    ): string
+    {
+        if (!empty($destinationFullFilePath) && is_dir($destinationFullFilePath)) {
+            throw new WorkerException("The given destination file path cannot be a directory.");
+        }
+
+        if (empty($destinationFullFilePath)) {
+            // We check the given parameters
+            if (!empty($exportDirPath)) {
+                $exportDirPath = rtrim($exportDirPath, DIRECTORY_SEPARATOR);
+            } else {
+                $exportDirPath = ".";
+            }
+
+            // We define a default name
+            $fileName = rtrim($defaultNamePrefix, "_") . "_" . time();
+            $fileExtension = FileParser::getFileExtensionByContentType($contentType);
+            if ($fileExtension) {
+                $fileName .= '.' . $fileExtension;
+            } else {
+                // It means that the given content type is not supported by the FileParser class.
+                // In this case, we set it by default to array.
+                $contentType = self::CONTENT_TYPE_ARRAY;
+                $fileName .= '.php';
+            }
+            $destinationFullFilePath = $exportDirPath . DIRECTORY_SEPARATOR . $fileName;
+        }
+
+        // If XML content type, we have to define a parent node name
+        if ($contentType === FileParser::CONTENT_TYPE_XML) {
+            $content['element'] = $content;
+        }
+
+        // We write the result to the file path
+        self::writeToFile($content, $destinationFullFilePath, $contentType);
+
+        return $destinationFullFilePath;
     }
 }

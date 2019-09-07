@@ -5,6 +5,8 @@ namespace Forte\Worker\Runners;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\WorkerException;
+use Forte\Worker\Helpers\FileParser;
 
 /**
  * Class AbstractRunner. A base class for all runner implementations.
@@ -76,5 +78,77 @@ class AbstractRunner
         }
 
         return $actionResults;
+    }
+
+    /**
+     * Export the configured actions for this AbstractRunner subclass instance to the
+     * given destination full file path. If no destination full file path is specified,
+     * a default path will be generated.
+     *
+     * @param string $contentType The report file content type (accepted values are
+     * FileParser constants starting with "CONTENT_TYPE_").
+     * @param string $destinationFullFilePath The destination file path. If not given,
+     * a default file name will be created.
+     *
+     * @return string The export full file path.
+     *
+     * @throws WorkerException
+     */
+    public function exportAllActionsToFile(
+        string $contentType = FileParser::CONTENT_TYPE_JSON,
+        string $destinationFullFilePath = ""
+    ): string
+    {
+        $exportedActions = [];
+        foreach ($this->actions as $action) {
+            if ($action instanceof AbstractAction) {
+                $actionResult = new ActionResult($action);
+                $exportedActions[] = $actionResult->toArray(false);
+            }
+        }
+
+        return FileParser::exportArrayReportToFile(
+            $exportedActions,
+            $contentType,
+            $destinationFullFilePath,
+            "export_action_"
+        );
+    }
+
+    /**
+     * Export the given list of ActionResult instances to the destination full file
+     * path. If no destination full file path is specified, a default path will be
+     * generated.
+     *
+     * @param array $actionResults A list of ActionResult instances to be exported
+     * to the destination full file path.
+     * @param string $contentType The report file content type (accepted values are
+     * FileParser constants starting with "CONTENT_TYPE_").
+     * @param string $destinationFullFilePath The destination file path. If not given,
+     * a default file name will be created.
+     *
+     * @return string
+     *
+     * @throws WorkerException
+     */
+    public static function exportAllActionResultsToFile(
+        array $actionResults,
+        string $contentType = FileParser::CONTENT_TYPE_JSON,
+        string $destinationFullFilePath = ""
+    ): string
+    {
+        $exportedActionResults = [];
+        foreach ($actionResults as $actionResult) {
+            if ($actionResult instanceof ActionResult) {
+                $exportedActionResults[] = $actionResult->toArray();
+            }
+        }
+
+        return FileParser::exportArrayReportToFile(
+            $exportedActionResults,
+            $contentType,
+            $destinationFullFilePath,
+            "export_action_results_"
+        );
     }
 }

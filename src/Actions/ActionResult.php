@@ -311,117 +311,74 @@ class ActionResult
     /**
      * Convert this ActionResult instance to an array.
      *
+     * @param bool $runMode If true, all fields related to the execution of the AbstractAction
+     * subclass instance wrapped by this ActionResult instance, will be included.
+     *
      * @return array An array representation of this ActionResult instance.
      */
-    public function toArray(): array
+    public function toArray(bool $runMode = true): array
     {
         $array = [];
-
-        // Start and end timestamp
-        if ($this->startTimestamp) {
-            $array['start_timestamp'] = $this->startTimestamp;
-            $array['start_date'] = date('Y-m-d H:i:s', $this->startTimestamp);
-        }
-        if ($this->endTimestamp) {
-            $array['end_timestamp'] = $this->endTimestamp;
-            $array['end_date'] = date('Y-m-d H:i:s', $this->endTimestamp);
-        }
 
         // We add the action
         $array['action'] = $this->action->toArray();
 
-        // The global status
-        $array['execution_status'] = $this->getStatus();
-
-        // The result
-        if ($this->result instanceof AbstractAction) {
-            $array['result'] = $this->result->toArray();
-        } else {
-            $array['result'] = $this->result;
-        }
-
-        // The main action failures
-        $array['main_action_failures'] = [];
-        foreach ($this->actionFailures as $failure) {
-            if ($failure instanceof ActionException) {
-                $array['main_action_failures'][] = $failure->toArray();
+        if ($runMode) {
+            // Start and end timestamp
+            if ($this->startTimestamp) {
+                $array['start_timestamp'] = $this->startTimestamp;
+                $array['start_date'] = date('Y-m-d H:i:s', $this->startTimestamp);
             }
-        }
+            if ($this->endTimestamp) {
+                $array['end_timestamp'] = $this->endTimestamp;
+                $array['end_date'] = date('Y-m-d H:i:s', $this->endTimestamp);
+            }
 
-        // The pre-run action results
-        $array['pre_run_action_results'] = [];
-        foreach ($this->failedPreRunActionResults as $preRunActionResult) {
-            if ($preRunActionResult instanceof ActionResult) {
-                $array['pre_run_action_results'][] = $preRunActionResult->toArray();
-            }
-        }
-        foreach ($this->preRunActionResults as $preRunActionResult) {
-            if ($preRunActionResult instanceof ActionResult) {
-                $array['pre_run_action_results'][] = $preRunActionResult->toArray();
-            }
-        }
+            // The global status
+            $array['execution_status'] = $this->getStatus();
 
-        // The pre-run action results
-        $array['post_run_action_results'] = [];
-        foreach ($this->failedPostRunActionResults as $postRunActionResult) {
-            if ($postRunActionResult instanceof ActionResult) {
-                $array['post_run_action_results'][] = $postRunActionResult->toArray();
+            // The result
+            if ($this->result instanceof AbstractAction) {
+                $array['result'] = $this->result->toArray();
+            } else {
+                $array['result'] = $this->result;
             }
-        }
-        foreach ($this->postRunActionResults as $postRunActionResult) {
-            if ($postRunActionResult instanceof ActionResult) {
-                $array['post_run_action_results'][] = $postRunActionResult->toArray();
+
+            // The main action failures
+            $array['main_action_failures'] = [];
+            foreach ($this->actionFailures as $failure) {
+                if ($failure instanceof ActionException) {
+                    $array['main_action_failures'][] = $failure->toArray();
+                }
+            }
+
+            // The pre-run action results
+            $array['pre_run_action_results'] = [];
+            foreach ($this->failedPreRunActionResults as $preRunActionResult) {
+                if ($preRunActionResult instanceof ActionResult) {
+                    $array['pre_run_action_results'][] = $preRunActionResult->toArray();
+                }
+            }
+            foreach ($this->preRunActionResults as $preRunActionResult) {
+                if ($preRunActionResult instanceof ActionResult) {
+                    $array['pre_run_action_results'][] = $preRunActionResult->toArray();
+                }
+            }
+
+            // The pre-run action results
+            $array['post_run_action_results'] = [];
+            foreach ($this->failedPostRunActionResults as $postRunActionResult) {
+                if ($postRunActionResult instanceof ActionResult) {
+                    $array['post_run_action_results'][] = $postRunActionResult->toArray();
+                }
+            }
+            foreach ($this->postRunActionResults as $postRunActionResult) {
+                if ($postRunActionResult instanceof ActionResult) {
+                    $array['post_run_action_results'][] = $postRunActionResult->toArray();
+                }
             }
         }
 
         return $array;
-    }
-
-    /**
-     * Export this ActionResult instance to a file. It convert this instance to an appropriate
-     * file content, according to the given content type. The supported content types are the
-     * FileParser constants starting with "CONTENT_TYPE_".
-     *
-     * @param string $contentType The desired content type (FileParser constants starting with
-     * "CONTENT_TYPE").
-     * @param string $exportDirPath The desired export directory.
-     *
-     * @throws WorkerException
-     */
-    public function exportToFile(
-        string $contentType = FileParser::CONTENT_TYPE_JSON,
-        string $exportDirPath = ""
-    ): void
-    {
-        // We check the given parameters
-        if (!empty($exportDirPath)) {
-            $exportDirPath = rtrim($exportDirPath, DIRECTORY_SEPARATOR);
-        } else {
-            $exportDirPath = ".";
-        }
-
-        // We define a default name
-        $fileName = "action_result_" . time();
-        $fileExtension = FileParser::getFileExtensionByContentType($contentType);
-        if ($fileExtension) {
-            $fileName .= '.' . $fileExtension;
-        } else {
-            // It means that the given content type is not supported by the FileParser class.
-            // In this case, we set it by default to array.
-            $contentType = FileParser::CONTENT_TYPE_ARRAY;
-            $fileName .= '.php';
-        }
-        $filePath = $exportDirPath . DIRECTORY_SEPARATOR . $fileName;
-
-        // We convert this object to an array
-        $actionResultArray = $this->toArray();
-
-        // If XML content type, we have to define a parent node name
-        if ($contentType === FileParser::CONTENT_TYPE_XML) {
-            $actionResultArray['element'] = $actionResultArray;
-        }
-
-        // We write the result to the file path
-        FileParser::writeToFile($actionResultArray, $filePath, $contentType);
     }
 }
