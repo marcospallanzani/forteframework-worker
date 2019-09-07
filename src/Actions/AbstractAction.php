@@ -323,6 +323,7 @@ abstract class AbstractAction implements ValidActionInterface
             try {
                 if ($action instanceof AbstractAction) {
                     // We run the pre-run action
+                    $preActionResult->setStartTimestamp();
                     $preActionResult = $action->run();
 
                     /**
@@ -332,6 +333,8 @@ abstract class AbstractAction implements ValidActionInterface
                      */
                     if (!$preActionResult->isSuccessfulRun() || !$action->validateResult($preActionResult)) {
                         $actionResult->addFailedPreRunActionResult($preActionResult);
+                    } else {
+                        $actionResult->addPreRunActionResult($preActionResult);
                     }
                 }
             } catch (ActionException $actionException) {
@@ -348,6 +351,7 @@ abstract class AbstractAction implements ValidActionInterface
                 // to the list of failed pre-run action results
                 $actionResult->addFailedPreRunActionResult($preActionResult);
             }
+            $preActionResult->setEndTimestamp();
         }
     }
 
@@ -366,6 +370,7 @@ abstract class AbstractAction implements ValidActionInterface
             try {
                 if ($action instanceof AbstractAction) {
                     // We run the post-run action
+                    $postActionResult->setStartTimestamp();
                     $postActionResult = $action->run();
 
                     /**
@@ -375,6 +380,8 @@ abstract class AbstractAction implements ValidActionInterface
                      */
                     if (!$postActionResult->isSuccessfulRun() || !$action->validateResult($postActionResult)) {
                         $actionResult->addFailedPostRunActionResult($postActionResult);
+                    } else {
+                        $actionResult->addPostRunActionResult($postActionResult);
                     }
                 }
             } catch (ActionException $actionException) {
@@ -389,8 +396,9 @@ abstract class AbstractAction implements ValidActionInterface
 
                 // If no exception is thrown, we add the post-run result object
                 // to the list of failed post-run action results
-                $actionResult->addFailedPreRunActionResult($postActionResult);
+                $actionResult->addFailedPostRunActionResult($postActionResult);
             }
+            $postActionResult->setEndTimestamp();
         }
     }
 
