@@ -12,14 +12,14 @@
 namespace Tests\Unit\Helpers;
 
 use Forte\Worker\Helpers\Collection;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class CollectionTest.
  *
  * @package Tests\Unit\Helpers
  */
-class CollectionTest extends TestCase
+class CollectionTest extends BaseTest
 {
     /**
      * Data provider for filter-by-prefix-key tests.

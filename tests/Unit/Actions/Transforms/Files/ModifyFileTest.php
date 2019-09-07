@@ -14,14 +14,14 @@ namespace Tests\Unit\Actions\Transforms\Files;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class ModifyFileTest.
  *
  * @package Tests\Unit\Actions\Transforms\Files
  */
-class ModifyFileTest extends TestCase
+class ModifyFileTest extends BaseTest
 {
     /**
      * Temporary files constants.

@@ -6,14 +6,14 @@ use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class VerifyArrayTest
  *
  * @package Tests\Unit\Actions\Checks\Arrays
  */
-class VerifyArrayTest extends TestCase
+class VerifyArrayTest extends BaseTest
 {
     /**
      * A general test array.

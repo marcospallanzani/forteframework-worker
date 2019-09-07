@@ -7,14 +7,14 @@ use Forte\Worker\Actions\Checks\Files\FileHasValidEntries;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\FileParser;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class FileHasValidEntriesTest
  *
  * @package Tests\Unit\Actions\Checks\Files
  */
-class FileHasValidEntriesTest extends TestCase
+class FileHasValidEntriesTest extends BaseTest
 {
     /**
      * Temporary files constants

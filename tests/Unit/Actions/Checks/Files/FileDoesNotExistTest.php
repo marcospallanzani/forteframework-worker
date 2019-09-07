@@ -14,14 +14,14 @@ namespace Tests\Unit\Actions\Checks\Files;
 use Forte\Worker\Actions\Checks\Files\FileDoesNotExist;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class FileDoesNotExistTest.
  *
  * @package Tests\Unit\Actions\Checks\Files
  */
-class FileDoesNotExistTest extends TestCase
+class FileDoesNotExistTest extends BaseTest
 {
     /**
      * Data provider for does-not-exist tests.

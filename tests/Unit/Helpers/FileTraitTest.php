@@ -4,14 +4,14 @@ namespace Tests\Unit\Helpers;
 
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\FileTrait;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class FileTraitTest
  *
  * @package Tests\Unit\Helpers
  */
-class FileTraitTest extends TestCase
+class FileTraitTest extends BaseTest
 {
     /**
      * Returns an anonymous class to test ClassAccessTrait.

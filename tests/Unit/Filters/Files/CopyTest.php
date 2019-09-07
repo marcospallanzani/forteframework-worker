@@ -4,14 +4,14 @@ namespace Tests\Unit\Filters\Files;
 
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Filters\Files\Copy as CopyFilter;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class CopyTest
  *
  * @package Tests\Unit\Filters\Files
  */
-class CopyTest extends TestCase
+class CopyTest extends BaseTest
 {
     /**
      * Temporary files constants

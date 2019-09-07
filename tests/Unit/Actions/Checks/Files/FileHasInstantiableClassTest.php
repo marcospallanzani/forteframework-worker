@@ -13,14 +13,14 @@ namespace Tests\Unit\Actions\Checks\Files;
 
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Exceptions\ActionException;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class FileHasInstantiableClassTest
  *
  * @package Tests\Unit\Actions\Checks\Files
  */
-class FileHasInstantiableClassTest extends TestCase
+class FileHasInstantiableClassTest extends BaseTest
 {
     /**
      * Temporary files constants

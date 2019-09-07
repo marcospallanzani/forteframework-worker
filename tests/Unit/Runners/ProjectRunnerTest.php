@@ -8,15 +8,14 @@ use Forte\Worker\Actions\Checks\Files\DirectoryExists;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Runners\ProjectRunner;
-use Forte\Worker\Actions\Transforms\EmptyTransform;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class ProjectRunnersTest.
  *
  * @package Tests\Unit\Runners
  */
-class ProjectRunnerTest extends TestCase
+class ProjectRunnerTest extends BaseTest
 {
     /**
      * Data provider for runner tests.

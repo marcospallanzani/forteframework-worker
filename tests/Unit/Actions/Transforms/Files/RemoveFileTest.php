@@ -18,14 +18,14 @@ use Forte\Worker\Actions\Checks\Files\FileDoesNotExist;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Files\RemoveFile;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class RemoveFileTest.
  *
  * @package Tests\Unit\Actions\Transforms\Files
  */
-class RemoveFileTest extends TestCase
+class RemoveFileTest extends BaseTest
 {
     /**
      * Temporary files constants.

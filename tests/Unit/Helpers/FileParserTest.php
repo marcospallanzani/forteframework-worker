@@ -5,14 +5,14 @@ namespace Tests\Unit\Helpers;
 use Forte\Worker\Exceptions\MissingKeyException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\FileParser;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class FileParserTest.
  *
  * @package Tests\Unit\Helpers
  */
-class FileParserTest extends TestCase
+class FileParserTest extends BaseTest
 {
     /**
      * A general test array.

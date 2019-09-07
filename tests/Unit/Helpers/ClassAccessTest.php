@@ -3,14 +3,14 @@
 namespace Tests\Unit\Helpers;
 
 use Forte\Worker\Helpers\ClassAccessTrait;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class ClassAccessTest
  *
  * @package Tests\Unit\Helpers
  */
-class ClassAccessTest extends TestCase
+class ClassAccessTest extends BaseTest
 {
     /**
      * Returns an anonymous class to test ClassAccessTrait.

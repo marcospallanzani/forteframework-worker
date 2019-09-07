@@ -13,14 +13,14 @@ namespace Tests\Unit\Helpers;
 
 use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Helpers\StringParser;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class StringParserTest
  *
  * @package Tests\Unit\Helpers
  */
-class StringParserTest extends TestCase
+class StringParserTest extends BaseTest
 {
     /**
      * Data provider for stringify tests.

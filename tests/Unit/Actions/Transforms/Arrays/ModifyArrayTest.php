@@ -4,14 +4,14 @@ namespace Tests\Unit\Actions\Transforms\Arrays;
 
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class ModifyArrayTest
  *
  * @package Tests\Unit\Actions\Transforms\Arrays
  */
-class ModifyArrayTest extends TestCase
+class ModifyArrayTest extends BaseTest
 {
     /**
      * Data provider for general modification tests.
