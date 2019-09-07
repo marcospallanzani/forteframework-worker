@@ -33,6 +33,7 @@ class FileExists extends AbstractAction
      */
     public function __construct(string $filePath = "")
     {
+        parent::__construct();
         $this->filePath = $filePath;
     }
 

@@ -72,6 +72,7 @@ class VerifyArray extends AbstractAction
      */
     public function __construct(string $key, string $action, $value = null, bool $reverseAction = false)
     {
+        parent::__construct();
         $this->key           = $key;
         $this->action        = $action;
         $this->value         = $value;

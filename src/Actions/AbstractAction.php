@@ -59,6 +59,14 @@ abstract class AbstractAction implements ValidActionInterface
     protected $isSuccessRequired = false;
 
     /**
+     * This ID represents a unique identifier for an AbstractAction subclass
+     * instance, so that it can be identified in a multi-level chain of actions.
+     *
+     * @var string
+     */
+    protected $uniqueExecutionId = "";
+
+    /**
      * Validate the given action result. This method returns true if the
      * given ActionResult instance has a result value that is considered
      * as a positive case by this AbstractAction subclass instance.
@@ -97,6 +105,19 @@ abstract class AbstractAction implements ValidActionInterface
      * @throws \Exception If validation breaches were found.
      */
     protected abstract function validateInstance(): bool;
+
+    /**
+     * AbstractAction constructor.
+     */
+    public function __construct()
+    {
+        $classNameSpace = explode('\\', static::class);
+        $this->uniqueExecutionId =
+            array_pop($classNameSpace) . "_" .
+            sha1(rand()) . "_" .
+            number_format(microtime(true), 12, '', '')
+        ;
+    }
 
     /**
      * Whether this AbstractAction subclass instance is valid or not.
@@ -306,6 +327,16 @@ abstract class AbstractAction implements ValidActionInterface
     public function __toString()
     {
         return static::stringify();
+    }
+
+    /**
+     * Return the unique execution ID for this AbstractAction subclass instance.
+     *
+     * @return string
+     */
+    public function getUniqueExecutionId(): string
+    {
+        return $this->uniqueExecutionId;
     }
 
     /**

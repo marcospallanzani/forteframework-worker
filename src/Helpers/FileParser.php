@@ -280,7 +280,7 @@ class FileParser
             }
 
             // We define a default name
-            $fileName = rtrim($defaultNamePrefix, "_") . "_" . time();
+            $fileName = rtrim($defaultNamePrefix, "_") . "_" . number_format(microtime(true), 12, '', '');
             $fileExtension = FileParser::getFileExtensionByContentType($contentType);
             if ($fileExtension) {
                 $fileName .= '.' . $fileExtension;

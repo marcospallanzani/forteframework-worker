@@ -3,10 +3,8 @@
 namespace Forte\Worker\Actions;
 
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ClassAccessTrait;
-use Forte\Worker\Helpers\FileParser;
-use Forte\Worker\Helpers\StringParser;
+use Forte\Worker\Helpers\Dates;
 
 /**
  * Class ActionResult. This class wraps the status of a given AbstractAction
@@ -297,7 +295,7 @@ class ActionResult
      */
     public function setStartTimestamp(): void
     {
-        $this->startTimestamp = time();
+        $this->startTimestamp = microtime(true);
     }
 
     /**
@@ -305,7 +303,7 @@ class ActionResult
      */
     public function setEndTimestamp(): void
     {
-        $this->endTimestamp = time();
+        $this->endTimestamp = microtime(true);
     }
 
     /**
@@ -327,11 +325,11 @@ class ActionResult
             // Start and end timestamp
             if ($this->startTimestamp) {
                 $array['start_timestamp'] = $this->startTimestamp;
-                $array['start_date'] = date('Y-m-d H:i:s', $this->startTimestamp);
+                $array['start_date'] = Dates::formatMicroTime($this->startTimestamp);
             }
             if ($this->endTimestamp) {
                 $array['end_timestamp'] = $this->endTimestamp;
-                $array['end_date'] = date('Y-m-d H:i:s', $this->endTimestamp);
+                $array['end_date'] = Dates::formatMicroTime($this->endTimestamp);
             }
 
             // The global status

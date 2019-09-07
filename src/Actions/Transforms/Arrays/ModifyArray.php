@@ -65,6 +65,7 @@ class ModifyArray extends AbstractAction
      */
     public function __construct(string $key, string $action, $value = null)
     {
+        parent::__construct();
         $this->key    = $key;
         $this->action = $action;
         $this->value  = $value;

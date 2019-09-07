@@ -41,6 +41,7 @@ class ChangeFileEntries extends AbstractAction
      */
     public function __construct(string $filePath, string $contentType)
     {
+        parent::__construct();
         $this->filePath = $filePath;
         $this->contentType = $contentType;
     }

@@ -85,6 +85,7 @@ class VerifyString extends AbstractAction
         $conditionValue = "",
         string $initialContent = ""
     ) {
+        parent::__construct();
         $this->condition      = $condition;
         $this->conditionValue = $conditionValue;
         $this->content        = $initialContent;
