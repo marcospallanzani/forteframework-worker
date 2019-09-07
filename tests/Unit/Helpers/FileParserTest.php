@@ -83,6 +83,7 @@ class FileParserTest extends BaseTest
             ["", FileParser::CONTENT_TYPE_JSON, $expectedArray, true],
             [__DIR__ . "", FileParser::CONTENT_TYPE_ARRAY, $expectedArray, true],
             [__DIR__ . "", FileParser::CONTENT_TYPE_XML, $expectedArray, true],
+            [__DIR__ . "/data/simple-config", 'text', [], false],
         ];
     }
 
