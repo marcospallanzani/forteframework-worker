@@ -15,7 +15,7 @@ $logger->pushHandler(new RotatingFileHandler('./storage/logs/forte-api-generator
 $application = new Application();
 
 // Registering all commands here
-$command = new \Forte\Generator\Api\Commands\GenerateForteAPI($logger, './config/app.yml');
+$command = new \Forte\Api\Generator\Commands\GenerateForteAPI($logger, './config/app.yml');
 $application->add($command);
 
 // Running the application

@@ -1,6 +1,6 @@
 <?php
 
-namespace Forte\Generator\Api\Builders;
+namespace Forte\Api\Generator\Builders;
 
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Checks\Files\FileHasValidEntries;
@@ -11,7 +11,7 @@ use Forte\Worker\Helpers\FileParser;
  * Class LaravelProjectBuilder. Class in charge of building a project transformer
  * with specific transformations for a Laravel project.
  *
- * @package Forte\Generator\Api\Builders
+ * @package Forte\Api\Generator\Builders
  */
 class LaravelProjectBuilder extends ProjectRunnerBuilder
 {

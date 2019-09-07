@@ -19,7 +19,7 @@
     },
     "autoload" : {
       "psr-4" : {
-        "Forte\\Generator\\Api\\": ["app"]
+        "Forte\\Api\\Generator\\": ["app"]
       }
     },
     "require-dev": {

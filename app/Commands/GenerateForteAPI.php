@@ -1,8 +1,8 @@
 <?php
 
-namespace Forte\Generator\Api\Commands;
+namespace Forte\Api\Generator\Commands;
 
-use Forte\Generator\Api\Config\ForteApi;
+use Forte\Api\Generator\Config\ForteApi;
 use Forte\Worker\Exceptions\MissingKeyException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,7 +15,7 @@ use Zend\Text\Figlet\Figlet;
 /**
  * Class GenerateForteAPI
  *
- * @package Forte\Generator\Api\Commands
+ * @package Forte\Api\Generator\Commands
  */
 class GenerateForteAPI extends Command
 {
