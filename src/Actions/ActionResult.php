@@ -53,6 +53,22 @@ class ActionResult
     protected $actionFailures = [];
 
     /**
+     * List of all pre-run ActionResult instances that were successful.
+     * Multiple failures are possible for one given parent action.
+     *
+     * @var array
+     */
+    protected $preRunActionResults = [];
+
+    /**
+     * List of all post-run ActionResult instances that were successful.
+     * Multiple failures are possible for one given parent action.
+     *
+     * @var array
+     */
+    protected $postRunActionResults = [];
+
+    /**
      * List of all pre-run ActionResult instances that failed.
      * Multiple failures are possible for one given parent action.
      *
@@ -196,6 +212,26 @@ class ActionResult
     }
 
     /**
+     * Return the list of all successful pre-run AbstractAction subclass instances.
+     *
+     * @return array A list of successful pre-run AbstractAction subclass instances.
+     */
+    public function getPreRunActionResults(): array
+    {
+        return $this->preRunActionResults;
+    }
+
+    /**
+     * Add the given ActionResult instance to the list of successful pre-run ActionResult instances.
+     *
+     * @param ActionResult $actionResult The pre-run ActionResult instance to add.
+     */
+    public function addPreRunActionResult(ActionResult $actionResult): void
+    {
+        $this->preRunActionResults[] = clone $actionResult;
+    }
+
+    /**
      * Return the list of all failed pre-run AbstractAction subclass instances.
      *
      * @return array A list of failed pre-run AbstractAction subclass instances.
@@ -216,6 +252,27 @@ class ActionResult
     }
 
     /**
+     * Return the list of all successful post-run ActionResult instances.
+     *
+     * @return array A list of successful post-run AbstractAction subclass instances.
+     */
+    public function getPostRunActionResults(): array
+    {
+        return $this->postRunActionResults;
+    }
+
+    /**
+     * Add the given ActionResult instance to the list of successful post-run ActionResult instances.
+     *
+     * @param ActionResult $actionResult The post-run ActionResult instance to add.
+     */
+    public function addPostRunActionResult(ActionResult $actionResult): void
+    {
+        $this->postRunActionResults[] = clone $actionResult;
+    }
+
+
+    /**
      * Return the list of all failed post-run ActionResult instances.
      *
      * @return array A list of failed post-run AbstractAction subclass instances.
@@ -223,6 +280,16 @@ class ActionResult
     public function getFailedPostRunActionResults(): array
     {
         return $this->failedPostRunActionResults;
+    }
+
+    /**
+     * Add the given ActionResult instance to the list of failed post-run ActionResult instances.
+     *
+     * @param ActionResult $failedActionResult The post-run ActionResult instance to add.
+     */
+    public function addFailedPostRunActionResult(ActionResult $failedActionResult): void
+    {
+        $this->failedPostRunActionResults[] = clone $failedActionResult;
     }
 
     /**
@@ -239,16 +306,6 @@ class ActionResult
     public function setEndTimestamp(): void
     {
         $this->endTimestamp = time();
-    }
-
-    /**
-     * Add the given ActionResult instance to the list of failed post-run ActionResult instances.
-     *
-     * @param ActionResult $failedActionResult The post-run ActionResult instance to add.
-     */
-    public function addFailedPostRunActionResult(ActionResult $failedActionResult): void
-    {
-        $this->failedPostRunActionResults[] = clone $failedActionResult;
     }
 
     /**
@@ -298,10 +355,20 @@ class ActionResult
                 $array['pre_run_action_results'][] = $preRunActionResult->toArray();
             }
         }
+        foreach ($this->preRunActionResults as $preRunActionResult) {
+            if ($preRunActionResult instanceof ActionResult) {
+                $array['pre_run_action_results'][] = $preRunActionResult->toArray();
+            }
+        }
 
         // The pre-run action results
         $array['post_run_action_results'] = [];
         foreach ($this->failedPostRunActionResults as $postRunActionResult) {
+            if ($postRunActionResult instanceof ActionResult) {
+                $array['post_run_action_results'][] = $postRunActionResult->toArray();
+            }
+        }
+        foreach ($this->postRunActionResults as $postRunActionResult) {
             if ($postRunActionResult instanceof ActionResult) {
                 $array['post_run_action_results'][] = $postRunActionResult->toArray();
             }
