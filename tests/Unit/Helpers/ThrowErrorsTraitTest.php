@@ -11,39 +11,17 @@
 
 namespace Tests\Unit\Helpers;
 
-use Forte\Worker\Actions\AbstractAction;
-use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Helpers\ThrowErrorsTrait;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\BaseTest;
 
 /**
  * Class ThrowErrorsTraitTest.
  *
  * @package Tests\Unit\Helpers
  */
-class ThrowErrorsTraitTest extends TestCase
+class ThrowErrorsTraitTest extends BaseTest
 {
-    const ACTION_TEST_MESSAGE = "action test";
-    const BASE_TEST_MESSAGE   = "error message %s.";
-
-    /**
-     * Returns an anonymous AbstractAction subclass instance to test ThrowErrorsTrait.
-     *
-     * @return object
-     */
-    protected function getAnonymousActionClass()
-    {
-        return new class extends AbstractAction {
-            use ThrowErrorsTrait;
-            protected function validateInstance(): bool { return true; }
-            protected function apply(ActionResult $actionResult): ActionResult { return $actionResult; }
-            public function stringify(): string { return ThrowErrorsTraitTest::ACTION_TEST_MESSAGE; }
-            public function validateResult(ActionResult $actionResult): bool { return true; }
-        };
-    }
-
     /**
      * Test ThrowErrorsTrait::throwWorkerException() method.
      */
