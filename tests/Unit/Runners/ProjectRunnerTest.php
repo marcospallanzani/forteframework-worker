@@ -87,6 +87,16 @@ class ProjectRunnerTest extends TestCase
                 ],
                 true
             ],
+            [
+                __DIR__,
+                2,
+                0,
+                [
+                    new FileExists(''),
+                    new DirectoryExists(""),
+                ],
+                false
+            ],
         ];
     }
 
