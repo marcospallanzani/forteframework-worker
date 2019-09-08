@@ -6,6 +6,7 @@ use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Helpers\FileParser;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 
@@ -147,20 +148,21 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
      *
      * @throws \Exception If validation breaches were found.
      */
-    protected function validateInstance(): bool    {
+    protected function validateInstance(): bool
+    {
         // The file path cannot be empty
         if (empty($this->filePath)) {
-            $this->throwActionException($this, "You must specify the file path.");
+            $this->throwValidationException($this, "You must specify the file path.");
         }
 
         if (empty($this->contentType)) {
-            $this->throwActionException($this, "You must specify the content type.");
+            $this->throwValidationException($this, "You must specify the content type.");
         }
 
         // Check if the given type is supported
         $contentTypeConstants = FileParser::getSupportedContentTypes();
         if (!in_array($this->contentType, $contentTypeConstants)) {
-            $this->throwActionException(
+            $this->throwValidationException(
                 $this,
                 "Content type %s not supported. Supported types are [%s].",
                 $this->contentType,
@@ -169,10 +171,11 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
         }
 
         // Check if the specified modifications are well configured
+        $wrongModifications = array();
         foreach ($this->modifications as $modification) {
 
             if (!$modification instanceof ModifyArray) {
-                $this->throwActionException(
+                $this->throwValidationException(
                     $this,
                     "Modifications should be registered as instances of class %s.",
                     ModifyArray::class
@@ -183,14 +186,18 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
                 // We check if the current modification is valid; if not valid,
                 // an ActionException should be thrown
                 $modification->isValid();
-            } catch (ActionException $actionException) {
-                $this->throwActionException(
-                    $this,
-                    "Invalid modification: %s. Error message: %s",
-                    $actionException->getAction(),
-                    $actionException->getMessage()
-                );
+            } catch (ValidationException $actionException) {
+                $wrongModifications[] = $actionException;
             }
+        }
+
+        // We check if some nested actions are not valid: if so, we throw an exception
+        if ($wrongModifications) {
+            $this->throwValidationExceptionWithChildren(
+                $this,
+                [$wrongModifications],
+                "One or more nested actions are not valid."
+            );
         }
 
         return true;
