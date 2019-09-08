@@ -69,12 +69,9 @@ class FileHasValidEntries extends FileExists
      *
      * @return FileHasValidEntries
      */
-    public function hasKey(string $key, bool $isFatal = false, bool $isSuccessRequired = false): self
+    public function hasKey(string $key): self
     {
-//TODO REFACTOR AND ADD NEW PARAMETERS TO THE OTHER ACTIONS AS WELL
         $verifyArray = new VerifyArray($key, VerifyArray::CHECK_ANY);
-        $verifyArray->setIsFatal($isFatal);
-        $verifyArray->setIsSuccessRequired($isSuccessRequired);
         $this->checks[] = $verifyArray;
 
         return $this;
@@ -90,7 +87,6 @@ class FileHasValidEntries extends FileExists
      */
     public function doesNotHaveKey(string $key): self
     {
-//TODO ADD NEW PARAMETERS isFatal AND isSuccessRequired
         $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_MISSING_KEY);
 
         return $this;
@@ -106,7 +102,6 @@ class FileHasValidEntries extends FileExists
      */
     public function hasKeyWithEmptyValue(string $key): self
     {
-//TODO ADD NEW PARAMETERS isFatal AND isSuccessRequired
         $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_EMPTY);
 
         return $this;
@@ -122,7 +117,6 @@ class FileHasValidEntries extends FileExists
      */
     public function hasKeyWithNonEmptyValue(string $key): self
     {
-//TODO ADD NEW PARAMETERS isFatal AND isSuccessRequired
         $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_EMPTY, null, true);
 
         return $this;
@@ -147,7 +141,6 @@ class FileHasValidEntries extends FileExists
         string $action = VerifyArray::CHECK_CONTAINS
     ): self
     {
-//TODO ADD NEW PARAMETERS isFatal AND isSuccessRequired
         $this->checks[] = new VerifyArray($key, $action, $value);
 
         return $this;
