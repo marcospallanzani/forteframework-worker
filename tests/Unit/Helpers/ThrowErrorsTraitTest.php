@@ -12,6 +12,7 @@
 namespace Tests\Unit\Helpers;
 
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
 use Tests\Unit\BaseTest;
 
@@ -63,9 +64,39 @@ class ThrowErrorsTraitTest extends BaseTest
     }
 
     /**
+     * Test ThrowErrorsTrait::throwValidationException() method.
+     */
+    public function testThrowValidationException(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage("error message action test.");
+        $anonymousActionClass = $this->getAnonymousActionClass();
+        $anonymousActionClass->throwValidationException(
+            $anonymousActionClass,
+            self::BASE_TEST_MESSAGE,
+            self::ACTION_TEST_MESSAGE
+        );
+    }
+
+    /**
+     * Test ThrowErrorsTrait::getValidationException() method.
+     */
+    public function testGetValidationException(): void
+    {
+        $anonymousActionClass = $this->getAnonymousActionClass();
+        $validationException = $anonymousActionClass->getValidationException(
+            $anonymousActionClass,
+            self::BASE_TEST_MESSAGE,
+            self::ACTION_TEST_MESSAGE
+        );
+        $this->assertInstanceOf(ValidationException::class, $validationException);
+        $this->assertEquals('error message action test.', $validationException->getMessage());
+    }
+
+    /**
      * Test ThrowErrorsTrait::throwActionExceptionWithChildren() method.
      */
-    public function testThrowActionExceptionWithChildre(): void
+    public function testThrowActionExceptionWithChildren(): void
     {
         $this->expectException(ActionException::class);
         $this->expectExceptionMessage("error message action test.");
@@ -81,7 +112,7 @@ class ThrowErrorsTraitTest extends BaseTest
     /**
      * Test ThrowErrorsTrait::getActionExceptionWithChildren() method.
      */
-    public function testGetActionExceptionWithChildre(): void
+    public function testGetActionExceptionWithChildren(): void
     {
         $anonymousActionClass = $this->getAnonymousActionClass();
         /** @var ActionException $actionException */
