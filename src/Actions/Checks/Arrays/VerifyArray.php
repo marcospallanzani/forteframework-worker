@@ -205,19 +205,20 @@ class VerifyArray extends AbstractAction
     {
         // Validate the key
         if (empty($this->key)) {
-            $this->throwWorkerException("You must specify the key to verify.");
+            $this->throwValidationException($this, "You must specify the key to verify.");
         }
 
         // Validate the action.
         $action = $this->getAction();
         if (empty($this->action)) {
-            $this->throwWorkerException("You must specify the action type.");
+            $this->throwValidationException($this, "You must specify the action type.");
         }
 
         // If no action is specified OR an unsupported action is given, then we throw an error.
         $checkActionsConstants = $this->getSupportedActions();
         if (!in_array($action, $checkActionsConstants)) {
-            $this->throwWorkerException(
+            $this->throwValidationException(
+                $this,
                 "Action type %s not supported. Supported checks are [%s].",
                 $action,
                 implode(', ', $checkActionsConstants)
@@ -225,7 +226,8 @@ class VerifyArray extends AbstractAction
         }
 
         if ($this->reverseAction && $action === self::CHECK_ANY) {
-            $this->throwWorkerException(
+            $this->throwValidationException(
+                $this,
                 "Action type %s not supported in the reverse mode. Use %s instead.",
                 $action,
                 self::CHECK_EQUALS
@@ -238,7 +240,8 @@ class VerifyArray extends AbstractAction
             // is 'check_equals', 'check_empty', 'check_non_empty' or 'check_any'.
             $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY, self::CHECK_MISSING_KEY];
             if (!in_array($action, $acceptsEmptyValue)) {
-                $this->throwWorkerException(
+                $this->throwValidationException(
+                    $this,
                     "Action type %s not supported for empty values. " .
                     "Supported actions for empty values are [%s]",
                     $action,
