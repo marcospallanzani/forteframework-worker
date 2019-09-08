@@ -255,7 +255,8 @@ class VerifyString extends AbstractAction
         // If no action is specified OR an unsupported action is given, then we throw an error.
         $supportedConditions = $this->getSupportedConditions();
         if (!in_array($this->condition, $supportedConditions)) {
-            $this->throwWorkerException(
+            $this->throwValidationException(
+                $this,
                 "Condition %s not supported. Supported conditions are [%s]",
                 $this->condition,
                 implode(', ', $supportedConditions)
@@ -268,7 +269,8 @@ class VerifyString extends AbstractAction
          * condition value (e.g. check if XXX is equal to YYY).
          */
         if ($this->condition !== self::CONDITION_IS_EMPTY && empty($this->conditionValue)) {
-            $this->throwWorkerException(
+            $this->throwValidationException(
+                $this,
                 "Condition %s requires a condition value. " .
                 "Empty value accepted only for condition %s.",
                 $this->condition,
