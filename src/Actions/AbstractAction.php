@@ -3,6 +3,7 @@
 namespace Forte\Worker\Actions;
 
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\FileTrait;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
@@ -106,23 +107,23 @@ abstract class AbstractAction implements ValidActionInterface
      * @return bool True if this AbstractAction subclass instance was
      * well configured; false otherwise.
      *
-     * @throws ActionException If this AbstractAction subclass instance
+     * @throws ValidationException If this AbstractAction subclass instance
      * was not well configured.
      */
     public final function isValid(): bool
     {
-        // By catching here all exceptions, we are sure that the
-        // isValid method only throws ActionException instances.
+        // By catching here all exceptions, we are sure that the isValid
+        // method only throws ValidationException instances.
         $isValid = false;
         try {
             $isValid = $this->validateInstance();
         } catch (\Exception $exception) {
             // We catch any exception coming from the child class
-            // And we convert them to an ActionException
-            if ($exception instanceof ActionException) {
+            // And we convert them to an ValidationException
+            if ($exception instanceof ValidationException) {
                 throw $exception;
             }
-            $this->throwActionException($this, $exception->getMessage());
+            $this->throwValidationException($this, $exception->getMessage());
         }
 
         return $isValid;
@@ -143,80 +144,84 @@ abstract class AbstractAction implements ValidActionInterface
 
         $actionResult->setStartTimestamp();
 
-        // We don't catch here the exceptions thrown by the isValid() method.
-        // A bad configured action should always be considered as FATAL.
-        if ($this->isValid()) {
+        try {
+            // We don't catch here the exceptions thrown by the isValid() method.
+            // A bad configured action should always be considered as FATAL.
+            if ($this->isValid()) {
 
-            // We run the pre-run actions
-            $this->runBeforeActions($actionResult);
+                // We run the pre-run actions
+                $this->runBeforeActions($actionResult);
 
-            // We run the logic specific to this AbstractAction subclass instance
-            // AND we save its result in the ActionResult wrapper object
-            try {
+                // We run the logic specific to this AbstractAction subclass instance
+                // AND we save its result in the ActionResult wrapper object
                 $actionResult = $this->apply($actionResult);
-            } catch (\Exception $exception) {
 
+                // We run the post-run actions
+                $this->runAfterActions($actionResult);
+            }
+        } catch (\Exception $exception) {
+
+            /**
+             * If the given exception is an instance of ActionException, we have to check
+             * if there are some fatal and/or success-required children failures: if so,
+             * then we throw the parent exception.
+             */
+            $childFatalError = false;
+            if ($exception instanceof ValidationException) {
+                // If it's a validation error, we don't apply any modifications
+                // and we continue with the remaining checks (is fatal?)
+                $actionFailure = $exception;
+            } else if ($exception instanceof ActionException) {
                 /**
-                 * If the given exception is an instance of ActionException, we have to check
-                 * if there are some fatal and/or success-required children failures: if so,
-                 * then we throw the parent exception.
+                 * We have caught a child-action failure. In this case, we add the caught
+                 * child-action exception to the list of failed children actions of the
+                 * current action failure object.
                  */
-                $childFatalError = false;
-                if ($exception instanceof ActionException) {
-                    /**
-                     * We have caught a child-action failure. In this case, we add the caught
-                     * child-action exception to the list of failed children actions of the
-                     * current action failure object.
-                     */
-                    $actionFailure = $this->getActionException(
-                        $this, "Action failure caused by one failed child action."
-                    );
-                    $actionFailure->addChildFailure($exception);
+                $actionFailure = $this->getActionException(
+                    $this, "Action failure caused by one failed child action."
+                );
+                $actionFailure->addChildFailure($exception);
 
-                    // We detected a child failure: in this case we check if it's fatal: if yes,
-                    // it should trigger the exception for the parent action as well
-                    $childFatalError = $exception->hasFatalFailures();
+                // We detected a child failure: in this case we check if it's fatal: if yes,
+                // it should trigger the exception for the parent action as well
+                $childFatalError = $exception->hasFatalFailures();
 
-                } else {
-                    $actionFailure = $this->getActionException($this, $exception->getMessage());
-                }
-
-                // We set a negative result for the current ActionResult instance
-                $this->setNegativeResult($actionResult);
-
-                // If we caught a fatal ActionException thrown by a child process
-                // OR the current action is fatal, then we throw the exception
-                if ($childFatalError || $this->isFatal) {
-                    throw $actionFailure;
-                } else {
-                    $actionResult->addActionFailure($actionFailure);
-                }
+            } else {
+                $actionFailure = $this->getActionException($this, $exception->getMessage());
             }
 
-            // If the result of the last execution of the run method returned a negative case,
-            // in case this action is flagged as 'success required', we need to throw an exception
-            if (!$this->validateResult($actionResult) && $this->isSuccessRequired) {
-                /**
-                 * We throw a new ActionException with an appropriate "success-required" message if:
-                 * - the current result has failures (i.e. the result was negative because of an error);
-                 * - the current result has NO failure (i.e. the action executed correctly, but the result was
-                 *   negative, e.g. check condition "file-exists" always runs successfully but return a negative
-                 *   result if the given file does no exist);
-                 */
-                $actionFailures = $actionResult->getActionFailures();
-                if (count($actionFailures) === 1) {
-                    throw current($actionFailures);
-                } else {
-                    $this->throwActionExceptionWithChildren(
-                        $actionResult->getAction(),
-                        $actionResult->getActionFailures(),
-                        "Positive result expected (action marked as 'success-required')."
-                    );
-                }
-            }
+            // We set a negative result for the current ActionResult instance
+            $this->setNegativeResult($actionResult);
 
-            // We run the post-run actions
-            $this->runAfterActions($actionResult);
+            // If we caught a fatal ActionException thrown by a child process
+            // OR the current action is fatal, then we throw the exception
+            if ($childFatalError || $this->isFatal) {
+                throw $actionFailure;
+            } else {
+                $actionResult->addActionFailure($actionFailure);
+            }
+        }
+
+        // If the result of the last execution of the run method returned a negative case,
+        // in case this action is flagged as 'success required', we need to throw an exception
+        if (!$this->validateResult($actionResult) && $this->isSuccessRequired) {
+            /**
+             * We throw a new ActionException with an appropriate "success-required" message if:
+             * - the current result has failures (i.e. the result was negative because of an error);
+             * - the current result has NO failure (i.e. the action executed correctly, but the result was
+             *   negative, e.g. check condition "file-exists" always runs successfully but return a negative
+             *   result if the given file does no exist);
+             */
+            $actionFailures = $actionResult->getActionFailures();
+            if (count($actionFailures) === 1) {
+                throw current($actionFailures);
+            } else {
+                $this->throwActionExceptionWithChildren(
+                    $actionResult->getAction(),
+                    $actionResult->getActionFailures(),
+                    "Positive result expected (action marked as 'success-required')."
+                );
+            }
         }
 
         $actionResult->setEndTimestamp();
