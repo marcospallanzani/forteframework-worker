@@ -176,23 +176,6 @@ class VerifyArray extends AbstractAction
     }
 
     /**
-     * Validate the current action result. This method returns true if the
-     * last execution of the apply() method executed correctly (i.e. the
-     * configured check condition was matched); false otherwise.
-     *
-     * @param ActionResult $actionResult The ActionResult instance to be checked
-     * with the specific validation logic of this VerifyArray instance.
-     *
-     * @return bool True if the last execution of the apply() method
-     * executed correctly (i.e. the configured check condition was
-     * matched); false otherwise.
-     */
-    public function validateResult(ActionResult $actionResult): bool
-    {
-        return (bool) $actionResult->getResult();
-    }
-
-    /**
      * Returns a string representation of this VerifyArray instance.
      *
      * @return false|string

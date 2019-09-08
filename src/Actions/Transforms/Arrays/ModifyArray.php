@@ -130,17 +130,16 @@ class ModifyArray extends AbstractAction
     /**
      * Validate the given action result. This method returns true if the
      * given ActionResult instance has a result value that is considered
-     * as a positive case by this AbstractAction subclass instance.
-     * E.g. if the aim of the current action is to check that a given key X
-     * is defined in a given array Y, then the expected positive result is a
-     * boolean flag equal to true if the key X exists in the array Y.
+     * as a positive case by this ModifyArray instance. This happens if
+     * the flag 'modificationApplied' is true (i.e. the given array was
+     * actually modified) and if the result is a valid array.
      *
-     * @param ActionResult $actionResult The ActionResult instance to be checked
-     * with the specific validation logic of the current AbstractAction subclass
-     * instance.
+     * @param ActionResult $actionResult The ActionResult instance to
+     * be checked with the specific validation logic of the current
+     * ModifyArray instance.
      *
-     * @return bool True if the given ActionResult instance has a result value
-     * that is considered as a positive case by this AbstractAction subclass
+     * @return bool True if the given ActionResult instance has a result
+     * value that is considered as a positive case by this ModifyArray
      * instance; false otherwise.
      */
     public function validateResult(ActionResult $actionResult): bool

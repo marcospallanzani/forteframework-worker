@@ -63,24 +63,6 @@ class FileExists extends AbstractAction
     }
 
     /**
-     * Validate the current action result. This method returns true if the
-     * last execution of the apply() method executed correctly (i.e. file
-     * exists); false otherwise.
-     *
-     * @param ActionResult $actionResult The ActionResult instance to be checked
-     * with the specific validation logic of this FileExists instance.
-     *
-     * @return bool True if the last execution of the apply() method
-     * executed correctly (i.e. file exists); false otherwise.
-     */
-    public function validateResult(ActionResult $actionResult): bool
-    {
-        // The ActionResult->result field should be set with a boolean
-        // representing the last execution of the apply method.
-        return (bool) $actionResult->getResult();
-    }
-
-    /**
      * Validate this FileExists instance using its specific validation logic.
      * It returns true if this FileExists instance respects the following rules:
      * - the field 'filePath' must be specified and not empty;

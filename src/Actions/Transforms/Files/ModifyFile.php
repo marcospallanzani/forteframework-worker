@@ -235,26 +235,6 @@ class ModifyFile extends AbstractAction
     }
 
     /**
-     * Validate the given action result. This method returns true if the
-     * given ActionResult instance has a result value that is considered
-     * as a positive case by this AbstractAction subclass instance.
-     *
-     * @param ActionResult $actionResult The ActionResult instance to be checked
-     * with the specific validation logic of the current AbstractAction subclass
-     * instance.
-     *
-     * @return bool True if the given ActionResult instance has a result value
-     * that is considered as a positive case by this AbstractAction subclass
-     * instance; false otherwise.
-     */
-    public function validateResult(ActionResult $actionResult): bool
-    {
-        // The ActionResult->result field should be set with a boolean
-        // representing the last execution of the apply method.
-        return (bool) $actionResult->getResult();
-    }
-
-    /**
      * Return a human-readable string representation of this
      * ModifyFile instance.
      *

@@ -3,7 +3,6 @@
 namespace Forte\Worker\Actions;
 
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\FileTrait;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
@@ -65,24 +64,6 @@ abstract class AbstractAction implements ValidActionInterface
      * @var string
      */
     protected $uniqueExecutionId = "";
-
-    /**
-     * Validate the given action result. This method returns true if the
-     * given ActionResult instance has a result value that is considered
-     * as a positive case by this AbstractAction subclass instance.
-     * E.g. if the aim of the current action is to check that a given key X
-     * is defined in a given array Y, then the expected positive result is a
-     * boolean flag equal to true if the key X exists in the array Y.
-     *
-     * @param ActionResult $actionResult The ActionResult instance to be checked
-     * with the specific validation logic of the current AbstractAction subclass
-     * instance.
-     *
-     * @return bool True if the given ActionResult instance has a result value
-     * that is considered as a positive case by this AbstractAction subclass
-     * instance; false otherwise.
-     */
-    public abstract function validateResult(ActionResult $actionResult): bool;
 
     /**
      * Apply the subclass action.
@@ -431,6 +412,28 @@ abstract class AbstractAction implements ValidActionInterface
             }
             $postActionResult->setEndTimestamp();
         }
+    }
+
+    /**
+     * Validate the given action result. This method returns true if the
+     * given ActionResult instance has a result value that is considered
+     * as a positive case by this AbstractAction subclass instance.
+     * E.g. if the aim of the current action is to check that a given key X
+     * is defined in a given array Y, then the expected positive result is a
+     * boolean flag equal to true if the key X exists in the array Y.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of the current AbstractAction subclass
+     * instance.
+     *
+     * @return bool True if the given ActionResult instance has a result value
+     * that is considered as a positive case by this AbstractAction subclass
+     * instance; false otherwise.
+     */
+    public function validateResult(ActionResult $actionResult): bool
+    {
+        // Default case: we assume that the result can be casted to a boolean value
+        return (bool) $actionResult->getResult();
     }
 
     /**

@@ -176,25 +176,6 @@ class VerifyString extends AbstractAction
     }
 
     /**
-     * Validate the current action result. This method returns true if the last
-     * execution of the apply() method executed correctly (i.e. the configured
-     * check condition on the given string was met); false otherwise.
-     *
-     * @param ActionResult $actionResult The ActionResult instance to be checked
-     * with the specific validation logic of this VerifyString instance.
-     *
-     * @return bool True if the last execution of the apply() method executed
-     * correctly (i.e. the configured check condition on the given string was
-     * met); false otherwise.
-     */
-    public function validateResult(ActionResult $actionResult): bool
-    {
-        // The ActionResult->result field should be set with a boolean
-        // representing the last execution of the apply method.
-        return (bool) $actionResult->getResult();
-    }
-
-    /**
      * Return an associative array of all available conditions. Possible values
      * are class constants, that begin by "CONDITION_".
      *
