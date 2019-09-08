@@ -16,6 +16,7 @@ use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
+use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Helpers\FileParser;
 
 /**
@@ -183,7 +184,7 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
      *
      * @return bool True if no validation breaches were found; false otherwise.
      *
-     * @throws \Exception If validation breaches were found.
+     * @throws ValidationException If validation breaches were found.
      */
     protected function validateInstance(): bool
     {
@@ -192,7 +193,8 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
         // Check if the given type is supported
         $contentTypeConstants = FileParser::getSupportedContentTypes();
         if (!in_array($this->contentType, $contentTypeConstants)) {
-            $this->throwWorkerException(
+            $this->throwValidationException(
+                $this,
                 "Content type %s not supported. Supported types are [%s].",
                 $this->contentType,
                 implode(', ', $contentTypeConstants)
@@ -204,18 +206,19 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
         foreach ($this->checks as $check) {
             // We validate all the nested checks
             try {
+                /** @var AbstractAction $check */
                 $check->isValid();
-            } catch (ActionException $actionException) {
-                $wrongChecks[] = $actionException;
+            } catch (ValidationException $validationException) {
+                $wrongChecks[] = $validationException;
             }
         }
 
         // We check if some nested checks are not valid: if so, we throw an exception
         if ($wrongChecks) {
-            $this->throwActionExceptionWithChildren(
+            $this->throwValidationExceptionWithChildren(
                 $this,
                 [$wrongChecks],
-                "One or more nested checks are not valid."
+                "One or more nested actions are not valid."
             );
         }
 

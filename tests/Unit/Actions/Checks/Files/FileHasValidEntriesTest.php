@@ -5,6 +5,7 @@ namespace Tests\Unit\Actions\Checks\Files;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Checks\Files\FileHasValidEntries;
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\FileParser;
 use Tests\Unit\BaseTest;
@@ -85,15 +86,15 @@ class FileHasValidEntriesTest extends BaseTest
             [self::TEST_FILE_TMP_XML, FileParser::CONTENT_TYPE_XML, null, true, false],
             [self::TEST_FILE_TMP_YAML, FileParser::CONTENT_TYPE_YAML, null, true, false],
             /** Negative cases */
-//            ['', FileParser::CONTENT_TYPE_YAML, null, false, true],
-//            ['', '', null, false, true],
-//            [self::TEST_FILE_TMP_YAML, '', null, false, true],
-//            [self::TEST_FILE_TMP_YAML, 'wrong-content-type', null, false, true],
-//            [self::TEST_FILE_TMP_JSON, FileParser::CONTENT_TYPE_JSON, '', false, true],
-//            [self::TEST_FILE_TMP_ARRAY, FileParser::CONTENT_TYPE_ARRAY, '', false, true],
-//            [self::TEST_FILE_TMP_INI, FileParser::CONTENT_TYPE_INI, '', false, true],
-//            [self::TEST_FILE_TMP_XML, FileParser::CONTENT_TYPE_XML, '', false, true],
-//            [self::TEST_FILE_TMP_YAML, FileParser::CONTENT_TYPE_YAML, '', false, true],
+            ['', FileParser::CONTENT_TYPE_YAML, null, false, true],
+            ['', '', null, false, true],
+            [self::TEST_FILE_TMP_YAML, '', null, false, true],
+            [self::TEST_FILE_TMP_YAML, 'wrong-content-type', null, false, true],
+            [self::TEST_FILE_TMP_JSON, FileParser::CONTENT_TYPE_JSON, '', false, true],
+            [self::TEST_FILE_TMP_ARRAY, FileParser::CONTENT_TYPE_ARRAY, '', false, true],
+            [self::TEST_FILE_TMP_INI, FileParser::CONTENT_TYPE_INI, '', false, true],
+            [self::TEST_FILE_TMP_XML, FileParser::CONTENT_TYPE_XML, '', false, true],
+            [self::TEST_FILE_TMP_YAML, FileParser::CONTENT_TYPE_YAML, '', false, true],
         ];
     }
 
@@ -105,137 +106,173 @@ class FileHasValidEntriesTest extends BaseTest
     public function filesHasKeyProvider(): array
     {
         list($jsonEntries, $arrayEntries, $iniEntries, $xmlEntries, $yamlEntries) = $this->getFileHasValidEntriesInstances();
-
+//TODO ADD CASES FOR IS SUCCESS REQUIRED
         return [
-            // FileHasValidEntries instance | expected result of search actions | expect an exception
+            // FileHasValidEntries instance | key | is fatal | is success required | expected | expect an exception
             /** JSON TESTS */
             [$jsonEntries, 'key1', false, false, true, false],
             [$jsonEntries, 'key2.key3', false, false, true, false],
             [$jsonEntries, 'key2.key4.key5', false, false, true, false],
             /** Negative cases */
-//            [$jsonEntries, 'key2.key4.key7', true, false, false, true],
-//            [$jsonEntries, 'key2.key4.key5.key6', true, false, false, true],
-//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_JSON), 'key1', true, false, false, true],
-//            [new FileHasValidEntries(self::TEST_FILE_TMP_JSON, ''), 'key1', true, false, false, true],
+            /** not successful, no fatal */
+            [$jsonEntries, 'key2.key4.key7', false, false, false, false],
+            [$jsonEntries, 'key2.key4.key5.key6', false, false, false, false],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_JSON), 'key1', false, false, false, false],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_JSON, ''), 'key1', false, false, false, false],
+            /** not successful, fatal */
+            // The only way to throw an action exception is to break one or more validation checks
+            [$jsonEntries, '', true, false, false, true],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_JSON), 'key1', true, false, false, true],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_JSON, ''), 'key1', true, false, false, true],
+
             /** ARRAY TESTS */
             [$arrayEntries, 'key1', false, false, true, false],
             [$arrayEntries, 'key2.key3', false, false, true, false],
             [$arrayEntries, 'key2.key4.key5', false, false, true, false],
-//            [$arrayEntries, 'key2.key4.key7', true, false, false, true],
-//            /** Negative cases */
-//            [$arrayEntries, 'key2.key4.key7', true, false, false, true],
-//            [$arrayEntries, 'key2.key4.key5.key6', true, false, false, true],
-//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_ARRAY), 'key1', true, false, false, true],
-//            [new FileHasValidEntries(self::TEST_FILE_TMP_ARRAY, ''), 'key1', true, false, false, true],
+            /** Negative cases */
+            /** not successful, no fatal */
+            [$arrayEntries, 'key2.key4.key7', false, false, false, false],
+            [$arrayEntries, 'key2.key4.key5.key6', false, false, false, false],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_ARRAY), 'key1', false, false, false, false],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_ARRAY, ''), 'key1', false, false, false, false],
+            /** not successful, fatal */
+            // The only way to throw an action exception is to break one or more validation checks
+            [$arrayEntries, '', true, false, false, true],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_ARRAY), 'key1', true, false, false, true],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_ARRAY, ''), 'key1', true, false, false, true],
+
             /** INI TESTS */
             [$iniEntries, 'key1', false, false, true, false],
             [$iniEntries, 'key2.key3', false, false, true, false],
             [$iniEntries, 'key2.key4.key5', false, false, true, false],
-//            [$iniEntries, 'key2.key4.key7', true, false, false, true],
-//            /** Negative cases */
-//            [$iniEntries, 'key2.key4.key7', true, false, false, true],
-//            [$iniEntries, 'key2.key4.key5.key6', true, false, false, true],
-//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_INI), 'key1', true, false, false, true],
-//            [new FileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', true, false, false, true],
+            /** Negative cases */
+            /** not successful, no fatal */
+            [$iniEntries, 'key2.key4.key7', false, false, false, false],
+            [$iniEntries, 'key2.key4.key5.key6', false, false, false, false],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_INI), 'key1', false, false, false, false],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', false, false, false, false],
+            /** not successful, fatal */
+            // The only way to throw an action exception is to break one or more validation checks
+            [$iniEntries, '', true, false, false, true],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_INI), 'key1', true, false, false, true],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', true, false, false, true],
+
             /** XML TESTS */
             [$xmlEntries, 'key1', false, false, true, false],
             [$xmlEntries, 'key2.key3', false, false, true, false],
             [$xmlEntries, 'key2.key4.key5', false, false, true, false],
-//            [$xmlEntries, 'key2.key4.key7', true, false, false, true],
-//            /** Negative cases */
-//            [$xmlEntries, 'key2.key4.key7', true, false, false, true],
-//            [$xmlEntries, 'key2.key4.key5.key6', true, false, false, true],
-//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_XML), 'key1', true, false, false, true],
-//            [new FileHasValidEntries(self::TEST_FILE_TMP_XML, ''), 'key1', true, false, false, true],
+            /** Negative cases */
+            /** not successful, no fatal */
+            [$xmlEntries, 'key2.key4.key7', false, false, false, false],
+            [$xmlEntries, 'key2.key4.key5.key6', false, false, false, false],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_XML), 'key1', false, false, false, false],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', false, false, false, false],
+            /** not successful, fatal */
+            // The only way to throw an action exception is to break one or more validation checks
+            [$xmlEntries, '', true, false, false, true],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_XML), 'key1', true, false, false, true],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_XML, ''), 'key1', true, false, false, true],
+
             /** YAML TESTS */
             [$yamlEntries, 'key1', false, false, true, false],
             [$yamlEntries, 'key2.key3', false, false, true, false],
             [$yamlEntries, 'key2.key4.key5', false, false, true, false],
-//            [$yamlEntries, 'key2.key4.key7', true, false, false, true],
-//            /** Negative cases */
-//            [$yamlEntries, 'key2.key4.key7', true, false, false, true],
-//            [$yamlEntries, 'key2.key4.key5.key6', true, false, false, true],
-//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
-//            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
+            /** Negative cases */
+            /** not successful, no fatal */
+            [$yamlEntries, 'key2.key4.key7', false, false, false, false],
+            [$yamlEntries, 'key2.key4.key5.key6', false, false, false, false],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', false, false, false, false],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', false, false, false, false],
+            /** not successful, fatal */
+            // The only way to throw an action exception is to break one or more validation checks
+            [$yamlEntries, '', true, false, false, true],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
         ];
+    }
+
+    /**
+     * Data provider for file-has-xxx tests.
+     *
+     * @param string $testName
+     * @param string $validKey
+     * @param string $failKey
+     *
+     * @return array
+     */
+    public function fileHasSomethingProvider(string $testName, string $validKey, string $failKey): array
+    {
+        list($jsonEntries, $arrayEntries, $iniEntries, $xmlEntries, $yamlEntries) = $this->getFileHasValidEntriesInstances();
+
+        return [
+            [clone $jsonEntries, $validKey, false, false, true, false],
+            [clone $arrayEntries, $validKey, false, false,  true, false],
+            [clone $iniEntries, $validKey, false, false,  true, false],
+            [clone $xmlEntries, $validKey, false, false,  true, false],
+            [clone $yamlEntries, $validKey, false, false,  true, false],
+            /** Negative cases */
+            /** not successful, no fatal */
+            [clone $jsonEntries, $failKey, false, false, false, false],
+            [clone $arrayEntries, $failKey, false, false, false, false],
+            [clone $iniEntries, $failKey, false, false, false, false],
+            [clone $xmlEntries, $failKey, false, false, false, false],
+            [clone $yamlEntries, $failKey, false, false, false, false],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', false, false, false, false],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', false, false, false, false],
+            /** not successful, fatal */
+            [clone $jsonEntries, '', true, false, false, true],
+            [clone $arrayEntries, '', true, false, false, true],
+            [clone $iniEntries, '', true, false, false, true],
+            [clone $xmlEntries, '', true, false, false, true],
+            [clone $yamlEntries, '', true, false, false, true],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), '', true, false, false, true],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), '', true, false, false, true],
+            /** successful with negative result, is success required */
+            [clone $jsonEntries, $failKey, false, true, false, true],
+            [clone $arrayEntries, $failKey, false, true, false, true],
+            [clone $iniEntries, $failKey, false, true, false, true],
+            [clone $xmlEntries, $failKey, false, true, false, true],
+            [clone $yamlEntries, $failKey, false, true, false, true],
+            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), '', false, true, false, true],
+            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), '', false, true, false, true],
+        ];
+
     }
 
     /**
      * Data provider for file-does-not-have-key tests.
      *
+     * @param string $testName
+     *
      * @return array
      */
-    public function filesDoesNotHaveKeyProvider(): array
+    public function filesDoesNotHaveKeyProvider(string $testName): array
     {
-        list($jsonEntries, $arrayEntries, $iniEntries, $xmlEntries, $yamlEntries) = $this->getFileHasValidEntriesInstances();
-
-        return [
-            [clone $jsonEntries, 'key2.key4.key5.key6', false, false, true, false],
-            [clone $arrayEntries, 'key2.key4.key5.key6', false, false,  true, false],
-            [clone $iniEntries, 'key2.key4.key5.key6', false, false,  true, false],
-            [clone $xmlEntries, 'key2.key4.key5.key6', false, false,  true, false],
-            [clone $yamlEntries, 'key2.key4.key5.key6', false, false,  true, false],
-            /** Negative cases */
-//            [clone $jsonEntries, 'key2.key3', true, false, false, true],
-//            [clone $arrayEntries, 'key2.key3', true, false, false, true],
-//            [clone $iniEntries, 'key2.key3', true, false, false, true],
-//            [clone $xmlEntries, 'key2.key3', true, false, false, true],
-//            [clone $yamlEntries, 'key2.key3', true, false, false, true],
-//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
-//            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
-        ];
+        return $this->fileHasSomethingProvider($testName, 'key2.key4.key5.key6', 'key2.key3');
     }
 
     /**
      * Data provider for file-has-key-with-empty-value tests.
      *
+     * @param string $testName
+     *
      * @return array
      */
-    public function filesHasKeyWithEmptyValueProvider(): array
+    public function filesHasKeyWithEmptyValueProvider(string $testName): array
     {
-        list($jsonEntries, $arrayEntries, $iniEntries, $xmlEntries, $yamlEntries) = $this->getFileHasValidEntriesInstances();
-
-        return [
-            [clone $jsonEntries, 'key99', false, false, true, false],
-            [clone $arrayEntries, 'key99', false, false, true, false],
-            [clone $iniEntries, 'key99', false, false, true, false],
-            [clone $xmlEntries, 'key99', false, false, true, false],
-            [clone $yamlEntries, 'key99', false, false, true, false],
-            /** Negative cases */
-//            [clone $jsonEntries, 'key2.key3', true, false, false, true],
-//            [clone $arrayEntries, 'key2.key3', true, false, false, true],
-//            [clone $iniEntries, 'key2.key3', true, false, false, true],
-//            [clone $xmlEntries, 'key2.key3', true, false, false, true],
-//            [clone $yamlEntries, 'key2.key3', true, false, false, true],
-//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
-//            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
-        ];
+        return $this->fileHasSomethingProvider($testName, 'key99', 'key2.key3');
     }
 
     /**
      * Data provider for file-has-key-with-non-empty-value tests.
      *
+     * @param string $testName
+     *
      * @return array
      */
-    public function filesHasKeyWithNonEmptyValueProvider(): array
+    public function filesHasKeyWithNonEmptyValueProvider(string $testName): array
     {
-        list($jsonEntries, $arrayEntries, $iniEntries, $xmlEntries, $yamlEntries) = $this->getFileHasValidEntriesInstances();
-
-        return [
-            [clone $jsonEntries, 'key2.key3', false, false, true, false],
-            [clone $arrayEntries, 'key2.key3', false, false, true, false],
-            [clone $iniEntries, 'key2.key3', false, false, true, false],
-            [clone $xmlEntries, 'key2.key3', false, false, true, false],
-            [clone $yamlEntries, 'key2.key3', false, false, true, false],
-            /** Negative cases */
-//            [clone $jsonEntries, 'key99', true, false, false, true],
-//            [clone $arrayEntries, 'key99', true, false, false, true],
-//            [clone $iniEntries, 'key99', true, false, false, true],
-//            [clone $xmlEntries, 'key99', true, false, false, true],
-//            [clone $yamlEntries, 'key99', true, false, false, true],
-//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
-//            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
-        ];
+        return $this->fileHasSomethingProvider($testName, 'key2.key3', 'key99');
     }
 
     /**
@@ -247,8 +284,13 @@ class FileHasValidEntriesTest extends BaseTest
     {
         $providedValues = [];
 
+        $failParams = [false, false, false, false];
+        $fatalParams = [true, false, false, true];
+        $successRequiredParams = [false, true, false, true];
+
         $fileEntriesInstances = $this->getFileHasValidEntriesInstances();
         foreach ($fileEntriesInstances as $instance) {
+            // Instance | key | value | compare action | is fatal | is success required | expected | exception
             $providedValues = array_merge($providedValues, [
                 /** CHECK_CONTAINS */
                 [clone $instance, 'key1', 'value1', VerifyArray::CHECK_CONTAINS, false, false, true, false],
@@ -264,14 +306,29 @@ class FileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key4.key5', 'val', VerifyArray::CHECK_CONTAINS, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', '5', VerifyArray::CHECK_CONTAINS, false, false, true, false],
                 /** Negative cases */
-//                [clone $instance, 'key1', 'yrew', VerifyArray::CHECK_CONTAINS, true, false, false, true],
-//                [clone $instance, 'key2.key4.key5', '3', VerifyArray::CHECK_CONTAINS, true, false, false, true],
-//                [clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_CONTAINS, true, false, false, true],
-//                [clone $instance, 'key99', 'xxx', VerifyArray::CHECK_CONTAINS, true, false, false, true],
-//                [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS, true, false, false, true],
-//                [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_CONTAINS, true, false, false, true],
+                /** not successful, no fatal */
+                // The only way to throw an action exception is to break one or more validation checks
+                array_merge([clone $instance, 'key1', 'yrew', VerifyArray::CHECK_CONTAINS], $failParams),
+                array_merge([clone $instance, 'key2.key4.key5', '', VerifyArray::CHECK_CONTAINS], $failParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $failParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $failParams),
+                /** not successful, fatal */
+                // The only way to throw an action exception is to break one or more validation checks
+                array_merge([clone $instance, '', 'yrew', VerifyArray::CHECK_CONTAINS], $fatalParams),
+                array_merge([clone $instance, '', '', VerifyArray::CHECK_CONTAINS], $fatalParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $fatalParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $fatalParams),
+                /** successful with negative result, is success required */
+                array_merge([clone $instance, 'key1', 'yrew', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
+                array_merge([clone $instance, 'key2.key4.key5', '3', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
+                array_merge([clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
+                array_merge([clone $instance, 'key99', 'xxx', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
+
             ]);
 
+            // Instance | key | value | compare action | is fatal | is success required | expected | exception
             $providedValues = array_merge($providedValues, [
                 /** CHECK_STARTS_WITH */
                 [clone $instance, 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
@@ -284,12 +341,28 @@ class FileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key4.key5', 'val', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', 'v', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
                 /** Negative cases */
-//                [clone $instance, 'key1', 'alue', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
-//                [clone $instance, 'key2.key4.key5', 'lue5', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
-//                [clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
-//                [clone $instance, 'key99', 'lue', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
+                /** not successful, no fatal */
+                // The only way to throw an action exception is to break one or more validation checks
+                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_STARTS_WITH], $failParams),
+                array_merge([clone $instance, 'key2.key4.key5', '', VerifyArray::CHECK_STARTS_WITH], $failParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $failParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $failParams),
+                /** not successful, fatal */
+                // The only way to throw an action exception is to break one or more validation checks
+                array_merge([clone $instance, '', 'alue', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
+                array_merge([clone $instance, '', '', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
+                /** successful with negative result, is success required */
+                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
+                array_merge([clone $instance, 'key2.key4.key5', 'lue5', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
+                array_merge([clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
+                array_merge([clone $instance, 'key99', 'lue', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
             ]);
 
+            // Instance | key | value | compare action | is fatal | is success required | expected | exception
             $providedValues = array_merge($providedValues, [
                 /** CHECK_ENDS_WITH */
                 [clone $instance, 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
@@ -302,12 +375,27 @@ class FileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key4.key5', 'ue5', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', '5', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
                 /** Negative cases */
-//                [clone $instance, 'key1', 'alue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
-//                [clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
-//                [clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
-//                [clone $instance, 'key99', 'lue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
+                /** not successful, no fatal */
+                // The only way to throw an action exception is to break one or more validation checks
+                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_ENDS_WITH], $failParams),
+                array_merge([clone $instance, 'key2.key4.key5', '', VerifyArray::CHECK_ENDS_WITH], $failParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $failParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $failParams),
+                /** not successful, fatal */
+                // The only way to throw an action exception is to break one or more validation checks
+                array_merge([clone $instance, '', 'alue', VerifyArray::CHECK_ENDS_WITH], $fatalParams),
+                array_merge([clone $instance, '', '', VerifyArray::CHECK_ENDS_WITH], $fatalParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $fatalParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $fatalParams),
+                /** successful with negative result, is success required */
+                // The only way to throw an action exception is to break one or more validation checks
+                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_ENDS_WITH], $successRequiredParams),
+                array_merge([clone $instance, 'key2.key4.key5', '', VerifyArray::CHECK_ENDS_WITH], $successRequiredParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $successRequiredParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $successRequiredParams),
             ]);
 
+            // Instance | key | value | compare action | is fatal | is success required | expected | exception
             $providedValues = array_merge($providedValues, [
                 /** CHECK_EQUALS */
                 [clone $instance, 'key1', 'value1', VerifyArray::CHECK_EQUALS, false, false, true, false],
@@ -315,12 +403,30 @@ class FileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EQUALS, false, false, true, false],
                 [clone $instance, 'key99', '', VerifyArray::CHECK_EQUALS, false, false, true, false],
                 /** Negative cases */
-//                [clone $instance, 'key1', 'alue', VerifyArray::CHECK_EQUALS, true, false, false, true],
-//                [clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_EQUALS, true, false, false, true],
-//                [clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_EQUALS, true, false, false, true],
-//                [clone $instance, 'key99', 'lue', VerifyArray::CHECK_EQUALS, true, false, false, true],
+                /** not successful, no fatal */
+                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_EQUALS], $failParams),
+                array_merge([clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_EQUALS], $failParams),
+                array_merge([clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_EQUALS], $failParams),
+                array_merge([clone $instance, 'key99', 'lue', VerifyArray::CHECK_EQUALS], $failParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $failParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $failParams),
+                /** not successful, fatal */
+                // The only way to throw an action exception is to break one or more validation checks
+                array_merge([clone $instance, '', 'alue', VerifyArray::CHECK_EQUALS], $fatalParams),
+                array_merge([clone $instance, '', '', VerifyArray::CHECK_EQUALS], $fatalParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $fatalParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $fatalParams),
+                /** successful with negative result, is success required */
+                // The only way to throw an action exception is to break one or more validation checks
+                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_EQUALS], $successRequiredParams),
+                array_merge([clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_EQUALS], $successRequiredParams),
+                array_merge([clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_EQUALS], $successRequiredParams),
+                array_merge([clone $instance, 'key99', 'lue', VerifyArray::CHECK_EQUALS], $successRequiredParams),
+                array_merge([new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $successRequiredParams),
+                array_merge([new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $successRequiredParams),
             ]);
 
+            // Instance | key | value | compare action | is fatal | is success required | expected | exception
             $providedValues = array_merge($providedValues, [
 //TODO CHANGE THE IS FATAL CASES WHEN THE ISVALID WILL BEHAVE AS THE RUN METHOD
                 /** CHECK_EMPTY */
@@ -340,6 +446,7 @@ class FileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_EMPTY, false, true, false, true],
             ]);
 
+            // Instance | key | value | compare action | is fatal | is success required | expected | exception
             $providedValues = array_merge($providedValues, [
                 /** CHECK_ANY */
                 [clone $instance, 'key1', 'value1', VerifyArray::CHECK_ANY, false, false, true, false],
@@ -349,6 +456,7 @@ class FileHasValidEntriesTest extends BaseTest
                 /** Negative cases */
             ]);
 
+            // Instance | key | value | compare action | is fatal | is success required | expected | exception
             $providedValues = array_merge($providedValues, [
                 /** CHECK_MISSING_KEY */
                 [clone $instance, 'key1000', 'value1', VerifyArray::CHECK_MISSING_KEY, false, false, true, false],
@@ -426,7 +534,7 @@ class FileHasValidEntriesTest extends BaseTest
      * @param bool $expected
      * @param bool $exceptionExpected
      *
-     * @throws ActionException
+     * @throws ValidationException
      */
     public function testIsValid(
         string $filePath,
@@ -441,7 +549,7 @@ class FileHasValidEntriesTest extends BaseTest
             $fileHasValidEntries->hasKey($verifyKey);
         }
         if ($exceptionExpected) {
-            $this->expectException(ActionException::class);
+            $this->expectException(ValidationException::class);
         }
         $this->assertEquals($expected, $fileHasValidEntries->isValid());
     }
