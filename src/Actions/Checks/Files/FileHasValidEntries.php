@@ -11,7 +11,9 @@
 
 namespace Forte\Worker\Actions\Checks\Files;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
+use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Helpers\FileParser;
@@ -21,7 +23,7 @@ use Forte\Worker\Helpers\FileParser;
  *
  * @package Forte\Worker\Actions\Checks\Files
  */
-class FileHasValidEntries extends FileExists
+class FileHasValidEntries extends FileExists implements NestedActionCallbackInterface
 {
     /**
      * @var string
@@ -236,8 +238,6 @@ class FileHasValidEntries extends FileExists
         // We check if the specified file exists
         $this->fileExists($this->filePath);
 
-        $failedNestedActions = array();
-
         // We read the file and we convert it to an array, when possible.
         $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
         if (!is_array($parsedContent)) {
@@ -247,57 +247,44 @@ class FileHasValidEntries extends FileExists
             );
         }
 
-        // We check all configured conditions for the configured file
-        foreach ($this->checks as $check) {
-            // We create the action result object for the current check
-            $checkResult = new ActionResult($check);
-            try {
-                /** @var VerifyArray $check */
-                $checkResult = $check->setCheckContent($parsedContent)->run();
-                if (!$check->validateResult($checkResult)) {
-                    $failedNestedActions[] = $checkResult;
-                }
-            } catch (ActionException $actionException) {
-                // We handle the caught ActionException for the just-run failed check: if critical,
-                // we throw it again so that it can be caught and handled in the run method
-                if ($check->isFatal() || $check->isSuccessRequired()) {
-                    throw $actionException;
-                }
+        // We run the modifications configured for this action
+        $this->applyWithNestedRunActions(
+            $actionResult,
+            $this->checks,
+            $this,
+            $parsedContent
+        );
 
-                /**
-                 * If we get to this point, it means that the just-checked failed
-                 * check is NOT FATAL; in this case, we add to the list of failed
-                 * checks and we continue the execution of the current foreach loop.
-                 */
-                $checkResult->addActionFailure($actionException);
-                $failedNestedActions[] = $checkResult;
-            }
+        return $actionResult;
+    }
+
+    /**
+     * Run the given nested action and modify the given nested action result accordingly.
+     *
+     * @param AbstractAction $nestedAction The nested action to be run.
+     * @param ActionResult $nestedActionResult The nested action result to be modified by
+     * the given nested run action.
+     * @param array $failedNestedActions A list of failed nested actions.
+     * @param mixed $content The content to be used by the run method, if required.
+     * @param array $actionOptions Additional options required to run the given
+     * AbstractAction subclass instance.
+     *
+     * @throws ActionException
+     */
+    public function runNestedAction(
+        AbstractAction &$nestedAction,
+        ActionResult &$nestedActionResult,
+        array &$failedNestedActions,
+        &$content = null,
+        array &$actionOptions = array()
+    ): void
+    {
+        if ($nestedAction instanceof VerifyArray) {
+            $nestedAction->setCheckContent($content);
         }
-
-        $globalResult = true;
-
-        if ($failedNestedActions) {
-
-            // We generate a failure instance to handle the fatal/success-required cases
-            $actionException = $this->getActionException($actionResult->getAction(), "One or more sub-checks failed.");
-            foreach ($failedNestedActions as $failedNestedAction) {
-                foreach ($failedNestedAction->getActionFailures() as $failure) {
-                    $actionException->addChildFailure($failure);
-                }
-            }
-
-            // If fatal or success-required, we throw the exception
-            if ($this->isFatal() || $this->isSuccessRequired()) {
-                throw $actionException;
-            }
-
-            // If not fatal, we add the current failure to the list of failures for this action
-            $actionResult->addActionFailure($actionException);
-
-            $globalResult = false;
+        $nestedActionResult = $nestedAction->run();
+        if (!$nestedAction->validateResult($nestedActionResult)) {
+            $failedNestedActions[] = $nestedActionResult;
         }
-
-        // The action executed without failures
-        return $actionResult->setResult($globalResult);
     }
 }

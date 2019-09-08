@@ -107,33 +107,35 @@ class ActionException extends WorkerException
     }
 
     /**
-     * Check if some critical failures are found in the failures tree of this
+     * Check if some fatal failures are found in the failures tree of this
      * ActionException instance.
      *
-     * @return bool True if some critical failures were found in the failures
+     * @return bool True if some fatal failures were found in the failures
      * tree of this ActionException instance.
      */
-    public function hasCriticalFailures(): bool
+    public function hasFatalFailures(): bool
     {
-        return $this->checkForCriticalFailures($this);
+        return $this->checkForFatalFailures($this);
     }
 
     /**
-     * Check if some critical failures were found in the failures tree
+     * Check if some fatal failures were found in the failures tree
      * of this ActionException.
      *
-     * @return bool True if some critical failures were found in the
+     * @param ActionException $actionException The exception to be checked.
+     *
+     * @return bool True if some fatal failures were found in the
      * failures tree of this ActionException.
      */
-    public static function checkForCriticalFailures(ActionException $actionException): bool
+    public static function checkForFatalFailures(ActionException $actionException): bool
     {
         $action = $actionException->getAction();
-        if ($action->isFatal() || $action->isSuccessRequired()) {
+        if ($action->isFatal()) {
             return true;
         }
 
         foreach ($actionException->getChildrenFailures() as $actionFailure) {
-            if (self::checkForCriticalFailures($actionFailure)) {
+            if (self::checkForFatalFailures($actionFailure)) {
                 return true;
             }
         }

@@ -161,9 +161,8 @@ abstract class AbstractAction implements ValidActionInterface
                  * if there are some fatal and/or success-required children failures: if so,
                  * then we throw the parent exception.
                  */
-                $childCriticalError = false;
+                $childFatalError = false;
                 if ($exception instanceof ActionException) {
-
                     /**
                      * We have caught a child-action failure. In this case, we add the caught
                      * child-action exception to the list of failed children actions of the
@@ -174,17 +173,20 @@ abstract class AbstractAction implements ValidActionInterface
                     );
                     $actionFailure->addChildFailure($exception);
 
-                    // We detected a child failure: in this case we check if it's critical: if yes,
+                    // We detected a child failure: in this case we check if it's fatal: if yes,
                     // it should trigger the exception for the parent action as well
-                    $childCriticalError = $exception->hasCriticalFailures();
+                    $childFatalError = $exception->hasFatalFailures();
 
                 } else {
                     $actionFailure = $this->getActionException($this, $exception->getMessage());
                 }
 
-                // If we caught a critical ActionException thrown by a child process
-                // OR the current action is critical, then we throw the exception
-                if ($childCriticalError || $this->isFatal || $this->isSuccessRequired) {
+                // We set a negative result for the current ActionResult instance
+                $this->setNegativeResult($actionResult);
+
+                // If we caught a fatal ActionException thrown by a child process
+                // OR the current action is fatal, then we throw the exception
+                if ($childFatalError || $this->isFatal) {
                     throw $actionFailure;
                 } else {
                     $actionResult->addActionFailure($actionFailure);
@@ -194,10 +196,23 @@ abstract class AbstractAction implements ValidActionInterface
             // If the result of the last execution of the run method returned a negative case,
             // in case this action is flagged as 'success required', we need to throw an exception
             if (!$this->validateResult($actionResult) && $this->isSuccessRequired) {
-                $this->throwActionException(
-                    $actionResult->getAction(),
-                    "Positive result expected (action marked as 'success-required')."
-                );
+                /**
+                 * We throw a new ActionException with an appropriate "success-required" message if:
+                 * - the current result has failures (i.e. the result was negative because of an error);
+                 * - the current result has NO failure (i.e. the action executed correctly, but the result was
+                 *   negative, e.g. check condition "file-exists" always runs successfully but return a negative
+                 *   result if the given file does no exist);
+                 */
+                $actionFailures = $actionResult->getActionFailures();
+                if (count($actionFailures) === 1) {
+                    throw current($actionFailures);
+                } else {
+                    $this->throwActionExceptionWithChildren(
+                        $actionResult->getAction(),
+                        $actionResult->getActionFailures(),
+                        "Positive result expected (action marked as 'success-required')."
+                    );
+                }
             }
 
             // We run the post-run actions
@@ -300,6 +315,55 @@ abstract class AbstractAction implements ValidActionInterface
     }
 
     /**
+     * Return the unique execution ID for this AbstractAction subclass instance.
+     *
+     * @return string
+     */
+    public function getUniqueExecutionId(): string
+    {
+        return $this->uniqueExecutionId;
+    }
+
+
+
+    /**
+     * Validate the given action result. This method returns true if the
+     * given ActionResult instance has a result value that is considered
+     * as a positive case by this AbstractAction subclass instance.
+     * E.g. if the aim of the current action is to check that a given key X
+     * is defined in a given array Y, then the expected positive result is a
+     * boolean flag equal to true, if the key X exists in the array Y.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of the current AbstractAction subclass
+     * instance.
+     *
+     * @return bool True if the given ActionResult instance has a result value
+     * that is considered as a positive case by this AbstractAction subclass
+     * instance; false otherwise.
+     */
+    public function validateResult(ActionResult $actionResult): bool
+    {
+        // Default case: we assume that the result can be casted to a boolean value
+        return (bool) $actionResult->getResult();
+    }
+
+    /**
+     * Change the given ActionResult instance so that it has a value, which is
+     * considered as the negative case by this AbstractAction subclass instance.
+     * E.g. if the aim of the current action is to check that a given key X
+     * is defined in a given array Y, then the expected negative result is a
+     * boolean flag equal to false, if the key X exists in the array Y.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be modified
+     * with a negative-case value.
+     */
+    public function setNegativeResult(ActionResult &$actionResult): void
+    {
+        $actionResult->setResult(false);
+    }
+
+    /**
      * Return a string representation of this AbstractAction subclass instance.
      *
      * @return false|string A string representation of this AbstractAction
@@ -308,16 +372,6 @@ abstract class AbstractAction implements ValidActionInterface
     public function __toString()
     {
         return static::stringify();
-    }
-
-    /**
-     * Return the unique execution ID for this AbstractAction subclass instance.
-     *
-     * @return string
-     */
-    public function getUniqueExecutionId(): string
-    {
-        return $this->uniqueExecutionId;
     }
 
     /**
@@ -350,19 +404,21 @@ abstract class AbstractAction implements ValidActionInterface
                     }
                 }
             } catch (ActionException $actionException) {
-                // We handle the child ActionException (check if critical  and add it
+                // We handle the child ActionException (check if fatal  and add it
                 // to the list of action failures)
                 $this->handleChildActionException(
                     $preActionResult,
                     $actionResult,
                     $actionException,
-                    "Action failure caused by a critical pre-run failed action."
+                    "Action failure caused by a fatal pre-run failed action."
                 );
 
                 // If no exception is thrown, we add the pre-run result object
                 // to the list of failed pre-run action results
                 $actionResult->addFailedPreRunActionResult($preActionResult);
             }
+
+//TODO SHOULD WE HANDLE HERE THE CASE IS SUCCESS REQUIRED SEPARATELY FROM THE FATAL CASE?
             $preActionResult->setEndTimestamp();
         }
     }
@@ -397,48 +453,123 @@ abstract class AbstractAction implements ValidActionInterface
                     }
                 }
             } catch (ActionException $actionException) {
-                // We handle the child ActionException (check if critical and add it
+                // We handle the child ActionException (check if fatal and add it
                 // to the list of action failures)
                 $this->handleChildActionException(
                     $postActionResult,
                     $actionResult,
                     $actionException,
-                    "Action failure caused by a critical post-run failed action."
+                    "Action failure caused by a fatal post-run failed action."
                 );
 
                 // If no exception is thrown, we add the post-run result object
                 // to the list of failed post-run action results
                 $actionResult->addFailedPostRunActionResult($postActionResult);
             }
+//TODO SHOULD WE HANDLE HERE THE CASE IS SUCCESS REQUIRED SEPARATELY FROM THE FATAL CASE?
             $postActionResult->setEndTimestamp();
         }
     }
 
     /**
-     * Validate the given action result. This method returns true if the
-     * given ActionResult instance has a result value that is considered
-     * as a positive case by this AbstractAction subclass instance.
-     * E.g. if the aim of the current action is to check that a given key X
-     * is defined in a given array Y, then the expected positive result is a
-     * boolean flag equal to true if the key X exists in the array Y.
+     * Run the given list of nested actions and apply, for each one of them, the given callable
+     * (defined in this AbstractAction subclass instance).
      *
-     * @param ActionResult $actionResult The ActionResult instance to be checked
-     * with the specific validation logic of the current AbstractAction subclass
-     * instance.
+     * @param ActionResult $parentActionResult The parent action ActionResult instance. This instance
+     * will be modified by this action, with the final result, the children failures, etc.
+     * @param array $nestedRunActions A list of nested AbstractAction subclass instances to run.
+     * @param NestedActionCallbackInterface $nestedActionCallback A callable that implements the run logic
+     * specific to the current AbstractAction subclass instance.
+     * @param mixed $nestedRunContent The content to be used by the nested action run method, if required.
+     * @param array $runActionsOptions The options to run the given list of AbstractAction subclass instances
+     * (options for action X must be registered in this array with the same key as the one used to register
+     * action X in the parameter $nestedRunActions).
      *
-     * @return bool True if the given ActionResult instance has a result value
-     * that is considered as a positive case by this AbstractAction subclass
-     * instance; false otherwise.
+     * @throws ActionException
      */
-    public function validateResult(ActionResult $actionResult): bool
+    protected function applyWithNestedRunActions(
+        ActionResult &$parentActionResult,
+        array &$nestedRunActions,
+        NestedActionCallbackInterface $nestedActionCallback,
+        &$nestedRunContent = null,
+        array &$runActionsOptions = array()
+    ): void
     {
-        // Default case: we assume that the result can be casted to a boolean value
-        return (bool) $actionResult->getResult();
+        // We check all configured conditions for the configured file
+        $failedNestedActions = array();
+        foreach ($nestedRunActions as $actionKey => $nestedRunAction) {
+            // We create the action result object for the current check
+            $nestedActionResult = new ActionResult($nestedRunAction);
+            try {
+                $currentActionOptions = [];
+                if (array_key_exists($actionKey, $runActionsOptions)) {
+                    // By reference
+                    $currentActionOptions = &$runActionsOptions[$actionKey];
+                }
+                $nestedActionCallback->runNestedAction(
+                    $nestedRunAction,
+                    $nestedActionResult,
+                    $failedNestedActions,
+                    $nestedRunContent,
+                    $currentActionOptions
+                );
+            } catch (\Exception $exception) {
+                // If not an ActionException, it means that the nested action throw an unexpected error.
+                // In this case, we convert this error to an ActionException instance and we continue.
+                if (!$exception instanceof ActionException) {
+                    $actionException = $this->getActionException($nestedRunAction, $exception->getMessage());
+                } else {
+                    $actionException = $exception;
+                }
+
+                // We handle the caught ActionException for the just-run failed check: if fatal,
+                // we throw it again so that it can be caught and handled in the run method
+                if ($nestedRunAction->isFatal()) {
+                    throw $actionException;
+                }
+
+                // If the current nested action is marked as "success-required", it means that
+                /**
+                 * If we get to this point, it means that the just-checked failed
+                 * check is NOT FATAL; in this case, we add to the list of failed
+                 * checks and we continue the execution of the current foreach loop.
+                 */
+                $nestedActionResult->addActionFailure($actionException);
+                $failedNestedActions[] = $nestedActionResult;
+            }
+        }
+
+        /**
+         * We check the results of the nested actions. If some errors occurred,
+         * we have to check if they are fatal or not. If fatal, we throw
+         * a global action exception;
+         *
+         * The other scenarios should be handled in the child class.
+         */
+        $globalResult = true;
+        if ($failedNestedActions) {
+            // We set the global result to false, as some children actions failed
+            // either because of a negative result or because of an exception
+            $globalResult = false;
+
+            // We generate a failure instance to handle the fatal/success-required cases
+            $exception = $this->getActionException($parentActionResult->getAction(), "One or more sub-action failed.");
+            foreach ($failedNestedActions as $failedNestedAction) {
+                foreach ($failedNestedAction->getActionFailures() as $failure) {
+                    $exception->addChildFailure($failure);
+                }
+            }
+
+            // If not fatal, we add the current failure to the list of failures for this action
+            $parentActionResult->addActionFailure($exception);
+        }
+
+        $parentActionResult->setResult($globalResult);
     }
 
     /**
      * Handle the given child ActionException instance. It also handles the "isFatal"
-     * and "isSuccessRequired" of the child AbstractAction subclass instance.
+     * case of the child AbstractAction subclass instance.
      *
      * @param ActionResult $childActionResult
      * @param ActionResult $parentActionResult
@@ -457,9 +588,8 @@ abstract class AbstractAction implements ValidActionInterface
         // We set the caught error as a failure of the given child action result
         $childActionResult->addActionFailure($childActionException);
 
-        // If FATAL action failed, we throw the error
-        // so the action can be interrupted
-        if ($childActionResult->getAction()->isFatal() || $childActionResult->getAction()->isSuccessRequired()) {
+        // If FATAL action failed, we throw the error, so that the main action can be interrupted
+        if ($childActionResult->getAction()->isFatal()) {
             $this->throwActionExceptionWithChildren(
                 $parentActionResult->getAction(),
                 [$childActionException],

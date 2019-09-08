@@ -4,6 +4,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
+use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\FileParser;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
@@ -13,7 +14,7 @@ use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class ChangeFileEntries extends AbstractAction
+class ChangeFileEntries extends AbstractAction implements NestedActionCallbackInterface
 {
     /**
      * The file to modify.
@@ -220,69 +221,51 @@ class ChangeFileEntries extends AbstractAction
             );
         }
 
-        // We check all configured conditions for the configured file
-        $failedNestedActions = array();
-        foreach ($this->modifications as $modification) {
-            // We create the action result object for the current check
-            $modificationResult = new ActionResult($modification);
-            try {
-                /** @var ModifyArray $modification */
-                $modificationResult = $modification->setModifyContent($parsedContent)->run();
-                if (!$modification->validateResult($modificationResult)) {
-                    $failedNestedActions[] = $modificationResult;
-                } else {
-                    $parsedContent = $modificationResult->getResult();
-                }
-            } catch (ActionException $actionException) {
-                // We handle the caught ActionException for the just-run failed check: if critical,
-                // we throw it again so that it can be caught and handled in the run method
-                if ($modification->isFatal() || $modification->isSuccessRequired()) {
-                    throw $actionException;
-                }
-
-                /**
-                 * If we get to this point, it means that the just-checked failed
-                 * check is NOT FATAL; in this case, we add to the list of failed
-                 * checks and we continue the execution of the current foreach loop.
-                 */
-                $modificationResult->addActionFailure($actionException);
-                $failedNestedActions[] = $modificationResult;
-            }
-        }
-
-        /**
-         * We check the results of the nested modification actions:
-         * - if no error, we can save the new content.
-         * If some errors occurred, we have to check if they are critical or not:
-         * - if critical, we throw a global exception;
-         * - if not critical, we save the partially modified content and we return.
-         */
-        $globalResult = true;
-        if ($failedNestedActions) {
-
-            // We generate a failure instance to handle the fatal/success-required cases
-            $actionException = $this->getActionException($actionResult->getAction(), "One or more sub-modifications failed.");
-            foreach ($failedNestedActions as $failedNestedAction) {
-                foreach ($failedNestedAction->getActionFailures() as $failure) {
-                    $actionException->addChildFailure($failure);
-                }
-            }
-
-            // If fatal or success-required, we throw the exception
-            if ($this->isFatal() || $this->isSuccessRequired()) {
-                throw $actionException;
-            }
-
-            // If not fatal, we add the current failure to the list of failures for this action
-            $actionResult->addActionFailure($actionException);
-
-            $globalResult = false;
-        }
+        // We run the modifications configured for this action
+        $this->applyWithNestedRunActions(
+            $actionResult,
+            $this->modifications,
+            $this,
+            $parsedContent
+        );
 
         // We save the new content to the original file.
-        FileParser::writeToFile($parsedContent, $this->filePath, $this->contentType);
+        if ($this->validateResult($actionResult)) {
+            FileParser::writeToFile($parsedContent, $this->filePath, $this->contentType);
+        }
 
-        // The action executed without failures
-        return $actionResult->setResult($globalResult);
+        return $actionResult;
+    }
+
+    /**
+     * Run the given nested action and modify the given nested action result accordingly.
+     *
+     * @param AbstractAction $nestedAction The nested action to be run.
+     * @param ActionResult $nestedActionResult The nested action result to be modified by
+     * the given nested run action.
+     * @param array $failedNestedActions A list of failed nested actions.
+     * @param mixed $content The content to be used by the run method, if required.
+     * @param array $actionOptions Additional options required to run the given
+     * AbstractAction subclass instance.
+     *
+     * @throws ActionException
+     */
+    public function runNestedAction(
+        AbstractAction &$nestedAction,
+        ActionResult &$nestedActionResult,
+        array &$failedNestedActions,
+        &$content = null,
+        array &$actionOptions = array()
+    ): void
+    {
+        if ($nestedAction instanceof ModifyArray) {
+            $nestedAction->setModifyContent($content);
+        }
+        $nestedActionResult = $nestedAction->run();
+        if (!$nestedAction->validateResult($nestedActionResult)) {
+            $failedNestedActions[] = $nestedActionResult;
+        } else {
+            $content = $nestedActionResult->getResult();
+        }
     }
 }

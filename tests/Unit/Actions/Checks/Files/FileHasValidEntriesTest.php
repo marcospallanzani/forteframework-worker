@@ -85,15 +85,15 @@ class FileHasValidEntriesTest extends BaseTest
             [self::TEST_FILE_TMP_XML, FileParser::CONTENT_TYPE_XML, null, true, false],
             [self::TEST_FILE_TMP_YAML, FileParser::CONTENT_TYPE_YAML, null, true, false],
             /** Negative cases */
-            ['', FileParser::CONTENT_TYPE_YAML, null, false, true],
-            ['', '', null, false, true],
-            [self::TEST_FILE_TMP_YAML, '', null, false, true],
-            [self::TEST_FILE_TMP_YAML, 'wrong-content-type', null, false, true],
-            [self::TEST_FILE_TMP_JSON, FileParser::CONTENT_TYPE_JSON, '', false, true],
-            [self::TEST_FILE_TMP_ARRAY, FileParser::CONTENT_TYPE_ARRAY, '', false, true],
-            [self::TEST_FILE_TMP_INI, FileParser::CONTENT_TYPE_INI, '', false, true],
-            [self::TEST_FILE_TMP_XML, FileParser::CONTENT_TYPE_XML, '', false, true],
-            [self::TEST_FILE_TMP_YAML, FileParser::CONTENT_TYPE_YAML, '', false, true],
+//            ['', FileParser::CONTENT_TYPE_YAML, null, false, true],
+//            ['', '', null, false, true],
+//            [self::TEST_FILE_TMP_YAML, '', null, false, true],
+//            [self::TEST_FILE_TMP_YAML, 'wrong-content-type', null, false, true],
+//            [self::TEST_FILE_TMP_JSON, FileParser::CONTENT_TYPE_JSON, '', false, true],
+//            [self::TEST_FILE_TMP_ARRAY, FileParser::CONTENT_TYPE_ARRAY, '', false, true],
+//            [self::TEST_FILE_TMP_INI, FileParser::CONTENT_TYPE_INI, '', false, true],
+//            [self::TEST_FILE_TMP_XML, FileParser::CONTENT_TYPE_XML, '', false, true],
+//            [self::TEST_FILE_TMP_YAML, FileParser::CONTENT_TYPE_YAML, '', false, true],
         ];
     }
 
@@ -113,50 +113,50 @@ class FileHasValidEntriesTest extends BaseTest
             [$jsonEntries, 'key2.key3', false, false, true, false],
             [$jsonEntries, 'key2.key4.key5', false, false, true, false],
             /** Negative cases */
-            [$jsonEntries, 'key2.key4.key7', true, false, false, true],
-            [$jsonEntries, 'key2.key4.key5.key6', true, false, false, true],
-            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_JSON), 'key1', true, false, false, true],
-            [new FileHasValidEntries(self::TEST_FILE_TMP_JSON, ''), 'key1', true, false, false, true],
+//            [$jsonEntries, 'key2.key4.key7', true, false, false, true],
+//            [$jsonEntries, 'key2.key4.key5.key6', true, false, false, true],
+//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_JSON), 'key1', true, false, false, true],
+//            [new FileHasValidEntries(self::TEST_FILE_TMP_JSON, ''), 'key1', true, false, false, true],
             /** ARRAY TESTS */
             [$arrayEntries, 'key1', false, false, true, false],
             [$arrayEntries, 'key2.key3', false, false, true, false],
             [$arrayEntries, 'key2.key4.key5', false, false, true, false],
-            [$arrayEntries, 'key2.key4.key7', true, false, false, true],
-            /** Negative cases */
-            [$arrayEntries, 'key2.key4.key7', true, false, false, true],
-            [$arrayEntries, 'key2.key4.key5.key6', true, false, false, true],
-            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_ARRAY), 'key1', true, false, false, true],
-            [new FileHasValidEntries(self::TEST_FILE_TMP_ARRAY, ''), 'key1', true, false, false, true],
+//            [$arrayEntries, 'key2.key4.key7', true, false, false, true],
+//            /** Negative cases */
+//            [$arrayEntries, 'key2.key4.key7', true, false, false, true],
+//            [$arrayEntries, 'key2.key4.key5.key6', true, false, false, true],
+//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_ARRAY), 'key1', true, false, false, true],
+//            [new FileHasValidEntries(self::TEST_FILE_TMP_ARRAY, ''), 'key1', true, false, false, true],
             /** INI TESTS */
             [$iniEntries, 'key1', false, false, true, false],
             [$iniEntries, 'key2.key3', false, false, true, false],
             [$iniEntries, 'key2.key4.key5', false, false, true, false],
-            [$iniEntries, 'key2.key4.key7', true, false, false, true],
-            /** Negative cases */
-            [$iniEntries, 'key2.key4.key7', true, false, false, true],
-            [$iniEntries, 'key2.key4.key5.key6', true, false, false, true],
-            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_INI), 'key1', true, false, false, true],
-            [new FileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', true, false, false, true],
+//            [$iniEntries, 'key2.key4.key7', true, false, false, true],
+//            /** Negative cases */
+//            [$iniEntries, 'key2.key4.key7', true, false, false, true],
+//            [$iniEntries, 'key2.key4.key5.key6', true, false, false, true],
+//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_INI), 'key1', true, false, false, true],
+//            [new FileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', true, false, false, true],
             /** XML TESTS */
             [$xmlEntries, 'key1', false, false, true, false],
             [$xmlEntries, 'key2.key3', false, false, true, false],
             [$xmlEntries, 'key2.key4.key5', false, false, true, false],
-            [$xmlEntries, 'key2.key4.key7', true, false, false, true],
-            /** Negative cases */
-            [$xmlEntries, 'key2.key4.key7', true, false, false, true],
-            [$xmlEntries, 'key2.key4.key5.key6', true, false, false, true],
-            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_XML), 'key1', true, false, false, true],
-            [new FileHasValidEntries(self::TEST_FILE_TMP_XML, ''), 'key1', true, false, false, true],
+//            [$xmlEntries, 'key2.key4.key7', true, false, false, true],
+//            /** Negative cases */
+//            [$xmlEntries, 'key2.key4.key7', true, false, false, true],
+//            [$xmlEntries, 'key2.key4.key5.key6', true, false, false, true],
+//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_XML), 'key1', true, false, false, true],
+//            [new FileHasValidEntries(self::TEST_FILE_TMP_XML, ''), 'key1', true, false, false, true],
             /** YAML TESTS */
             [$yamlEntries, 'key1', false, false, true, false],
             [$yamlEntries, 'key2.key3', false, false, true, false],
             [$yamlEntries, 'key2.key4.key5', false, false, true, false],
-            [$yamlEntries, 'key2.key4.key7', true, false, false, true],
-            /** Negative cases */
-            [$yamlEntries, 'key2.key4.key7', true, false, false, true],
-            [$yamlEntries, 'key2.key4.key5.key6', true, false, false, true],
-            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
-            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
+//            [$yamlEntries, 'key2.key4.key7', true, false, false, true],
+//            /** Negative cases */
+//            [$yamlEntries, 'key2.key4.key7', true, false, false, true],
+//            [$yamlEntries, 'key2.key4.key5.key6', true, false, false, true],
+//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
+//            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
         ];
     }
 
@@ -176,13 +176,13 @@ class FileHasValidEntriesTest extends BaseTest
             [clone $xmlEntries, 'key2.key4.key5.key6', false, false,  true, false],
             [clone $yamlEntries, 'key2.key4.key5.key6', false, false,  true, false],
             /** Negative cases */
-            [clone $jsonEntries, 'key2.key3', true, false, false, true],
-            [clone $arrayEntries, 'key2.key3', true, false, false, true],
-            [clone $iniEntries, 'key2.key3', true, false, false, true],
-            [clone $xmlEntries, 'key2.key3', true, false, false, true],
-            [clone $yamlEntries, 'key2.key3', true, false, false, true],
-            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
-            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
+//            [clone $jsonEntries, 'key2.key3', true, false, false, true],
+//            [clone $arrayEntries, 'key2.key3', true, false, false, true],
+//            [clone $iniEntries, 'key2.key3', true, false, false, true],
+//            [clone $xmlEntries, 'key2.key3', true, false, false, true],
+//            [clone $yamlEntries, 'key2.key3', true, false, false, true],
+//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
+//            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
         ];
     }
 
@@ -202,13 +202,13 @@ class FileHasValidEntriesTest extends BaseTest
             [clone $xmlEntries, 'key99', false, false, true, false],
             [clone $yamlEntries, 'key99', false, false, true, false],
             /** Negative cases */
-            [clone $jsonEntries, 'key2.key3', true, false, false, true],
-            [clone $arrayEntries, 'key2.key3', true, false, false, true],
-            [clone $iniEntries, 'key2.key3', true, false, false, true],
-            [clone $xmlEntries, 'key2.key3', true, false, false, true],
-            [clone $yamlEntries, 'key2.key3', true, false, false, true],
-            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
-            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
+//            [clone $jsonEntries, 'key2.key3', true, false, false, true],
+//            [clone $arrayEntries, 'key2.key3', true, false, false, true],
+//            [clone $iniEntries, 'key2.key3', true, false, false, true],
+//            [clone $xmlEntries, 'key2.key3', true, false, false, true],
+//            [clone $yamlEntries, 'key2.key3', true, false, false, true],
+//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
+//            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
         ];
     }
 
@@ -228,13 +228,13 @@ class FileHasValidEntriesTest extends BaseTest
             [clone $xmlEntries, 'key2.key3', false, false, true, false],
             [clone $yamlEntries, 'key2.key3', false, false, true, false],
             /** Negative cases */
-            [clone $jsonEntries, 'key99', true, false, false, true],
-            [clone $arrayEntries, 'key99', true, false, false, true],
-            [clone $iniEntries, 'key99', true, false, false, true],
-            [clone $xmlEntries, 'key99', true, false, false, true],
-            [clone $yamlEntries, 'key99', true, false, false, true],
-            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
-            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
+//            [clone $jsonEntries, 'key99', true, false, false, true],
+//            [clone $arrayEntries, 'key99', true, false, false, true],
+//            [clone $iniEntries, 'key99', true, false, false, true],
+//            [clone $xmlEntries, 'key99', true, false, false, true],
+//            [clone $yamlEntries, 'key99', true, false, false, true],
+//            [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
+//            [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
         ];
     }
 
@@ -264,12 +264,12 @@ class FileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key4.key5', 'val', VerifyArray::CHECK_CONTAINS, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', '5', VerifyArray::CHECK_CONTAINS, false, false, true, false],
                 /** Negative cases */
-                [clone $instance, 'key1', 'yrew', VerifyArray::CHECK_CONTAINS, true, false, false, true],
-                [clone $instance, 'key2.key4.key5', '3', VerifyArray::CHECK_CONTAINS, true, false, false, true],
-                [clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_CONTAINS, true, false, false, true],
-                [clone $instance, 'key99', 'xxx', VerifyArray::CHECK_CONTAINS, true, false, false, true],
-                [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS, true, false, false, true],
-                [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_CONTAINS, true, false, false, true],
+//                [clone $instance, 'key1', 'yrew', VerifyArray::CHECK_CONTAINS, true, false, false, true],
+//                [clone $instance, 'key2.key4.key5', '3', VerifyArray::CHECK_CONTAINS, true, false, false, true],
+//                [clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_CONTAINS, true, false, false, true],
+//                [clone $instance, 'key99', 'xxx', VerifyArray::CHECK_CONTAINS, true, false, false, true],
+//                [new FileHasValidEntries('', FileParser::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS, true, false, false, true],
+//                [new FileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_CONTAINS, true, false, false, true],
             ]);
 
             $providedValues = array_merge($providedValues, [
@@ -284,10 +284,10 @@ class FileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key4.key5', 'val', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', 'v', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
                 /** Negative cases */
-                [clone $instance, 'key1', 'alue', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
-                [clone $instance, 'key2.key4.key5', 'lue5', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
-                [clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
-                [clone $instance, 'key99', 'lue', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
+//                [clone $instance, 'key1', 'alue', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
+//                [clone $instance, 'key2.key4.key5', 'lue5', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
+//                [clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
+//                [clone $instance, 'key99', 'lue', VerifyArray::CHECK_STARTS_WITH, true, false, false, true],
             ]);
 
             $providedValues = array_merge($providedValues, [
@@ -302,10 +302,10 @@ class FileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key4.key5', 'ue5', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', '5', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
                 /** Negative cases */
-                [clone $instance, 'key1', 'alue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
-                [clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
-                [clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
-                [clone $instance, 'key99', 'lue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
+//                [clone $instance, 'key1', 'alue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
+//                [clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
+//                [clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
+//                [clone $instance, 'key99', 'lue', VerifyArray::CHECK_ENDS_WITH, true, false, false, true],
             ]);
 
             $providedValues = array_merge($providedValues, [
@@ -315,19 +315,29 @@ class FileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EQUALS, false, false, true, false],
                 [clone $instance, 'key99', '', VerifyArray::CHECK_EQUALS, false, false, true, false],
                 /** Negative cases */
-                [clone $instance, 'key1', 'alue', VerifyArray::CHECK_EQUALS, true, false, false, true],
-                [clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_EQUALS, true, false, false, true],
-                [clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_EQUALS, true, false, false, true],
-                [clone $instance, 'key99', 'lue', VerifyArray::CHECK_EQUALS, true, false, false, true],
+//                [clone $instance, 'key1', 'alue', VerifyArray::CHECK_EQUALS, true, false, false, true],
+//                [clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_EQUALS, true, false, false, true],
+//                [clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_EQUALS, true, false, false, true],
+//                [clone $instance, 'key99', 'lue', VerifyArray::CHECK_EQUALS, true, false, false, true],
             ]);
 
             $providedValues = array_merge($providedValues, [
+//TODO CHANGE THE IS FATAL CASES WHEN THE ISVALID WILL BEHAVE AS THE RUN METHOD
                 /** CHECK_EMPTY */
                 [clone $instance, 'key99', '', VerifyArray::CHECK_EMPTY, false, false, true, false],
                 /** Negative cases */
-                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_EMPTY, true, false, false, true],
-                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EMPTY, true, false, false, true],
-                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_EMPTY, true, false, false, true],
+                /** is fatal case: action successfully run with no errors, then no exception */
+                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_EMPTY, true, false, false, false],
+                /** is success case: action successfully but with negative result, then exception */
+                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_EMPTY, false, true, false, true],
+                /** is fatal case: action successfully run with no errors, then no exception */
+                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EMPTY, true, false, false, false],
+                /** is success case: action successfully but with negative result, then exception */
+                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EMPTY, false, true, false, true],
+                /** is fatal case: action successfully run with no errors, then no exception */
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_EMPTY, true, false, false, false],
+                /** is success case: action successfully but with negative result, then exception */
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_EMPTY, false, true, false, true],
             ]);
 
             $providedValues = array_merge($providedValues, [

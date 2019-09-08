@@ -64,7 +64,7 @@ class AbstractRunner
             } catch (ActionException $actionException) {
 
                 // If failure is critical (i.e. fatal or success required), we throw it again
-                if ($actionException->hasCriticalFailures()) {
+                if ($actionException->hasFatalFailures()) {
                     throw $actionException;
                 }
 

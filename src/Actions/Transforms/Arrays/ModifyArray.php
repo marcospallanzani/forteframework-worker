@@ -240,10 +240,10 @@ class ModifyArray extends AbstractAction
      * Applies the configured changes to the given array.
      * This method supports multi-level arrays too.
      *
-     * @param array  $array
+     * @param array $array
      * @param string $key
      * @param string $action
-     * @param mixed  $modifiedValue
+     * @param mixed $modifiedValue
      *
      * @return array|mixed|null
      */

@@ -14,6 +14,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
+use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ClassAccessTrait;
@@ -27,7 +28,7 @@ use Forte\Worker\Helpers\ThrowErrorsTrait;
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class ModifyFile extends AbstractAction
+class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
 {
     use ClassAccessTrait, ThrowErrorsTrait;
 
@@ -416,39 +417,37 @@ class ModifyFile extends AbstractAction
         // We open the file. we read it line by line and we modify each line if the condition is met
         $fileHandler = fopen($this->filePath, "r");
         $modifiedContent = [];
-        $failedNestedActions = [];
         while(! feof($fileHandler))  {
             $line = fgets($fileHandler);
 
-            // We check all configured conditions for the configured file
-            foreach ($this->actions as $action) {
-                // We create the action result object for the current modification action
-                $modifyCondition = $action['condition'];
-                $modifyResult = new ActionResult($modifyCondition);
-                try {
-                    /** @var VerifyString $action */
-                    $modifyResult = $modifyCondition->setContent(trim($line, PHP_EOL))->run();
-                    if (!$modifyCondition->validateResult($modifyResult)) {
-                        $failedNestedActions[] = $modifyResult;
-                    } else {
-                        $line = $this->applyActionToLine($action['action'], $action['search'], $action['value'], $line);
-                    }
-                } catch (ActionException $actionException) {
-                    // We handle the caught ActionException for the just-run failed action: if critical,
-                    // we throw it again so that it can be caught and handled in the run method
-                    if ($action->isFatal() || $action->isSuccessRequired()) {
-                        throw $actionException;
-                    }
-
-                    /**
-                     * If we get to this point, it means that the just-checked failed
-                     * check is NOT FATAL; in this case, we add to the list of failed
-                     * checks and we continue the execution of the current foreach loop.
-                     */
-                    $modifyResult->addActionFailure($actionException);
-                    $failedNestedActions[] = $modifyResult;
+            // We extract from $this->action all the condition entries,
+            // which are the AbstractAction subclass instances to be run
+            $runnableActions = $actionOptions = [];
+            array_walk($this->actions, function (&$item, $key) use (&$runnableActions, &$actionOptions) {
+                if (is_array($item)
+                    && array_key_exists('condition', $item)
+                        && array_key_exists('action', $item)
+                            && array_key_exists('search', $item)
+                                && array_key_exists('value', $item)
+                                    && $item['condition'] instanceof AbstractAction
+                ) {
+                    $runnableActions[$key] = $item['condition'];
+                    $actionOptions[$key] = [
+                        'action' => $item['action'],
+                        'search' => $item['search'],
+                        'value' => $item['value'],
+                    ];
                 }
-            }
+            });
+
+            // We run the modifications configured for this action
+            $this->applyWithNestedRunActions(
+                $actionResult,
+                $runnableActions,
+                $this,
+                $line,
+                $actionOptions
+            );
 
             if (!is_null($line)) {
                 $modifiedContent[] = $line;
@@ -456,37 +455,17 @@ class ModifyFile extends AbstractAction
         }
         fclose($fileHandler);
 
-        // Before writing the new content, we check if all the actions run successfully
-        $globalResult = true;
-        if ($failedNestedActions) {
-            // We generate a failure instance to handle the fatal/success-required cases
-            $actionException = $this->getActionException($actionResult->getAction(), "One or more sub-actions failed.");
-            foreach ($failedNestedActions as $failedNestedAction) {
-                foreach ($failedNestedAction->getActionFailures() as $failure) {
-                    $actionException->addChildFailure($failure);
-                }
-            }
-
-            // If fatal or success-required, we throw the exception
-            if ($this->isFatal() || $this->isSuccessRequired()) {
-                throw $actionException;
-            }
-
-            // If not fatal, we add the current failure to the list of failures for this action
-            $actionResult->addActionFailure($actionException);
-
-            $globalResult = false;
-        } else {
+        // We save the new content to the original file.
+        if ($this->validateResult($actionResult)) {
             // We write the modified content line by line to the same file
             $fileHandler = fopen($this->filePath, 'w+') or die("Can't open file.");
             foreach ($modifiedContent as $line) {
                 fwrite($fileHandler, $line);
             }
             fclose($fileHandler);
-
         }
 
-        return $actionResult->setResult($globalResult);
+        return $actionResult;
     }
 
     /**
@@ -559,5 +538,46 @@ class ModifyFile extends AbstractAction
                 break;
         }
         return $line;
+    }
+
+    /**
+     * Run the given nested action and modify the given nested action result accordingly.
+     *
+     * @param AbstractAction $nestedAction The nested action to be run.
+     * @param ActionResult $nestedActionResult The nested action result to be modified by
+     * the given nested run action.
+     * @param array $failedNestedActions A list of failed nested actions.
+     * @param mixed $content The content to be used by the run method, if required.
+     * @param array $actionOptions Additional options required to run the given
+     * AbstractAction subclass instance.
+     *
+     * @throws WorkerException
+     */
+    public function runNestedAction(
+        AbstractAction &$nestedAction,
+        ActionResult &$nestedActionResult,
+        array &$failedNestedActions,
+        &$content = null,
+        array &$actionOptions = array()
+    ): void
+    {
+        if (array_key_exists('action', $actionOptions)
+            && array_key_exists('search', $actionOptions)
+                && array_key_exists('value', $actionOptions)
+        ) {
+            // In this case, we use the content variable as each parsed line in the original
+            if ($nestedAction instanceof VerifyString) {
+                $nestedActionResult = $nestedAction->setContent(trim($content, PHP_EOL))->run();
+                // If condition is matched, we modify the line
+                if ($nestedAction->validateResult($nestedActionResult)) {
+                    $content = $this->applyActionToLine(
+                        $actionOptions['action'],
+                        $actionOptions['search'],
+                        $actionOptions['value'],
+                        $content
+                    );
+                }
+            }
+        }
     }
 }
