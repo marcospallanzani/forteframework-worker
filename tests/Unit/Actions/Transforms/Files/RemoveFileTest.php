@@ -77,7 +77,7 @@ class RemoveFileTest extends BaseTest
             [self::TEST_DIR_TMP, false, false, false, false, RemoveFile::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."]
         ];
     }
-
+//TODO WRITE TEST FOR isValid METHOD
     /**
      * Test the Forte\Worker\Actions\Transforms\Files\Remove::run() method
      * for one single file.

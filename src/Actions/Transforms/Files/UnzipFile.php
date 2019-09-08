@@ -74,7 +74,7 @@ class UnzipFile extends AbstractAction
     {
         // The zip file path cannot be empty
         if (empty($this->zipFilePath)) {
-            $this->throwActionException($this, "You must specify the zip file path.");
+            $this->throwValidationException($this, "You must specify the zip file path.");
         }
 
         return true;

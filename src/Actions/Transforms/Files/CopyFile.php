@@ -144,7 +144,7 @@ class CopyFile extends AbstractAction
     {
         // The origin file path cannot be empty
         if (empty($this->originFilePath)) {
-            $this->throwActionException($this, "You must specify a file to be copied.");
+            $this->throwValidationException($this, "You must specify a file to be copied.");
         }
 
         // If no destination folder is specified, or it is the same as the origin folder,
@@ -152,7 +152,7 @@ class CopyFile extends AbstractAction
         // THEN we throw an error
         $destinationFilePath = $this->getDestinationFilePath();
         if (rtrim($this->originFilePath, DIRECTORY_SEPARATOR) === $destinationFilePath) {
-            $this->throwActionException(
+            $this->throwValidationException(
                 $this,
                 "The origin file '%s' and the specified destination file '%s' cannot be the same.",
                 $this->originFilePath,
