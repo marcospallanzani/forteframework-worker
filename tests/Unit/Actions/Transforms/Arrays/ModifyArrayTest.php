@@ -4,6 +4,7 @@ namespace Tests\Unit\Actions\Transforms\Arrays;
 
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
+use Forte\Worker\Exceptions\ValidationException;
 use Tests\Unit\BaseTest;
 
 /**
@@ -71,6 +72,7 @@ class ModifyArrayTest extends BaseTest
      */
     public function validationWithErrorsProvider(): array
     {
+        // Action | exception message | expect exception | expected value
         return [
             [
                 new ModifyArray('key', ModifyArray::MODIFY_ADD),
@@ -98,6 +100,80 @@ class ModifyArrayTest extends BaseTest
                 "No key specified",
                 true,
                 null
+            ],
+        ];
+    }
+
+    /**
+     * Data provider for run tests.
+     *
+     * @return array
+     *
+     * @throws ActionException
+     */
+    public function runWithErrorsProvider(): array
+    {
+        // Action | exception message | expect exception | expected value | fatal | success required
+        return [
+            [
+                new ModifyArray('key', ModifyArray::MODIFY_ADD),
+                '',
+                false,
+                ['key' => '']
+            ],
+            [
+                $modify = new ModifyArray('', ModifyArray::MODIFY_ADD),
+                "No key specified",
+                true,
+                null,
+                true,
+                false
+            ],
+            [
+                $modify = new ModifyArray('', ModifyArray::MODIFY_ADD),
+                "No key specified",
+                true,
+                null,
+                false,
+                true
+            ],
+            [
+                $emptyModify = new ModifyArray('', ''),
+                "No key specified",
+                true,
+                null,
+                true,
+                false
+            ],
+            [
+                $emptyModify = new ModifyArray('', ''),
+                "No key specified",
+                true,
+                null,
+                false,
+                true
+            ],
+            [
+                $modifyWrongAction = new ModifyArray('key1', 'wrong_action'),
+                sprintf(
+                    "Action wrong_action not supported. Supported actions are [%s]",
+                    implode(', ', $modifyWrongAction->getSupportedActions())
+                ),
+                true,
+                null,
+                true,
+                false
+            ],
+            [
+                $modifyWrongAction = new ModifyArray('key1', 'wrong_action'),
+                sprintf(
+                    "Action wrong_action not supported. Supported actions are [%s]",
+                    implode(', ', $modifyWrongAction->getSupportedActions())
+                ),
+                true,
+                null,
+                false,
+                true
             ],
         ];
     }
@@ -169,7 +245,7 @@ class ModifyArrayTest extends BaseTest
      * @param string $exceptionMessage
      * @param bool $expectException
      *
-     * @throws ActionException
+     * @throws ValidationException
      */
     public function testIsValidWithErrorMessage(
         ModifyArray $modifyArray,
@@ -178,7 +254,7 @@ class ModifyArrayTest extends BaseTest
     ): void
     {
         if ($expectException) {
-            $this->expectException(ActionException::class);
+            $this->expectException(ValidationException::class);
             $this->expectExceptionMessage($exceptionMessage);
             $isValid = $modifyArray->setModifyContent([])->isValid();
             $this->assertFalse($isValid);
@@ -191,12 +267,14 @@ class ModifyArrayTest extends BaseTest
     /**
      * Tests the run() function failures.
      *
-     * @dataProvider validationWithErrorsProvider
+     * @dataProvider runWithErrorsProvider
      *
      * @param ModifyArray $modifyArray
      * @param string $exceptionMessage
      * @param bool $expectException
      * @param mixed $expected
+     * @param bool $isFatal
+     * @param bool $isSuccessRequired
      *
      * @throws ActionException
      */
@@ -204,9 +282,16 @@ class ModifyArrayTest extends BaseTest
         ModifyArray $modifyArray,
         string $exceptionMessage,
         bool $expectException,
-        $expected
+        $expected,
+        bool $isFatal = false,
+        bool $isSuccessRequired = false
     ): void
     {
+        $modifyArray
+            ->setIsFatal($isFatal)
+            ->setIsSuccessRequired($isSuccessRequired)
+        ;
+
         if ($expectException) {
             $this->expectException(ActionException::class);
             $modifyArray->setModifyContent([])->run();

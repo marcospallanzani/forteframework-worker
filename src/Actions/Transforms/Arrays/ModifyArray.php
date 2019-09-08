@@ -202,13 +202,13 @@ class ModifyArray extends AbstractAction
     protected function validateInstance(): bool
     {
         if (empty($this->key)) {
-            $this->throwActionException($this, "No key specified.");
+            $this->throwValidationException($this, "No key specified.");
         }
 
         // If no action is specified OR an unsupported action is given, then we throw an error.
         $modifyConstants = $this->getSupportedActions();
         if (!in_array($this->action, $modifyConstants)) {
-            $this->throwActionException(
+            $this->throwValidationException(
                 $this,
                 "Action %s not supported. Supported actions are [%s]",
                 $this->action,
