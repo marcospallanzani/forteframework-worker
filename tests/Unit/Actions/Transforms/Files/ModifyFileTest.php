@@ -14,6 +14,7 @@ namespace Tests\Unit\Actions\Transforms\Files;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
+use Forte\Worker\Exceptions\ValidationException;
 use Tests\Unit\BaseTest;
 
 /**
@@ -121,9 +122,13 @@ class ModifyFileTest extends BaseTest
             [$this->getAppendTemplateModifyFile(), true, false, true, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
             [$this->getReplaceWithTemplateModifyFile(), true, false, true, self::TEST_TEMPLATE_CONTENT],
             [new ModifyFile(self::TEST_FILE_MODIFY), true, false, true, self::TEST_CONTENT],
-            [new ModifyFile(''), false, true, false, self::TEST_CONTENT],
-            [$this->getModifyFileWithUnsupportedAction(), false, true, false, self::TEST_CONTENT],
-            [$this->getModifyFileWithUnsupportedCondition(), false, true, false, self::TEST_CONTENT],
+            /** negative cases: fatal VS non-fatal */
+            [new ModifyFile(''), false, false, false, self::TEST_CONTENT],
+            [(new ModifyFile(''))->setIsFatal(true), false, true, false, self::TEST_CONTENT],
+            [$this->getModifyFileWithUnsupportedAction(), false, false, false, self::TEST_CONTENT],
+            [$this->getModifyFileWithUnsupportedAction()->setIsFatal(true), false, true, false, self::TEST_CONTENT],
+            [$this->getModifyFileWithUnsupportedCondition(), false, false, false, self::TEST_CONTENT],
+            [$this->getModifyFileWithUnsupportedCondition()->setIsFatal(true), false, true, false, self::TEST_CONTENT],
         ];
     }
 
@@ -165,12 +170,12 @@ class ModifyFileTest extends BaseTest
      * @param bool $expectedException
      * @param bool $isValid
      *
-     * @throws ActionException
+     * @throws ValidationException
      */
     public function testIsValid(ModifyFile $modifyFile, bool $expected, bool $expectedException, bool $isValid): void
     {
-        if ($expectedException) {
-            $this->expectException(ActionException::class);
+        if (!$isValid) {
+            $this->expectException(ValidationException::class);
         }
         $this->assertEquals($isValid, $modifyFile->isValid());
     }

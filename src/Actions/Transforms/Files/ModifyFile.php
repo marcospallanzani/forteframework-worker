@@ -15,7 +15,7 @@ use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
-use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\StringParser;
@@ -347,11 +347,7 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
     protected function validateInstance(): bool
     {
         if (empty($this->filePath)) {
-            $this->throwActionException(
-                $this,
-                "You need to specify the 'filePath' for the following transformation: '%s'.",
-                $this
-            );
+            $this->throwValidationException($this, "File path cannot be empty.");
         }
 
         // If no action is specified OR an unsupported action is given, then we throw an error.
@@ -361,7 +357,7 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
             // We check if the condition object is valid
             $condition = $action['condition'];
             if (!$condition instanceof VerifyString) {
-                $wrongActionsAndConditions[] = $this->getActionException(
+                $wrongActionsAndConditions[] = $this->getValidationException(
                     new VerifyString(''),
                     "Unsupported condition type given [%s]. Supported types are [%s]",
                     (is_object($condition) ? get_class($condition) : gettype($condition)),
@@ -371,7 +367,7 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
 
             // We check if the action is supported
             if (!in_array($action['action'], $modifyConstants)) {
-                $wrongActionsAndConditions[] = $this->getActionException(
+                $wrongActionsAndConditions[] = $this->getValidationException(
                     $this,
                     "Action %s not supported. Supported actions are [%s].",
                     $action['action'],
@@ -382,14 +378,14 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
             // We validate all the nested actions
             try {
                 $condition->isValid();
-            } catch (ActionException $actionException) {
-                $wrongActionsAndConditions[] = $actionException;
+            } catch (ValidationException $validationException) {
+                $wrongActionsAndConditions[] = $validationException;
             }
         }
 
         // We check if some nested actions are not valid: if so, we throw an exception
         if ($wrongActionsAndConditions) {
-            $this->throwActionExceptionWithChildren(
+            $this->throwValidationExceptionWithChildren(
                 $this,
                 [$wrongActionsAndConditions],
                 "One or more nested actions are not valid."
