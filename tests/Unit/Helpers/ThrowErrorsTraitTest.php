@@ -128,4 +128,40 @@ class ThrowErrorsTraitTest extends BaseTest
         $this->assertInstanceOf(ActionException::class, $childFailure);
         $this->assertEquals('children error message action test.', $childFailure->getMessage());
     }
+
+    /**
+     * Test ThrowErrorsTrait::throwValidationExceptionWithChildren() method.
+     */
+    public function testThrowValidationExceptionWithChildren(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage("error message action test.");
+        $anonymousActionClass = $this->getAnonymousActionClass();
+        $anonymousActionClass->throwValidationExceptionWithChildren(
+            $anonymousActionClass,
+            [new ValidationException($anonymousActionClass, 'children error message action test.')],
+            self::BASE_TEST_MESSAGE,
+            self::ACTION_TEST_MESSAGE
+        );
+    }
+
+    /**
+     * Test ThrowErrorsTrait::getValidationExceptionWithChildren() method.
+     */
+    public function testGetValidationExceptionWithChildren(): void
+    {
+        $anonymousActionClass = $this->getAnonymousActionClass();
+        /** @var ValidationException $validationException */
+        $validationException = $anonymousActionClass->getValidationExceptionWithChildren(
+            $anonymousActionClass,
+            [new ValidationException($anonymousActionClass, 'children error message action test.')],
+            self::BASE_TEST_MESSAGE,
+            self::ACTION_TEST_MESSAGE
+        );
+        $this->assertInstanceOf(ValidationException::class, $validationException);
+        $this->assertCount(1, $validationException->getChildrenFailures());
+        $childFailure = current($validationException->getChildrenFailures());
+        $this->assertInstanceOf(ValidationException::class, $childFailure);
+        $this->assertEquals('children error message action test.', $childFailure->getMessage());
+    }
 }
