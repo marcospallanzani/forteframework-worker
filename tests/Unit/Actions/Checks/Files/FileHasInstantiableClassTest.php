@@ -13,6 +13,7 @@ namespace Tests\Unit\Actions\Checks\Files;
 
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\ValidationException;
 use Tests\Unit\BaseTest;
 
 /**
@@ -98,12 +99,12 @@ class FileHasInstantiableClassTest extends BaseTest
      * @param bool $expected
      * @param bool $exceptionExpected
      *
-     * @throws ActionException
+     * @throws ValidationException
      */
     public function testIsValid(string $filePath, string $className, bool $expected, bool $exceptionExpected): void
     {
         if ($exceptionExpected) {
-            $this->expectException(ActionException::class);
+            $this->expectException(ValidationException::class);
         }
         $this->assertEquals($expected, (new FileHasInstantiableClass($filePath, $className))->isValid());
     }

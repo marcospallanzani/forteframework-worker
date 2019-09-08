@@ -13,6 +13,7 @@ namespace Forte\Worker\Actions\Checks\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
+use Forte\Worker\Exceptions\ValidationException;
 
 /**
  * Class FileExists.
@@ -69,13 +70,13 @@ class FileExists extends AbstractAction
      *
      * @return bool True if no validation breaches were found; false otherwise.
      *
-     * @throws \Exception If validation breaches were found.
+     * @throws ValidationException If validation breaches were found.
      */
     protected function validateInstance(): bool
     {
         // The file path cannot be empty
         if (empty($this->filePath)) {
-            $this->throwWorkerException("You must specify the file path.");
+            $this->throwValidationException($this, "You must specify the file path.");
         }
 
         return true;
