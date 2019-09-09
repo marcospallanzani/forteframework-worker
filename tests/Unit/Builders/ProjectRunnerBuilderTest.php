@@ -28,7 +28,7 @@ class ProjectRunnerBuilderTest extends BaseTest
     {
         return [
             // Add method | add method params | expected action class
-            ['initFromZipFile', ['test.zip'], UnzipFile::class],
+            ['unzipFile', ['test.zip'], UnzipFile::class],
             ['copyFileTo', [__FILE__], CopyFile::class],
             ['hasInstantiableClass', [__FILE__, __CLASS__], EmptyTransform::class],
             ['modifyConfigKey', [__FILE__, FileParser::CONTENT_TYPE_JSON, 'key', 'value'], ChangeFileEntries::class],
