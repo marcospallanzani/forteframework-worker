@@ -56,6 +56,7 @@ class AbstractRunner
     {
         $actionResults = array();
         foreach ($this->actions as $action) {
+//TODO DO WE NEED TO CATCH THE EXCEPTIONS HERE? THEY SHOULD BE HANDLED IN THE RUN METHOD.. AFTER ALL, IF FATAL SHOULD THROW AN EXCEPTION
             $actionResult = new ActionResult($action);
             try {
                 if ($action instanceof AbstractAction) {
@@ -76,6 +77,8 @@ class AbstractRunner
             $actionResults[] = $actionResult;
 
         }
+
+//TODO CHECK HERE FOR IS SUCCESS REQUIRED
 
         return $actionResults;
     }
