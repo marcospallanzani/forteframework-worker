@@ -17,7 +17,7 @@ namespace Forte\Worker\Actions;
  *
  * @package Forte\Worker\Actions
  */
-interface ValidActionInterface extends ValidInterface, ActionInterface
+interface ValidActionInterface extends ValidInterface, ActionInterface, ArrayableInterface
 {
     //
 }
