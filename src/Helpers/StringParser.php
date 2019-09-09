@@ -97,4 +97,19 @@ class StringParser
     {
         return vsprintf($message, $parameters);
     }
+
+    /**
+     * Return a random unique id.
+     *
+     * @param string $prefix A string to prepend to the random unique id.
+     *
+     * @return string A random unique id.
+     */
+    public static function getRandomUniqueId(string $prefix = ''): string
+    {
+        return
+            (!empty($prefix) ? $prefix . "_" : "") .
+            sha1(rand()) . "_" .
+            number_format(microtime(true), 12, '', '');
+    }
 }
