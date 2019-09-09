@@ -64,4 +64,20 @@ class CollectionTest extends BaseTest
     {
         $this->assertEquals($expected, Collection::filterArrayByPrefixKey($initialArray, $prefix));
     }
+
+    /**
+     * Test method Collection::variablesToArray().
+     */
+    public function testToVariablesToArray(): void
+    {
+        $anonymousAction = $this->getAnonymousActionClass();
+        $childAction = $this->getAnonymousActionClass();
+
+        // We build the expected output
+        $arrayAnonymousAction = $anonymousAction->toArray();
+        $anonymousAction->addBeforeAction($childAction);
+        $arrayAnonymousAction['beforeActions'][] = $childAction->toArray();
+
+        $this->assertEquals(['key' => 'value1', 'value', true, $arrayAnonymousAction], Collection::variablesToArray(['key' => 'value1', 'value', true, $anonymousAction]));
+    }
 }

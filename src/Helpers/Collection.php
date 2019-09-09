@@ -11,6 +11,8 @@
 
 namespace Forte\Worker\Helpers;
 
+use Forte\Worker\Actions\ArrayableInterface;
+
 /**
  * Class Collection. A set of functions to handle collections.
  *
@@ -36,5 +38,28 @@ class Collection
             },
             ARRAY_FILTER_USE_KEY
         );
+    }
+
+    /**
+     * Convert all elements in the given variables list to an array.
+     *
+     * @param array $variables
+     *
+     * @return array
+     */
+    public static function variablesToArray(array $variables): array
+    {
+        $toArray = [];
+        foreach ($variables as $key => $variable) {
+            if ($variable instanceof ArrayableInterface) {
+                $toArray[$key] = $variable->toArray();
+            } elseif (is_array($variable)) {
+                $toArray[$key] = self::variablesToArray($variable);
+            } else {
+                $toArray[$key] = $variable;
+            }
+        }
+
+        return $toArray;
     }
 }
