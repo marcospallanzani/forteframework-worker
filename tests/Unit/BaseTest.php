@@ -4,6 +4,8 @@ namespace Tests\Unit;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
+use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -39,5 +41,61 @@ abstract class BaseTest extends TestCase
             public function stringify(): string { return $this->className; }
             public function validateResult(ActionResult $actionResult): bool { return true; }
         };
+    }
+
+    /**
+     * Base test for all isValid tests.
+     *
+     * @param bool $isValid
+     * @param AbstractAction $action
+     *
+     * @throws ValidationException
+     */
+    protected function isValidTest(bool $isValid, AbstractAction $action): void
+    {
+        if (!$isValid) {
+            $this->expectException(ValidationException::class);
+        }
+        $this->assertEquals($isValid, $action->isValid());
+    }
+
+    /**
+     * Base test for all stringify tests.
+     *
+     * @param string $expectedMessage
+     * @param AbstractAction $action
+     */
+    protected function stringifyTest(string $expectedMessage, AbstractAction $action): void
+    {
+        $this->assertEquals($expectedMessage, $action->stringify());
+        $this->assertEquals($expectedMessage, (string) $action);
+    }
+
+    /**
+     * Base test for all run tests.
+     *
+     * @param bool $exceptionExpected
+     * @param bool $isValid
+     * @param AbstractAction $action
+     * @param $expected
+     *
+     * @throws ActionException
+     */
+    protected function runBasicTest(
+        bool $exceptionExpected,
+        bool $isValid,
+        AbstractAction $action,
+        $expected
+    ): void
+    {
+        if ($exceptionExpected) {
+            if ($isValid) {
+                $this->expectException(ActionException::class);
+            } else {
+                $this->expectException(ValidationException::class);
+            }
+        }
+        $this->assertEquals($expected, $action->run()->getResult());
+
     }
 }
