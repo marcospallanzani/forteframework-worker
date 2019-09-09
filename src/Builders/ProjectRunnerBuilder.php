@@ -4,6 +4,7 @@ namespace Forte\Worker\Builders;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
+use Forte\Worker\Actions\Checks\Files\DirectoryExists;
 use Forte\Worker\Actions\Checks\Files\FileHasValidEntries;
 use Forte\Worker\Runners\ProjectRunner;
 use Forte\Worker\Actions\Checks\Files\FileExists;
@@ -32,19 +33,18 @@ class ProjectRunnerBuilder
      */
     public function __construct(string $projectRootFolder)
     {
-        $this->runner = new ProjectRunner($projectRootFolder);
+        $this->reset($projectRootFolder);
     }
 
     /**
-     * It initializes the project folder from the given zip file.
-     * It unzips the file in the base project folder specified in
-     * the constructor.
+     * Add an action to decompress the given zip file. It unzips the file in
+     * the base project folder specified in the constructor.
      *
      * @param string $zipFilePath The zip file to unzip.
      *
      * @return self
      */
-    public function initFromZipFile(string $zipFilePath): self
+    public function unzipFile(string $zipFilePath): self
     {
         $fullProjectPath = $this->runner->getProjectFolder();
 
@@ -55,6 +55,27 @@ class ProjectRunnerBuilder
             [new FileExists($zipFilePath)],
             /** post-run actions */
             [new FileExists($fullProjectPath)]
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add an action to check if the given path corresponds to an existing directory.
+     *
+     * @param string $path The directory path to be checked.
+     *
+     * @return self
+     */
+    public function dirExists(string $path): self
+    {
+        $this->addAction(
+            /** main action */
+            new DirectoryExists($path),
+            /** pre-run actions */
+            [],
+            /** post-run actions */
+            []
         );
 
         return $this;
@@ -257,5 +278,55 @@ class ProjectRunnerBuilder
     public function getRunner(): ProjectRunner
     {
         return $this->runner;
+    }
+//TODO WE SHOULD REFACTOR THE FOLLOWING TWO METHODS WITH A MORE GENERAL METHOD THAT CAN HANDLE THE CRITICAL STATUS AS WELL
+    /**
+     * Set the "fatal" status with the given flag for all registered actions.
+     *
+     * @param bool $fatal The desired "fatal" status (true, all actions will
+     * be marked as fatal).
+     *
+     * @return ProjectRunnerBuilder
+     */
+    public function setFatalStatusForAllActions(bool $fatal = true): self
+    {
+        foreach ($this->runner->getActions() as &$action) {
+            if ($action instanceof AbstractAction) {
+                $action->setIsFatal($fatal);
+            }
+        }
+
+        return $this;
+    }
+//TODO WE SHOULD REFACTOR THE FOLLOWING TWO METHODS WITH A MORE GENERAL METHOD THAT CAN HANDLE THE CRITICAL STATUS AS WELL
+    /**
+     * Set the "success-required" status with the given flag for all
+     * registered actions.
+     *
+     * @param bool $successRequired The desired "success-required"
+     * status (true, all actions will be marked as success-required).
+     *
+     * @return ProjectRunnerBuilder
+     */
+    public function setSuccessRequiredForAllActions(bool $successRequired = true): self
+    {
+        foreach ($this->runner->getActions() as &$action) {
+            if ($action instanceof AbstractAction) {
+                $action->setIsFatal($successRequired);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Reset the current runner with a new instance for the given
+     * project root folder.
+     *
+     * @param string $projectRootFolder The project root folder.
+     */
+    protected function reset(string $projectRootFolder): void
+    {
+        $this->runner = new ProjectRunner($projectRootFolder);
     }
 }
