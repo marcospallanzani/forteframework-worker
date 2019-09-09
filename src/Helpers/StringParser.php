@@ -84,4 +84,17 @@ class StringParser
             return (string) $variable;
         }
     }
+
+    /**
+     * Return a formatted message.
+     *
+     * @param string $message The message to be formatted.
+     * @param mixed[] $parameters The values to replace in the given message.
+     *
+     * @return string
+     */
+    public static function getFormattedMessage(string $message, ...$parameters): string
+    {
+        return vsprintf($message, $parameters);
+    }
 }

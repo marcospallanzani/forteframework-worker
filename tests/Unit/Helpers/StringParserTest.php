@@ -79,4 +79,14 @@ class StringParserTest extends BaseTest
     {
         $this->assertEquals($expected, StringParser::stringifyVariable($variable));
     }
+
+    /**
+     * Test the StringParser::getFormattedMessage() method.
+     */
+    public function testFormatMessage(): void
+    {
+        $this->assertEquals('test formatted string', StringParser::getFormattedMessage('test %s %s', 'formatted', 'string'));
+        $this->assertEquals('test formatted 10', StringParser::getFormattedMessage('test %s %d', 'formatted', 10.01));
+        $this->assertStringStartsWith('test formatted 10.01', StringParser::getFormattedMessage('test %s %f', 'formatted', 10.01));
+    }
 }
