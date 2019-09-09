@@ -45,7 +45,7 @@ class RemoveFileTest extends BaseTest
 
         // We have to copy the template file, which will be deleted by this test
         if (!is_dir(self::TEST_DIR_TMP)) {
-            mkdir(self::TEST_DIR_TMP);
+            @mkdir(self::TEST_DIR_TMP);
         }
         @file_put_contents(self::TEST_FILE_TXT, self::TEST_CONTENT);
         @file_put_contents(self::TEST_FILE_JSON, self::TEST_CONTENT);
