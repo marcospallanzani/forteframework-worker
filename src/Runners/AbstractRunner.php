@@ -154,4 +154,16 @@ class AbstractRunner
             "export_action_results_"
         );
     }
+
+    /**
+     * Reset the current runner instance to its initial state (no configured actions).
+     *
+     * @return bool True if the runner instance was reset to its initial state.
+     */
+    public function reset(): bool
+    {
+        $this->actions = [];
+
+        return true;
+    }
 }
