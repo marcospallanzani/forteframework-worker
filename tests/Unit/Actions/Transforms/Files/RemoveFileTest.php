@@ -73,11 +73,20 @@ class RemoveFileTest extends BaseTest
             // File path | expected result | is fatal | is success required | exception expected | remove mode | expected stringify message
             [self::TEST_FILE_TXT, true, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_TXT . "'."],
             [self::TEST_FILE_JSON, true, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_JSON . "'."],
+            /** Negative cases */
+            /** not successful, no fatal */
             [self::TEST_WRONG_FILE, false, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
-            [self::TEST_DIR_TMP, false, false, false, false, RemoveFile::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."]
+            [self::TEST_DIR_TMP, false, false, false, false, RemoveFile::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."],
+            ['', false, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
+            /** not successful, fatal */
+            [self::TEST_WRONG_FILE, false, true, false, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
+            ['', false, true, false, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
+            /** successful with negative result, is success required */
+            [self::TEST_WRONG_FILE, false, false, true, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
+            ['', false, false, true, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
         ];
     }
-//TODO WRITE TEST FOR isValid METHOD
+
     /**
      * Test the Forte\Worker\Actions\Transforms\Files\Remove::run() method
      * for one single file.

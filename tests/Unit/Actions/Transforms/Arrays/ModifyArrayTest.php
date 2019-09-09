@@ -67,8 +67,6 @@ class ModifyArrayTest extends BaseTest
      * Data provider for validation tests.
      *
      * @return array
-     *
-     * @throws ActionException
      */
     public function validationWithErrorsProvider(): array
     {
@@ -108,8 +106,6 @@ class ModifyArrayTest extends BaseTest
      * Data provider for run tests.
      *
      * @return array
-     *
-     * @throws ActionException
      */
     public function runWithErrorsProvider(): array
     {
@@ -294,6 +290,7 @@ class ModifyArrayTest extends BaseTest
 
         if ($expectException) {
             $this->expectException(ActionException::class);
+            $this->expectExceptionMessage($exceptionMessage);
             $modifyArray->setModifyContent([])->run();
         } else {
             $result = $modifyArray->setModifyContent([])->run();

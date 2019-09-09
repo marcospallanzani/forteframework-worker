@@ -113,22 +113,29 @@ class ModifyFileTest extends BaseTest
      */
     public function applyProvider(): array
     {
+        // Action | is valid | is fatal | success required | expected value | exception | exception content
         return [
-            [$this->getReplaceValueModifyFile(), true, false, true, 'ANY REPLACED CONTENT'],
-            [$this->getReplaceLineModifyFile(),true, false, true, self::TEST_REPLACED_CONTENT],
-            [$this->getRemoveValueModifyFile(), true, false, true, 'ANY '],
-            [$this->getRemoveLineModifyFile(), true, false, true, ''],
-            [$this->getAppendValueModifyFile(), true, false, true, self::TEST_CONTENT . self::TEST_APPENDED_CONTENT],
-            [$this->getAppendTemplateModifyFile(), true, false, true, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
-            [$this->getReplaceWithTemplateModifyFile(), true, false, true, self::TEST_TEMPLATE_CONTENT],
-            [new ModifyFile(self::TEST_FILE_MODIFY), true, false, true, self::TEST_CONTENT],
-            /** negative cases: fatal VS non-fatal */
-            [new ModifyFile(''), false, false, false, self::TEST_CONTENT],
-            [(new ModifyFile(''))->setIsFatal(true), false, true, false, self::TEST_CONTENT],
-            [$this->getModifyFileWithUnsupportedAction(), false, false, false, self::TEST_CONTENT],
-            [$this->getModifyFileWithUnsupportedAction()->setIsFatal(true), false, true, false, self::TEST_CONTENT],
-            [$this->getModifyFileWithUnsupportedCondition(), false, false, false, self::TEST_CONTENT],
-            [$this->getModifyFileWithUnsupportedCondition()->setIsFatal(true), false, true, false, self::TEST_CONTENT],
+            [$this->getReplaceValueModifyFile(), true, false, false, true, false, 'ANY REPLACED CONTENT'],
+            [$this->getReplaceLineModifyFile(), true, false, false, true, false, self::TEST_REPLACED_CONTENT],
+            [$this->getRemoveValueModifyFile(), true, false, false, true, false, 'ANY '],
+            [$this->getRemoveLineModifyFile(), true, false, false, true, false, ''],
+            [$this->getAppendValueModifyFile(), true, false, false, true, false, self::TEST_CONTENT . self::TEST_APPENDED_CONTENT],
+            [$this->getAppendTemplateModifyFile(), true, false, false, true, false, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
+            [$this->getReplaceWithTemplateModifyFile(), true, false, false, true, false, self::TEST_TEMPLATE_CONTENT],
+            [new ModifyFile(self::TEST_FILE_MODIFY), true, false, false, true, false, self::TEST_CONTENT],
+            /** Negative cases */
+            /** not successful, no fatal */
+            [new ModifyFile(''), false, false, false, false, false, self::TEST_CONTENT],
+            [$this->getModifyFileWithUnsupportedAction(), false, false, false, false, false, self::TEST_CONTENT],
+            [$this->getModifyFileWithUnsupportedCondition(), false, false, false, false, false, self::TEST_CONTENT],
+            /** not successful, fatal */
+            [(new ModifyFile('')), false, true, false, false, true, self::TEST_CONTENT],
+            [$this->getModifyFileWithUnsupportedAction(), false, true, false, false, true, self::TEST_CONTENT],
+            [$this->getModifyFileWithUnsupportedCondition(), false, true, false, false, true, self::TEST_CONTENT],
+            /** successful with negative result, is success required */
+            [new ModifyFile(''), false, false, true, false, true, self::TEST_CONTENT],
+            [$this->getModifyFileWithUnsupportedAction(), false, false, true, false, true, self::TEST_CONTENT],
+            [$this->getModifyFileWithUnsupportedCondition(), false, false, true, false, true, self::TEST_CONTENT],
         ];
     }
 
@@ -138,23 +145,35 @@ class ModifyFileTest extends BaseTest
      * @dataProvider applyProvider
      *
      * @param ModifyFile $modifyFile
+     * @param bool $isValid
+     * @param bool $isFatal
+     * @param bool $isSuccessRequired
      * @param bool $expected
      * @param bool $expectedException
-     * @param bool $isValid
      * @param string $expectedContent
      *
      * @throws ActionException
      */
     public function testRun(
         ModifyFile $modifyFile,
+        bool $isValid,
+        bool $isFatal,
+        bool $isSuccessRequired,
         bool $expected,
         bool $expectedException,
-        bool $isValid,
         string $expectedContent
     ): void
     {
+        $modifyFile
+            ->setIsFatal($isFatal)
+            ->setIsSuccessRequired($isSuccessRequired);
+
         if ($expectedException) {
-            $this->expectException(ActionException::class);
+            if ($isValid) {
+                $this->expectException(ActionException::class);
+            } else {
+                $this->expectException(ValidationException::class);
+            }
         }
         $this->assertEquals($expected, $modifyFile->run()->getResult());
         $this->assertTrue($this->checkFileContent(self::TEST_FILE_MODIFY, $expectedContent));
@@ -166,13 +185,11 @@ class ModifyFileTest extends BaseTest
      * @dataProvider applyProvider
      *
      * @param ModifyFile $modifyFile
-     * @param bool $expected
-     * @param bool $expectedException
      * @param bool $isValid
      *
      * @throws ValidationException
      */
-    public function testIsValid(ModifyFile $modifyFile, bool $expected, bool $expectedException, bool $isValid): void
+    public function testIsValid(ModifyFile $modifyFile, bool $isValid): void
     {
         if (!$isValid) {
             $this->expectException(ValidationException::class);
