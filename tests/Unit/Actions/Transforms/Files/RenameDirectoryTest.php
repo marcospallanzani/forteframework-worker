@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Actions\Transforms\Files;
 
-use Forte\Worker\Actions\Transforms\Files\RenameDirectory;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Tests\Unit\BaseTest;
@@ -82,7 +82,7 @@ class RenameDirectoryTest extends BaseTest
      */
     public function testIsValid(string $sourcePath, string $targetName, bool $isValid): void
     {
-        $this->isValidTest($isValid, new RenameDirectory($sourcePath, $targetName));
+        $this->isValidTest($isValid, ActionFactory::createRenameDirectory($sourcePath, $targetName));
     }
 
     /**
@@ -110,7 +110,7 @@ class RenameDirectoryTest extends BaseTest
         string $message
     ): void
     {
-        $this->stringifyTest($message, new RenameDirectory($sourcePath, $targetName));
+        $this->stringifyTest($message, ActionFactory::createRenameDirectory($sourcePath, $targetName));
     }
 
     /**
@@ -125,7 +125,6 @@ class RenameDirectoryTest extends BaseTest
      * @param bool $isSuccessRequired
      * @param $expected
      * @param bool $exceptionExpected
-     * @param string $message
      *
      * @throws ActionException
      */
@@ -136,20 +135,20 @@ class RenameDirectoryTest extends BaseTest
         bool $isFatal,
         bool $isSuccessRequired,
         $expected,
-        bool $exceptionExpected,
-        string $message
+        bool $exceptionExpected
     ): void
     {
-        $renameDirectory =
-            (new RenameDirectory())
+        // Basic checks
+        $this->runBasicTest(
+            $exceptionExpected,
+            $isValid,
+            ActionFactory::createRenameDirectory()
                 ->rename($sourcePath)
                 ->to($targetName)
                 ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
-        ;
-
-        // Basic checks
-        $this->runBasicTest($exceptionExpected, $isValid, $renameDirectory, $expected);
+                ->setIsSuccessRequired($isSuccessRequired),
+            $expected
+        );
 
         // The directory has been renamed, then we check if the original file is not in the file system anymore
         if ($expected) {

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Actions\Transforms\Files;
 
-use Forte\Worker\Actions\Transforms\Files\MoveFile;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Tests\Unit\BaseTest;
@@ -78,7 +78,7 @@ class MoveFileTest extends BaseTest
      */
     public function testIsValid(string $sourcePath, string $targetPath, bool $isValid): void
     {
-        $this->isValidTest($isValid, new MoveFile($sourcePath, $targetPath));
+        $this->isValidTest($isValid, ActionFactory::createMoveFile($sourcePath, $targetPath));
     }
 
     /**
@@ -106,7 +106,7 @@ class MoveFileTest extends BaseTest
         string $message
     ): void
     {
-        $this->stringifyTest($message, new MoveFile($sourcePath, $targetPath));
+        $this->stringifyTest($message, ActionFactory::createMoveFile($sourcePath, $targetPath));
     }
 
     /**
@@ -121,7 +121,6 @@ class MoveFileTest extends BaseTest
      * @param bool $isSuccessRequired
      * @param $expected
      * @param bool $exceptionExpected
-     * @param string $message
      *
      * @throws ActionException
      */
@@ -132,20 +131,20 @@ class MoveFileTest extends BaseTest
         bool $isFatal,
         bool $isSuccessRequired,
         $expected,
-        bool $exceptionExpected,
-        string $message
+        bool $exceptionExpected
     ): void
     {
-        $moveFile =
-            (new MoveFile())
+        // Basic checks
+        $this->runBasicTest(
+            $exceptionExpected,
+            $isValid,
+            ActionFactory::createMoveFile()
                 ->move($sourcePath)
                 ->to($targetPath)
                 ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
-            ;
-
-        // Basic checks
-        $this->runBasicTest($exceptionExpected, $isValid, $moveFile, $expected);
+                ->setIsSuccessRequired($isSuccessRequired),
+            $expected
+        );
 
         // The file has been moved, then we check if the original
         // file is not in the file system anymore

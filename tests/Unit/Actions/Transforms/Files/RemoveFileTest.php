@@ -12,12 +12,10 @@
 namespace Tests\Unit\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Actions\Checks\Files\DirectoryDoesNotExist;
-use Forte\Worker\Actions\Checks\Files\DirectoryExists;
-use Forte\Worker\Actions\Checks\Files\FileDoesNotExist;
-use Forte\Worker\Actions\Checks\Files\FileExists;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Files\RemoveFile;
+use Forte\Worker\Exceptions\ValidationException;
 use Tests\Unit\BaseTest;
 
 /**
@@ -70,20 +68,20 @@ class RemoveFileTest extends BaseTest
     public function filesProvider(): array
     {
         return [
-            // File path | expected result | is fatal | is success required | exception expected | remove mode | expected stringify message
-            [self::TEST_FILE_TXT, true, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_TXT . "'."],
-            [self::TEST_FILE_JSON, true, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_JSON . "'."],
+            // File path | is valid | expected result | is fatal | is success required | exception expected | remove mode | expected stringify message
+            [self::TEST_FILE_TXT, true, true, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_TXT . "'."],
+            [self::TEST_FILE_JSON, true, true, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_JSON . "'."],
             /** Negative cases */
             /** not successful, no fatal */
-            [self::TEST_WRONG_FILE, false, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
-            [self::TEST_DIR_TMP, false, false, false, false, RemoveFile::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."],
-            ['', false, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
+            [self::TEST_WRONG_FILE, true, false, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
+            [self::TEST_DIR_TMP, true, false, false, false, false, RemoveFile::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."],
+            ['', false, false, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
             /** not successful, fatal */
-            [self::TEST_WRONG_FILE, false, true, false, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
-            ['', false, true, false, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
+            [self::TEST_WRONG_FILE, true, false, true, false, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
+            ['', false, false, true, false, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
             /** successful with negative result, is success required */
-            [self::TEST_WRONG_FILE, false, false, true, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
-            ['', false, false, true, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
+            [self::TEST_WRONG_FILE, true, false, false, true, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
+            ['', false, false, false, true, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
         ];
     }
 
@@ -94,6 +92,7 @@ class RemoveFileTest extends BaseTest
      * @dataProvider filesProvider
      *
      * @param string $filePath
+     * @param bool $isValid
      * @param bool $expected
      * @param bool $isFatal
      * @param bool $isSuccessRequired
@@ -103,25 +102,23 @@ class RemoveFileTest extends BaseTest
      */
     public function testRemoveFile(
         string $filePath,
+        bool $isValid,
         bool $expected,
         bool $isFatal,
         bool $isSuccessRequired,
         bool $exceptionExpected
     ): void
     {
-        if ($exceptionExpected) {
-            $this->expectException(ActionException::class);
-        }
-        $this->assertEquals(
-            $expected,
-            (new RemoveFile())
+        $this->runBasicTest(
+            $exceptionExpected,
+            $isValid,
+            ActionFactory::createRemoveFile()
                 ->removeFile($filePath)
-                ->addBeforeAction(new FileExists($filePath))
-                ->addAfterAction(new FileDoesNotExist($filePath))
+                ->addBeforeAction(ActionFactory::createFileExists($filePath))
+                ->addAfterAction(ActionFactory::createFileDoesNotExist($filePath))
                 ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
-                ->run()
-                ->getResult()
+                ->setIsSuccessRequired($isSuccessRequired),
+            $expected
         );
     }
 
@@ -132,6 +129,7 @@ class RemoveFileTest extends BaseTest
      * @dataProvider filesProvider
      *
      * @param string $filePath
+     * @param bool $isValid
      * @param bool $expected
      * @param bool $isFatal
      * @param bool $isSuccessRequired
@@ -141,23 +139,21 @@ class RemoveFileTest extends BaseTest
      */
     public function testRemoveFileNoChecks(
         string $filePath,
+        bool $isValid,
         bool $expected,
         bool $isFatal,
         bool $isSuccessRequired,
         bool $exceptionExpected
     ): void
     {
-        if ($exceptionExpected) {
-            $this->expectException(ActionException::class);
-        }
-        $this->assertEquals(
-            $expected,
-            (new RemoveFile())
+        $this->runBasicTest(
+            $exceptionExpected,
+            $isValid,
+            ActionFactory::createRemoveFile()
                 ->removeFile($filePath)
                 ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
-                ->run()
-                ->getResult()
+                ->setIsSuccessRequired($isSuccessRequired),
+            $expected
         );
     }
 
@@ -173,7 +169,7 @@ class RemoveFileTest extends BaseTest
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->expectException(ActionException::class);
-        (new RemoveFile())->removeFile(self::TEST_DIR_TMP)->setIsFatal(true)->run();
+        ActionFactory::createRemoveFile()->removeFile(self::TEST_DIR_TMP)->setIsFatal(true)->run();
     }
 
     /**
@@ -187,7 +183,7 @@ class RemoveFileTest extends BaseTest
     {
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
-        $actionResult = (new RemoveFile())->removeFile(self::TEST_DIR_TMP)->run();
+        $actionResult = ActionFactory::createRemoveFile()->removeFile(self::TEST_DIR_TMP)->run();
         $this->assertInstanceOf(ActionResult::class, $actionResult);
         $this->assertEmpty($actionResult->getResult());
         $this->assertCount(1, $actionResult->getActionFailures());
@@ -204,15 +200,14 @@ class RemoveFileTest extends BaseTest
     {
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
-        $removeTransform = (new RemoveFile())
-            ->removeDirectory(self::TEST_DIR_TMP)
-            ->addBeforeAction(new DirectoryExists(self::TEST_DIR_TMP))
-            ->addAfterAction(new DirectoryDoesNotExist(self::TEST_DIR_TMP))
-            ->run()
-            ->getResult()
-        ;
-
-        $this->assertTrue($removeTransform);
+        $this->assertTrue(
+            ActionFactory::createRemoveFile()
+                ->removeDirectory(self::TEST_DIR_TMP)
+                ->addBeforeAction(ActionFactory::createDirectoryExists(self::TEST_DIR_TMP))
+                ->addAfterAction(ActionFactory::createDirectoryDoesNotExist(self::TEST_DIR_TMP))
+                ->run()
+                ->getResult()
+        );
     }
 
     /**
@@ -225,15 +220,13 @@ class RemoveFileTest extends BaseTest
     {
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
-        $removeTransform = (new RemoveFile())
-            ->removeFilePattern(self::TEST_DIR_TMP . '/*json')
-            ->addBeforeAction(new FileExists(self::TEST_FILE_JSON))
-            ->addAfterAction(new FileDoesNotExist(self::TEST_FILE_JSON))
-            ->run()
-            ->getResult()
-        ;
-
-        $this->assertTrue($removeTransform);
+        $this->assertTrue(
+            ActionFactory::createRemoveFile()
+                ->removeFilePattern(self::TEST_DIR_TMP . '/*json')
+                ->addBeforeAction(ActionFactory::createFileExists(self::TEST_FILE_JSON))
+                ->addAfterAction(ActionFactory::createFileDoesNotExist(self::TEST_FILE_JSON))
+                ->run()
+        );
     }
 
     /**
@@ -248,7 +241,7 @@ class RemoveFileTest extends BaseTest
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->expectException(ActionException::class);
-        (new RemoveFile())->removeFile(__DIR__ . '/files/xxx/')->setIsFatal(true)->run();
+        ActionFactory::createRemoveFile()->removeFile(__DIR__ . '/files/xxx/')->setIsFatal(true)->run();
     }
 
     /**
@@ -262,7 +255,7 @@ class RemoveFileTest extends BaseTest
     {
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
-        $actionResult = (new RemoveFile())->removeFile(__DIR__ . '/files/xxx/')->run();
+        $actionResult = ActionFactory::createRemoveFile()->removeFile(__DIR__ . '/files/xxx/')->run();
         $this->assertInstanceOf(ActionResult::class, $actionResult);
         $this->assertEmpty($actionResult->getResult());
         $this->assertCount(1, $actionResult->getActionFailures());
@@ -271,11 +264,40 @@ class RemoveFileTest extends BaseTest
     }
 
     /**
+     * Test method RemoveFile::isValid().
+     *
+     * @dataProvider filesProvider
+     *
+     * @param string $filePath
+     * @param bool $isValid
+     * @param bool $expected
+     * @param bool $isFatal
+     * @param bool $isSuccessRequired
+     * @param bool $exceptionExpected
+     * @param string $removeMode
+     *
+     * @throws ValidationException
+     */
+    public function testIsValid(
+        string $filePath,
+        bool $isValid,
+        bool $expected,
+        bool $isFatal,
+        bool $isSuccessRequired,
+        bool $exceptionExpected,
+        string $removeMode
+    ): void
+    {
+        $this->isValidTest($isValid, ActionFactory::createRemoveFile()->remove($filePath, $removeMode));
+    }
+
+    /**
      * Test method Remove::stringify().
      *
      * @dataProvider filesProvider
      *
      * @param string $filePath
+     * @param bool $isValid
      * @param bool $expected
      * @param bool $isFatal
      * @param bool $isSuccessRequired
@@ -285,6 +307,7 @@ class RemoveFileTest extends BaseTest
      */
     public function testStringify(
         string $filePath,
+        bool $isValid,
         bool $expected,
         bool $isFatal,
         bool $isSuccessRequired,
@@ -293,8 +316,6 @@ class RemoveFileTest extends BaseTest
         string $message
     ): void
     {
-        $fileExists = (new RemoveFile())->remove($filePath, $mode);
-        $this->assertEquals($message, (string) $fileExists);
-        $this->assertEquals($message, $fileExists->stringify());
+        $this->stringifyTest($message, ActionFactory::createRemoveFile()->remove($filePath, $mode));
     }
 }

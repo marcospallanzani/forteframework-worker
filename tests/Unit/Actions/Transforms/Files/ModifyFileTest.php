@@ -12,6 +12,7 @@
 namespace Tests\Unit\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
 use Forte\Worker\Exceptions\ValidationException;
@@ -101,8 +102,8 @@ class ModifyFileTest extends BaseTest
             [$removeLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Remove each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
             [$appendTemplateToLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Append template '".self::TEST_FILE_TEMPLATE."' to each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
             [$replaceWithTemplateIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace each line that meets the following condition, with template '".self::TEST_FILE_TEMPLATE."': 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
-            [new ModifyFile(self::TEST_FILE_MODIFY), "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "No transformations configured." . PHP_EOL],
-            [new ModifyFile(''), "Apply the following transformations to the specified file '': " . PHP_EOL . "No transformations configured." . PHP_EOL],
+            [ActionFactory::createModifyFile(self::TEST_FILE_MODIFY), "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "No transformations configured." . PHP_EOL],
+            [ActionFactory::createModifyFile(''), "Apply the following transformations to the specified file '': " . PHP_EOL . "No transformations configured." . PHP_EOL],
         ];
     }
 
@@ -122,18 +123,18 @@ class ModifyFileTest extends BaseTest
             [$this->getAppendValueModifyFile(), true, false, false, true, false, self::TEST_CONTENT . self::TEST_APPENDED_CONTENT],
             [$this->getAppendTemplateModifyFile(), true, false, false, true, false, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
             [$this->getReplaceWithTemplateModifyFile(), true, false, false, true, false, self::TEST_TEMPLATE_CONTENT],
-            [new ModifyFile(self::TEST_FILE_MODIFY), true, false, false, true, false, self::TEST_CONTENT],
+            [ActionFactory::createModifyFile(self::TEST_FILE_MODIFY), true, false, false, true, false, self::TEST_CONTENT],
             /** Negative cases */
             /** not successful, no fatal */
-            [new ModifyFile(''), false, false, false, false, false, self::TEST_CONTENT],
+            [ActionFactory::createModifyFile(''), false, false, false, false, false, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedAction(), false, false, false, false, false, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedCondition(), false, false, false, false, false, self::TEST_CONTENT],
             /** not successful, fatal */
-            [(new ModifyFile('')), false, true, false, false, true, self::TEST_CONTENT],
+            [ActionFactory::createModifyFile(''), false, true, false, false, true, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedAction(), false, true, false, false, true, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedCondition(), false, true, false, false, true, self::TEST_CONTENT],
             /** successful with negative result, is success required */
-            [new ModifyFile(''), false, false, true, false, true, self::TEST_CONTENT],
+            [ActionFactory::createModifyFile(''), false, false, true, false, true, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedAction(), false, false, true, false, true, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedCondition(), false, false, true, false, true, self::TEST_CONTENT],
         ];
@@ -164,18 +165,16 @@ class ModifyFileTest extends BaseTest
         string $expectedContent
     ): void
     {
-        $modifyFile
-            ->setIsFatal($isFatal)
-            ->setIsSuccessRequired($isSuccessRequired);
+        $this->runBasicTest(
+            $expectedException,
+            $isValid,
+            $modifyFile
+                ->setIsFatal($isFatal)
+                ->setIsSuccessRequired($isSuccessRequired),
+            $expected
+        );
 
-        if ($expectedException) {
-            if ($isValid) {
-                $this->expectException(ActionException::class);
-            } else {
-                $this->expectException(ValidationException::class);
-            }
-        }
-        $this->assertEquals($expected, $modifyFile->run()->getResult());
+        // We check if the modified file content is the expected one
         $this->assertTrue($this->checkFileContent(self::TEST_FILE_MODIFY, $expectedContent));
     }
 
@@ -191,10 +190,7 @@ class ModifyFileTest extends BaseTest
      */
     public function testIsValid(ModifyFile $modifyFile, bool $isValid): void
     {
-        if (!$isValid) {
-            $this->expectException(ValidationException::class);
-        }
-        $this->assertEquals($isValid, $modifyFile->isValid());
+        $this->isValidTest($isValid, $modifyFile);
     }
 
     /**
@@ -207,8 +203,7 @@ class ModifyFileTest extends BaseTest
      */
     public function testStringify(ModifyFile $modifyFile, string $expectedMessage): void
     {
-        $this->assertEquals($expectedMessage, $modifyFile->stringify());
-        $this->assertEquals($expectedMessage, (string) $modifyFile);
+        $this->stringifyTest($expectedMessage, $modifyFile);
     }
 
     /**
@@ -232,7 +227,7 @@ class ModifyFileTest extends BaseTest
     protected function getReplaceValueModifyFile(): ModifyFile
     {
         return
-            (new ModifyFile(self::TEST_FILE_MODIFY))
+            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->replaceValueIfLineStartsWith('ANY', 'CONTENT', self::TEST_REPLACED_CONTENT)
             ;
     }
@@ -245,7 +240,7 @@ class ModifyFileTest extends BaseTest
     protected function getRemoveValueModifyFile(): ModifyFile
     {
         return
-            (new ModifyFile(self::TEST_FILE_MODIFY))
+            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->removeValueIfLineStartsWith('ANY', 'CONTENT')
             ;
     }
@@ -258,7 +253,7 @@ class ModifyFileTest extends BaseTest
     protected function getRemoveLineModifyFile(): ModifyFile
     {
         return
-            (new ModifyFile(self::TEST_FILE_MODIFY))
+            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->removeLineIfLineStartsWith('ANY')
             ;
     }
@@ -271,7 +266,7 @@ class ModifyFileTest extends BaseTest
     protected function getAppendValueModifyFile(): ModifyFile
     {
         return
-            (new ModifyFile(self::TEST_FILE_MODIFY))
+            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->addAction(
                     ModifyFile::MODIFY_FILE_APPEND_TO_LINE,
                     VerifyString::CONDITION_STARTS_WITH,
@@ -289,7 +284,7 @@ class ModifyFileTest extends BaseTest
     protected function getAppendTemplateModifyFile(): ModifyFile
     {
         return
-            (new ModifyFile(self::TEST_FILE_MODIFY))
+            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->addAction(
                     ModifyFile::MODIFY_FILE_APPEND_TEMPLATE,
                     VerifyString::CONDITION_STARTS_WITH,
@@ -307,7 +302,7 @@ class ModifyFileTest extends BaseTest
     protected function getReplaceWithTemplateModifyFile(): ModifyFile
     {
         return
-            (new ModifyFile(self::TEST_FILE_MODIFY))
+            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->addAction(
                     ModifyFile::MODIFY_FILE_REPLACE_WITH_TEMPLATE,
                     VerifyString::CONDITION_STARTS_WITH,
@@ -325,7 +320,7 @@ class ModifyFileTest extends BaseTest
     protected function getReplaceLineModifyFile(): ModifyFile
     {
         return
-            (new ModifyFile(self::TEST_FILE_MODIFY))
+            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->replaceLineIfLineStartsWith('ANY', self::TEST_REPLACED_CONTENT)
             ;
     }
@@ -338,7 +333,7 @@ class ModifyFileTest extends BaseTest
     protected function getModifyFileWithUnsupportedAction(): ModifyFile
     {
         return
-            (new ModifyFile(self::TEST_FILE_MODIFY))
+            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->addAction(
                     'wrong_action',
                     VerifyString::CONDITION_STARTS_WITH,
@@ -356,7 +351,7 @@ class ModifyFileTest extends BaseTest
     protected function getModifyFileWithUnsupportedCondition(): ModifyFile
     {
         return
-            (new ModifyFile(self::TEST_FILE_MODIFY))
+            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->addAction(
                     ModifyFile::MODIFY_FILE_REPLACE_WITH_TEMPLATE,
                     'wrong_condition',

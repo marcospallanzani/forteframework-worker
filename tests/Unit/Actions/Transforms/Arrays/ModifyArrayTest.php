@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Actions\Transforms\Arrays;
 
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Exceptions\ValidationException;
@@ -73,19 +74,19 @@ class ModifyArrayTest extends BaseTest
         // Action | exception message | expect exception | expected value
         return [
             [
-                new ModifyArray('key', ModifyArray::MODIFY_ADD),
+                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_ADD),
                 '',
                 false,
                 ['key' => '']
             ],
             [
-                $modify = new ModifyArray('', ModifyArray::MODIFY_ADD),
+                ActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD),
                 "No key specified",
                 true,
                 null
             ],
             [
-                $modifyWrongAction = new ModifyArray('key1', 'wrong_action'),
+                $modifyWrongAction = ActionFactory::createModifyArray('key1', 'wrong_action'),
                 sprintf(
                     "Action wrong_action not supported. Supported actions are [%s]",
                     implode(', ', $modifyWrongAction->getSupportedActions())
@@ -94,7 +95,7 @@ class ModifyArrayTest extends BaseTest
                 null
             ],
             [
-                $emptyModify = new ModifyArray('', ''),
+                ActionFactory::createModifyArray('', ''),
                 "No key specified",
                 true,
                 null
@@ -112,13 +113,13 @@ class ModifyArrayTest extends BaseTest
         // Action | exception message | expect exception | expected value | fatal | success required
         return [
             [
-                new ModifyArray('key', ModifyArray::MODIFY_ADD),
+                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_ADD),
                 '',
                 false,
                 ['key' => '']
             ],
             [
-                $modify = new ModifyArray('', ModifyArray::MODIFY_ADD),
+                ActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD),
                 "No key specified",
                 true,
                 null,
@@ -126,7 +127,7 @@ class ModifyArrayTest extends BaseTest
                 false
             ],
             [
-                $modify = new ModifyArray('', ModifyArray::MODIFY_ADD),
+                ActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD),
                 "No key specified",
                 true,
                 null,
@@ -134,7 +135,7 @@ class ModifyArrayTest extends BaseTest
                 true
             ],
             [
-                $emptyModify = new ModifyArray('', ''),
+                ActionFactory::createModifyArray('', ''),
                 "No key specified",
                 true,
                 null,
@@ -142,7 +143,7 @@ class ModifyArrayTest extends BaseTest
                 false
             ],
             [
-                $emptyModify = new ModifyArray('', ''),
+                ActionFactory::createModifyArray('', ''),
                 "No key specified",
                 true,
                 null,
@@ -150,7 +151,7 @@ class ModifyArrayTest extends BaseTest
                 true
             ],
             [
-                $modifyWrongAction = new ModifyArray('key1', 'wrong_action'),
+                $modifyWrongAction = ActionFactory::createModifyArray('key1', 'wrong_action'),
                 sprintf(
                     "Action wrong_action not supported. Supported actions are [%s]",
                     implode(', ', $modifyWrongAction->getSupportedActions())
@@ -161,7 +162,7 @@ class ModifyArrayTest extends BaseTest
                 false
             ],
             [
-                $modifyWrongAction = new ModifyArray('key1', 'wrong_action'),
+                $modifyWrongAction = ActionFactory::createModifyArray('key1', 'wrong_action'),
                 sprintf(
                     "Action wrong_action not supported. Supported actions are [%s]",
                     implode(', ', $modifyWrongAction->getSupportedActions())
@@ -186,12 +187,7 @@ class ModifyArrayTest extends BaseTest
      */
     public function testStringify(string $key, string $action, $value, string $expected): void
     {
-        $modifyArray = new ModifyArray($key, $action, $value);
-        $this->assertEquals($expected, $modifyArray->stringify());
-        $this->assertEquals($expected, (string) $modifyArray);
-        $this->assertEquals($key, $modifyArray->getKey());
-        $this->assertEquals($action, $modifyArray->getAction());
-        $this->assertEquals($value, $modifyArray->getValue());
+        $this->stringifyTest($expected, ActionFactory::createModifyArray($key, $action, $value));
     }
 
     /**
@@ -205,7 +201,7 @@ class ModifyArrayTest extends BaseTest
      */
     public function testGetters(string $key, string $action, $value): void
     {
-        $modifyArray = new ModifyArray($key, $action, $value);
+        $modifyArray = ActionFactory::createModifyArray($key, $action, $value);
         $this->assertEquals($key, $modifyArray->getKey());
         $this->assertEquals($action, $modifyArray->getAction());
         $this->assertEquals($value, $modifyArray->getValue());
@@ -226,10 +222,12 @@ class ModifyArrayTest extends BaseTest
      */
     public function testRun(string $key, string $action, $value, array $array, array $expected): void
     {
-        $modifyArray = new ModifyArray($key, $action, $value);
-        $result = $modifyArray->setModifyContent($array)->run();
-        $this->assertTrue($modifyArray->validateResult($result));
-        $this->assertEquals($expected, $result->getResult());
+        $this->runBasicTest(
+            false,
+            true,
+            ActionFactory::createModifyArray($key, $action, $value)->setModifyContent($array),
+            $expected
+        );
     }
 
     /**
@@ -249,15 +247,7 @@ class ModifyArrayTest extends BaseTest
         bool $expectException
     ): void
     {
-        if ($expectException) {
-            $this->expectException(ValidationException::class);
-            $this->expectExceptionMessage($exceptionMessage);
-            $isValid = $modifyArray->setModifyContent([])->isValid();
-            $this->assertFalse($isValid);
-        } else {
-            $isValid = $modifyArray->setModifyContent([])->isValid();
-            $this->assertTrue($isValid);
-        }
+        $this->isValidTest(!$expectException, $modifyArray, $exceptionMessage);
     }
 
     /**
@@ -283,18 +273,15 @@ class ModifyArrayTest extends BaseTest
         bool $isSuccessRequired = false
     ): void
     {
-        $modifyArray
-            ->setIsFatal($isFatal)
-            ->setIsSuccessRequired($isSuccessRequired)
-        ;
-
-        if ($expectException) {
-            $this->expectException(ActionException::class);
-            $this->expectExceptionMessage($exceptionMessage);
-            $modifyArray->setModifyContent([])->run();
-        } else {
-            $result = $modifyArray->setModifyContent([])->run();
-            $this->assertEquals($expected, $result->getResult());
-        }
+        $this->runBasicTest(
+            $expectException,
+            !$expectException,
+            $modifyArray
+                ->setModifyContent([])
+                ->setIsFatal($isFatal)
+                ->setIsSuccessRequired($isSuccessRequired),
+            $expected,
+            $exceptionMessage
+        );
     }
 }

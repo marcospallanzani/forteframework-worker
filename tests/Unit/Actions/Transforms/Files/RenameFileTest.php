@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Actions\Transforms\Files;
 
-use Forte\Worker\Actions\Transforms\Files\RenameFile;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Tests\Unit\BaseTest;
@@ -83,7 +83,7 @@ class RenameFileTest extends BaseTest
      */
     public function testIsValid(string $sourcePath, string $targetName, bool $isValid): void
     {
-        $this->isValidTest($isValid, new RenameFile($sourcePath, $targetName));
+        $this->isValidTest($isValid, ActionFactory::createRenameFile($sourcePath, $targetName));
     }
 
     /**
@@ -111,7 +111,7 @@ class RenameFileTest extends BaseTest
         string $message
     ): void
     {
-        $this->stringifyTest($message, new RenameFile($sourcePath, $targetName));
+        $this->stringifyTest($message, ActionFactory::createRenameFile($sourcePath, $targetName));
     }
 
     /**
@@ -126,7 +126,6 @@ class RenameFileTest extends BaseTest
      * @param bool $isSuccessRequired
      * @param $expected
      * @param bool $exceptionExpected
-     * @param string $message
      *
      * @throws ActionException
      */
@@ -137,20 +136,20 @@ class RenameFileTest extends BaseTest
         bool $isFatal,
         bool $isSuccessRequired,
         $expected,
-        bool $exceptionExpected,
-        string $message
+        bool $exceptionExpected
     ): void
     {
-        $renameFileAction =
-            (new RenameFile())
+        // Basic checks
+        $this->runBasicTest(
+            $exceptionExpected,
+            $isValid,
+            ActionFactory::createRenameFile()
                 ->rename($sourcePath)
                 ->to($targetName)
                 ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
-        ;
-
-        // Basic checks
-        $this->runBasicTest($exceptionExpected, $isValid, $renameFileAction, $expected);
+                ->setIsSuccessRequired($isSuccessRequired),
+            $expected
+        );
 
         // The file has been renamed, then we check if the original file is not in the file system anymore
         if ($expected) {

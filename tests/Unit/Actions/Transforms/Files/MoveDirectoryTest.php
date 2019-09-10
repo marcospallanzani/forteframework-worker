@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Actions\Transforms\Files;
 
-use Forte\Worker\Actions\Transforms\Files\MoveDirectory;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Tests\Unit\BaseTest;
@@ -78,7 +78,7 @@ class MoveDirectoryTest extends BaseTest
      */
     public function testIsValid(string $sourcePath, string $targetPath, bool $isValid): void
     {
-        $this->isValidTest($isValid, new MoveDirectory($sourcePath, $targetPath));
+        $this->isValidTest($isValid, ActionFactory::createMoveDirectory($sourcePath, $targetPath));
     }
 
     /**
@@ -106,7 +106,7 @@ class MoveDirectoryTest extends BaseTest
         string $message
     ): void
     {
-        $this->stringifyTest($message, new MoveDirectory($sourcePath, $targetPath));
+        $this->stringifyTest($message, ActionFactory::createMoveDirectory($sourcePath, $targetPath));
     }
 
     /**
@@ -121,7 +121,6 @@ class MoveDirectoryTest extends BaseTest
      * @param bool $isSuccessRequired
      * @param $expected
      * @param bool $exceptionExpected
-     * @param string $message
      *
      * @throws ActionException
      */
@@ -132,20 +131,20 @@ class MoveDirectoryTest extends BaseTest
         bool $isFatal,
         bool $isSuccessRequired,
         $expected,
-        bool $exceptionExpected,
-        string $message
+        bool $exceptionExpected
     ): void
     {
-        $moveDirectory =
-            (new MoveDirectory())
+        // Basic checks
+        $this->runBasicTest(
+            $exceptionExpected,
+            $isValid,
+            ActionFactory::createMoveDirectory()
                 ->move($sourcePath)
                 ->to($targetPath)
                 ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
-            ;
-
-        // Basic checks
-        $this->runBasicTest($exceptionExpected, $isValid, $moveDirectory, $expected);
+                ->setIsSuccessRequired($isSuccessRequired),
+            $expected
+        );
 
         // The directory has been moved, then we check if the original
         // directory is not in the file system anymore
