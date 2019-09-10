@@ -176,6 +176,50 @@ class ModifyArrayTest extends BaseTest
     }
 
     /**
+     * Data provider for actions tests.
+     *
+     * @return array
+     */
+    public function actionProvider(): array
+    {
+        $testArray = ['key1' => 'value1', 'key2' => ''];
+
+        return [
+            [
+                ActionFactory::createModifyArray()->addKey('key3', 'value3'),
+                $testArray,
+                array_merge($testArray, ['key3' => 'value3'])
+            ],
+            [
+                ActionFactory::createModifyArray()->addKey('key2', 'value2'),
+                $testArray,
+                array_merge($testArray, ['key2' => 'value2'])
+            ],
+            [
+                ActionFactory::createModifyArray()->modifyKey('key3', 'value3'),
+                $testArray,
+                array_merge($testArray, ['key3' => 'value3'])
+            ],
+            [
+                ActionFactory::createModifyArray()->modifyKey('key2', 'value2'),
+                $testArray,
+                array_merge($testArray, ['key2' => 'value2'])
+            ],
+            [
+                ActionFactory::createModifyArray()->removeKey('key2'),
+                $testArray,
+                ['key1' => 'value1']
+            ],
+            [
+                ActionFactory::createModifyArray()->removeKey('key4'),
+                $testArray,
+                $testArray
+            ],
+        ];
+    }
+
+
+    /**
      * Tests the ModifyArray::testStringify() method.
      *
      * @dataProvider modificationsProvider
@@ -188,23 +232,6 @@ class ModifyArrayTest extends BaseTest
     public function testStringify(string $key, string $action, $value, string $expected): void
     {
         $this->stringifyTest($expected, ActionFactory::createModifyArray($key, $action, $value));
-    }
-
-    /**
-     * Tests all object getters.
-     *
-     * @dataProvider modificationsProvider
-     *
-     * @param string $key
-     * @param string $action
-     * @param mixed  $value
-     */
-    public function testGetters(string $key, string $action, $value): void
-    {
-        $modifyArray = ActionFactory::createModifyArray($key, $action, $value);
-        $this->assertEquals($key, $modifyArray->getKey());
-        $this->assertEquals($action, $modifyArray->getAction());
-        $this->assertEquals($value, $modifyArray->getValue());
     }
 
     /**
@@ -225,7 +252,7 @@ class ModifyArrayTest extends BaseTest
         $this->runBasicTest(
             false,
             true,
-            ActionFactory::createModifyArray($key, $action, $value)->setModifyContent($array),
+            ActionFactory::createModifyArray($key, $action, $value)->modifyContent($array),
             $expected
         );
     }
@@ -277,11 +304,28 @@ class ModifyArrayTest extends BaseTest
             $expectException,
             !$expectException,
             $modifyArray
-                ->setModifyContent([])
+                ->modifyContent([])
                 ->setIsFatal($isFatal)
                 ->setIsSuccessRequired($isSuccessRequired),
             $expected,
             $exceptionMessage
         );
+    }
+
+    /**
+     * Test the action methods (i.e. addKey, modifyKey, removeKey).
+     *
+     * @dataProvider actionProvider
+     *
+     * @param ModifyArray $modifyAction
+     * @param array $modifyContent
+     * @param array $expected
+     *
+     * @throws ActionException
+     */
+    public function testActions(ModifyArray $modifyAction, array $modifyContent, array $expected): void
+    {
+        $result = $modifyAction->modifyContent($modifyContent)->run()->getResult();
+        $this->assertEquals($expected, $result);
     }
 }
