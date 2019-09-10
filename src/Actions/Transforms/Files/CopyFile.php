@@ -29,6 +29,24 @@ class CopyFile extends AbstractAction
     protected $destinationFileName;
 
     /**
+     * CopyFile constructor.
+     *
+     * @param string $originalFilePath
+     * @param string $destinationFolder
+     * @param string $destinationFileName
+     */
+    public function __construct(
+        string $originalFilePath = "",
+        string $destinationFolder = "",
+        string $destinationFileName = ""
+    ) {
+        parent::__construct();
+        $this->originFilePath      = $originalFilePath;
+        $this->destinationFolder   = $destinationFolder;
+        $this->destinationFileName = $destinationFileName;
+    }
+
+    /**
      * Set the origin file path.
      *
      * @param string $originFilePath The full file path to be copied
