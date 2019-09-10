@@ -226,6 +226,7 @@ class RemoveFileTest extends BaseTest
                 ->addBeforeAction(ActionFactory::createFileExists(self::TEST_FILE_JSON))
                 ->addAfterAction(ActionFactory::createFileDoesNotExist(self::TEST_FILE_JSON))
                 ->run()
+                ->getResult()
         );
     }
 
