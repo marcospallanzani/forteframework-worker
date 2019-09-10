@@ -78,10 +78,24 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
      *
      * @param string $filePath The file path of the file to be modified.
      */
-    public function __construct(string $filePath)
+    public function __construct(string $filePath = "")
     {
         parent::__construct();
         $this->filePath = $filePath;
+    }
+
+    /**
+     * Set the file path to be modified.
+     *
+     * @param string $filePath The file to modify.
+     *
+     * @return ModifyFile
+     */
+    public function modify(string $filePath): self
+    {
+        $this->filePath = $filePath;
+
+        return $this;
     }
 
     /**

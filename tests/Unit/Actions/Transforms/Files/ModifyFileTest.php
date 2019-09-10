@@ -227,7 +227,8 @@ class ModifyFileTest extends BaseTest
     protected function getReplaceValueModifyFile(): ModifyFile
     {
         return
-            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
+            ActionFactory::createModifyFile()
+                ->modify(self::TEST_FILE_MODIFY)
                 ->replaceValueIfLineStartsWith('ANY', 'CONTENT', self::TEST_REPLACED_CONTENT)
             ;
     }
@@ -240,7 +241,8 @@ class ModifyFileTest extends BaseTest
     protected function getRemoveValueModifyFile(): ModifyFile
     {
         return
-            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
+            ActionFactory::createModifyFile()
+                ->modify(self::TEST_FILE_MODIFY)
                 ->removeValueIfLineStartsWith('ANY', 'CONTENT')
             ;
     }
@@ -253,7 +255,8 @@ class ModifyFileTest extends BaseTest
     protected function getRemoveLineModifyFile(): ModifyFile
     {
         return
-            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
+            ActionFactory::createModifyFile()
+                ->modify(self::TEST_FILE_MODIFY)
                 ->removeLineIfLineStartsWith('ANY')
             ;
     }
@@ -320,7 +323,8 @@ class ModifyFileTest extends BaseTest
     protected function getReplaceLineModifyFile(): ModifyFile
     {
         return
-            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
+            ActionFactory::createModifyFile()
+                ->modify(self::TEST_FILE_MODIFY)
                 ->replaceLineIfLineStartsWith('ANY', self::TEST_REPLACED_CONTENT)
             ;
     }
