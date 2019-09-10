@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Actions\Checks\Arrays;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
@@ -382,6 +383,45 @@ class VerifyArrayTest extends BaseTest
     }
 
     /**
+     * Data provider for actions tests.
+     *
+     * @return array
+     */
+    public function actionProvider(): array
+    {
+        $testArray     = ['key1' => 'value1', 'key2' => ''];
+        $keyWithValue  = "key1";
+        $keyEmptyValue = "key2";
+
+        return [
+            [
+                ActionFactory::createVerifyArray()->checkContent($testArray)->startsWith($keyWithValue, 'val'),
+                ActionFactory::createVerifyArray()->checkContent($testArray)->startsWith($keyWithValue, 'x'),
+            ],
+            [
+                ActionFactory::createVerifyArray()->checkContent($testArray)->endsWith($keyWithValue, 'ue1'),
+                ActionFactory::createVerifyArray()->checkContent($testArray)->endsWith($keyWithValue, 'x'),
+            ],
+            [
+                ActionFactory::createVerifyArray()->checkContent($testArray)->contains($keyWithValue, 'ue'),
+                ActionFactory::createVerifyArray()->checkContent($testArray)->contains($keyWithValue, 'x'),
+            ],
+            [
+                ActionFactory::createVerifyArray()->checkContent($testArray)->isEqualTo($keyWithValue, 'value1'),
+                ActionFactory::createVerifyArray()->checkContent($testArray)->isEqualTo($keyWithValue, 'x'),
+            ],
+            [
+                ActionFactory::createVerifyArray()->checkContent($testArray)->isEmpty($keyEmptyValue),
+                ActionFactory::createVerifyArray()->checkContent($testArray)->isEmpty   ($keyWithValue),
+            ],
+            [
+                ActionFactory::createVerifyArray()->checkContent($testArray)->isKeyMissing('key3'),
+                ActionFactory::createVerifyArray()->checkContent($testArray)->isKeyMissing($keyWithValue),
+            ],
+        ];
+    }
+
+    /**
      * Tests the operation message.
      *
      * @dataProvider verificationsProvider
@@ -396,26 +436,6 @@ class VerifyArrayTest extends BaseTest
     public function testStringify(string $key, string $operation, $value, bool $reverseAction, string $expected): void
     {
         $this->stringifyTest($expected, ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction));
-    }
-
-    /**
-     * Tests all object getters.
-     *
-     * @dataProvider verificationsProvider
-     * @dataProvider reverseVerificationsProvider
-     *
-     * @param string $key
-     * @param string $operation
-     * @param mixed  $value
-     * @param bool $reverseAction
-     */
-    public function testGetters(string $key, string $operation, $value, $reverseAction): void
-    {
-        $modifyArray = ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction);
-        $this->assertEquals($key, $modifyArray->getKey());
-        $this->assertEquals($operation, $modifyArray->getAction());
-        $this->assertEquals($value, $modifyArray->getValue());
-        $this->assertEquals($reverseAction, $modifyArray->getReverseAction());
     }
 
     /**
@@ -445,10 +465,10 @@ class VerifyArrayTest extends BaseTest
         $verifyArray = ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction);
         if ($expectException) {
             $this->expectException(ValidationException::class);
-            $isValid = $verifyArray->setCheckContent($checkContent)->isValid();
+            $isValid = $verifyArray->checkContent($checkContent)->isValid();
             $this->assertFalse($isValid);
         } else {
-            $isValid = $verifyArray->setCheckContent($checkContent)->isValid();
+            $isValid = $verifyArray->checkContent($checkContent)->isValid();
             $this->assertTrue($isValid);
         }
     }
@@ -469,6 +489,7 @@ class VerifyArrayTest extends BaseTest
      * @param mixed $expectedResult
      * @param bool $expectException
      *
+     * @throws ActionException
      */
     public function testRun(
         array $array,
@@ -482,15 +503,18 @@ class VerifyArrayTest extends BaseTest
         bool $expectException
     ): void
     {
+        /** @var VerifyArray $verifyArray */
         $verifyArray =
             ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction)
-            ->setIsFatal($isFatal)
-            ->setIsSuccessRequired($isSuccessRequired)
+                ->checkContent($array)
+                ->setIsFatal($isFatal)
+                ->setIsSuccessRequired($isSuccessRequired)
         ;
+
         if ($expectException) {
             $this->expectException(ActionException::class);
         }
-        $this->assertEquals($expectedResult, $verifyArray->setCheckContent($array)->run()->getResult());
+        $this->assertEquals($expectedResult, $verifyArray->run()->getResult());
     }
 
     /**
@@ -507,7 +531,7 @@ class VerifyArrayTest extends BaseTest
         $verifyArray = ActionFactory::createVerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
         $verifyArray->setIsFatal(true);
         $this->expectException(ActionException::class);
-        $verifyArray->setCheckContent($array)->run();
+        $verifyArray->checkContent($array)->run();
     }
 
     /**
@@ -522,7 +546,7 @@ class VerifyArrayTest extends BaseTest
             "test1" => "test2"
         ];
         $verifyArray = ActionFactory::createVerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
-        $actionResult = $verifyArray->setCheckContent($array)->run();
+        $actionResult = $verifyArray->checkContent($array)->run();
         $this->assertInstanceOf(ActionResult::class, $actionResult);
         $this->assertEmpty($actionResult->getResult());
         $this->assertCount(1, $actionResult->getActionFailures());
@@ -557,7 +581,32 @@ class VerifyArrayTest extends BaseTest
             ->once()
             ->andReturn([])
         ;
-        $verifyArrayMock->setCheckContent($this->testArray)->setIsFatal(true);
+        $verifyArrayMock->checkContent($this->testArray)->setIsFatal(true);
         $verifyArrayMock->run();
+    }
+
+    /**
+     * Test the action methods (i.e. contains, startsWith, endsWith, etc).
+     * It also checks the reverse mode.
+     *
+     * Starts with -> does not start with
+     * Ends with -> does not end with
+     * Contains -> does not contain
+     *
+     * @dataProvider actionProvider
+     *
+     * @param AbstractAction $verifyMatched
+     * @param AbstractAction $verifyNotMatched
+     *
+     * @throws ActionException
+     */
+    public function testActions(AbstractAction $verifyMatched, AbstractAction $verifyNotMatched): void
+    {
+        $this->assertTrue($verifyMatched->run()->getResult());
+        $this->assertFalse($verifyNotMatched->run()->getResult());
+
+        // Check the action in reverse mode
+        $this->assertFalse($verifyMatched->reverse()->run()->getResult());
+        $this->assertTrue($verifyNotMatched->reverse()->run()->getResult());
     }
 }

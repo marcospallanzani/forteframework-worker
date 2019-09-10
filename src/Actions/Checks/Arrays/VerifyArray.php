@@ -27,7 +27,11 @@ class VerifyArray extends AbstractAction
     const CHECK_CONTAINS     = "check_contains";
     const CHECK_EQUALS       = "check_equals";
     const CHECK_EMPTY        = "check_empty";
+
+//TODO CONSIDER REMOVING ANY -> REVERSE OF EMPTY
     const CHECK_ANY          = "check_any";
+
+//TODO CONSIDER CONVERTING TO HAS_KEY
     const CHECK_MISSING_KEY  = "check_missing_key";
 
     /**
@@ -66,12 +70,16 @@ class VerifyArray extends AbstractAction
      * @param string $key The array key to access (multi-level keys separated by '.').
      * @param string $action The operation to perform (look inside isValid() implementation
      * for list of supported values).
-     * @param mixed $value The value to set/change/remove.
+     * @param mixed $value The value to be matched by the action condition.
      * @param bool $reverseAction Whether the reverse actions should be performed or not
      * (e.g. contains -> not-contains).
      */
-    public function __construct(string $key, string $action, $value = null, bool $reverseAction = false)
-    {
+    public function __construct(
+        string $key = "",
+        string $action = "",
+        $value = null,
+        bool $reverseAction = false
+    ) {
         parent::__construct();
         $this->key           = $key;
         $this->action        = $action;
@@ -80,43 +88,126 @@ class VerifyArray extends AbstractAction
     }
 
     /**
-     * Returns the key.
+     * Set this VerifyArray instance, so that it checks if the checked content has a key,
+     * whose value starts with the given value.
      *
-     * @return string
+     * @param string $key The array key to be checked (multi-level keys separated by '.').
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyArray
      */
-    public function getKey(): string
+    public function startsWith(string $key, string $value): self
     {
-        return $this->key;
+        $this->action = self::CHECK_STARTS_WITH;
+        $this->value  = $value;
+        $this->key    = $key;
+
+        return $this;
     }
 
     /**
-     * Returns the value.
+     * Set this VerifyArray instance, so that it checks if the checked content has a key,
+     * whose value ends with the given value.
      *
-     * @return mixed
+     * @param string $key The array key to be checked (multi-level keys separated by '.').
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyArray
      */
-    public function getValue()
+    public function endsWith(string $key, string $value): self
     {
-        return $this->value;
+        $this->action = self::CHECK_ENDS_WITH;
+        $this->value  = $value;
+        $this->key    = $key;
+
+        return $this;
     }
 
     /**
-     * Returns the action.
+     * Set this VerifyArray instance, so that it checks if the checked content has a key,
+     * whose value contains the given value.
      *
-     * @return string
+     * @param string $key The array key to be checked (multi-level keys separated by '.').
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyArray
      */
-    public function getAction(): string
+    public function contains(string $key, string $value): self
     {
-        return $this->action;
+        $this->action = self::CHECK_CONTAINS;
+        $this->value  = $value;
+        $this->key    = $key;
+
+        return $this;
     }
 
     /**
-     * Returns the reverse action flag.
+     * Set this VerifyArray instance, so that it checks if the checked content has a key,
+     * whose value is equal to the given value.
      *
-     * @return bool
+     * @param string $key The array key to be checked (multi-level keys separated by '.').
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyArray
      */
-    public function getReverseAction(): bool
+    public function isEqualTo(string $key, string $value): self
     {
-        return $this->reverseAction;
+        $this->action = self::CHECK_EQUALS;
+        $this->value  = $value;
+        $this->key    = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set this VerifyArray instance, so that it checks if the checked content has a key,
+     * whose value is empty.
+     *
+     * @param string $key The array key to be checked (multi-level keys separated by '.').
+     *
+     * @return VerifyArray
+     */
+    public function isEmpty(string $key): self
+    {
+        $this->action = self::CHECK_EMPTY;
+        $this->key    = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set this VerifyArray instance, so that it checks if the checked content has an entry
+     * with the given key,
+     *
+     * @param string $key The array key to be checked (multi-level keys separated by '.').
+     *
+     * @return VerifyArray
+     */
+    public function isKeyMissing(string $key): self
+    {
+        $this->action = self::CHECK_MISSING_KEY;
+        $this->key    = $key;
+
+        return $this;
+    }
+
+    /**
+     * Reverse the current configured action to its opposite.
+     *
+     * e.g.
+     * contains -> does not contain
+     * starts with -> does not start with
+     * ends with -> does not end with
+     * is empty -> is not empty
+     * is key missing -> has key
+     *
+     * @return VerifyArray
+     */
+    public function reverse(): self
+    {
+        $this->reverseAction = !$this->reverseAction;
+
+        return $this;
     }
 
     /**
@@ -128,7 +219,7 @@ class VerifyArray extends AbstractAction
      *
      * @return VerifyArray
      */
-    public function setCheckContent(array $content): self
+    public function checkContent(array $content): self
     {
         $this->checkContent = $content;
 
@@ -209,27 +300,26 @@ class VerifyArray extends AbstractAction
         }
 
         // Validate the action.
-        $action = $this->getAction();
         if (empty($this->action)) {
             $this->throwValidationException($this, "You must specify the action type.");
         }
 
         // If no action is specified OR an unsupported action is given, then we throw an error.
         $checkActionsConstants = $this->getSupportedActions();
-        if (!in_array($action, $checkActionsConstants)) {
+        if (!in_array($this->action, $checkActionsConstants)) {
             $this->throwValidationException(
                 $this,
                 "Action type %s not supported. Supported checks are [%s].",
-                $action,
+                $this->action,
                 implode(', ', $checkActionsConstants)
             );
         }
 
-        if ($this->reverseAction && $action === self::CHECK_ANY) {
+        if ($this->reverseAction && $this->action === self::CHECK_ANY) {
             $this->throwValidationException(
                 $this,
                 "Action type %s not supported in the reverse mode. Use %s instead.",
-                $action,
+                $this->action,
                 self::CHECK_EQUALS
             );
         }
@@ -239,12 +329,12 @@ class VerifyArray extends AbstractAction
             // If an empty value is specified (e.g. null, ""), we will use this check, only if the set action
             // is 'check_equals', 'check_empty', 'check_non_empty' or 'check_any'.
             $acceptsEmptyValue = [self::CHECK_ANY, self::CHECK_EQUALS, self::CHECK_EMPTY, self::CHECK_MISSING_KEY];
-            if (!in_array($action, $acceptsEmptyValue)) {
+            if (!in_array($this->action, $acceptsEmptyValue)) {
                 $this->throwValidationException(
                     $this,
                     "Action type %s not supported for empty values. " .
                     "Supported actions for empty values are [%s]",
-                    $action,
+                    $this->action,
                     implode(', ', $acceptsEmptyValue)
                 );
             }
@@ -275,15 +365,15 @@ class VerifyArray extends AbstractAction
             // If no exceptions are thrown, then the key was found in the given config array
             switch($this->action) {
                 case self::CHECK_CONTAINS:
-                    $contains = $this->contains($value);
+                    $contains = $this->valueContains($value);
                     $matched = $this->reverseAction ? !$contains : $contains;
                     break;
                 case self::CHECK_ENDS_WITH:
-                    $endsWith = $this->endsWith($value);
+                    $endsWith = $this->valueEndsWith($value);
                     $matched = $this->reverseAction ? !$endsWith : $endsWith;
                     break;
                 case self::CHECK_STARTS_WITH:
-                    $startsWith = $this->startsWith($value);
+                    $startsWith = $this->valueStartsWith($value);
                     $matched = $this->reverseAction ? !$startsWith : $startsWith;
                     break;
                 case self::CHECK_ANY:
@@ -297,7 +387,7 @@ class VerifyArray extends AbstractAction
                     $matched = true;
                     break;
                 case self::CHECK_EQUALS:
-                    $equalsTo = $this->equalsTo($value);
+                    $equalsTo = $this->valueEqualTo($value);
                     $matched = $this->reverseAction ? !$equalsTo : $equalsTo;
                     break;
                 case self::CHECK_EMPTY:
@@ -381,7 +471,7 @@ class VerifyArray extends AbstractAction
      *
      * @throws \Exception
      */
-    protected function contains($searchValue): bool
+    protected function valueContains($searchValue): bool
     {
         if (is_string($searchValue) && is_string($this->value)) {
             if (strpos($searchValue, $this->value) !== false) {
@@ -406,7 +496,7 @@ class VerifyArray extends AbstractAction
      *
      * @throws \Exception
      */
-    protected function endsWith($value): bool
+    protected function ValueEndsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
             return StringParser::endsWith($value, $this->value);
@@ -426,7 +516,7 @@ class VerifyArray extends AbstractAction
      *
      * @throws \Exception
      */
-    protected function startsWith($value): bool
+    protected function valueStartsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
             return StringParser::startsWith($value, $this->value);
@@ -444,7 +534,7 @@ class VerifyArray extends AbstractAction
      *
      * @return bool
      */
-    protected function equalsTo($value): bool
+    protected function valueEqualTo($value): bool
     {
         if (is_numeric($this->value) && is_numeric($value)) {
             if ($this->value == $value) {

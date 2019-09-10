@@ -283,7 +283,7 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
     ): void
     {
         if ($nestedAction instanceof VerifyArray) {
-            $nestedAction->setCheckContent($content);
+            $nestedAction->checkContent($content);
         }
         $nestedActionResult = $nestedAction->run();
         if (!$nestedAction->validateResult($nestedActionResult)) {
