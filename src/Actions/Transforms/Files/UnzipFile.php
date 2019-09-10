@@ -24,6 +24,17 @@ class UnzipFile extends AbstractAction
     protected $extractToPath;
 
     /**
+     * UnzipFile constructor.
+     *
+     * @param string zipFilePath The file to decompress.
+     */
+    public function __construct(string $zipFilePath = "")
+    {
+        parent::__construct();
+        $this->zipFilePath = $zipFilePath;
+    }
+
+    /**
      * Open the specified zip file.
      *
      * @param string $zipFilePath The zip file path.
