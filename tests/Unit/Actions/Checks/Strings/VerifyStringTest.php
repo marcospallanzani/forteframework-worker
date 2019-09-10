@@ -260,7 +260,6 @@ class VerifyStringTest extends BaseTest
      * @return array
      */
     public function actionProvider(): array
-
     {
         $testSmallVersionString = "1.0.1";
         $testBigVersionString   = "1.1.1";
@@ -433,8 +432,6 @@ class VerifyStringTest extends BaseTest
         $this->assertInstanceOf(VerifyString::class, $verifyString->checkContent('test2'));
         $this->assertEquals("Check if the given content 'test2' is empty.", (string) $verifyString);
     }
-
-
 
     /**
      * Test the action methods (i.e. contains, startsWith, endsWith, etc).
