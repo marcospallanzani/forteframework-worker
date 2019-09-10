@@ -327,8 +327,6 @@ abstract class AbstractAction implements ValidActionInterface
         return $this->uniqueExecutionId;
     }
 
-
-
     /**
      * Validate the given action result. This method returns true if the
      * given ActionResult instance has a result value that is considered
