@@ -37,6 +37,19 @@ class RemoveFile extends AbstractAction
     protected $mode;
 
     /**
+     * RemoveFile constructor.
+     *
+     * @param string $filePath The file path to be removed.
+     * @param string $mode The delete mode (one of the class constants
+     * that begin by "REMOVE_").
+     */
+    public function __construct(string $filePath = "", string $mode = "")
+    {
+        parent::__construct();
+        $this->remove($filePath, $mode);
+    }
+
+    /**
      * Set the file path to be removed with a specific delete mode.
      * Accepted modes are the class constants beginning by "REMOVE_".
      *
