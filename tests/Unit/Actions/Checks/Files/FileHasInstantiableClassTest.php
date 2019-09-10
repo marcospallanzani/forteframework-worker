@@ -11,7 +11,7 @@
 
 namespace Tests\Unit\Actions\Checks\Files;
 
-use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Tests\Unit\BaseTest;
@@ -106,7 +106,10 @@ class FileHasInstantiableClassTest extends BaseTest
         if ($exceptionExpected) {
             $this->expectException(ValidationException::class);
         }
-        $this->assertEquals($expected, (new FileHasInstantiableClass($filePath, $className))->isValid());
+        $this->assertEquals(
+            $expected,
+            ActionFactory::createFileHasInstantiableClass($filePath, $className)->isValid()
+        );
     }
 
 
@@ -139,7 +142,7 @@ class FileHasInstantiableClassTest extends BaseTest
         }
         $this->assertEquals(
             $expected,
-            (new FileHasInstantiableClass($filePath, $className))
+            ActionFactory::createFileHasInstantiableClass($filePath, $className)
                 ->setIsFatal($isFatal)
                 ->setIsSuccessRequired($isSuccessRequired)
                 ->run()
@@ -166,10 +169,11 @@ class FileHasInstantiableClassTest extends BaseTest
         string $stringified
     ): void
     {
-        $fileHasInstantiableClass = new FileHasInstantiableClass();
-        $fileHasInstantiableClass->setPath($filePath);
-        $fileHasInstantiableClass->setClass($className);
-        $this->assertEquals($stringified, (string) $fileHasInstantiableClass);
-        $this->assertEquals($stringified, $fileHasInstantiableClass->stringify());
+        $this->stringifyTest(
+            $stringified,
+            ActionFactory::createFileHasInstantiableClass()
+                ->setClass($className)
+                ->setPath($filePath)
+        );
     }
 }

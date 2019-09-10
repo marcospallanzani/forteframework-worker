@@ -11,8 +11,7 @@
 
 namespace Tests\Unit\Actions\Checks\Files;
 
-use Forte\Worker\Actions\Checks\Files\DirectoryDoesNotExist;
-use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
 use Tests\Unit\BaseTest;
@@ -53,7 +52,7 @@ class DirectoryDoesNotExistTest extends BaseTest
         if ($exceptionExpected) {
             $this->expectException(ValidationException::class);
         }
-        $this->assertEquals($expected, (new DirectoryDoesNotExist($dirPath))->isValid());
+        $this->assertEquals($expected, ActionFactory::createDirectoryDoesNotExist($dirPath)->isValid());
     }
 
     /**
@@ -66,8 +65,8 @@ class DirectoryDoesNotExistTest extends BaseTest
     public function testCheckDirectoryExists(): void
     {
         $directoryPath = "/path/to/test";
-        $this->assertEquals(true, (new DirectoryDoesNotExist($directoryPath))->run()->getResult());
-        $this->assertEquals(true, (new DirectoryDoesNotExist())->setPath($directoryPath)->run()->getResult());
+        $this->assertEquals(true, ActionFactory::createDirectoryDoesNotExist($directoryPath)->run()->getResult());
+        $this->assertEquals(true, ActionFactory::createDirectoryDoesNotExist()->setPath($directoryPath)->run()->getResult());
     }
 
     /**
@@ -76,8 +75,9 @@ class DirectoryDoesNotExistTest extends BaseTest
     public function testStringify(): void
     {
         $directoryPath = "/path/to/test/file.php";
-        $directoryDoesNotExist = new DirectoryDoesNotExist($directoryPath);
-        $this->assertEquals("Check if directory '$directoryPath' does not exist.", (string) $directoryDoesNotExist);
-        $this->assertEquals("Check if directory '$directoryPath' does not exist.", $directoryDoesNotExist->stringify());
+        $this->stringifyTest(
+            "Check if directory '$directoryPath' does not exist.",
+            ActionFactory::createDirectoryDoesNotExist($directoryPath)
+        );
     }
 }

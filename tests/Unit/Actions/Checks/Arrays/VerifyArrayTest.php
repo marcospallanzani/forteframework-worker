@@ -3,6 +3,7 @@
 namespace Tests\Unit\Actions\Checks\Arrays;
 
 use Forte\Worker\Actions\ActionResult;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
@@ -394,9 +395,7 @@ class VerifyArrayTest extends BaseTest
      */
     public function testStringify(string $key, string $operation, $value, bool $reverseAction, string $expected): void
     {
-        $verifyArray = new VerifyArray($key, $operation, $value, $reverseAction);
-        $this->assertEquals($expected, $verifyArray->stringify());
-        $this->assertEquals($expected, (string) $verifyArray);
+        $this->stringifyTest($expected, ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction));
     }
 
     /**
@@ -412,7 +411,7 @@ class VerifyArrayTest extends BaseTest
      */
     public function testGetters(string $key, string $operation, $value, $reverseAction): void
     {
-        $modifyArray = new VerifyArray($key, $operation, $value, $reverseAction);
+        $modifyArray = ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction);
         $this->assertEquals($key, $modifyArray->getKey());
         $this->assertEquals($operation, $modifyArray->getAction());
         $this->assertEquals($value, $modifyArray->getValue());
@@ -443,7 +442,7 @@ class VerifyArrayTest extends BaseTest
         bool $expectException
     ): void
     {
-        $verifyArray = new VerifyArray($key, $operation, $value, $reverseAction);
+        $verifyArray = ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction);
         if ($expectException) {
             $this->expectException(ValidationException::class);
             $isValid = $verifyArray->setCheckContent($checkContent)->isValid();
@@ -484,7 +483,7 @@ class VerifyArrayTest extends BaseTest
     ): void
     {
         $verifyArray =
-            (new VerifyArray($key, $operation, $value, $reverseAction))
+            ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction)
             ->setIsFatal($isFatal)
             ->setIsSuccessRequired($isSuccessRequired)
         ;
@@ -505,7 +504,7 @@ class VerifyArrayTest extends BaseTest
         $array = [
             "test1" => "test2"
         ];
-        $verifyArray = new VerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
+        $verifyArray = ActionFactory::createVerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
         $verifyArray->setIsFatal(true);
         $this->expectException(ActionException::class);
         $verifyArray->setCheckContent($array)->run();
@@ -522,7 +521,7 @@ class VerifyArrayTest extends BaseTest
         $array = [
             "test1" => "test2"
         ];
-        $verifyArray = new VerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
+        $verifyArray = ActionFactory::createVerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
         $actionResult = $verifyArray->setCheckContent($array)->run();
         $this->assertInstanceOf(ActionResult::class, $actionResult);
         $this->assertEmpty($actionResult->getResult());

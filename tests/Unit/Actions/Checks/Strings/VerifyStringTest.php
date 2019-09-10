@@ -12,6 +12,7 @@
 namespace Tests\Unit\Actions\Checks\Strings;
 
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Tests\Unit\BaseTest;
@@ -274,8 +275,10 @@ class VerifyStringTest extends BaseTest
         if (!$isValid) {
             $this->expectException(ValidationException::class);
         }
-        $verifyString = new VerifyString($condition, $conditionValue, $initialContent);
-        $this->assertEquals($isValid, $verifyString->isValid());
+        $this->assertEquals(
+            $isValid,
+            ActionFactory::createVerifyString($condition, $conditionValue, $initialContent)->isValid()
+        );
     }
 
     /**
@@ -306,7 +309,7 @@ class VerifyStringTest extends BaseTest
     ): void
     {
         $verifyString =
-            (new VerifyString($condition, $conditionValue, $initialContent))
+            ActionFactory::createVerifyString($condition, $conditionValue, $initialContent)
                 ->setIsFatal($isFatal)
                 ->setIsSuccessRequired($isSuccessRequired)
         ;
@@ -343,10 +346,10 @@ class VerifyStringTest extends BaseTest
         string $objectMessage
     ): void
     {
-        $verifyString = new VerifyString($condition, $conditionValue);
-        $verifyString->setContent($initialContent);
-        $this->assertEquals($objectMessage, (string) $verifyString);
-        $this->assertEquals($objectMessage, $verifyString->stringify());
+        $this->stringifyTest(
+            $objectMessage,
+            ActionFactory::createVerifyString($condition, $conditionValue)->setContent($initialContent)
+        );
     }
 
     /**
@@ -354,7 +357,7 @@ class VerifyStringTest extends BaseTest
      */
     public function testSetContent(): void
     {
-        $verifyString = new VerifyString(VerifyString::CONDITION_IS_EMPTY, '', 'test1');
+        $verifyString = ActionFactory::createVerifyString(VerifyString::CONDITION_IS_EMPTY, '', 'test1');
         $this->assertInstanceOf(VerifyString::class, $verifyString->setContent('test2'));
         $this->assertEquals("Check if the given content 'test2' is empty.", (string) $verifyString);
     }
