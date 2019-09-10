@@ -63,7 +63,7 @@ class ModifyArray extends AbstractAction
      * for list of supported values).
      * @param mixed  $value The value to set/change/remove.
      */
-    public function __construct(string $key, string $action, $value = null)
+    public function __construct(string $key = "", string $action = "", $value = null)
     {
         parent::__construct();
         $this->key    = $key;
@@ -72,33 +72,55 @@ class ModifyArray extends AbstractAction
     }
 
     /**
-     * Returns the key.
+     * Set this ModifyArray instance, so that it adds the given key with the given value
+     * to the specified "modify-content".
      *
-     * @return string
+     * @param string $key The key of the value to be added.
+     * @param mixed $value The value to be added with the given key.
+     *
+     * @return ModifyArray
      */
-    public function getKey(): string
+    public function addKey(string $key, $value): self
     {
-        return $this->key;
+        $this->action = self::MODIFY_ADD;
+        $this->key    = $key;
+        $this->value  = $value;
+
+        return $this;
     }
 
     /**
-     * Returns the value.
+     * Set this ModifyArray instance, so that it modifies the given key with the given value
+     * in the specified "modify-content". If the key does not exist, it will be added.
      *
-     * @return mixed
+     * @param string $key The key of the value to be modified.
+     * @param mixed $value The new value for the given key.
+     *
+     * @return ModifyArray
      */
-    public function getValue()
+    public function modifyKey(string $key, $value): self
     {
-        return $this->value;
+        $this->action = self::MODIFY_CHANGE_VALUE;
+        $this->key    = $key;
+        $this->value  = $value;
+
+        return $this;
     }
 
     /**
-     * Returns the action.
+     * Set this ModifyArray instance, so that it removes the given key
+     * from the specified "modify-content".
      *
-     * @return string
+     * @param string $key The key to be removed.
+     *
+     * @return ModifyArray
      */
-    public function getAction(): string
+    public function removeKey(string $key): self
     {
-        return $this->action;
+        $this->action = self::MODIFY_REMOVE_KEY;
+        $this->key    = $key;
+
+        return $this;
     }
 
     /**
@@ -110,21 +132,11 @@ class ModifyArray extends AbstractAction
      *
      * @return ModifyArray
      */
-    public function setModifyContent(array $content): self
+    public function modifyContent(array $content): self
     {
         $this->modifyContent = $content;
 
         return $this;
-    }
-
-    /**
-     * Returned the modified array.
-     *
-     * @return array
-     */
-    public function getModifiedContent(): array
-    {
-        return $this->modifyContent;
     }
 
     /**
