@@ -33,6 +33,37 @@ use Tests\Unit\BaseTest;
 class ActionFactoryTest extends BaseTest
 {
     /**
+     * Data provider for all class generation tests.
+     *
+     * @return array
+     */
+    public function classesProvider(): array
+    {
+        $wrongParams = [new \stdClass(), true, null];
+
+        return [
+            [VerifyArray::class, $wrongParams],
+            [DirectoryDoesNotExist::class, $wrongParams],
+            [DirectoryExists::class, $wrongParams],
+            [FileDoesNotExist::class, $wrongParams],
+            [FileExists::class, $wrongParams],
+            [FileHasInstantiableClass::class, $wrongParams],
+            [FileHasValidEntries::class, $wrongParams],
+            [VerifyString::class, $wrongParams],
+            [ModifyArray::class, $wrongParams],
+            [ChangeFileEntries::class, $wrongParams],
+            [CopyFile::class, $wrongParams],
+            [ModifyFile::class, $wrongParams],
+            [MoveDirectory::class, $wrongParams],
+            [MoveFile::class, $wrongParams],
+            [RemoveFile::class, $wrongParams],
+            [RenameDirectory::class, $wrongParams],
+            [RenameFile::class, $wrongParams],
+            [UnzipFile::class, $wrongParams],
+        ];
+    }
+
+    /**
      * Test for all ActionFactory creation methods.
      *
      * @throws WorkerException
@@ -95,5 +126,33 @@ class ActionFactoryTest extends BaseTest
 
         $this->assertInstanceOf(UnzipFile::class, ActionFactory::createUnzipFile());
         $this->assertInstanceOf(UnzipFile::class, ActionFactory::create(UnzipFile::class));
+    }
+
+    /**
+     * Test ActionFactory::create() method with a non-supported class.
+     *
+     * @throws WorkerException
+     */
+    public function testFailure(): void
+    {
+        $this->expectException(WorkerException::class);
+        $this->expectExceptionMessage("The given action type '".self::class."' is not supported.");
+        ActionFactory::create(self::class);
+    }
+
+    /**
+     * Test ActionFactory::create() method with wrong parameters (wrong parameter types).
+     *
+     * @dataProvider classesProvider
+     *
+     * @param string $className
+     * @param array $wrongParameters
+     *
+     * @throws WorkerException
+     */
+    public function testWrongArguments(string $className, array $wrongParameters): void
+    {
+        $this->expectException(WorkerException::class);
+        ActionFactory::create($className, ...$wrongParameters);
     }
 }
