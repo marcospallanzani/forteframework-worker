@@ -249,16 +249,31 @@ class VerifyArray extends AbstractAction
         $reverseAction = $this->getReverseActionTag();
         switch($this->action) {
             case self::CHECK_ANY:
-                return $baseMessage . " and has any value";
+                return "$baseMessage and has any value";
             case self::CHECK_CONTAINS:
-                return $baseMessage . " and $reverseAction value '" . $this->stringifyValue() . "'";
+                return sprintf(
+                    "%s and %s value '%s'",
+                    $baseMessage,
+                    $reverseAction,
+                    StringParser::stringifyVariable($this->value)
+                );
             case self::CHECK_ENDS_WITH:
             case self::CHECK_STARTS_WITH:
-                return $baseMessage . " and $reverseAction with value '" . $this->stringifyValue() . "'";
+                return sprintf(
+                    "%s and %s with value '%s'",
+                    $baseMessage,
+                    $reverseAction,
+                    StringParser::stringifyVariable($this->value)
+                );
             case self::CHECK_EQUALS:
-                return $baseMessage . " and $reverseAction equal to value '" . $this->stringifyValue() . "'";
+                return sprintf(
+                    "%s and %s equal to value '%s'",
+                    $baseMessage,
+                    $reverseAction,
+                    StringParser::stringifyVariable($this->value)
+                );
             case self::CHECK_EMPTY:
-                return $baseMessage . " and $reverseAction empty (empty string or null)";
+                return "$baseMessage and $reverseAction empty (empty string or null)";
             case self::CHECK_MISSING_KEY:
                 return "Check if key '" . $this->key . "' $reverseAction set";
             default:
@@ -417,19 +432,6 @@ class VerifyArray extends AbstractAction
         }
 
         return $actionResult->setResult($matched);
-    }
-
-    /**
-     * Returns a string version of the set value (it converts arrays to json).
-     *
-     * @return string
-     */
-    protected function stringifyValue(): string
-    {
-        if (is_array($this->value)) {
-            return json_encode($this->value);
-        }
-        return (string) $this->value;
     }
 
     /**

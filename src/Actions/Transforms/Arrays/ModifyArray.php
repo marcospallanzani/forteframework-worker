@@ -5,6 +5,7 @@ namespace Forte\Worker\Actions\Transforms\Arrays;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Helpers\ClassAccessTrait;
+use Forte\Worker\Helpers\StringParser;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
 
 /**
@@ -180,9 +181,17 @@ class ModifyArray extends AbstractAction
     {
         switch($this->action) {
             case self::MODIFY_ADD:
-                return sprintf("Add value '%s' with key '%s'", $this->stringifyValue(), $this->key);
+                return sprintf(
+                    "Add value '%s' with key '%s'",
+                    StringParser::stringifyVariable($this->value),
+                    $this->key
+                );
             case self::MODIFY_CHANGE_VALUE:
-                return sprintf("Modify key '%s' and set it to '%s'", $this->key, $this->stringifyValue());
+                return sprintf(
+                    "Modify key '%s' and set it to '%s'",
+                    $this->key,
+                    StringParser::stringifyVariable($this->value)
+                );
             case self::MODIFY_REMOVE_KEY:
                 return sprintf("Remove key '%s'", $this->key);
             default:
@@ -337,18 +346,5 @@ class ModifyArray extends AbstractAction
                 unset($array[$key]);
                 break;
         }
-    }
-
-    /**
-     * Returns a string version of the set value (it converts arrays to json).
-     *
-     * @return string
-     */
-    protected function stringifyValue(): string
-    {
-        if (is_array($this->value)) {
-            return json_encode($this->value);
-        }
-        return (string) $this->value;
     }
 }

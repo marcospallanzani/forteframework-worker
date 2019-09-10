@@ -25,12 +25,12 @@ class ModifyArrayTest extends BaseTest
         return [
             ['key1', ModifyArray::MODIFY_ADD, 'value1', "Add value 'value1' with key 'key1'"],
             ['key1', ModifyArray::MODIFY_ADD, ['test-array' => 'array-value'], "Add value '{\"test-array\":\"array-value\"}' with key 'key1'"],
-            ['key1', ModifyArray::MODIFY_ADD, true, "Add value '1' with key 'key1'"],
-            ['key1', ModifyArray::MODIFY_ADD, null, "Add value '' with key 'key1'"],
+            ['key1', ModifyArray::MODIFY_ADD, true, "Add value 'true' with key 'key1'"],
+            ['key1', ModifyArray::MODIFY_ADD, null, "Add value 'null' with key 'key1'"],
             ['key1', ModifyArray::MODIFY_CHANGE_VALUE, 'value1', "Modify key 'key1' and set it to 'value1'"],
             ['key1', ModifyArray::MODIFY_CHANGE_VALUE, ['test-array' => 'array-value'], "Modify key 'key1' and set it to '{\"test-array\":\"array-value\"}'"],
-            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, true, "Modify key 'key1' and set it to '1'"],
-            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, null, "Modify key 'key1' and set it to ''"],
+            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, true, "Modify key 'key1' and set it to 'true'"],
+            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, null, "Modify key 'key1' and set it to 'null'"],
             ['key1', ModifyArray::MODIFY_REMOVE_KEY, 'value1', "Remove key 'key1'"],
             ['key1', "", 'value1', "Unsupported action"],
         ];

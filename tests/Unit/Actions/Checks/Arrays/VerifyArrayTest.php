@@ -73,9 +73,9 @@ class VerifyArrayTest extends BaseTest
             ['key1', VerifyArray::CHECK_EQUALS, 'value1', $reverse, "Check if key 'key1' is set and is " . ($reverse ? "not " : "") . "equal to value 'value1'"],
             ['key1', VerifyArray::CHECK_EMPTY, 'value1', $reverse, "Check if key 'key1' is set and is " . ($reverse ? "not " : "") . "empty (empty string or null)"],
             ['key1', VerifyArray::CHECK_CONTAINS, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value 'value1'"],
-            ['key1', VerifyArray::CHECK_CONTAINS, true, $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value '1'"],
+            ['key1', VerifyArray::CHECK_CONTAINS, true, $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value 'true'"],
             ['key1', VerifyArray::CHECK_CONTAINS, 55, $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value '55'"],
-            ['key1', VerifyArray::CHECK_CONTAINS, null, $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value ''"],
+            ['key1', VerifyArray::CHECK_CONTAINS, null, $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value 'null'"],
             ['key1', VerifyArray::CHECK_CONTAINS, ['test-array' => 'array-value'], $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value '{\"test-array\":\"array-value\"}'"],
             ['key1', "", 'value1', $reverse, "Check if key 'key1' is set"],
         ];
