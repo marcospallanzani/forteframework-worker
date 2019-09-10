@@ -17,6 +17,8 @@ use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
  */
 class ChangeFileEntries extends AbstractAction implements NestedActionCallbackInterface
 {
+//TODO CONSIDER CHANGING THE NAME OF THIS CLASS AS IT IS NOT VERY CLEAR. IT ONLY MODIFIES json, ini, yml, xml and array FILES AND THE
+//NAME IS A BIT MISLEADING. IT SEEMS THAT IT CAN MODIFY ANY TYPES OF FILE AND ADD ANY TYPES OF CONTENT.
     /**
      * The file to modify.
      *
@@ -38,10 +40,10 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
      * ChangeFileEntries constructor.
      *
      * @param string $filePath The file to modify.
-     * @param string $contentType The content type (accepted values:
-     * constants FileParser::CONTENT_TYPE_XXX).
+     * @param string $contentType The content type; accepted values are the FileParser
+     * class constants with prefix "CONTENT_TYPE".
      */
-    public function __construct(string $filePath, string $contentType)
+    public function __construct(string $filePath = "", string $contentType = "")
     {
         parent::__construct();
         $this->filePath = $filePath;
@@ -49,21 +51,18 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
     }
 
     /**
-     * Sets the file content type. Accepted values are the FileParser class
-     * constants with prefix "CONTENT_TYPE".
      *
-     * @param string $type The content type; accepted values are the FileParser
-     * class constants with prefix "CONTENT_TYPE".
+     * @param string $filePath The file to modify.
      *
      * @return ChangeFileEntries
      */
-    public function contentType(string $type): self
+    public function modify(string $filePath): self
     {
-        $this->contentType = $type;
+        $this->filePath = $filePath;
 
         return $this;
     }
-
+//TODO FIX THIS BLOCK OF COMMENTS
     /**
      * Adds a new modification to this ChangeFileEntries instance,
      * to add the new pair key-value in the specified file. The
@@ -82,7 +81,7 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
 
         return $this;
     }
-
+//TODO FIX THIS BLOCK OF COMMENTS
     /**
      * Adds a new modification to this ChangeFileEntries instance,
      * to modify the given pair key-value in the specified file.
@@ -102,7 +101,7 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
 
         return $this;
     }
-
+//TODO FIX THIS BLOCK OF COMMENTS
     /**
      * Adds a new modification to this ChangeFileEntries instance, to remove
      * the given key in the specified file. The key can have multiple nested
