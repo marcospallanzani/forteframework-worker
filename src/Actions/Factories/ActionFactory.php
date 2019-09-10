@@ -338,11 +338,13 @@ class ActionFactory implements ActionFactoryInterface
                 default:
                     throw new WorkerException("The given action type '$class' is not supported.");
             }
-        } catch (\ArgumentCountError $argumentCountError) {
+        } catch (\Throwable $error) {
+            // Here we catch \Throwable instances to be sure that we catch \TypeError instances too.
+            // These instances are thrown if a constructor is called with the wrong parameter types.
             throw new WorkerException(sprintf(
-                "Impossible to create an instance of class '%s'. Reason: %s ",
+                "Impossible to create an instance of class '%s'. Reason: %s.",
                 $class,
-                $argumentCountError->getMessage()
+                $error->getMessage()
             ));
         }
     }
