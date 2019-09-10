@@ -81,7 +81,7 @@ class VerifyString extends AbstractAction
      * @param string $initialContent
      */
     public function __construct(
-        string $condition,
+        string $condition = "",
         $conditionValue = "",
         string $initialContent = ""
     ) {
@@ -89,6 +89,195 @@ class VerifyString extends AbstractAction
         $this->condition      = $condition;
         $this->conditionValue = $conditionValue;
         $this->content        = $initialContent;
+    }
+
+    /**
+     * Set this VerifyString instance, so that it checks if the check content
+     * starts with the given value.
+     *
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyString
+     */
+    public function startsWith(string $value): self
+    {
+        $this->condition      = self::CONDITION_STARTS_WITH;
+        $this->conditionValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set this VerifyString instance, so that it checks if the check content
+     * ends with the given value.
+     *
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyString
+     */
+    public function endsWith(string $value): self
+    {
+        $this->condition      = self::CONDITION_ENDS_WITH;
+        $this->conditionValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set this VerifyString instance, so that it checks if the check content
+     * contains the given value.
+     *
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyString
+     */
+    public function contains(string $value): self
+    {
+        $this->condition      = self::CONDITION_CONTAINS;
+        $this->conditionValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set this VerifyString instance, so that it checks if the check content
+     * is equal to the given value.
+     *
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyString
+     */
+    public function isEqualTo(string $value): self
+    {
+        $this->condition      = self::CONDITION_EQUAL_TO;
+        $this->conditionValue = $value;
+
+        return $this;
+    }
+
+
+    /**
+     * Set this VerifyString instance, so that it checks if the check content
+     * is less than the given value.
+     *
+     * This check can be used to compare also text representing versions.
+     * (e.g. 1.0.1 < 1.0.2 will return true).
+     *
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyString
+     */
+    public function isLessThan(string $value): self
+    {
+        $this->condition      = self::CONDITION_LESS_THAN;
+        $this->conditionValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set this VerifyString instance, so that it checks if the check content
+     * is less than / equal to the given value.
+     *
+     * This check can be used to compare also text representing versions.
+     * (e.g. 1.0.1 <= 1.0.2 will return true).
+     *
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyString
+     */
+    public function isLessThanEqualTo(string $value): self
+    {
+        $this->condition      = self::CONDITION_LESS_EQUAL_THAN;
+        $this->conditionValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set this VerifyString instance, so that it checks if the check content
+     * is greater than the given value.
+     *
+     * This check can be used to compare also text representing versions.
+     * (e.g. 1.0.2 > 1.0.1 will return true).
+     *
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyString
+     */
+    public function isGreaterThan(string $value): self
+    {
+        $this->condition      = self::CONDITION_GREATER_THAN;
+        $this->conditionValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set this VerifyString instance, so that it checks if the check content
+     * is greater than / equal to the given value.
+     *
+     * This check can be used to compare also text representing versions.
+     * (e.g. 1.0.2 >= 1.0.1 will return true).
+     *
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyString
+     */
+    public function isGreaterThanEqualTo(string $value): self
+    {
+        $this->condition      = self::CONDITION_GREATER_EQUAL_THAN;
+        $this->conditionValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set this VerifyString instance, so that it checks if the check content
+     * is different than the given value.
+     *
+     * This check can be used to compare also text representing versions.
+     * (e.g. 1.0.2 <> 1.0.1 will return true).
+     *
+     * @param mixed $value The value to be matched by the action condition.
+     *
+     * @return VerifyString
+     */
+    public function isDifferentThan(string $value): self
+    {
+        $this->condition      = self::CONDITION_DIFFERENT_THAN;
+        $this->conditionValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set this VerifyString instance, so that it checks if the check content
+     * matches the given regular expression.
+     *
+     * @param mixed $regex The regex to be used to parse the specified check content.
+     *
+     * @return VerifyString
+     */
+    public function matchesReqex(string $regex): self
+    {
+        $this->condition      = self::CONDITION_REGEX;
+        $this->conditionValue = $regex;
+
+        return $this;
+    }
+
+    /**
+     * Set this VerifyString instance, so that it checks if the check content
+     * is empty.
+     *
+     * @return VerifyString
+     */
+    public function isEmpty(): self
+    {
+        $this->condition = self::CONDITION_IS_EMPTY;
+
+        return $this;
     }
 
     /**
@@ -100,21 +289,11 @@ class VerifyString extends AbstractAction
      *
      * @return VerifyString
      */
-    public function setContent(string $content): self
+    public function checkContent(string $content): self
     {
         $this->content = $content;
 
         return $this;
-    }
-
-    /**
-     * Return the condition value.
-     *
-     * @return mixed|string
-     */
-    public function getConditionValue()
-    {
-        return $this->conditionValue;
     }
 
     /**

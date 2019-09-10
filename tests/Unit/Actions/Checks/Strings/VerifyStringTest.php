@@ -11,6 +11,7 @@
 
 namespace Tests\Unit\Actions\Checks\Strings;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
@@ -254,6 +255,77 @@ class VerifyStringTest extends BaseTest
     }
 
     /**
+     * Data provider for actions tests.
+     *
+     * @return array
+     */
+    public function actionProvider(): array
+
+    {
+        $testSmallVersionString = "1.0.1";
+        $testBigVersionString   = "1.1.1";
+        $testEmptyString        = "";
+        $testString             = "This is the string to be checked by the condition";
+        $decimalValueRegex      = '/(\w+)[-+]?([0-9]*\.[0-9]+|[0-9]+)/';
+        $wordRegex              = '/[a-z]/';
+
+        return [
+            [
+                ActionFactory::createVerifyString()->checkContent($testString)->startsWith("This"),
+                ActionFactory::createVerifyString()->checkContent($testString)->startsWith("x"),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testString)->endsWith("condition"),
+                ActionFactory::createVerifyString()->checkContent($testString)->endsWith("x"),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testString)->contains("to be"),
+                ActionFactory::createVerifyString()->checkContent($testString)->contains("x"),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testString)->isEqualTo($testString),
+                ActionFactory::createVerifyString()->checkContent($testString)->isEqualTo("x"),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testEmptyString)->isEmpty(),
+                ActionFactory::createVerifyString()->checkContent($testString)->isEmpty(),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testSmallVersionString)->isLessThan($testBigVersionString),
+                ActionFactory::createVerifyString()->checkContent($testBigVersionString)->isLessThan($testSmallVersionString),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testSmallVersionString)->isLessThanEqualTo($testBigVersionString),
+                ActionFactory::createVerifyString()->checkContent($testBigVersionString)->isLessThanEqualTo($testSmallVersionString),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testSmallVersionString)->isLessThanEqualTo($testSmallVersionString),
+                ActionFactory::createVerifyString()->checkContent($testBigVersionString)->isLessThanEqualTo($testSmallVersionString),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testBigVersionString)->isGreaterThan($testSmallVersionString),
+                ActionFactory::createVerifyString()->checkContent($testSmallVersionString)->isGreaterThan($testBigVersionString),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testBigVersionString)->isGreaterThanEqualTo($testSmallVersionString),
+                ActionFactory::createVerifyString()->checkContent($testSmallVersionString)->isGreaterThanEqualTo($testBigVersionString),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testSmallVersionString)->isGreaterThanEqualTo($testSmallVersionString),
+                ActionFactory::createVerifyString()->checkContent($testSmallVersionString)->isGreaterThanEqualTo($testBigVersionString),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testSmallVersionString)->isDifferentThan($testBigVersionString),
+                ActionFactory::createVerifyString()->checkContent($testSmallVersionString)->isDifferentThan($testSmallVersionString),
+            ],
+            [
+                ActionFactory::createVerifyString()->checkContent($testSmallVersionString)->matchesReqex($decimalValueRegex),
+                ActionFactory::createVerifyString()->checkContent($testSmallVersionString)->matchesReqex($wordRegex),
+            ],
+        ];
+    }
+
+    /**
      * Test method FileExists::isValid().
      *
      * @dataProvider conditionsProvider
@@ -348,17 +420,35 @@ class VerifyStringTest extends BaseTest
     {
         $this->stringifyTest(
             $objectMessage,
-            ActionFactory::createVerifyString($condition, $conditionValue)->setContent($initialContent)
+            ActionFactory::createVerifyString($condition, $conditionValue)->checkContent($initialContent)
         );
     }
 
     /**
-     * Test for method VerifyString::setContent().
+     * Test for method VerifyString::checkContent().
      */
-    public function testSetContent(): void
+    public function testCheckContent(): void
     {
         $verifyString = ActionFactory::createVerifyString(VerifyString::CONDITION_IS_EMPTY, '', 'test1');
-        $this->assertInstanceOf(VerifyString::class, $verifyString->setContent('test2'));
+        $this->assertInstanceOf(VerifyString::class, $verifyString->checkContent('test2'));
         $this->assertEquals("Check if the given content 'test2' is empty.", (string) $verifyString);
+    }
+
+
+
+    /**
+     * Test the action methods (i.e. contains, startsWith, endsWith, etc).
+     *
+     * @dataProvider actionProvider
+     *
+     * @param AbstractAction $verifyMatched
+     * @param AbstractAction $verifyNotMatched
+     *
+     * @throws ActionException
+     */
+    public function testActions(AbstractAction $verifyMatched, AbstractAction $verifyNotMatched): void
+    {
+        $this->assertTrue($verifyMatched->run()->getResult());
+        $this->assertFalse($verifyNotMatched->run()->getResult());
     }
 }
