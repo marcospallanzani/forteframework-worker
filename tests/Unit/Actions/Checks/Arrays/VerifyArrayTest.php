@@ -412,7 +412,7 @@ class VerifyArrayTest extends BaseTest
             ],
             [
                 ActionFactory::createVerifyArray()->checkContent($testArray)->isEmpty($keyEmptyValue),
-                ActionFactory::createVerifyArray()->checkContent($testArray)->isEmpty   ($keyWithValue),
+                ActionFactory::createVerifyArray()->checkContent($testArray)->isEmpty($keyWithValue),
             ],
             [
                 ActionFactory::createVerifyArray()->checkContent($testArray)->isKeyMissing('key3'),
