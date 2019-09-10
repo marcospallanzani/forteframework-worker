@@ -266,7 +266,7 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
     ): void
     {
         if ($nestedAction instanceof ModifyArray) {
-            $nestedAction->setModifyContent($content);
+            $nestedAction->modifyContent($content);
         }
         $nestedActionResult = $nestedAction->run();
         if (!$nestedAction->validateResult($nestedActionResult)) {
