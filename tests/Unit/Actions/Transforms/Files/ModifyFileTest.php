@@ -371,7 +371,7 @@ class ModifyFileTest extends BaseTest
     {
         $actions = $modifyFile->getActions();
         array_walk($actions, function (&$action) use ($content) {
-            $action['condition']->setContent($content);
+            $action['condition']->checkContent($content);
         });
     }
 }

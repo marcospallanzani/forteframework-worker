@@ -563,7 +563,7 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
         ) {
             // In this case, we use the content variable as each parsed line in the original
             if ($nestedAction instanceof VerifyString) {
-                $nestedActionResult = $nestedAction->setContent(trim($content, PHP_EOL))->run();
+                $nestedActionResult = $nestedAction->checkContent(trim($content, PHP_EOL))->run();
                 // If condition is matched, we modify the line
                 if ($nestedAction->validateResult($nestedActionResult)) {
                     $content = $this->applyActionToLine(
