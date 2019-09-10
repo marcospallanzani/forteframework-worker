@@ -24,7 +24,20 @@ trait ThrowErrorsTrait
      */
     public function throwWorkerException(string $message, string ...$parameters): void
     {
-        throw new WorkerException(vsprintf($message, $parameters));
+        throw $this->getWorkerException($message, ...$parameters);
+    }
+
+    /**
+     * Return a WorkerException with the given message and parameters.
+     *
+     * @param string $message The exception message.
+     * @param string[] $parameters The values to replace in the error message.
+     *
+     * @return WorkerException
+     */
+    public function getWorkerException(string $message, string ...$parameters): WorkerException
+    {
+        return new WorkerException(vsprintf($message, $parameters));
     }
 
     /**
@@ -42,7 +55,7 @@ trait ThrowErrorsTrait
         string ...$parameters
     ): void
     {
-        throw $this->getActionException($action, vsprintf($message, $parameters));
+        throw $this->getActionException($action, $message, ...$parameters);
     }
 
     /**
@@ -78,7 +91,7 @@ trait ThrowErrorsTrait
         string ...$parameters
     ): void
     {
-        throw $this->getValidationException($action, vsprintf($message, $parameters));
+        throw $this->getValidationException($action, $message, ...$parameters);
     }
 
     /**
@@ -118,7 +131,7 @@ trait ThrowErrorsTrait
         string ...$parameters
     ): void
     {
-        throw $this->getActionExceptionWithChildren($action, $childFailures, vsprintf($message, $parameters));
+        throw $this->getActionExceptionWithChildren($action, $childFailures, $message, ...$parameters);
     }
 
     /**
@@ -140,9 +153,9 @@ trait ThrowErrorsTrait
         string ...$parameters
     ): ActionException
     {
-        $actionException = $this->getActionException($action, vsprintf($message, $parameters));
+        $actionException = $this->getActionException($action, $message, ...$parameters);
         foreach ($childFailures as $childFailure) {
-            if ($childFailure instanceof ActionException) {
+            if ($childFailure instanceof WorkerException) {
                 $actionException->addChildFailure($childFailure);
             }
         }
@@ -168,7 +181,7 @@ trait ThrowErrorsTrait
         string ...$parameters
     ): void
     {
-        throw $this->getValidationExceptionWithChildren($action, $childFailures, vsprintf($message, $parameters));
+        throw $this->getValidationExceptionWithChildren($action, $childFailures, $message, ...$parameters);
     }
 
     /**
@@ -190,9 +203,9 @@ trait ThrowErrorsTrait
         string ...$parameters
     ): ValidationException
     {
-        $actionException = $this->getValidationException($action, vsprintf($message, $parameters));
+        $actionException = $this->getValidationException($action, $message, ...$parameters);
         foreach ($childFailures as $childFailure) {
-            if ($childFailure instanceof ActionException) {
+            if ($childFailure instanceof WorkerException) {
                 $actionException->addChildFailure($childFailure);
             }
         }

@@ -34,6 +34,20 @@ class ThrowErrorsTraitTest extends BaseTest
     }
 
     /**
+     * Test ThrowErrorsTrait::getWorkerException() method.
+     */
+    public function testGetWorkerException(): void
+    {
+        $anonymousActionClass = $this->getAnonymousActionClass();
+        $workerException = $anonymousActionClass->getWorkerException(
+            self::BASE_TEST_MESSAGE,
+            self::ACTION_TEST_MESSAGE
+        );
+        $this->assertInstanceOf(WorkerException::class, $workerException);
+        $this->assertEquals('error message action test.', $workerException->getMessage());
+    }
+
+    /**
      * Test ThrowErrorsTrait::throwActionException() method.
      */
     public function testThrowActionException(): void
