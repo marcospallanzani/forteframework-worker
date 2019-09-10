@@ -48,13 +48,17 @@ abstract class BaseTest extends TestCase
      *
      * @param bool $isValid
      * @param AbstractAction $action
+     * @param string $exceptionMessage
      *
      * @throws ValidationException
      */
-    protected function isValidTest(bool $isValid, AbstractAction $action): void
+    protected function isValidTest(bool $isValid, AbstractAction $action, string $exceptionMessage = ""): void
     {
         if (!$isValid) {
             $this->expectException(ValidationException::class);
+            if ($exceptionMessage) {
+                $this->expectExceptionMessage($exceptionMessage);
+            }
         }
         $this->assertEquals($isValid, $action->isValid());
     }
@@ -78,6 +82,7 @@ abstract class BaseTest extends TestCase
      * @param bool $isValid
      * @param AbstractAction $action
      * @param $expected
+     * @param string $exceptionMessage
      *
      * @throws ActionException
      */
@@ -85,7 +90,8 @@ abstract class BaseTest extends TestCase
         bool $exceptionExpected,
         bool $isValid,
         AbstractAction $action,
-        $expected
+        $expected,
+        string $exceptionMessage = ""
     ): void
     {
         if ($exceptionExpected) {
@@ -93,6 +99,9 @@ abstract class BaseTest extends TestCase
                 $this->expectException(ActionException::class);
             } else {
                 $this->expectException(ValidationException::class);
+            }
+            if ($exceptionMessage) {
+                $this->expectExceptionMessage($exceptionMessage);
             }
         }
         $this->assertEquals($expected, $action->run()->getResult());
