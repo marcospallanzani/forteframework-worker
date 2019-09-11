@@ -131,7 +131,7 @@ class ProjectRunnerBuilder
         /** main action */
             new EmptyTransform(),
             /** pre-run actions */
-            [new FileHasInstantiableClass($classFilePath, $className)]
+            [ActionFactory::createFileHasInstantiableClass($classFilePath, $className)]
         );
 
         return $this;
