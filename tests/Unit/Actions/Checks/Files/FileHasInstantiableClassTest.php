@@ -172,8 +172,8 @@ class FileHasInstantiableClassTest extends BaseTest
         $this->stringifyTest(
             $stringified,
             ActionFactory::createFileHasInstantiableClass()
-                ->setClass($className)
-                ->setPath($filePath)
+                ->hasClass($className)
+                ->path($filePath)
         );
     }
 }

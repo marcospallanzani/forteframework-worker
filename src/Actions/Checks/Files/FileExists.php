@@ -45,7 +45,7 @@ class FileExists extends AbstractAction
      *
      * @return FileExists
      */
-    public function setPath(string $filePath): self
+    public function path(string $filePath): self
     {
         $this->filePath = $filePath;
 

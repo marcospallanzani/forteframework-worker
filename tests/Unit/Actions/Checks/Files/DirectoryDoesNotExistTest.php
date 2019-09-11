@@ -66,7 +66,7 @@ class DirectoryDoesNotExistTest extends BaseTest
     {
         $directoryPath = "/path/to/test";
         $this->assertEquals(true, ActionFactory::createDirectoryDoesNotExist($directoryPath)->run()->getResult());
-        $this->assertEquals(true, ActionFactory::createDirectoryDoesNotExist()->setPath($directoryPath)->run()->getResult());
+        $this->assertEquals(true, ActionFactory::createDirectoryDoesNotExist()->path($directoryPath)->run()->getResult());
     }
 
     /**

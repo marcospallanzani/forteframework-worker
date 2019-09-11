@@ -82,7 +82,7 @@ class FileExistsTest extends BaseTest
     public function testCheckFileExists(string $filePath, bool $expected): void
     {
         $this->assertEquals($expected, ActionFactory::createFileExists($filePath)->run()->getResult());
-        $this->assertEquals($expected, ActionFactory::createFileExists()->setPath($filePath)->run()->getResult());
+        $this->assertEquals($expected, ActionFactory::createFileExists()->path($filePath)->run()->getResult());
     }
 
     /**
