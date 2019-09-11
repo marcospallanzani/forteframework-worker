@@ -52,9 +52,9 @@ class ProjectRunnerBuilder
             /** main action */
             (new UnzipFile())->open($zipFilePath)->extractTo($fullProjectPath),
             /** pre-run actions */
-            [new FileExists($zipFilePath)],
+            [ActionFactory::createFileExists($zipFilePath)],
             /** post-run actions */
-            [new FileExists($fullProjectPath)]
+            [ActionFactory::createFileExists($fullProjectPath)]
         );
 
         return $this;
@@ -108,9 +108,9 @@ class ProjectRunnerBuilder
             /** main action */
             $copy,
             /** pre-run actions */
-            [new FileExists($sourceFilePath)],
+            [ActionFactory::createFileExists($sourceFilePath)],
             /** post-run actions */
-            [new FileExists($copy->getDestinationFilePath())]
+            [ActionFactory::createFileExists($copy->getDestinationFilePath())]
         );
 
         return $this;

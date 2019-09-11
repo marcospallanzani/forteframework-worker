@@ -3,6 +3,7 @@
 namespace Tests\Unit\Builders;
 
 use Forte\Worker\Actions\Checks\Files\FileExists;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
@@ -34,7 +35,7 @@ class ProjectRunnerBuilderTest extends BaseTest
             ['modifyConfigKey', [__FILE__, FileParser::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
             ['addConfigKey', [__FILE__, FileParser::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
             ['removeConfigKey', [__FILE__, FileParser::CONTENT_TYPE_JSON, 'key'], ChangeConfigFileEntries::class],
-            ['addAction', [new FileExists(__FILE__)], FileExists::class],
+            ['addAction', [ActionFactory::createFileExists(__FILE__)], FileExists::class],
         ];
     }
 

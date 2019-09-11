@@ -4,7 +4,6 @@ namespace Tests\Unit\Runners;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Runners\ProjectRunner;
@@ -31,8 +30,8 @@ class ProjectRunnerTest extends BaseTest
                 0,
                 2,
                 [
-                    (new FileExists(__FILE__))->addBeforeAction(new FileExists(__FILE__)),
-                    (new FileExists(__FILE__))->addBeforeAction(ActionFactory::createDirectoryExists(__DIR__)),
+                    ActionFactory::createFileExists(__FILE__)->addBeforeAction(ActionFactory::createFileExists(__FILE__)),
+                    ActionFactory::createFileExists(__FILE__)->addBeforeAction(ActionFactory::createDirectoryExists(__DIR__)),
                 ],
                 false
             ],
@@ -52,8 +51,8 @@ class ProjectRunnerTest extends BaseTest
                 2,
                 [
 //TODO AT THE MOMENT THE FAILURE OF A BEFORE ACTION DOES NOT CHANGE THE RESULT OF THE MAIN ACTION: THIS SHOULD BE CHANGED
-                    (new FileExists(__FILE__))->addBeforeAction((new FileExists('wrong-file'))),
-                    (new FileExists(__FILE__))->addBeforeAction(ActionFactory::createDirectoryExists(__DIR__)),
+                    ActionFactory::createFileExists(__FILE__)->addBeforeAction(ActionFactory::createFileExists('wrong-file')),
+                    ActionFactory::createFileExists(__FILE__)->addBeforeAction(ActionFactory::createDirectoryExists(__DIR__)),
                 ],
                 false
             ],
@@ -62,7 +61,7 @@ class ProjectRunnerTest extends BaseTest
                 2,
                 0,
                 [
-                    (new FileExists('wrong-file')),
+                    ActionFactory::createFileExists('wrong-file'),
                     ActionFactory::createDirectoryExists("wrong-directory"),
                 ],
                 false
@@ -72,7 +71,7 @@ class ProjectRunnerTest extends BaseTest
                 2,
                 0,
                 [
-                    new FileExists(''),
+                    ActionFactory::createFileExists(''),
                     ActionFactory::createDirectoryExists(""),
                 ],
                 false
