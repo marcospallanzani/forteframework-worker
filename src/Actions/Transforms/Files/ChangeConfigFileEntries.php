@@ -4,6 +4,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Helpers\FileParser;
@@ -74,7 +75,7 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
      */
     public function addKeyWithValue(string $key, $value): self
     {
-        $this->modifications[] = new ModifyArray($key, ModifyArray::MODIFY_ADD, $value);
+        $this->modifications[] = ActionFactory::createModifyArray($key, ModifyArray::MODIFY_ADD, $value);
 
         return $this;
     }
@@ -93,7 +94,7 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
      */
     public function modifyKeyWithValue(string $key, $value): self
     {
-        $this->modifications[] = new ModifyArray($key, ModifyArray::MODIFY_CHANGE_VALUE, $value);
+        $this->modifications[] = ActionFactory::createModifyArray($key, ModifyArray::MODIFY_CHANGE_VALUE, $value);
 
         return $this;
     }
@@ -111,7 +112,7 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
      */
     public function removeKey(string $key): self
     {
-        $this->modifications[] = new ModifyArray($key, ModifyArray::MODIFY_REMOVE_KEY);
+        $this->modifications[] = ActionFactory::createModifyArray($key, ModifyArray::MODIFY_REMOVE_KEY);
 
         return $this;
     }
