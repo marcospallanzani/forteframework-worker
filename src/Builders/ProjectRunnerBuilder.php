@@ -71,7 +71,7 @@ class ProjectRunnerBuilder
     {
         $this->addAction(
             /** main action */
-            new DirectoryExists($path),
+            ActionFactory::createDirectoryExists($path),
             /** pre-run actions */
             [],
             /** post-run actions */
