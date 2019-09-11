@@ -4,13 +4,9 @@ namespace Forte\Worker\Builders;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
-use Forte\Worker\Actions\Checks\Files\DirectoryExists;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Runners\ProjectRunner;
-use Forte\Worker\Actions\Checks\Files\FileExists;
-use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
-use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 
@@ -155,7 +151,7 @@ class ProjectRunnerBuilder
     {
         $this->addAction(
             /** main action */
-            (new ChangeConfigFileEntries($filePath, $contentType))->modifyKeyWithValue($key, $value),
+            ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->modifyKeyWithValue($key, $value),
             /** pre-run actions */
             [],
             /** post-run actions */
@@ -189,7 +185,7 @@ class ProjectRunnerBuilder
     {
         $this->addAction(
             /** main action */
-            (new ChangeConfigFileEntries($filePath, $contentType))->addKeyWithValue($key, $value),
+            ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->addKeyWithValue($key, $value),
             /** pre-run actions */
             [],
             /** post-run actions */
@@ -222,7 +218,7 @@ class ProjectRunnerBuilder
     {
         $this->addAction(
             /** main action */
-            (new ChangeConfigFileEntries($filePath, $contentType))->removeKey($key),
+            ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->removeKey($key),
             /** pre-run actions */
             [],
             /** post-run actions */
