@@ -3,6 +3,7 @@
 namespace Forte\Worker\Actions;
 
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\Dates;
 
@@ -345,7 +346,7 @@ class ActionResult
             // The main action failures
             $array['main_action_failures'] = [];
             foreach ($this->actionFailures as $failure) {
-                if ($failure instanceof ActionException) {
+                if ($failure instanceof WorkerException) {
                     $array['main_action_failures'][] = $failure->toArray();
                 }
             }
