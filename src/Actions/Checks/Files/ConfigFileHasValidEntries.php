@@ -13,6 +13,7 @@ namespace Forte\Worker\Actions\Checks\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
@@ -74,7 +75,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
      */
     public function hasKey(string $key): self
     {
-        $verifyArray = new VerifyArray($key, VerifyArray::CHECK_ANY);
+        $verifyArray = ActionFactory::createVerifyArray($key, VerifyArray::CHECK_ANY);
         $this->checks[] = $verifyArray;
 
         return $this;
@@ -90,7 +91,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
      */
     public function doesNotHaveKey(string $key): self
     {
-        $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_MISSING_KEY);
+        $this->checks[] = ActionFactory::createVerifyArray($key, VerifyArray::CHECK_MISSING_KEY);
 
         return $this;
     }
@@ -105,7 +106,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
      */
     public function hasKeyWithEmptyValue(string $key): self
     {
-        $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_EMPTY);
+        $this->checks[] = ActionFactory::createVerifyArray($key, VerifyArray::CHECK_EMPTY);
 
         return $this;
     }
@@ -120,7 +121,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
      */
     public function hasKeyWithNonEmptyValue(string $key): self
     {
-        $this->checks[] = new VerifyArray($key, VerifyArray::CHECK_EMPTY, null, true);
+        $this->checks[] = ActionFactory::createVerifyArray($key, VerifyArray::CHECK_EMPTY, null, true);
 
         return $this;
     }
@@ -144,7 +145,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
         string $action = VerifyArray::CHECK_CONTAINS
     ): self
     {
-        $this->checks[] = new VerifyArray($key, $action, $value);
+        $this->checks[] = ActionFactory::createVerifyArray($key, $action, $value);
 
         return $this;
     }
