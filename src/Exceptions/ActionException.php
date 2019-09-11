@@ -67,12 +67,12 @@ class ActionException extends WorkerException
     }
 
     /**
-     * Add the given ActionException instance to the list of
+     * Add the given WorkerException instance to the list of
      * children action failures.
      *
-     * @param ActionException $actionException The failure to add.
+     * @param WorkerException $actionException The failure to add.
      */
-    public function addChildFailure(ActionException $actionException): void
+    public function addChildFailure(WorkerException $actionException): void
     {
         $this->childrenFailures[] = $actionException;
     }
@@ -98,7 +98,7 @@ class ActionException extends WorkerException
         // The children failures
         $array['children_failures'] = [];
         foreach ($this->childrenFailures as $childrenFailure) {
-            if ($childrenFailure instanceof ActionException) {
+            if ($childrenFailure instanceof WorkerException) {
                 $array['children_failures'][] = $childrenFailure->toArray();
             }
         }
@@ -135,7 +135,7 @@ class ActionException extends WorkerException
         }
 
         foreach ($actionException->getChildrenFailures() as $actionFailure) {
-            if (self::checkForFatalFailures($actionFailure)) {
+            if ($actionFailure instanceof ActionException && self::checkForFatalFailures($actionFailure)) {
                 return true;
             }
         }
