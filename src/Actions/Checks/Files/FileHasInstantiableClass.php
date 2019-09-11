@@ -38,6 +38,7 @@ class FileHasInstantiableClass extends FileExists
         $this->class = $class;
     }
 
+//TODO RENAME TO hasClass
     /**
      * Set the expected class to be searched in the configured file path.
      *
@@ -51,7 +52,7 @@ class FileHasInstantiableClass extends FileExists
 
         return $this;
     }
-
+//TODO PARENT METHOD setPath SHOULD BE RENAME or WE SHOULD DEFINE HERE A METHOD inPath()
     /**
      * Return a human-readable string representation of this
      * FileHasInstantiableClass instance.
