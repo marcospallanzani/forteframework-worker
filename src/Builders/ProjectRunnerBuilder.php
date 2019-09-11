@@ -7,7 +7,6 @@ use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Runners\ProjectRunner;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
-use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 
 /**
  * Class ProjectRunnerBuilder
@@ -45,7 +44,7 @@ class ProjectRunnerBuilder
 
         $this->addAction(
             /** main action */
-            (new UnzipFile())->open($zipFilePath)->extractTo($fullProjectPath),
+            ActionFactory::createUnzipFile()->open($zipFilePath)->extractTo($fullProjectPath),
             /** pre-run actions */
             [ActionFactory::createFileExists($zipFilePath)],
             /** post-run actions */
