@@ -6,7 +6,6 @@ use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Runners\ProjectRunner;
-use Forte\Worker\Actions\Transforms\EmptyTransform;
 
 /**
  * Class ProjectRunnerBuilder
@@ -123,7 +122,7 @@ class ProjectRunnerBuilder
     {
         $this->addAction(
         /** main action */
-            new EmptyTransform(),
+            ActionFactory::createEmptyTransform(),
             /** pre-run actions */
             [ActionFactory::createFileHasInstantiableClass($classFilePath, $className)]
         );

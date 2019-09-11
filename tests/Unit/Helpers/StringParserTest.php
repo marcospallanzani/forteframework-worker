@@ -11,7 +11,7 @@
 
 namespace Tests\Unit\Helpers;
 
-use Forte\Worker\Actions\Transforms\EmptyTransform;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Helpers\StringParser;
 use Tests\Unit\BaseTest;
 
@@ -42,7 +42,7 @@ class StringParserTest extends BaseTest
             [100.10, '100.1'],
             [['test1' => 'value1'], '{"test1":"value1"}'],
             [$stdClass, 'Class type: stdClass. Object value: {"test1":"value1"}.'],
-            [new EmptyTransform(), 'Class type: Forte\Worker\Actions\Transforms\EmptyTransform. Object value: Empty transform.'],
+            [ActionFactory::createEmptyTransform(), 'Class type: Forte\Worker\Actions\Transforms\EmptyTransform. Object value: Empty transform.'],
         ];
     }
 
