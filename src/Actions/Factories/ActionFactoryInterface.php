@@ -13,7 +13,7 @@ use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
-use Forte\Worker\Actions\Transforms\Files\ChangeFileEntries;
+use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
 use Forte\Worker\Actions\Transforms\Files\MoveDirectory;
@@ -112,13 +112,13 @@ interface ActionFactoryInterface
     public static function createModifyArray(...$parameters): ModifyArray;
 
     /**
-     * Create an instance of the ChangeFileEntries class.
+     * Create an instance of the ChangeConfigFileEntries class.
      *
      * @param mixed ...$parameters The construction parameters.
      *
-     * @return ChangeFileEntries An instance of ChangeFileEntries.
+     * @return ChangeConfigFileEntries An instance of ChangeConfigFileEntries.
      */
-    public static function createChangeFileEntries(...$parameters): ChangeFileEntries;
+    public static function createChangeConfigFileEntries(...$parameters): ChangeConfigFileEntries;
 
     /**
      * Create an instance of the CopyFile class.

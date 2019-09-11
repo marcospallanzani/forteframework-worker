@@ -13,7 +13,7 @@ use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
-use Forte\Worker\Actions\Transforms\Files\ChangeFileEntries;
+use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
 use Forte\Worker\Actions\Transforms\Files\MoveDirectory;
@@ -51,7 +51,7 @@ class ActionFactoryTest extends BaseTest
             [ConfigFileHasValidEntries::class, $wrongParams],
             [VerifyString::class, $wrongParams],
             [ModifyArray::class, $wrongParams],
-            [ChangeFileEntries::class, $wrongParams],
+            [ChangeConfigFileEntries::class, $wrongParams],
             [CopyFile::class, $wrongParams],
             [ModifyFile::class, $wrongParams],
             [MoveDirectory::class, $wrongParams],
@@ -100,8 +100,8 @@ class ActionFactoryTest extends BaseTest
         $this->assertInstanceOf(EmptyTransform::class, ActionFactory::createEmptyTransform());
         $this->assertInstanceOf(EmptyTransform::class, ActionFactory::create(EmptyTransform::class));
 
-        $this->assertInstanceOf(ChangeFileEntries::class, ActionFactory::createChangeFileEntries());
-        $this->assertInstanceOf(ChangeFileEntries::class, ActionFactory::create(ChangeFileEntries::class));
+        $this->assertInstanceOf(ChangeConfigFileEntries::class, ActionFactory::createChangeConfigFileEntries());
+        $this->assertInstanceOf(ChangeConfigFileEntries::class, ActionFactory::create(ChangeConfigFileEntries::class));
 
         $this->assertInstanceOf(CopyFile::class, ActionFactory::createCopyFile());
         $this->assertInstanceOf(CopyFile::class, ActionFactory::create(CopyFile::class));

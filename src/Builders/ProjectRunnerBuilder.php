@@ -10,7 +10,7 @@ use Forte\Worker\Runners\ProjectRunner;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
-use Forte\Worker\Actions\Transforms\Files\ChangeFileEntries;
+use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 
@@ -155,7 +155,7 @@ class ProjectRunnerBuilder
     {
         $this->addAction(
             /** main action */
-            (new ChangeFileEntries($filePath, $contentType))->modifyKeyWithValue($key, $value),
+            (new ChangeConfigFileEntries($filePath, $contentType))->modifyKeyWithValue($key, $value),
             /** pre-run actions */
             [],
             /** post-run actions */
@@ -182,7 +182,7 @@ class ProjectRunnerBuilder
     {
         $this->addAction(
             /** main action */
-            (new ChangeFileEntries($filePath, $contentType))->addKeyWithValue($key, $value),
+            (new ChangeConfigFileEntries($filePath, $contentType))->addKeyWithValue($key, $value),
             /** pre-run actions */
             [],
             /** post-run actions */
@@ -208,7 +208,7 @@ class ProjectRunnerBuilder
     {
         $this->addAction(
             /** main action */
-            (new ChangeFileEntries($filePath, $contentType))->removeKey($key),
+            (new ChangeConfigFileEntries($filePath, $contentType))->removeKey($key),
             /** pre-run actions */
             [],
             /** post-run actions */

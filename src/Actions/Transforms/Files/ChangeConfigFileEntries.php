@@ -10,14 +10,12 @@ use Forte\Worker\Helpers\FileParser;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 
 /**
- * Class ChangeFileEntries
+ * Class ChangeConfigFileEntries
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class ChangeFileEntries extends AbstractAction implements NestedActionCallbackInterface
+class ChangeConfigFileEntries extends AbstractAction implements NestedActionCallbackInterface
 {
-//TODO CONSIDER CHANGING THE NAME OF THIS CLASS AS IT IS NOT VERY CLEAR. IT ONLY MODIFIES json, ini, yml, xml and array FILES AND THE
-//NAME IS A BIT MISLEADING. IT SEEMS THAT IT CAN MODIFY ANY TYPES OF FILE AND ADD ANY TYPES OF CONTENT.
     /**
      * The file to modify.
      *
@@ -36,7 +34,7 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
     protected $modifications = array();
 
     /**
-     * ChangeFileEntries constructor.
+     * ChangeConfigFileEntries constructor.
      *
      * @param string $filePath The file to modify.
      * @param string $contentType The content type; accepted values are the FileParser
@@ -53,7 +51,7 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
      *
      * @param string $filePath The file to modify.
      *
-     * @return ChangeFileEntries
+     * @return ChangeConfigFileEntries
      */
     public function modify(string $filePath): self
     {
@@ -61,18 +59,18 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
 
         return $this;
     }
-//TODO FIX THIS BLOCK OF COMMENTS
+
     /**
-     * Adds a new modification to this ChangeFileEntries instance,
-     * to add the new pair key-value in the specified file. The
-     * key can have multiple nested levels, separated by the constant
+     * Add a nested action to this ChangeConfigFileEntries instance, so that
+     * it adds the given value (with the given key) in the specified file.
+     * The key can have multiple nested levels, separated by the constant
      * ModifyArray::ARRAY_LEVELS_SEPARATOR.
      *
      * @param string $key The key to add (nested levels separated by
      * constant ModifyArray::ARRAY_LEVELS_SEPARATOR).
      * @param mixed $value The value to be added for the given key.
      *
-     * @return ChangeFileEntries
+     * @return ChangeConfigFileEntries
      */
     public function addKeyWithValue(string $key, $value): self
     {
@@ -80,19 +78,18 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
 
         return $this;
     }
-//TODO FIX THIS BLOCK OF COMMENTS
+
     /**
-     * Adds a new modification to this ChangeFileEntries instance,
-     * to modify the given pair key-value in the specified file.
-     * The key can have multiple nested levels, separated by the constant
-     * ModifyArray::ARRAY_LEVELS_SEPARATOR. If the given key was not found
-     * in the specified file, a new entry will be created.
+     * Add a nested action to this ChangeConfigFileEntries instance, so that
+     * it replaces the value for the given key with the given replace value,
+     * in the specified file. The key can have multiple nested levels,
+     * separated by the constant ModifyArray::ARRAY_LEVELS_SEPARATOR.
      *
-     * @param string $key The key to add (nested levels separated by
+     * @param string $key The key to modify (nested levels separated by
      * constant ModifyArray::ARRAY_LEVELS_SEPARATOR).
      * @param mixed $value The value to be added for the given key.
      *
-     * @return ChangeFileEntries
+     * @return ChangeConfigFileEntries
      */
     public function modifyKeyWithValue(string $key, $value): self
     {
@@ -100,16 +97,17 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
 
         return $this;
     }
-//TODO FIX THIS BLOCK OF COMMENTS
+
     /**
-     * Adds a new modification to this ChangeFileEntries instance, to remove
-     * the given key in the specified file. The key can have multiple nested
-     * levels, separated by the constant ModifyArray::ARRAY_LEVELS_SEPARATOR.
+     * Add a nested action to this ChangeConfigFileEntries instance, so that it
+     * removes, from the specified file, the config entries with the given key.
+     * The key can have multiple nested levels, separated by the constant
+     * ModifyArray::ARRAY_LEVELS_SEPARATOR.
      *
-     * @param string $key The key to add (nested levels separated by
+     * @param string $key The key to remove (nested levels separated by
      * constant ModifyArray::ARRAY_LEVELS_SEPARATOR).
      *
-     * @return ChangeFileEntries
+     * @return ChangeConfigFileEntries
      */
     public function removeKey(string $key): self
     {
@@ -120,10 +118,10 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
 
     /**
      * Return a human-readable string representation of this
-     * ChangeFileEntries instance.
+     * ChangeConfigFileEntries instance.
      *
      * @return string A human-readable string representation
-     * of this ChangeFileEntries instance.
+     * of this ChangeConfigFileEntries instance.
      */
     public function stringify(): string
     {
@@ -143,8 +141,8 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
     }
 
     /**
-     * Validate this ChangeFileEntries instance using its specific validation logic.
-     * It returns true if this ChangeFileEntries instance is well configured, i.e. if:
+     * Validate this ChangeConfigFileEntries instance using its specific validation logic.
+     * It returns true if this ChangeConfigFileEntries instance is well configured, i.e. if:
      * - filePath cannot be an empty string;
      * - content type is supported (FileParser constants starting with prefix 'CONTENT_TYPE');
      * - registered modifications (instances of ModifyArray) are valid;
