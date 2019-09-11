@@ -43,4 +43,25 @@ class MissingKeyException extends WorkerException
     {
         return $this->missingKey;
     }
+
+    /**
+     * Return an array representation of this WorkerException instance.
+     *
+     * @return array Array representation of this WorkerException instance.
+     */
+    public function toArray(): array
+    {
+        $array = [];
+
+        // The missing key
+        $array['missing_key'] = $this->missingKey;
+
+        // The error message
+        $array['error_message'] = $this->message;
+
+        // The error code
+        $array['error_code'] = $this->code;
+
+        return $array;
+    }
 }
