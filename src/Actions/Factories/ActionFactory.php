@@ -9,7 +9,7 @@ use Forte\Worker\Actions\Checks\Files\DirectoryExists;
 use Forte\Worker\Actions\Checks\Files\FileDoesNotExist;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
-use Forte\Worker\Actions\Checks\Files\FileHasValidEntries;
+use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
@@ -104,15 +104,15 @@ class ActionFactory implements ActionFactoryInterface
     }
 
     /**
-     * Create an instance of the FileHasValidEntries class.
+     * Create an instance of the ConfigFileHasValidEntries class.
      *
      * @param mixed ...$parameters The construction parameters.
      *
-     * @return FileHasValidEntries An instance of FileHasValidEntries.
+     * @return ConfigFileHasValidEntries An instance of ConfigFileHasValidEntries.
      */
-    public static function createFileHasValidEntries(...$parameters): FileHasValidEntries
+    public static function createConfigFileHasValidEntries(...$parameters): ConfigFileHasValidEntries
     {
-        return new FileHasValidEntries(...$parameters);
+        return new ConfigFileHasValidEntries(...$parameters);
     }
 
     /**
@@ -296,8 +296,8 @@ class ActionFactory implements ActionFactoryInterface
                 case FileHasInstantiableClass::class:
                     return self::createFileHasInstantiableClass(...$parameters);
                     break;
-                case FileHasValidEntries::class:
-                    return self::createFileHasValidEntries(...$parameters);
+                case ConfigFileHasValidEntries::class:
+                    return self::createConfigFileHasValidEntries(...$parameters);
                     break;
                 case VerifyString::class:
                     return self::createVerifyString(...$parameters);

@@ -8,7 +8,7 @@ use Forte\Worker\Actions\Checks\Files\DirectoryExists;
 use Forte\Worker\Actions\Checks\Files\FileDoesNotExist;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
-use Forte\Worker\Actions\Checks\Files\FileHasValidEntries;
+use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
@@ -48,7 +48,7 @@ class ActionFactoryTest extends BaseTest
             [FileDoesNotExist::class, $wrongParams],
             [FileExists::class, $wrongParams],
             [FileHasInstantiableClass::class, $wrongParams],
-            [FileHasValidEntries::class, $wrongParams],
+            [ConfigFileHasValidEntries::class, $wrongParams],
             [VerifyString::class, $wrongParams],
             [ModifyArray::class, $wrongParams],
             [ChangeFileEntries::class, $wrongParams],
@@ -88,8 +88,8 @@ class ActionFactoryTest extends BaseTest
         $this->assertInstanceOf(FileHasInstantiableClass::class, ActionFactory::createFileHasInstantiableClass());
         $this->assertInstanceOf(FileHasInstantiableClass::class, ActionFactory::create(FileHasInstantiableClass::class));
 
-        $this->assertInstanceOf(FileHasValidEntries::class, ActionFactory::createFileHasValidEntries());
-        $this->assertInstanceOf(FileHasValidEntries::class, ActionFactory::create(FileHasValidEntries::class));
+        $this->assertInstanceOf(ConfigFileHasValidEntries::class, ActionFactory::createConfigFileHasValidEntries());
+        $this->assertInstanceOf(ConfigFileHasValidEntries::class, ActionFactory::create(ConfigFileHasValidEntries::class));
 
         $this->assertInstanceOf(VerifyString::class, ActionFactory::createVerifyString());
         $this->assertInstanceOf(VerifyString::class, ActionFactory::create(VerifyString::class));

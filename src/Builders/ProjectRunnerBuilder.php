@@ -5,7 +5,7 @@ namespace Forte\Worker\Builders;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Checks\Files\DirectoryExists;
-use Forte\Worker\Actions\Checks\Files\FileHasValidEntries;
+use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Runners\ProjectRunner;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
@@ -159,7 +159,7 @@ class ProjectRunnerBuilder
             /** pre-run actions */
             [],
             /** post-run actions */
-            [(new FileHasValidEntries($filePath, $contentType))->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)]
+            [(new ConfigFileHasValidEntries($filePath, $contentType))->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)]
         );
 
         return $this;
@@ -186,7 +186,7 @@ class ProjectRunnerBuilder
             /** pre-run actions */
             [],
             /** post-run actions */
-            [(new FileHasValidEntries($filePath, $contentType))->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)]
+            [(new ConfigFileHasValidEntries($filePath, $contentType))->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS)]
         );
 
         return $this;
@@ -212,7 +212,7 @@ class ProjectRunnerBuilder
             /** pre-run actions */
             [],
             /** post-run actions */
-            [(new FileHasValidEntries($filePath, $contentType))->doesNotHaveKey($key)]
+            [(new ConfigFileHasValidEntries($filePath, $contentType))->doesNotHaveKey($key)]
         );
 
         return $this;

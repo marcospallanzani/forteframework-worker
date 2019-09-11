@@ -20,11 +20,11 @@ use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Helpers\FileParser;
 
 /**
- * Class FileHasValidEntries
+ * Class ConfigFileHasValidEntries
  *
  * @package Forte\Worker\Actions\Checks\Files
  */
-class FileHasValidEntries extends FileExists implements NestedActionCallbackInterface
+class ConfigFileHasValidEntries extends FileExists implements NestedActionCallbackInterface
 {
     /**
      * @var string
@@ -37,7 +37,7 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
     protected $checks = array();
 
     /**
-     * FileHasValidEntries constructor.
+     * ConfigFileHasValidEntries constructor.
      *
      * @param string $filePath The file path to check.
      * @param string $contentType The file content type.
@@ -55,7 +55,7 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
      * @param string $type The content type; accepted values are the
      * FileParser class constants with prefix "CONTENT_TYPE".
      *
-     * @return FileHasValidEntries
+     * @return ConfigFileHasValidEntries
      */
     public function contentType(string $type): self
     {
@@ -70,7 +70,7 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
      *
      * @param string $key The expected key.
      *
-     * @return FileHasValidEntries
+     * @return ConfigFileHasValidEntries
      */
     public function hasKey(string $key): self
     {
@@ -86,7 +86,7 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
      *
      * @param string $key The expected key.
      *
-     * @return FileHasValidEntries
+     * @return ConfigFileHasValidEntries
      */
     public function doesNotHaveKey(string $key): self
     {
@@ -101,7 +101,7 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
      *
      * @param string $key The key with an expected empty value.
      *
-     * @return FileHasValidEntries
+     * @return ConfigFileHasValidEntries
      */
     public function hasKeyWithEmptyValue(string $key): self
     {
@@ -116,7 +116,7 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
      *
      * @param string $key The key with an expected non-empty value.
      *
-     * @return FileHasValidEntries
+     * @return ConfigFileHasValidEntries
      */
     public function hasKeyWithNonEmptyValue(string $key): self
     {
@@ -136,7 +136,7 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
      * @param string $action The comparison action to be performed. Accepted
      * values are the VerifyArray constants with prefix "CHECK_".
      *
-     * @return FileHasValidEntries
+     * @return ConfigFileHasValidEntries
      */
     public function hasKeyWithValue(
         string $key,
@@ -151,10 +151,10 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
 
     /**
      * Return a human-readable string representation of this
-     * FileHasValidEntries instance.
+     * ConfigFileHasValidEntries instance.
      *
      * @return string A human-readable string representation
-     * of this FileHasValidEntries instance.
+     * of this ConfigFileHasValidEntries instance.
      */
     public function stringify(): string
     {
@@ -169,15 +169,15 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
     /**
      * Whether this instance is in a valid state or not.
      *
-     * @return bool Returns true if this FileHasValidEntries
+     * @return bool Returns true if this ConfigFileHasValidEntries
      * instance was well configured; false otherwise.
      *
      * @throws ActionException
      */
 
     /**
-     * Validate this FileHasValidEntries instance using its specific validation logic.
-     * It returns true if this FileHasValidEntries instance respects the following rules:
+     * Validate this ConfigFileHasValidEntries instance using its specific validation logic.
+     * It returns true if this ConfigFileHasValidEntries instance respects the following rules:
      * - the field 'filePath' must be specified and not empty;
      * - the field 'contentType' is not empty and has an accepted value;
      * - the configured checks are in a valid state too;

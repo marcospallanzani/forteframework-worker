@@ -9,7 +9,7 @@ use Forte\Worker\Actions\Checks\Files\DirectoryExists;
 use Forte\Worker\Actions\Checks\Files\FileDoesNotExist;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
-use Forte\Worker\Actions\Checks\Files\FileHasValidEntries;
+use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
@@ -85,13 +85,13 @@ interface ActionFactoryInterface
     public static function createFileHasInstantiableClass(...$parameters): FileHasInstantiableClass;
 
     /**
-     * Create an instance of the FileHasValidEntries class.
+     * Create an instance of the ConfigFileHasValidEntries class.
      *
      * @param mixed ...$parameters The construction parameters.
      *
-     * @return FileHasValidEntries An instance of FileHasValidEntries.
+     * @return ConfigFileHasValidEntries An instance of ConfigFileHasValidEntries.
      */
-    public static function createFileHasValidEntries(...$parameters): FileHasValidEntries;
+    public static function createConfigFileHasValidEntries(...$parameters): ConfigFileHasValidEntries;
 
     /**
      * Create an instance of the VerifyString class.
