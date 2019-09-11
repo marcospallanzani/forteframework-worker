@@ -52,7 +52,7 @@ class ConfigFile implements ArrayableInterface
      */
     public function getRequiredParameter(string $key)
     {
-        return FileParser::getRequiredNestedArrayValue($key, $this->configEntries);
+        return Collection::getRequiredNestedArrayValue($key, $this->configEntries);
     }
 
     /**

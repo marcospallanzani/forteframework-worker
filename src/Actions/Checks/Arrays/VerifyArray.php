@@ -6,7 +6,7 @@ use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\MissingKeyException;
 use Forte\Worker\Helpers\ClassAccessTrait;
-use Forte\Worker\Helpers\FileParser;
+use Forte\Worker\Helpers\Collection;
 use Forte\Worker\Helpers\StringParser;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
 
@@ -375,7 +375,7 @@ class VerifyArray extends AbstractAction
         $matched = false;
 
         try {
-            $value = FileParser::getRequiredNestedArrayValue($this->key, $this->checkContent);
+            $value = Collection::getRequiredNestedArrayValue($this->key, $this->checkContent);
 
             // If no exceptions are thrown, then the key was found in the given config array
             switch($this->action) {

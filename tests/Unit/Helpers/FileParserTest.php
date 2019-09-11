@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Helpers;
 
-use Forte\Worker\Exceptions\MissingKeyException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\FileParser;
 use Tests\Unit\BaseTest;
@@ -14,46 +13,6 @@ use Tests\Unit\BaseTest;
  */
 class FileParserTest extends BaseTest
 {
-    /**
-     * A general test array.
-     *
-     * @var array
-     */
-    protected $testArray = [
-        'test1' => [
-            'test2' => 'value2'
-        ],
-        'test5' => [
-            'test6' => [
-                'test7' => [
-                    'test8' => [
-                        'test9' => [
-                            'test10' => 'value10'
-                        ]
-                    ]
-                ],
-            ]
-        ],
-    ];
-
-    /**
-     * Data provider for all config access tests.
-     *
-     * @return array
-     */
-    public function configProvider(): array
-    {
-        return [
-            //  access key | content to be checked | expected value for the given key | an exception is expected
-            ['test1', $this->testArray, ['test2' => 'value2'], false],
-            ['WRONG-KEY', $this->testArray, ['test2' => 'value2'], true],
-            ['test1.test2', $this->testArray, 'value2', false],
-            ['test1.WRONG-KEY', $this->testArray, 'value2', true],
-            ['test5.test6.test7.test8.test9', $this->testArray, ['test10' => 'value10'], false],
-            ['test5.test6.test7.WRONG-KEY.test9', $this->testArray, ['test10' => 'value10'], true],
-        ];
-    }
-
     /**
      * Data provider for parse tests.
      *
@@ -139,31 +98,6 @@ class FileParserTest extends BaseTest
     {
         $this->expectException(WorkerException::class);
         FileParser::parseFile($filePath, $contentType);
-    }
-
-    /**
-     * Test the method FileParser::getRequiredNestedConfigValue().
-     *
-     * @dataProvider configProvider
-     *
-     * @param string $key
-     * @param array $checkContent
-     * @param mixed $expectedValue
-     * @param bool $expectException
-     *
-     * @throws MissingKeyException
-     */
-    public function testRequiredNestedConfigValue(
-        string $key,
-        array $checkContent,
-        $expectedValue,
-        bool $expectException
-    ): void
-    {
-        if ($expectException) {
-            $this->expectException(MissingKeyException::class);
-        }
-        $this->assertEquals($expectedValue, FileParser::getRequiredNestedArrayValue($key, $checkContent));
     }
 
     /**
