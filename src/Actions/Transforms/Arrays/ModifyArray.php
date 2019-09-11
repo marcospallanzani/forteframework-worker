@@ -5,6 +5,7 @@ namespace Forte\Worker\Actions\Transforms\Arrays;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Helpers\ClassAccessTrait;
+use Forte\Worker\Helpers\Collection;
 use Forte\Worker\Helpers\StringParser;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
 
@@ -23,11 +24,6 @@ class ModifyArray extends AbstractAction
     const MODIFY_ADD          = "modify_add";
     const MODIFY_REMOVE_KEY   = "modify_remove_key";
     const MODIFY_CHANGE_VALUE = "modify_change_value";
-
-    /**
-     * Elements separator
-     */
-    const ARRAY_LEVELS_SEPARATOR = ".";
 
     /**
      * @var string
@@ -270,7 +266,7 @@ class ModifyArray extends AbstractAction
      */
     protected function applyChangeToArray(array &$array, string $key, string $action, $modifiedValue): array
     {
-        $keysTree = explode(self::ARRAY_LEVELS_SEPARATOR, $key, 2);
+        $keysTree = explode(Collection::ARRAY_KEYS_LEVEL_SEPARATOR, $key, 2);
         $value = null;
         if (count($keysTree) <= 2) {
             // We check if a value for the current array key exists;
