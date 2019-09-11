@@ -7,7 +7,6 @@ use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Runners\ProjectRunner;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
-use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 
 /**
@@ -94,7 +93,7 @@ class ProjectRunnerBuilder
         string $targetFolder = ''
     ): self
     {
-        $copy = (new CopyFile())
+        $copy = ActionFactory::createCopyFile()
             ->copy($sourceFilePath)
             ->toFolder($targetFolder)
             ->withName($targetFileName)
