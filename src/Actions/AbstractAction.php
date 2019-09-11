@@ -376,6 +376,56 @@ abstract class AbstractAction implements ValidActionInterface
     }
 
     /**
+     * Check if the given nested actions are valid.
+     *
+     * @param array $nestedActions The list of nested actions to check.
+     * @param string $expectedActionClass The expected class name
+     * of the nested action instances.
+     *
+     * @return bool True if all the given actions are valid.
+     *
+     * @throws ValidationException If one or more actions in the
+     * given list are not valid.
+     */
+    protected function validateNestedActionsList(array $nestedActions, string $expectedActionClass): bool
+    {
+        // Check if the given nested actions are well configured
+        $wrongNestedActions = array();
+        foreach ($nestedActions as $nestedAction) {
+            /** @var AbstractAction $nestedAction */
+            // We check if the given actions are of the expected type
+            if (!is_a($nestedAction, $expectedActionClass)) {
+                $wrongNestedActions[] = $this->getActionException(
+                    $this,
+                    "Unsupported nested action type [%s] registered in class [%s]. " .
+                    "Nested actions should be instances of [%s]",
+                    (is_object($nestedAction) ? get_class($nestedAction) : gettype($nestedAction)),
+                    static::class,
+                    $expectedActionClass
+                );
+            }
+
+            try {
+                // We check if the current action is valid
+                $nestedAction->isValid();
+            } catch (ValidationException $actionException) {
+                $wrongNestedActions[] = $actionException;
+            }
+        }
+
+        // We check if some nested actions are not valid: if so, we throw an exception
+        if ($wrongNestedActions) {
+            $this->throwValidationExceptionWithChildren(
+                $this,
+                $wrongNestedActions,
+                "One or more nested actions are not valid."
+            );
+        }
+
+        return true;
+    }
+
+    /**
      * Run the pre-run actions and return a list failed AbstractAction instances.
      *
      * @param ActionResult $actionResult The parent ActionResult instance.
