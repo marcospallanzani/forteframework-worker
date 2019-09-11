@@ -371,10 +371,16 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
             // We check if the condition object is valid
             $condition = $action['condition'];
             if (!$condition instanceof VerifyString) {
-                $wrongActionsAndConditions[] = $this->getValidationException(
-                    new VerifyString(''),
-                    "Unsupported condition type given [%s]. Supported types are [%s]",
+                $wrongActionsAndConditions[] = $this->getActionException(
+                    $this,
+                    "Unsupported nested condition of type [%s] registered in class [%s] " .
+                    "with action type [%s], search value [%s] and replace value [%s]. " .
+                    "Nested conditions should be instances of [%s]",
                     (is_object($condition) ? get_class($condition) : gettype($condition)),
+                    self::class,
+                    $action["action"],
+                    $action["search"],
+                    $action["value"],
                     VerifyString::class
                 );
             }
@@ -401,7 +407,7 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
         if ($wrongActionsAndConditions) {
             $this->throwValidationExceptionWithChildren(
                 $this,
-                [$wrongActionsAndConditions],
+                $wrongActionsAndConditions,
                 "One or more nested actions are not valid."
             );
         }
