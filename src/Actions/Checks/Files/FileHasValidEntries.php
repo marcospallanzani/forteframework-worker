@@ -201,28 +201,11 @@ class FileHasValidEntries extends FileExists implements NestedActionCallbackInte
             );
         }
 
-        // Check if the specified checks are well configured
-        $wrongChecks = array();
-        foreach ($this->checks as $check) {
-            // We validate all the nested checks
-            try {
-                /** @var AbstractAction $check */
-                $check->isValid();
-            } catch (ValidationException $validationException) {
-                $wrongChecks[] = $validationException;
-            }
-        }
-
-        // We check if some nested checks are not valid: if so, we throw an exception
-        if ($wrongChecks) {
-            $this->throwValidationExceptionWithChildren(
-                $this,
-                [$wrongChecks],
-                "One or more nested actions are not valid."
-            );
-        }
-
-        return true;
+        /**
+         * We validate the list of nested checks: if they are all valid,
+         * true will be returned; otherwise, an exception will be thrown.
+         */
+        return $this->validateNestedActionsList($this->checks, VerifyArray::class);
     }
 
     /**
