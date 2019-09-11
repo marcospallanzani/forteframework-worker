@@ -14,6 +14,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
+use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
@@ -243,7 +244,7 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
             "action"    => $actionType,
             'search'    => $searchValue,
             "value"     => $replaceValue,
-            "condition" => new VerifyString($conditionType, $conditionValue)
+            "condition" => ActionFactory::createVerifyString($conditionType, $conditionValue)
         ];
 
         return $this;
