@@ -6,7 +6,6 @@ use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Helpers\FileParser;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 
@@ -130,7 +129,14 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
     {
         $message = "Modify the file '" . $this->filePath . "' with the following modifications.";
         foreach ($this->modifications as $key => $modification) {
-            $message .= " $key. " . (string) $modification;
+            if ($modification instanceof AbstractAction) {
+                $modificationText = (string) $modification;
+            } elseif (is_object($modification)) {
+                $modificationText = get_class($modification);
+            } else {
+                $modificationText = gettype($modification);
+            }
+            $message .= " $key. " . $modificationText;
         }
 
         return $message;
@@ -169,37 +175,15 @@ class ChangeFileEntries extends AbstractAction implements NestedActionCallbackIn
             );
         }
 
-        // Check if the specified modifications are well configured
-        $wrongModifications = array();
-        foreach ($this->modifications as $modification) {
-
-            if (!$modification instanceof ModifyArray) {
-                $this->throwValidationException(
-                    $this,
-                    "Modifications should be registered as instances of class %s.",
-                    ModifyArray::class
-                );
-            }
-
-            try {
-                // We check if the current modification is valid; if not valid,
-                // an ActionException should be thrown
-                $modification->isValid();
-            } catch (ValidationException $actionException) {
-                $wrongModifications[] = $actionException;
-            }
-        }
-
-        // We check if some nested actions are not valid: if so, we throw an exception
-        if ($wrongModifications) {
-            $this->throwValidationExceptionWithChildren(
-                $this,
-                [$wrongModifications],
-                "One or more nested actions are not valid."
-            );
-        }
-
-        return true;
+        /**
+         * We validate the list of nested modifications:
+         * if they are all valid, true will be returned;
+         * otherwise, an exception will be thrown.
+         */
+        return $this->validateNestedActionsList(
+            $this->modifications,
+            ModifyArray::class
+        );
     }
 
     /**
