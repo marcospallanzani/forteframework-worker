@@ -15,6 +15,7 @@ use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
+use Forte\Worker\Actions\Transforms\Files\MakeDirectory;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
 use Forte\Worker\Actions\Transforms\Files\MoveDirectory;
 use Forte\Worker\Actions\Transforms\Files\MoveFile;
@@ -60,6 +61,7 @@ class ActionFactoryTest extends BaseTest
             [RenameDirectory::class, $wrongParams],
             [RenameFile::class, $wrongParams],
             [UnzipFile::class, $wrongParams],
+            [MakeDirectory::class, $wrongParams],
         ];
     }
 
@@ -126,6 +128,9 @@ class ActionFactoryTest extends BaseTest
 
         $this->assertInstanceOf(UnzipFile::class, ActionFactory::createUnzipFile());
         $this->assertInstanceOf(UnzipFile::class, ActionFactory::create(UnzipFile::class));
+
+        $this->assertInstanceOf(MakeDirectory::class, ActionFactory::createMakeDirectory());
+        $this->assertInstanceOf(MakeDirectory::class, ActionFactory::create(MakeDirectory::class));
     }
 
     /**

@@ -15,6 +15,7 @@ use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
+use Forte\Worker\Actions\Transforms\Files\MakeDirectory;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
 use Forte\Worker\Actions\Transforms\Files\MoveDirectory;
 use Forte\Worker\Actions\Transforms\Files\MoveFile;
@@ -260,6 +261,18 @@ class ActionFactory implements ActionFactoryInterface
     }
 
     /**
+     * Create an instance of the MakeDirectory class.
+     *
+     * @param mixed ...$parameters The construction parameters.
+     *
+     * @return MakeDirectory An instance of MakeDirectory.
+     */
+    public static function createMakeDirectory(...$parameters): MakeDirectory
+    {
+        return new MakeDirectory(...$parameters);
+    }
+
+    /**
      * Create an instance of the given Abstract subclass
      * name (full namespace).
      *
@@ -334,6 +347,9 @@ class ActionFactory implements ActionFactoryInterface
                     break;
                 case EmptyTransform::class:
                     return self::createEmptyTransform(...$parameters);
+                    break;
+                case MakeDirectory::class:
+                    return self::createMakeDirectory(...$parameters);
                     break;
                 default:
                     throw new WorkerException("The given action type '$class' is not supported.");
