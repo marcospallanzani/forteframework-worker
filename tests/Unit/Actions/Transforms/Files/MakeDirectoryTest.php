@@ -17,7 +17,8 @@ class MakeDirectoryTest extends BaseTest
     /**
      * Test constants.
      */
-    const TEST_DIR_TMP    = __DIR__ . '/tomake';
+    const TEST_DIR_TMP       = __DIR__ . '/tomake';
+    const TEST_DIR_EXIST_TMP = __DIR__ . '/already-made';
 
     /**
      * This method is called before each test.
@@ -30,6 +31,11 @@ class MakeDirectoryTest extends BaseTest
         if (is_dir(self::TEST_DIR_TMP)) {
             @rmdir(self::TEST_DIR_TMP);
         }
+
+        if (is_dir(self::TEST_DIR_EXIST_TMP)) {
+            @rmdir(self::TEST_DIR_EXIST_TMP);
+        }
+        @mkdir(self::TEST_DIR_EXIST_TMP);
     }
 
     /**
@@ -39,6 +45,7 @@ class MakeDirectoryTest extends BaseTest
     {
         parent::tearDown();
         @rmdir(self::TEST_DIR_TMP);
+        @rmdir(self::TEST_DIR_EXIST_TMP);
     }
 
     /**
@@ -54,10 +61,13 @@ class MakeDirectoryTest extends BaseTest
             /** Negative cases */
             /** not successful, no fatal */
             ['', false, false, false, false, false, "Create directory ''."],
+            [self::TEST_DIR_EXIST_TMP, true, false, false, false, false, "Create directory '".self::TEST_DIR_EXIST_TMP."'."],
             /** fatal */
             ['', false, true, false, false, true, "Create directory ''."],
+            [self::TEST_DIR_EXIST_TMP, true, true, false, false, true, "Create directory '".self::TEST_DIR_EXIST_TMP."'."],
             /** success required */
             ['', false, false, true, false, true, "Create directory ''."],
+            [self::TEST_DIR_EXIST_TMP, true, false, true, false, true, "Create directory '".self::TEST_DIR_EXIST_TMP."'."],
         ];
     }
 

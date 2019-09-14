@@ -4,6 +4,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
+use Forte\Worker\Exceptions\WorkerException;
 
 /**
  * Class MakeDirectory. Class to create a directory (it allows the creation of nested directories).
@@ -57,9 +58,14 @@ class MakeDirectory extends AbstractAction
      * @return ActionResult The ActionResult instance with updated fields
      * regarding failures and result content.
      *
+     * @throws WorkerException If the given directory already exists.
      */
     protected function apply(ActionResult $actionResult): ActionResult
     {
+        if (is_dir($this->directoryPath)) {
+            $this->throwWorkerException("Directory '%s' already exists.", $this->directoryPath);
+        }
+
         return $actionResult->setResult(
             @mkdir(
                 $this->directoryPath,
