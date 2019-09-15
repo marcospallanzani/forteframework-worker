@@ -41,6 +41,20 @@ class ActionResult
     protected $result;
 
     /**
+     * List of all action result instances created by the run action of
+     * AbstractAction subclass instance wrapped by this class.
+     *
+     * This is used if the wrapped action has nested actions or is
+     * a conditional action.
+     *
+     * In case that the wrapped action does not have any nested actions,
+     * or is not a conditional action, then this array is not used.
+     *
+     * @var array
+     */
+    protected $actionsResults = [];
+
+    /**
      * List of all failures for the AbstractAction subclass instance
      * wrapped in this ActionResult instance. It is a list of all the
      * exception objects with all the error details that caused the
@@ -190,6 +204,34 @@ class ActionResult
     }
 
     /**
+     * Return a list of all action results. This list is used to save
+     * all action results of the nested actions of the AbstractAction
+     * subclass instance wrapped by this ActionResult instance.
+     *
+     * @return array
+     */
+    public function getActionResults(): array
+    {
+        return $this->actionsResults;
+    }
+
+    /**
+     * Add the given ActionResult instance to the list of nested action
+     * results.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to add
+     * to the list of nested action results.
+     *
+     * @return $this
+     */
+    public function addActionResult(ActionResult $actionResult): self
+    {
+        $this->actionsResults[$actionResult->getActionUniqueExecutionId()] = clone $actionResult;
+
+        return $this;
+    }
+
+    /**
      * Return a list of all action failures for the AbstractAction
      * subclass instance wrapped by this ActionResult instance.
      *
@@ -204,10 +246,14 @@ class ActionResult
      * Add the given action failure to this ActionResult instance.
      *
      * @param ActionException $actionFailure The ActionException instance to add.
+     *
+     * @return ActionResult
      */
-    public function addActionFailure(ActionException $actionFailure): void
+    public function addActionFailure(ActionException $actionFailure): self
     {
         $this->actionFailures[] = $actionFailure;
+
+        return $this;
     }
 
     /**
@@ -224,10 +270,14 @@ class ActionResult
      * Add the given ActionResult instance to the list of successful pre-run ActionResult instances.
      *
      * @param ActionResult $actionResult The pre-run ActionResult instance to add.
+     *
+     * @return ActionResult
      */
-    public function addPreRunActionResult(ActionResult $actionResult): void
+    public function addPreRunActionResult(ActionResult $actionResult): self
     {
-        $this->preRunActionResults[] = clone $actionResult;
+        $this->preRunActionResults[$actionResult->getActionUniqueExecutionId()] = clone $actionResult;
+
+        return $this;
     }
 
     /**
@@ -243,11 +293,15 @@ class ActionResult
     /**
      * Add the given ActionResult instance to the list of failed pre-run ActionResult instances.
      *
-     * @param ActionResult $failedActionResult The pre-run ActionResult instance to add.
+     * @param ActionResult $actionResult The pre-run ActionResult instance to add.
+     *
+     * @return ActionResult
      */
-    public function addFailedPreRunActionResult(ActionResult $failedActionResult): void
+    public function addFailedPreRunActionResult(ActionResult $actionResult): self
     {
-        $this->failedPreRunActionResults[] = clone $failedActionResult;
+        $this->failedPreRunActionResults[$actionResult->getActionUniqueExecutionId()] = clone $actionResult;
+
+        return $this;
     }
 
     /**
@@ -264,10 +318,14 @@ class ActionResult
      * Add the given ActionResult instance to the list of successful post-run ActionResult instances.
      *
      * @param ActionResult $actionResult The post-run ActionResult instance to add.
+     *
+     * @return ActionResult
      */
-    public function addPostRunActionResult(ActionResult $actionResult): void
+    public function addPostRunActionResult(ActionResult $actionResult): self
     {
-        $this->postRunActionResults[] = clone $actionResult;
+        $this->postRunActionResults[$actionResult->getActionUniqueExecutionId()] = clone $actionResult;
+
+        return $this;
     }
 
 
@@ -284,11 +342,15 @@ class ActionResult
     /**
      * Add the given ActionResult instance to the list of failed post-run ActionResult instances.
      *
-     * @param ActionResult $failedActionResult The post-run ActionResult instance to add.
+     * @param ActionResult $actionResult The post-run ActionResult instance to add.
+     *
+     * @return ActionResult
      */
-    public function addFailedPostRunActionResult(ActionResult $failedActionResult): void
+    public function addFailedPostRunActionResult(ActionResult $actionResult): self
     {
-        $this->failedPostRunActionResults[] = clone $failedActionResult;
+        $this->failedPostRunActionResults[$actionResult->getActionUniqueExecutionId()] = clone $actionResult;
+
+        return $this;
     }
 
     /**
@@ -308,10 +370,23 @@ class ActionResult
     }
 
     /**
+     * Return the unique execution id of the AbstractAction subclass
+     * instance wrapped by this ActionResult instance.
+     *
+     * @return string The unique execution id of the AbstractAction
+     * subclass instance wrapped by this ActionResult instance.
+     */
+    public function getActionUniqueExecutionId(): string
+    {
+        return $this->action->getUniqueExecutionId();
+    }
+
+    /**
      * Convert this ActionResult instance to an array.
      *
-     * @param bool $runMode If true, all fields related to the execution of the AbstractAction
-     * subclass instance wrapped by this ActionResult instance, will be included.
+     * @param bool $runMode If true, all fields related to the execution
+     * of the AbstractAction subclass instance wrapped by this ActionResult
+     * instance, will be included.
      *
      * @return array An array representation of this ActionResult instance.
      */
