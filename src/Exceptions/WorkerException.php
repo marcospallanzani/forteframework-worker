@@ -2,12 +2,14 @@
 
 namespace Forte\Worker\Exceptions;
 
+use Forte\Worker\Actions\ArrayableInterface;
+
 /**
  * Class WorkerException
  *
  * @package Forte\Worker\Exceptions
  */
-class WorkerException extends \Exception
+class WorkerException extends \Exception implements ArrayableInterface
 {
     /**
      * Return an array representation of this WorkerException instance.

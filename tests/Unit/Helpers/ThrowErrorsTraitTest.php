@@ -12,6 +12,7 @@
 namespace Tests\Unit\Helpers;
 
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
 use Tests\Unit\BaseTest;
@@ -25,6 +26,8 @@ class ThrowErrorsTraitTest extends BaseTest
 {
     /**
      * Test ThrowErrorsTrait::throwWorkerException() method.
+     *
+     * @throws WorkerException
      */
     public function testThrowWorkerException(): void
     {
@@ -49,6 +52,8 @@ class ThrowErrorsTraitTest extends BaseTest
 
     /**
      * Test ThrowErrorsTrait::throwActionException() method.
+     *
+     * @throws ActionException
      */
     public function testThrowActionException(): void
     {
@@ -79,6 +84,8 @@ class ThrowErrorsTraitTest extends BaseTest
 
     /**
      * Test ThrowErrorsTrait::throwValidationException() method.
+     *
+     * @throws ValidationException
      */
     public function testThrowValidationException(): void
     {
@@ -108,7 +115,41 @@ class ThrowErrorsTraitTest extends BaseTest
     }
 
     /**
+     * Test ThrowErrorsTrait::throwConfigurationException() method.
+     *
+     * @throws ConfigurationException
+     */
+    public function testThrowConfigurationException(): void
+    {
+        $this->expectException(ConfigurationException::class);
+        $this->expectExceptionMessage("error message action test.");
+        $anonymousActionClass = $this->getAnonymousActionClass();
+        $anonymousActionClass->throwConfigurationException(
+            $anonymousActionClass,
+            self::BASE_TEST_MESSAGE,
+            self::ACTION_TEST_MESSAGE
+        );
+    }
+
+    /**
+     * Test ThrowErrorsTrait::getConfigurationException() method.
+     */
+    public function testGetConfigurationException(): void
+    {
+        $anonymousActionClass = $this->getAnonymousActionClass();
+        $configurationException = $anonymousActionClass->getConfigurationException(
+            $anonymousActionClass,
+            self::BASE_TEST_MESSAGE,
+            self::ACTION_TEST_MESSAGE
+        );
+        $this->assertInstanceOf(ConfigurationException::class, $configurationException);
+        $this->assertEquals('error message action test.', $configurationException->getMessage());
+    }
+
+    /**
      * Test ThrowErrorsTrait::throwActionExceptionWithChildren() method.
+     *
+     * @throws ActionException
      */
     public function testThrowActionExceptionWithChildren(): void
     {
@@ -145,6 +186,8 @@ class ThrowErrorsTraitTest extends BaseTest
 
     /**
      * Test ThrowErrorsTrait::throwValidationExceptionWithChildren() method.
+     *
+     * @throws ValidationException
      */
     public function testThrowValidationExceptionWithChildren(): void
     {

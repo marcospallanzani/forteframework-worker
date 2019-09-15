@@ -4,6 +4,7 @@ namespace Forte\Worker\Helpers;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
 
@@ -74,6 +75,42 @@ trait ThrowErrorsTrait
     ): ActionException
     {
         return new ActionException($action, vsprintf($message, $parameters));
+    }
+
+    /**
+     * Throw an ConfigurationException with the given message and parameters.
+     *
+     * @param AbstractAction $action The action that originated this error.
+     * @param string $message The exception message.
+     * @param string[] $parameters The values to replace in the error message.
+     *
+     * @throws ConfigurationException
+     */
+    public function throwConfigurationException(
+        AbstractAction $action,
+        string $message,
+        string ...$parameters
+    ): void
+    {
+        throw $this->getConfigurationException($action, $message, ...$parameters);
+    }
+
+    /**
+     * Return an ConfigurationException with the given message and parameters.
+     *
+     * @param AbstractAction $action The action that originated this error.
+     * @param string $message The exception message.
+     * @param string[] $parameters The values to replace in the error message.
+     *
+     * @return ConfigurationException
+     */
+    public function getConfigurationException(
+        AbstractAction $action,
+        string $message,
+        string ...$parameters
+    ): ConfigurationException
+    {
+        return new ConfigurationException($action, vsprintf($message, $parameters));
     }
 
     /**
