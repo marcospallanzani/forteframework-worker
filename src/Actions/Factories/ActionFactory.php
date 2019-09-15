@@ -11,6 +11,7 @@ use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
+use Forte\Worker\Actions\Conditionals\IfStatement;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
@@ -23,6 +24,7 @@ use Forte\Worker\Actions\Transforms\Files\RemoveFile;
 use Forte\Worker\Actions\Transforms\Files\RenameDirectory;
 use Forte\Worker\Actions\Transforms\Files\RenameFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
+use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Exceptions\WorkerException;
 
 /**
@@ -273,6 +275,20 @@ class ActionFactory implements ActionFactoryInterface
     }
 
     /**
+     * Create an instance of the IfStatement class.
+     *
+     * @param mixed ...$parameters The construction parameters.
+     *
+     * @return IfStatement
+     *
+     * @throws ConfigurationException
+     */
+    public static function createIfStatement(...$parameters): IfStatement
+    {
+        return new IfStatement(...$parameters);
+    }
+
+    /**
      * Create an instance of the given Abstract subclass
      * name (full namespace).
      *
@@ -350,6 +366,9 @@ class ActionFactory implements ActionFactoryInterface
                     break;
                 case MakeDirectory::class:
                     return self::createMakeDirectory(...$parameters);
+                    break;
+                case IfStatement::class:
+                    return self::createIfStatement(...$parameters);
                     break;
                 default:
                     throw new WorkerException("The given action type '$class' is not supported.");
