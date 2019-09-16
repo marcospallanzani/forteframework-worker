@@ -44,19 +44,22 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
     public function __construct(string $filePath = "", string $contentType = "")
     {
         parent::__construct();
-        $this->filePath = $filePath;
-        $this->contentType = $contentType;
+        $this->modify($filePath, $contentType);
     }
 
     /**
+     * Set the file path and content type to be modified.
      *
      * @param string $filePath The file to modify.
+     * @param string $contentType The content type; accepted values are the FileParser
+     * class constants with prefix "CONTENT_TYPE".
      *
      * @return ChangeConfigFileEntries
      */
-    public function modify(string $filePath): self
+    public function modify(string $filePath, string $contentType): self
     {
-        $this->filePath = $filePath;
+        $this->filePath    = $filePath;
+        $this->contentType = $contentType;
 
         return $this;
     }
