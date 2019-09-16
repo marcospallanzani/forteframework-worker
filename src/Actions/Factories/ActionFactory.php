@@ -279,15 +279,22 @@ class ActionFactory implements ActionFactoryInterface
     /**
      * Create an instance of the IfStatement class.
      *
-     * @param mixed ...$parameters The construction parameters.
+     * @param AbstractAction|null $defaultAction The default action to execute, in case no statements are registered
+     * or the registered statement conditions are not met.
+     * @param array $statementGroups A list of statements to register. A statement is a couple "Condition->Action",
+     * where the first element indicates the condition of the if-block, whereas the second one is the action to be
+     * executed in case its condition is met.
      *
      * @return IfStatement
      *
      * @throws ConfigurationException
      */
-    public static function createIfStatement(...$parameters): IfStatement
+    public static function createIfStatement(
+        AbstractAction $defaultAction = null,
+        array $statementGroups = array()
+    ): IfStatement
     {
-        return new IfStatement(...$parameters);
+        return new IfStatement($defaultAction, $statementGroups);
     }
 
     /**
@@ -310,6 +317,7 @@ class ActionFactory implements ActionFactoryInterface
      * @param mixed $expression The expression of this SwitchStatement instance.
      * @param AbstractAction|null $defaultAction The default action of this
      * SwitchStatement instance.
+     * @param array $cases The cases to add.
      *
      * @return SwitchStatement
      *
@@ -317,10 +325,11 @@ class ActionFactory implements ActionFactoryInterface
      */
     public static function createSwitchStatement(
         $expression = null,
-        AbstractAction $defaultAction = null
+        AbstractAction $defaultAction = null,
+        array $cases = []
     ): SwitchStatement
     {
-        return new SwitchStatement($expression, $defaultAction);
+        return new SwitchStatement($expression, $defaultAction, $cases);
     }
 
     /**

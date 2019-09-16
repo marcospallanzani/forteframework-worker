@@ -33,13 +33,20 @@ class IfStatement extends AbstractAction
     /**
      * IfStatement constructor.
      *
-     * @param array $statementGroups A list of Condition Action - Run Action to register.
+     * @param AbstractAction|null $defaultAction The default action to execute, in case no statements are registered
+     * or the registered statement conditions are not met.
+     * @param array $statementGroups A list of statements to register. A statement is a couple "Condition->Action",
+     * where the first element indicates the condition of the if-block, whereas the second one is the action to be
+     * executed in case its condition is met.
      *
-     * @throws ConfigurationException If the given array is not well built.
+     * @throws ConfigurationException
      */
-    public function __construct(array $statementGroups = array())
+    public function __construct(AbstractAction $defaultAction = null, array $statementGroups = array())
     {
         parent::__construct();
+        if ($defaultAction) {
+            $this->addDefaultStatement($defaultAction);
+        }
         $this->addStatements($statementGroups);
     }
 

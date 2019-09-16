@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Actions\Conditionals;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ConfigurationException;
@@ -25,6 +26,7 @@ class IfStatementTest extends BaseTest
         // if-statements | is valid | is fatal | is success required | expected result | exception expected | message
         return [
             [
+                ActionFactory::createFileExists(__FILE__),
                 // We have to wrap the array [condition, run-action] into another array,
                 // as the method createFileExists is a variadic function
                 [
@@ -35,11 +37,12 @@ class IfStatementTest extends BaseTest
                 false,
                 true,
                 false,
-                "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Check if file '".__FILE__."' exists.]; \n"
+                "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Check if file '".__FILE__."' exists.]; \nDEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
             ],
             /** Negative cases */
             /** not successful, not fatal */
             [
+                ActionFactory::createFileExists('xxx'),
                 // We have to wrap the array [condition, run-action] into another array,
                 // as the method createFileExists is a variadic function
                 [
@@ -50,10 +53,11 @@ class IfStatementTest extends BaseTest
                 false,
                 false,
                 false,
-                "Run the following chain of if-else statements: \nIF [Check if file 'xxx' exists.] THEN [Check if file 'xxx' exists.]; \n"
+                "Run the following chain of if-else statements: \nIF [Check if file 'xxx' exists.] THEN [Check if file 'xxx' exists.]; \nDEFAULT CONDITION [Check if file 'xxx' exists.]"
             ],
             /** not successful, fatal */
             [
+                ActionFactory::createFileExists(__FILE__),
                 // We have to wrap the array [condition, run-action] into another array,
                 // as the method createFileExists is a variadic function
                 [
@@ -64,10 +68,11 @@ class IfStatementTest extends BaseTest
                 false,
                 false,
                 true,
-                "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Create directory '".__DIR__."'.]; \n"
+                "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Create directory '".__DIR__."'.]; \nDEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
             ],
             /** not successful, fatal */
             [
+                ActionFactory::createFileExists(__FILE__),
                 // We have to wrap the array [condition, run-action] into another array,
                 // as the method createFileExists is a variadic function
                 [
@@ -78,7 +83,7 @@ class IfStatementTest extends BaseTest
                 true,
                 false,
                 true,
-                "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Create directory '".__DIR__."'.]; \n"
+                "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Create directory '".__DIR__."'.]; \nDEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
             ],
         ];
     }
@@ -88,15 +93,16 @@ class IfStatementTest extends BaseTest
      *
      * @dataProvider statementsProvider
      *
+     * @param AbstractAction $defaultAction
      * @param array $ifStatements
      * @param bool $isValid
      *
-     * @throws ValidationException
      * @throws ConfigurationException
+     * @throws ValidationException
      */
-    public function testIsValid(array $ifStatements, bool $isValid): void
+    public function testIsValid(AbstractAction $defaultAction, array $ifStatements, bool $isValid): void
     {
-        $this->isValidTest($isValid, ActionFactory::createIfStatement($ifStatements));
+        $this->isValidTest($isValid, ActionFactory::createIfStatement($defaultAction, $ifStatements));
     }
 
     /**
@@ -108,7 +114,7 @@ class IfStatementTest extends BaseTest
     public function testIsValidWithWrongConstructionParameters(): void
     {
         $this->expectException(ConfigurationException::class);
-        $this->isValidTest(false, ActionFactory::createIfStatement([ActionFactory::createFileExists(__FILE__)]));
+        $this->isValidTest(false, ActionFactory::createIfStatement(null, [ActionFactory::createFileExists(__FILE__)]));
     }
 
     /**
@@ -116,6 +122,7 @@ class IfStatementTest extends BaseTest
      *
      * @dataProvider statementsProvider
      *
+     * @param AbstractAction $defaultAction
      * @param array $ifStatements
      * @param bool $isValid
      * @param bool $isFatal
@@ -127,6 +134,7 @@ class IfStatementTest extends BaseTest
      * @throws ConfigurationException
      */
     public function testStringify(
+        AbstractAction $defaultAction,
         array $ifStatements,
         bool $isValid,
         bool $isFatal,
@@ -136,7 +144,7 @@ class IfStatementTest extends BaseTest
         string $message
     ): void
     {
-        $this->stringifyTest($message, ActionFactory::createIfStatement($ifStatements));
+        $this->stringifyTest($message, ActionFactory::createIfStatement($defaultAction, $ifStatements));
     }
 
     /**
@@ -144,6 +152,7 @@ class IfStatementTest extends BaseTest
      *
      * @dataProvider statementsProvider
      *
+     * @param AbstractAction $defaultAction
      * @param array $ifStatements
      * @param bool $isValid
      * @param bool $isFatal
@@ -155,6 +164,7 @@ class IfStatementTest extends BaseTest
      * @throws ConfigurationException
      */
     public function testRun(
+        AbstractAction $defaultAction,
         array $ifStatements,
         bool $isValid,
         bool $isFatal,
@@ -167,7 +177,7 @@ class IfStatementTest extends BaseTest
         $this->runBasicTest(
             $exceptionExpected,
             $isValid,
-            ActionFactory::createIfStatement()
+            ActionFactory::createIfStatement($defaultAction)
                 ->addStatements($ifStatements)
                 ->setIsFatal($isFatal)
                 ->setIsSuccessRequired($isSuccessRequired),

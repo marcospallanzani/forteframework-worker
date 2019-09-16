@@ -42,15 +42,15 @@ class SwitchStatement extends AbstractAction
      * @param mixed $expression The expression of this SwitchStatement instance.
      * @param AbstractAction|null $defaultAction The default action of this
      * SwitchStatement instance.
+     * @param array $cases The cases to add.
      *
      * @throws ConfigurationException If one or both the given parameters are not valid.
      */
-    public function __construct($expression = null, AbstractAction $defaultAction = null)
+    public function __construct($expression = null, AbstractAction $defaultAction = null, array $cases = [])
     {
         parent::__construct();
-
         $this->addExpression($expression);
-
+        $this->addCases($cases);
         if ($defaultAction) {
             $this->addDefaultCase($defaultAction);
         }

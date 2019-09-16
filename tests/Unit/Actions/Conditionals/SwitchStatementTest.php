@@ -218,11 +218,7 @@ class SwitchStatementTest extends BaseTest
     {
         $this->expectException(ConfigurationException::class);
         $this->expectExceptionMessage($exceptionMessage);
-        ActionFactory::createSwitchStatement()
-            ->addDefaultCase($defaultCase)
-            ->addExpression($expression)
-            ->addCases([$case])
-        ;
+        ActionFactory::createSwitchStatement($expression, $defaultCase, [$case]);
     }
 
     /**
