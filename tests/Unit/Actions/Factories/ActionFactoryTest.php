@@ -10,6 +10,8 @@ use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
+use Forte\Worker\Actions\Conditionals\ForEachLoop;
+use Forte\Worker\Actions\Conditionals\IfStatement;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
@@ -62,6 +64,8 @@ class ActionFactoryTest extends BaseTest
             [RenameFile::class, $wrongParams],
             [UnzipFile::class, $wrongParams],
             [MakeDirectory::class, $wrongParams],
+            [IfStatement::class, $wrongParams],
+            [ForEachLoop::class, $wrongParams],
         ];
     }
 
@@ -131,6 +135,12 @@ class ActionFactoryTest extends BaseTest
 
         $this->assertInstanceOf(MakeDirectory::class, ActionFactory::createMakeDirectory());
         $this->assertInstanceOf(MakeDirectory::class, ActionFactory::create(MakeDirectory::class));
+
+        $this->assertInstanceOf(IfStatement::class, ActionFactory::createIfStatement());
+        $this->assertInstanceOf(IfStatement::class, ActionFactory::create(IfStatement::class));
+
+        $this->assertInstanceOf(ForEachLoop::class, ActionFactory::createForEachLoop());
+        $this->assertInstanceOf(ForEachLoop::class, ActionFactory::create(ForEachLoop::class));
     }
 
     /**

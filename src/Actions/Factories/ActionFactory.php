@@ -11,6 +11,7 @@ use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
+use Forte\Worker\Actions\Conditionals\ForEachLoop;
 use Forte\Worker\Actions\Conditionals\IfStatement;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
@@ -289,6 +290,18 @@ class ActionFactory implements ActionFactoryInterface
     }
 
     /**
+     * Create an instance of the ForEachLoop class.
+     *
+     * @param array $actions
+     *
+     * @return ForEachLoop
+     */
+    public static function createForEachLoop(array $actions = array()): ForEachLoop
+    {
+        return new ForEachLoop($actions);
+    }
+
+    /**
      * Create an instance of the given Abstract subclass
      * name (full namespace).
      *
@@ -369,6 +382,9 @@ class ActionFactory implements ActionFactoryInterface
                     break;
                 case IfStatement::class:
                     return self::createIfStatement(...$parameters);
+                    break;
+                case ForEachLoop::class:
+                    return self::createForEachLoop(...$parameters);
                     break;
                 default:
                     throw new WorkerException("The given action type '$class' is not supported.");
