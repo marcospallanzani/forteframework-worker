@@ -13,6 +13,7 @@ use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Conditionals\ForEachLoop;
 use Forte\Worker\Actions\Conditionals\IfStatement;
+use Forte\Worker\Actions\Conditionals\SwitchStatement;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
@@ -295,10 +296,31 @@ class ActionFactory implements ActionFactoryInterface
      * @param array $actions
      *
      * @return ForEachLoop
+     *
+     * @throws ConfigurationException
      */
     public static function createForEachLoop(array $actions = array()): ForEachLoop
     {
         return new ForEachLoop($actions);
+    }
+
+    /**
+     * Create an instance of the SwitchStatement class.
+     *
+     * @param mixed $expression The expression of this SwitchStatement instance.
+     * @param AbstractAction|null $defaultAction The default action of this
+     * SwitchStatement instance.
+     *
+     * @return SwitchStatement
+     *
+     * @throws ConfigurationException
+     */
+    public static function createSwitchStatement(
+        $expression = null,
+        AbstractAction $defaultAction = null
+    ): SwitchStatement
+    {
+        return new SwitchStatement($expression, $defaultAction);
     }
 
     /**
@@ -385,6 +407,9 @@ class ActionFactory implements ActionFactoryInterface
                     break;
                 case ForEachLoop::class:
                     return self::createForEachLoop(...$parameters);
+                    break;
+                case SwitchStatement::class:
+                    return self::createSwitchStatement(...$parameters);
                     break;
                 default:
                     throw new WorkerException("The given action type '$class' is not supported.");

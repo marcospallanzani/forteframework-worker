@@ -12,6 +12,7 @@ use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Conditionals\ForEachLoop;
 use Forte\Worker\Actions\Conditionals\IfStatement;
+use Forte\Worker\Actions\Conditionals\SwitchStatement;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
@@ -141,6 +142,9 @@ class ActionFactoryTest extends BaseTest
 
         $this->assertInstanceOf(ForEachLoop::class, ActionFactory::createForEachLoop());
         $this->assertInstanceOf(ForEachLoop::class, ActionFactory::create(ForEachLoop::class));
+
+        $this->assertInstanceOf(SwitchStatement::class, ActionFactory::createSwitchStatement(true, null));
+        $this->assertInstanceOf(SwitchStatement::class, ActionFactory::create(SwitchStatement::class, true, null));
     }
 
     /**
