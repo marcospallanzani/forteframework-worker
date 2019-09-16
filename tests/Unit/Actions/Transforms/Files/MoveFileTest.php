@@ -38,11 +38,12 @@ class MoveFileTest extends BaseTest
     public function tearDown(): void
     {
         parent::tearDown();
-        @unlink(self::TEST_SOURCE_FILE_TMP);
-        @unlink(self::TEST_TARGET_PATH_TMP);
         if (is_dir(self::TEST_TARGET_DIR_TMP)) {
+            @unlink(self::TEST_TARGET_DIR_TMP.self::TEST_SOURCE_FILE_NAME_TMP);
             @rmdir(self::TEST_TARGET_DIR_TMP);
         }
+        @unlink(self::TEST_SOURCE_FILE_TMP);
+        @unlink(self::TEST_TARGET_PATH_TMP);
     }
 
     /**
