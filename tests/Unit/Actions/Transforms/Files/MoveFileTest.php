@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Actions\Transforms\Files;
 
+use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
@@ -17,8 +18,10 @@ class MoveFileTest extends BaseTest
     /**
      * Temporary files constants.
      */
-    const TEST_SOURCE_FILE_TMP = __DIR__ . '/file-to-move';
-    const TEST_TARGET_PATH_TMP = __DIR__ . '/file-moved';
+    const TEST_SOURCE_FILE_NAME_TMP = '/file-to-move';
+    const TEST_SOURCE_FILE_TMP      = __DIR__ . self::TEST_SOURCE_FILE_NAME_TMP  ;
+    const TEST_TARGET_PATH_TMP      = __DIR__ . '/file-moved';
+    const TEST_TARGET_DIR_TMP       = __DIR__ . '/dir-file-moved';
 
     /**
      * This method is called before each test.
@@ -37,6 +40,9 @@ class MoveFileTest extends BaseTest
         parent::tearDown();
         @unlink(self::TEST_SOURCE_FILE_TMP);
         @unlink(self::TEST_TARGET_PATH_TMP);
+        if (is_dir(self::TEST_TARGET_DIR_TMP)) {
+            @rmdir(self::TEST_TARGET_DIR_TMP);
+        }
     }
 
     /**
@@ -47,21 +53,22 @@ class MoveFileTest extends BaseTest
     public function moveProvider(): array
     {
         return [
-            // source | target | is valid | fatal | success required | expected | exception | message
-            [self::TEST_SOURCE_FILE_TMP, self::TEST_TARGET_PATH_TMP, true, false, false, true, false, "Move file '".self::TEST_SOURCE_FILE_TMP."' to '".self::TEST_TARGET_PATH_TMP."'."],
+            // source | target | full target path | is valid | fatal | success required | expected | exception | message
+            [self::TEST_SOURCE_FILE_TMP, self::TEST_TARGET_PATH_TMP, true, true, false, false, true, false, "Move file '".self::TEST_SOURCE_FILE_TMP."' to '".self::TEST_TARGET_PATH_TMP."'."],
+            [self::TEST_SOURCE_FILE_TMP, self::TEST_TARGET_DIR_TMP, false, true, false, false, true, false, "Move file '".self::TEST_SOURCE_FILE_TMP."' to '".self::TEST_TARGET_DIR_TMP.self::TEST_SOURCE_FILE_NAME_TMP."'."],
             /** Negative cases */
             /** not successful, no fatal */
-            ['', self::TEST_TARGET_PATH_TMP, false, false, false, false, false, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
-            [self::TEST_SOURCE_FILE_TMP, '', false, false, false, false, false, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
-            ['', '', false, false, false, false, false, "Move file '' to ''."],
+            ['', self::TEST_TARGET_PATH_TMP, true, false, false, false, false, false, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
+            [self::TEST_SOURCE_FILE_TMP, '', true, false, false, false, false, false, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
+            ['', '', true, false, false, false, false, false, "Move file '' to ''."],
             /** fatal */
-            ['', self::TEST_TARGET_PATH_TMP, false, true, false, false, true, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
-            [self::TEST_SOURCE_FILE_TMP, '', false, true, false, false, true, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
-            ['', '', false, true, false, false, true, "Move file '' to ''."],
+            ['', self::TEST_TARGET_PATH_TMP, true, false, true, false, false, true, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
+            [self::TEST_SOURCE_FILE_TMP, '', true, false, true, false, false, true, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
+            ['', '', true, false, true, false, false, true, "Move file '' to ''."],
             /** success required */
-            ['', self::TEST_TARGET_PATH_TMP, false, false, true, false, true, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
-            [self::TEST_SOURCE_FILE_TMP, '', false, false, true, false, true, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
-            ['', '', false, false, true, false, true, "Move file '' to ''."],
+            ['', self::TEST_TARGET_PATH_TMP, true, false, false, true, false, true, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
+            [self::TEST_SOURCE_FILE_TMP, '', true, false, false, true, false, true, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
+            ['', '', true, false, false, true, false, true, "Move file '' to ''."],
         ];
     }
 
@@ -72,12 +79,17 @@ class MoveFileTest extends BaseTest
      *
      * @param string $sourcePath
      * @param string $targetPath
+     * @param bool $isFullTargetPath
      * @param bool $isValid
      *
      * @throws ValidationException
      */
-    public function testIsValid(string $sourcePath, string $targetPath, bool $isValid): void
+    public function testIsValid(string $sourcePath, string $targetPath, bool $isFullTargetPath, bool $isValid): void
     {
+        $action = ActionFactory::createMoveFile($sourcePath);
+
+        $this->setTarget($action, $isFullTargetPath, $targetPath);
+
         $this->isValidTest($isValid, ActionFactory::createMoveFile($sourcePath, $targetPath));
     }
 
@@ -88,6 +100,7 @@ class MoveFileTest extends BaseTest
      *
      * @param string $sourcePath
      * @param string $targetPath
+     * @param bool $isFullTargetPath
      * @param bool $isValid
      * @param bool $isFatal
      * @param bool $isSuccessRequired
@@ -98,6 +111,7 @@ class MoveFileTest extends BaseTest
     public function testStringify(
         string $sourcePath,
         string $targetPath,
+        bool $isFullTargetPath,
         bool $isValid,
         bool $isFatal,
         bool $isSuccessRequired,
@@ -106,7 +120,11 @@ class MoveFileTest extends BaseTest
         string $message
     ): void
     {
-        $this->stringifyTest($message, ActionFactory::createMoveFile($sourcePath, $targetPath));
+        $action = ActionFactory::createMoveFile($sourcePath);
+
+        $this->setTarget($action, $isFullTargetPath, $targetPath);
+
+        $this->stringifyTest($message, $action);
     }
 
     /**
@@ -116,6 +134,7 @@ class MoveFileTest extends BaseTest
      *
      * @param string $sourcePath
      * @param string $targetPath
+     * @param bool $isFullTargetPath
      * @param bool $isValid
      * @param bool $isFatal
      * @param bool $isSuccessRequired
@@ -127,6 +146,7 @@ class MoveFileTest extends BaseTest
     public function testRun(
         string $sourcePath,
         string $targetPath,
+        bool $isFullTargetPath,
         bool $isValid,
         bool $isFatal,
         bool $isSuccessRequired,
@@ -134,15 +154,19 @@ class MoveFileTest extends BaseTest
         bool $exceptionExpected
     ): void
     {
+        $action = ActionFactory::createMoveFile()
+            ->move($sourcePath)
+            ->setIsFatal($isFatal)
+            ->setIsSuccessRequired($isSuccessRequired)
+        ;
+
+        $this->setTarget($action, $isFullTargetPath, $targetPath);
+
         // Basic checks
         $this->runBasicTest(
             $exceptionExpected,
             $isValid,
-            ActionFactory::createMoveFile()
-                ->move($sourcePath)
-                ->to($targetPath)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired),
+            $action,
             $expected
         );
 
@@ -151,6 +175,22 @@ class MoveFileTest extends BaseTest
         if ($expected) {
             $this->assertFileExists($targetPath);
             $this->assertFileNotExists($sourcePath);
+        }
+    }
+
+    /**
+     * Set the target path in the given action.
+     *
+     * @param AbstractAction $action
+     * @param bool $isFullTargetPath
+     * @param string $targetPath
+     */
+    protected function setTarget(AbstractAction &$action, bool $isFullTargetPath, string $targetPath): void
+    {
+        if ($isFullTargetPath) {
+            $action->to($targetPath);
+        } else {
+            $action->toFolder($targetPath);
         }
     }
 }

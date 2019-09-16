@@ -6,6 +6,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
+use Forte\Worker\Actions\Factories\ActionFactory;
 
 /**
  * Class MoveFile.
@@ -25,6 +26,11 @@ class MoveFile extends AbstractAction
     protected $targetPath;
 
     /**
+     * @var bool
+     */
+    protected $isTargetFullPath = false;
+
+    /**
      * MoveFile constructor.
      *
      * @param string $sourcePath The source file path to be moved.
@@ -33,8 +39,9 @@ class MoveFile extends AbstractAction
     public function __construct(string $sourcePath = "", string $targetPath = "")
     {
         parent::__construct();
-        $this->sourcePath = $sourcePath;
-        $this->targetPath = $targetPath;
+        $this->sourcePath       = $sourcePath;
+        $this->targetPath       = $targetPath;
+        $this->isTargetFullPath = true;
     }
 
     /**
@@ -52,7 +59,8 @@ class MoveFile extends AbstractAction
     }
 
     /**
-     * Set the target file path for the previously given source file path.
+     * Set the target FULL file path for the previously given
+     * source file path. (e.g. /new/folder/new-file-name.php)
      *
      * @param string $targetPath The target path.
      *
@@ -60,7 +68,24 @@ class MoveFile extends AbstractAction
      */
     public function to(string $targetPath): self
     {
-        $this->targetPath = $targetPath;
+        $this->targetPath       = $targetPath;
+        $this->isTargetFullPath = true;
+
+        return $this;
+    }
+
+    /**
+     * Set the target directory. The source file name will be
+     * kept.
+     *
+     * @param string $targetDirectory The target directory.
+     *
+     * @return $this
+     */
+    public function toFolder(string $targetDirectory): self
+    {
+        $this->targetPath       = $targetDirectory;
+        $this->isTargetFullPath = false;
 
         return $this;
     }
@@ -80,6 +105,23 @@ class MoveFile extends AbstractAction
     {
         // We check if the origin file exists
         $this->fileExists($this->sourcePath);
+
+//TODO REPLACE THIS CHECK AND TARGET CREATION WITH A IfStatement -> IF TARGET DOES NOT EXIST, CREATE FOLDER
+        // We check if the target directory exists
+        if ($this->isTargetFullPath) {
+            $directory = dirname($this->targetPath);
+        } else {
+            $directory = $this->targetPath;
+        }
+
+        if (!is_dir($directory)) {
+            $actionResult->addActionResult(ActionFactory::createMakeDirectory($directory)->run());
+        }
+
+        if (!$this->isTargetFullPath) {
+            // In this case, we use the same name as the original path
+            $this->targetPath .= DIRECTORY_SEPARATOR . basename($this->sourcePath);
+        }
 
         return $actionResult->setResult(
             rename(
@@ -125,10 +167,19 @@ class MoveFile extends AbstractAction
      */
     public function stringify(): string
     {
+        $targetFullPath = $this->targetPath;
+
+        // We check if source path is not empty, as the method stringify can be
+        // called before the validation methods
+        if (!$this->isTargetFullPath && !empty($this->sourcePath)) {
+            // In this case, we use the same name as the original path
+            $targetFullPath .= DIRECTORY_SEPARATOR . basename($this->sourcePath);
+        }
+
         return sprintf(
             "Move file '%s' to '%s'.",
             $this->sourcePath,
-            $this->targetPath
+            $targetFullPath
         );
     }
 }
