@@ -6,9 +6,9 @@ use Forte\Stdlib\ClassAccessTrait;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\MissingKeyException;
+use Forte\Worker\Exceptions\ThrowErrorsTrait;
 use Forte\Worker\Helpers\Collection;
 use Forte\Worker\Helpers\StringParser;
-use Forte\Worker\Helpers\ThrowErrorsTrait;
 
 /**
  * Class VerifyArray. Class used to wrap all required check parameters.

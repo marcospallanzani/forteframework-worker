@@ -9,7 +9,7 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Helpers;
+namespace Tests\Unit\Exceptions;
 
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ConfigurationException;
@@ -20,7 +20,7 @@ use Tests\Unit\BaseTest;
 /**
  * Class ThrowErrorsTraitTest.
  *
- * @package Tests\Unit\Helpers
+ * @package Tests\Unit\Exceptions
  */
 class ThrowErrorsTraitTest extends BaseTest
 {

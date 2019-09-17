@@ -5,8 +5,8 @@ namespace Tests\Unit;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\ThrowErrorsTrait;
 use Forte\Worker\Exceptions\ValidationException;
-use Forte\Worker\Helpers\ThrowErrorsTrait;
 use PHPUnit\Framework\TestCase;
 
 /**

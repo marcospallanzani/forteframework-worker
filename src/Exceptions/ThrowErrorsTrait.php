@@ -1,20 +1,18 @@
 <?php
 
-namespace Forte\Worker\Helpers;
+namespace Forte\Worker\Exceptions;
 
 use Forte\Worker\Actions\AbstractAction;
-use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Exceptions\ConfigurationException;
-use Forte\Worker\Exceptions\ValidationException;
-use Forte\Worker\Exceptions\WorkerException;
 
 /**
  * Trait ThrowErrorsTrait. Methods to easily throw application exceptions.
  *
- * @package Forte\Worker\Helpers
+ * @package Forte\Worker\Exceptions
  */
 trait ThrowErrorsTrait
 {
+    use \Forte\Stdlib\Exceptions\ThrowErrorsTrait;
+
     /**
      * Throw a WorkerException with the given message and parameters.
      *
