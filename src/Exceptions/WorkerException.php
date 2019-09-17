@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Exceptions;
 
-use Forte\Worker\Actions\ArrayableInterface;
+use Forte\Stdlib\ArrayableInterface;
 
 /**
  * Class WorkerException

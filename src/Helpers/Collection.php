@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Helpers;
 
-use Forte\Worker\Actions\ArrayableInterface;
+use Forte\Stdlib\ArrayableInterface;
 use Forte\Worker\Exceptions\MissingKeyException;
 
 /**

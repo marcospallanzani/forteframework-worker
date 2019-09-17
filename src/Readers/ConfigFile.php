@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Readers;
 
-use Forte\Worker\Actions\ArrayableInterface;
+use Forte\Stdlib\ArrayableInterface;
 use Forte\Worker\Exceptions\MissingKeyException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\Collection;

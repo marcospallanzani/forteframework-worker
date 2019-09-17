@@ -11,6 +11,8 @@
 
 namespace Forte\Worker\Actions;
 
+use Forte\Stdlib\ArrayableInterface;
+
 /**
  * Interface ValidActionInterface. Basic behaviour of all classes that
  * perform an action, which needs a pre-run validation.
