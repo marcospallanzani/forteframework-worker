@@ -11,6 +11,7 @@
 
 namespace Forte\Worker\Actions\Transforms\Files;
 
+use Forte\Stdlib\ClassAccessTrait;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
@@ -18,7 +19,6 @@ use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\StringParser;
 use Forte\Worker\Helpers\ThrowErrorsTrait;
 

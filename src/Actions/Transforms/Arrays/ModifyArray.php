@@ -2,9 +2,9 @@
 
 namespace Forte\Worker\Actions\Transforms\Arrays;
 
+use Forte\Stdlib\ClassAccessTrait;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\Collection;
 use Forte\Worker\Helpers\StringParser;
 use Forte\Worker\Helpers\ThrowErrorsTrait;

@@ -2,9 +2,9 @@
 
 namespace Forte\Worker\Actions;
 
+use Forte\Stdlib\ClassAccessTrait;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
-use Forte\Worker\Helpers\ClassAccessTrait;
 use Forte\Worker\Helpers\Collection;
 use Forte\Worker\Helpers\FileTrait;
 use Forte\Worker\Helpers\StringParser;
