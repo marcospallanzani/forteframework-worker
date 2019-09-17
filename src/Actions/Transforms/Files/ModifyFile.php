@@ -17,10 +17,10 @@ use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
+use Forte\Worker\Exceptions\ThrowErrorsTrait;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\StringParser;
-use Forte\Worker\Helpers\ThrowErrorsTrait;
 
 /**
  * Class ModifyFile. This class is used to modify the content of a given
