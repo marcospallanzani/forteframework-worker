@@ -279,57 +279,43 @@ class ActionFactory implements ActionFactoryInterface
     /**
      * Create an instance of the IfStatement class.
      *
-     * @param AbstractAction|null $defaultAction The default action to execute, in case no statements are registered
-     * or the registered statement conditions are not met.
-     * @param array $statementGroups A list of statements to register. A statement is a couple "Condition->Action",
-     * where the first element indicates the condition of the if-block, whereas the second one is the action to be
-     * executed in case its condition is met.
+     * @param mixed ...$parameters The construction parameters.
      *
      * @return IfStatement
      *
      * @throws ConfigurationException
      */
-    public static function createIfStatement(
-        AbstractAction $defaultAction = null,
-        array $statementGroups = array()
-    ): IfStatement
+    public static function createIfStatement(...$parameters): IfStatement
     {
-        return new IfStatement($defaultAction, $statementGroups);
+        return new IfStatement(...$parameters);
     }
 
     /**
      * Create an instance of the ForEachLoop class.
      *
-     * @param array $actions
+     * @param mixed ...$parameters The construction parameters.
      *
      * @return ForEachLoop
      *
      * @throws ConfigurationException
      */
-    public static function createForEachLoop(array $actions = array()): ForEachLoop
+    public static function createForEachLoop(...$parameters): ForEachLoop
     {
-        return new ForEachLoop($actions);
+        return new ForEachLoop(...$parameters);
     }
 
     /**
      * Create an instance of the SwitchStatement class.
      *
-     * @param mixed $expression The expression of this SwitchStatement instance.
-     * @param AbstractAction|null $defaultAction The default action of this
-     * SwitchStatement instance.
-     * @param array $cases The cases to add.
+     * @param mixed ...$parameters The construction parameters.
      *
      * @return SwitchStatement
      *
      * @throws ConfigurationException
      */
-    public static function createSwitchStatement(
-        $expression = null,
-        AbstractAction $defaultAction = null,
-        array $cases = []
-    ): SwitchStatement
+    public static function createSwitchStatement(...$parameters): SwitchStatement
     {
-        return new SwitchStatement($expression, $defaultAction, $cases);
+        return new SwitchStatement(...$parameters);
     }
 
     /**
