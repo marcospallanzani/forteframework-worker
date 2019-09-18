@@ -11,6 +11,7 @@ use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 use Forte\Worker\Builders\ProjectRunnerBuilder;
+use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Runners\ProjectRunner;
 use Forte\Worker\Tests\Unit\BaseTest;
 
@@ -120,24 +121,19 @@ class ProjectRunnerBuilderTest extends BaseTest
     }
 
     /**
-     * Test function ProjectRunnerBuilder::modifyEnvFileConfigKey().
+     * Test function ProjectRunnerBuilder::modifyEnvFileConfigKey() with a non-existent file.
      *
      * @throws GeneralException
      */
-    public function testModifyEnvFileConfigKeyWithErrors(): void
+    public function testModifyEnvFileConfigKeyWithWrongFile(): void
     {
         // We modify its content and check if it's correct
+        $filePath = __DIR__ . "/xxx";
+        $this->expectException(ActionException::class);
+        $this->expectExceptionMessage("The file '$filePath' does not exist.");
         $builder = new ProjectRunnerBuilder(__DIR__);
-        $builder->modifyEnvFileConfigKey(__DIR__ . "/xxx", "KEY1", 500);
+        $builder->modifyEnvFileConfigKey($filePath, "KEY1", 500);
+        $builder->setFatalStatusForAllActions(true);
         $builder->getRunner()->applyActions();
-
-//        // Now we open the file and check if the content has been correctly changed
-//        $envVariables = FileUtils::parseFile(self::ENV_FILE_PATH, FileUtils::CONTENT_TYPE_ENV);
-//        $this->assertIsArray($envVariables);
-//        $this->assertCount(2, $envVariables);
-//        $this->assertArrayHasKey('KEY1', $envVariables);
-//        $this->assertArrayHasKey('KEY2', $envVariables);
-//        $this->assertEquals(500, $envVariables['KEY1']);
-//        $this->assertEquals(20, $envVariables['KEY2']);
     }
 }
