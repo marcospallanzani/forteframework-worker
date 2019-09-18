@@ -3,7 +3,6 @@
 namespace Forte\Worker\Builders;
 
 use Forte\Stdlib\DotenvLoader;
-use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
@@ -88,8 +87,6 @@ class ProjectRunnerBuilder
      * @param string|null $targetFolder The destination folder.
      *
      * @return self
-     *
-     * @throws GeneralException
      */
     public function copyFileTo(
         string $sourceFilePath,
@@ -102,7 +99,7 @@ class ProjectRunnerBuilder
             ->toFolder($targetFolder)
             ->withName($targetFileName)
         ;
-
+//TODO method copy->getDestinationFilePath shouln't throw an exception
         $this->addAction(
             /** main action */
             $copy,
