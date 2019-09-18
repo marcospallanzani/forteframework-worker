@@ -4,7 +4,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Filters\Files\Copy as CopyFilter;
+use Forte\Stdlib\Filters\Files\Copy as CopyFilter;
 
 /**
  * Class CopyFile
