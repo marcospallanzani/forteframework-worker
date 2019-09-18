@@ -11,10 +11,14 @@ use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
+use Forte\Worker\Actions\Conditionals\ForEachLoop;
+use Forte\Worker\Actions\Conditionals\IfStatement;
+use Forte\Worker\Actions\Conditionals\SwitchStatement;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
+use Forte\Worker\Actions\Transforms\Files\MakeDirectory;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
 use Forte\Worker\Actions\Transforms\Files\MoveDirectory;
 use Forte\Worker\Actions\Transforms\Files\MoveFile;
@@ -200,6 +204,42 @@ interface ActionFactoryInterface
      * @return EmptyTransform An instance of EmptyTransform.
      */
     public static function createEmptyTransform(...$parameters): EmptyTransform;
+
+    /**
+     * Create an instance of the MakeDirectory class.
+     *
+     * @param mixed ...$parameters The construction parameters.
+     *
+     * @return MakeDirectory An instance of MakeDirectory.
+     */
+    public static function createMakeDirectory(...$parameters): MakeDirectory;
+
+    /**
+     * Create an instance of the IfStatement class.
+     *
+     * @param mixed ...$parameters The construction parameters.vv
+     *
+     * @return IfStatement
+     */
+    public static function createIfStatement(...$parameters): IfStatement;
+
+    /**
+     * Create an instance of the ForEachLoop class.
+     *
+     * @param mixed ...$parameters The construction parameters.
+     *
+     * @return ForEachLoop
+     */
+    public static function createForEachLoop(...$parameters): ForEachLoop;
+
+    /**
+     * Create an instance of the SwitchStatement class.
+     *
+     * @param mixed ...$parameters The construction parameters.
+     *
+     * @return SwitchStatement
+     */
+    public static function createSwitchStatement(...$parameters): SwitchStatement;
 
     /**
      * Create an instance of the given Abstract subclass name (full namespace).
