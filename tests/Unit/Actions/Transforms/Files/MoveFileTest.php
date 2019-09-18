@@ -91,7 +91,7 @@ class MoveFileTest extends BaseTest
 
         $this->setTarget($action, $isFullTargetPath, $targetPath);
 
-        $this->isValidTest($isValid, ActionFactory::createMoveFile($sourcePath, $targetPath));
+        $this->isValidTest($isValid, $action);
     }
 
     /**
