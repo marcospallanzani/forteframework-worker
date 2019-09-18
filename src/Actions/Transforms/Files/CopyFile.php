@@ -167,7 +167,12 @@ class CopyFile extends AbstractAction
      */
     public function stringify(): string
     {
-        return sprintf("Copy file '%s' to '%s'.", $this->originFilePath, $this->getDestinationFilePath());
+        try {
+            $targetPath = $this->getDestinationFilePath();
+        } catch (GeneralException $generalException) {
+            $targetPath = "";
+        }
+        return sprintf("Copy file '%s' to '%s'.", $this->originFilePath, $targetPath);
     }
 
     /**
