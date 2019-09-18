@@ -27,6 +27,13 @@ class ProjectRunner extends AbstractRunner
     protected $installationFolder;
 
     /**
+     * The relative folder (e.g. 'my-project').
+     *
+     * @var string
+     */
+    protected $relativeFolder;
+
+    /**
      * ProjectRunner constructor. This class allows to apply a given set of
      * actions to the configured project.
      *
@@ -35,12 +42,17 @@ class ProjectRunner extends AbstractRunner
      */
     public function __construct(string $projectFolder)
     {
-        $this->projectFolder      = rtrim($projectFolder, DIRECTORY_SEPARATOR);
+        // Set the full project path
+        $this->projectFolder = rtrim($projectFolder, DIRECTORY_SEPARATOR);
+        // Set the installation folder
         $this->installationFolder = dirname($projectFolder);
+        // Set the relative project path (last-level folder)
+        $pathParts = explode(DIRECTORY_SEPARATOR, $this->projectFolder);
+        $this->relativeFolder = array_pop($pathParts);
     }
 
     /**
-     * Returns the project folder.
+     * Return the project folder.
      *
      * @return string
      */
@@ -50,12 +62,22 @@ class ProjectRunner extends AbstractRunner
     }
 
     /**
-     * Returns the project installation folder.
+     * Return the project installation folder.
      *
      * @return string
      */
     public function getInstallationFolder(): string
     {
         return $this->installationFolder;
+    }
+
+    /**
+     * Return the relative project folder.
+     *
+     * @return string
+     */
+    public function getRelativeFolder(): string
+    {
+        return $this->relativeFolder;
     }
 }

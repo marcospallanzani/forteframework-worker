@@ -144,6 +144,8 @@ class ProjectRunnerTest extends BaseTest
         // We assert that the project paths have been correctly set
         $this->assertEquals($dirPath, $projectRunner->getProjectFolder());
         $this->assertEquals(dirname($dirPath), $projectRunner->getInstallationFolder());
+        $pathParts = explode(DIRECTORY_SEPARATOR, $projectRunner->getProjectFolder());
+        $this->assertEquals(array_pop($pathParts), $projectRunner->getRelativeFolder());
 
         $addedActions = [];
         foreach ($actions as $action) {
