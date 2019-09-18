@@ -7,7 +7,6 @@ use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Exceptions\WorkerException;
 
 /**
  * Class AbstractRunner. A base class for all runner implementations.
@@ -51,7 +50,7 @@ class AbstractRunner
      * @return array A list of ActionResult instances, where each entry
      * represents the result of each run action.
      *
-     * @throws ActionException A critical error was found.
+     * @throws GeneralException A critical error was found.
      */
     public function applyActions(): array
     {
@@ -96,7 +95,8 @@ class AbstractRunner
      *
      * @return string The export full file path.
      *
-     * @throws GeneralException
+     * @throws GeneralException Error while exporting the data to the given file path
+     * (e.g. given file path is actually a directory).
      */
     public function exportAllActionsToFile(
         string $contentType = FileUtils::CONTENT_TYPE_JSON,
@@ -133,7 +133,8 @@ class AbstractRunner
      *
      * @return string
      *
-     * @throws WorkerException
+     * @throws GeneralException Error while exporting the data to the given file path
+     * (e.g. given file path is actually a directory).
      */
     public static function exportAllActionResultsToFile(
         array $actionResults,
