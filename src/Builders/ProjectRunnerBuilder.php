@@ -2,6 +2,9 @@
 
 namespace Forte\Worker\Builders;
 
+use Forte\Stdlib\DotenvLoader;
+use Forte\Stdlib\Exceptions\GeneralException;
+use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Factories\ActionFactory;
@@ -62,6 +65,7 @@ class ProjectRunnerBuilder
      */
     public function dirExists(string $path): self
     {
+//TODO HERE ADD THE NEW CONDITIONAL ACTION
         $this->addAction(
             /** main action */
             ActionFactory::createDirectoryExists($path),
@@ -84,6 +88,8 @@ class ProjectRunnerBuilder
      * @param string|null $targetFolder The destination folder.
      *
      * @return self
+     *
+     * @throws GeneralException
      */
     public function copyFileTo(
         string $sourceFilePath,
@@ -125,6 +131,40 @@ class ProjectRunnerBuilder
             ActionFactory::createEmptyTransform(),
             /** pre-run actions */
             [ActionFactory::createFileHasInstantiableClass($classFilePath, $className)]
+        );
+
+        return $this;
+    }
+
+    /**
+     * Modify the given key with the given value in the provided ENV file.
+     *
+     * @param string $filePath The ENV file path to modify.
+     * @param string $key The ENV file key, whose value needs to be modified.
+     * @param mixed $value The new value for the specified key.
+     *
+     * @return $this
+     */
+    public function modifyEnvFileConfigKey(string $filePath, string $key, $value): self
+    {
+        $this->addAction(
+            /** main action */
+            ActionFactory::createModifyFile($filePath)
+                ->replaceLineIfLineStartsWith(
+                    $key."=",
+                    DotenvLoader::getLineFromVariables($key, $value)
+                ),
+            /** pre-run actions */
+            [],
+            /** post-run actions */
+            [
+                ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_ENV)
+                    ->hasKeyWithValue(
+                        $key,
+                        $value,
+                        VerifyArray::CHECK_EQUALS
+                    )
+            ]
         );
 
         return $this;
@@ -286,7 +326,7 @@ class ProjectRunnerBuilder
     {
         return $this->runner;
     }
-//TODO WE SHOULD REFACTOR THE FOLLOWING TWO METHODS WITH A MORE GENERAL METHOD THAT CAN HANDLE THE CRITICAL STATUS AS WELL
+
     /**
      * Set the "fatal" status with the given flag for all registered actions.
      *
@@ -305,7 +345,7 @@ class ProjectRunnerBuilder
 
         return $this;
     }
-//TODO WE SHOULD REFACTOR THE FOLLOWING TWO METHODS WITH A MORE GENERAL METHOD THAT CAN HANDLE THE CRITICAL STATUS AS WELL
+
     /**
      * Set the "success-required" status with the given flag for all
      * registered actions.
