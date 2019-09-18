@@ -6,7 +6,7 @@ use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Helpers\StringParser;
+use Forte\Worker\Helpers\StringHelper;
 
 /**
  * Class Loop.
@@ -53,7 +53,7 @@ class ForEachLoop extends AbstractAction
             $this->throwConfigurationException(
                 $this,
                 "Invalid action detected. Found [%s]. AbstractAction subclass instance expected.",
-                StringParser::stringifyVariable($action)
+                StringHelper::stringifyVariable($action)
             );
         }
 
@@ -148,7 +148,7 @@ class ForEachLoop extends AbstractAction
                 } else {
                     $this->throwWorkerException(
                         "Invalid action detected. Found [%s]. AbstractAction subclass instance expected.",
-                        StringParser::stringifyVariable($action)
+                        StringHelper::stringifyVariable($action)
                     );
                 }
             }

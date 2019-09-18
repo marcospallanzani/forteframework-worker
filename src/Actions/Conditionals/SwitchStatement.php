@@ -6,7 +6,7 @@ use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Helpers\StringParser;
+use Forte\Worker\Helpers\StringHelper;
 
 /**
  * Class SwitchStatement.
@@ -73,7 +73,7 @@ class SwitchStatement extends AbstractAction
                 $this,
                 "The expression of a switch case should be either a non-object " .
                 "or an AbstractAction subclass instance. Given expression is '%s'.",
-                StringParser::stringifyVariable($expression)
+                StringHelper::stringifyVariable($expression)
             );
         }
 
@@ -146,7 +146,7 @@ class SwitchStatement extends AbstractAction
                 $this,
                 "It is not possible to add a case statement with an object " .
                 "as an expression value. Given expression value is '%s'.",
-                StringParser::stringifyVariable($expressionValue)
+                StringHelper::stringifyVariable($expressionValue)
             );
         }
 
@@ -277,20 +277,20 @@ class SwitchStatement extends AbstractAction
                     if (!$this->isValidExpressionValue($case[self::EXPRESSION_VALUE])) {
                         $this->throwWorkerException(
                             "Invalid expression value detected. Found [%s]. Non-object variable expected.",
-                            StringParser::stringifyVariable($case[self::EXPRESSION_VALUE])
+                            StringHelper::stringifyVariable($case[self::EXPRESSION_VALUE])
                         );
                     }
                     // We validate the action
                     if (!$this->isValidCaseAction($case[self::CASE_ACTION])) {
                         $this->throwWorkerException(
                             "Invalid case action detected. Found [%s]. AbstractAction subclass instance expected.",
-                            StringParser::stringifyVariable($case[self::CASE_ACTION])
+                            StringHelper::stringifyVariable($case[self::CASE_ACTION])
                         );
                     }
                 } else {
                     $this->throwWorkerException(
                         "Invalid case block detected. Found [%s]. Array with %s and %s indexes expected.",
-                        StringParser::stringifyVariable($case),
+                        StringHelper::stringifyVariable($case),
                         self::EXPRESSION_VALUE,
                         self::CASE_ACTION
                     );
@@ -303,7 +303,7 @@ class SwitchStatement extends AbstractAction
             } else {
                 $this->throwWorkerException(
                     "Invalid default action detected. Found [%s]. AbstractAction subclass instance expected.",
-                    StringParser::stringifyVariable($this->defaultAction)
+                    StringHelper::stringifyVariable($this->defaultAction)
                 );
             }
 
@@ -312,7 +312,7 @@ class SwitchStatement extends AbstractAction
                 $this->throwWorkerException(
                     "Invalid expression detected. Found [%s]. Non-object variables " .
                     "OR AbstractAction subclass instance expected.",
-                    StringParser::stringifyVariable($this->expression)
+                    StringHelper::stringifyVariable($this->expression)
                 );
             }
         } catch (WorkerException $workerException) {

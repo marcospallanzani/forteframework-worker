@@ -8,7 +8,7 @@ use Forte\Stdlib\FileTrait;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ThrowErrorsTrait;
 use Forte\Worker\Exceptions\ValidationException;
-use Forte\Worker\Helpers\StringParser;
+use Forte\Worker\Helpers\StringHelper;
 
 /**
  * Class AbstractAction.
@@ -96,7 +96,7 @@ abstract class AbstractAction implements ValidActionInterface
     public function __construct()
     {
         $classNameSpace = explode('\\', static::class);
-        $this->uniqueExecutionId = StringParser::getRandomUniqueId(array_pop($classNameSpace));
+        $this->uniqueExecutionId = StringHelper::getRandomUniqueId(array_pop($classNameSpace));
     }
 
     /**

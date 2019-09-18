@@ -13,7 +13,7 @@ namespace Forte\Worker\Actions\Checks\Strings;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Helpers\StringParser;
+use Forte\Worker\Helpers\StringHelper;
 
 /**
  * Class VerifyString. This class describes a check condition to be executed
@@ -403,10 +403,10 @@ class VerifyString extends AbstractAction
                 return $actionResult->setResult($conditionMet);
                 break;
             case self::CONDITION_STARTS_WITH:
-                return $actionResult->setResult(StringParser::startsWith($this->content, $this->conditionValue));
+                return $actionResult->setResult(StringHelper::startsWith($this->content, $this->conditionValue));
                 break;
             case self::CONDITION_ENDS_WITH:
-                return $actionResult->setResult(StringParser::endsWith($this->content, $this->conditionValue));
+                return $actionResult->setResult(StringHelper::endsWith($this->content, $this->conditionValue));
                 break;
             case self::CONDITION_IS_EMPTY:
                 return $actionResult->setResult(empty($this->content));

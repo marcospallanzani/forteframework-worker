@@ -7,7 +7,7 @@ use Forte\Stdlib\ClassAccessTrait;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ThrowErrorsTrait;
-use Forte\Worker\Helpers\StringParser;
+use Forte\Worker\Helpers\StringHelper;
 
 /**
  * Class ModifyArray.
@@ -179,14 +179,14 @@ class ModifyArray extends AbstractAction
             case self::MODIFY_ADD:
                 return sprintf(
                     "Add value '%s' with key '%s'",
-                    StringParser::stringifyVariable($this->value),
+                    StringHelper::stringifyVariable($this->value),
                     $this->key
                 );
             case self::MODIFY_CHANGE_VALUE:
                 return sprintf(
                     "Modify key '%s' and set it to '%s'",
                     $this->key,
-                    StringParser::stringifyVariable($this->value)
+                    StringHelper::stringifyVariable($this->value)
                 );
             case self::MODIFY_REMOVE_KEY:
                 return sprintf("Remove key '%s'", $this->key);

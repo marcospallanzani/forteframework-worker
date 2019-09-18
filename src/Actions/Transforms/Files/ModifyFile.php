@@ -20,7 +20,7 @@ use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ThrowErrorsTrait;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Helpers\StringParser;
+use Forte\Worker\Helpers\StringHelper;
 
 /**
  * Class ModifyFile. This class is used to modify the content of a given
@@ -517,7 +517,7 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
     {
         switch ($action) {
             case self::MODIFY_FILE_APPEND_TO_LINE:
-                if (StringParser::endsWith($line, PHP_EOL)) {
+                if (StringHelper::endsWith($line, PHP_EOL)) {
                     $line = trim($line, PHP_EOL) . $replaceValue . PHP_EOL;
                 } else {
                     $line .= $replaceValue;
@@ -527,7 +527,7 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
                 $line = str_replace($searchValue, "", $line);
                 break;
             case self::MODIFY_FILE_REMOVE_LINE:
-                if (StringParser::endsWith($line, PHP_EOL)) {
+                if (StringHelper::endsWith($line, PHP_EOL)) {
                     $line = PHP_EOL;
                 } else {
                     $line = null;
@@ -538,7 +538,7 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
                 break;
             case self::MODIFY_FILE_REPLACE_LINE:
                 $newLine = $replaceValue;
-                if (StringParser::endsWith($line, PHP_EOL)) {
+                if (StringHelper::endsWith($line, PHP_EOL)) {
                     $newLine .= PHP_EOL;
                 }
                 $line = $newLine;

@@ -8,7 +8,7 @@ use Forte\Stdlib\Exceptions\MissingKeyException;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ThrowErrorsTrait;
-use Forte\Worker\Helpers\StringParser;
+use Forte\Worker\Helpers\StringHelper;
 
 /**
  * Class VerifyArray. Class used to wrap all required check parameters.
@@ -255,7 +255,7 @@ class VerifyArray extends AbstractAction
                     "%s and %s value '%s'",
                     $baseMessage,
                     $reverseAction,
-                    StringParser::stringifyVariable($this->value)
+                    StringHelper::stringifyVariable($this->value)
                 );
             case self::CHECK_ENDS_WITH:
             case self::CHECK_STARTS_WITH:
@@ -263,14 +263,14 @@ class VerifyArray extends AbstractAction
                     "%s and %s with value '%s'",
                     $baseMessage,
                     $reverseAction,
-                    StringParser::stringifyVariable($this->value)
+                    StringHelper::stringifyVariable($this->value)
                 );
             case self::CHECK_EQUALS:
                 return sprintf(
                     "%s and %s equal to value '%s'",
                     $baseMessage,
                     $reverseAction,
-                    StringParser::stringifyVariable($this->value)
+                    StringHelper::stringifyVariable($this->value)
                 );
             case self::CHECK_EMPTY:
                 return "$baseMessage and $reverseAction empty (empty string or null)";
@@ -501,7 +501,7 @@ class VerifyArray extends AbstractAction
     protected function ValueEndsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
-            return StringParser::endsWith($value, $this->value);
+            return StringHelper::endsWith($value, $this->value);
         }
         $this->throwWorkerException(
             "Check %s supports only strings for both the configured and expected values.",
@@ -521,7 +521,7 @@ class VerifyArray extends AbstractAction
     protected function valueStartsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
-            return StringParser::startsWith($value, $this->value);
+            return StringHelper::startsWith($value, $this->value);
         }
         $this->throwWorkerException(
             "Check %s supports only strings for both the configured and expected values.",
