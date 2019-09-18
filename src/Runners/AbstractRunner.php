@@ -2,11 +2,12 @@
 
 namespace Forte\Worker\Runners;
 
+use Forte\Stdlib\Exceptions\GeneralException;
+use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Helpers\FileParser;
 
 /**
  * Class AbstractRunner. A base class for all runner implementations.
@@ -89,16 +90,16 @@ class AbstractRunner
      * a default path will be generated.
      *
      * @param string $contentType The report file content type (accepted values are
-     * FileParser constants starting with "CONTENT_TYPE_").
+     * FileUtils constants starting with "CONTENT_TYPE_").
      * @param string $destinationFullFilePath The destination file path. If not given,
      * a default file name will be created.
      *
      * @return string The export full file path.
      *
-     * @throws WorkerException
+     * @throws GeneralException
      */
     public function exportAllActionsToFile(
-        string $contentType = FileParser::CONTENT_TYPE_JSON,
+        string $contentType = FileUtils::CONTENT_TYPE_JSON,
         string $destinationFullFilePath = ""
     ): string
     {
@@ -110,7 +111,7 @@ class AbstractRunner
             }
         }
 
-        return FileParser::exportArrayReportToFile(
+        return FileUtils::exportArrayReportToFile(
             $exportedActions,
             $contentType,
             $destinationFullFilePath,
@@ -126,7 +127,7 @@ class AbstractRunner
      * @param array $actionResults A list of ActionResult instances to be exported
      * to the destination full file path.
      * @param string $contentType The report file content type (accepted values are
-     * FileParser constants starting with "CONTENT_TYPE_").
+     * FileUtils constants starting with "CONTENT_TYPE_").
      * @param string $destinationFullFilePath The destination file path. If not given,
      * a default file name will be created.
      *
@@ -136,7 +137,7 @@ class AbstractRunner
      */
     public static function exportAllActionResultsToFile(
         array $actionResults,
-        string $contentType = FileParser::CONTENT_TYPE_JSON,
+        string $contentType = FileUtils::CONTENT_TYPE_JSON,
         string $destinationFullFilePath = ""
     ): string
     {
@@ -147,7 +148,7 @@ class AbstractRunner
             }
         }
 
-        return FileParser::exportArrayReportToFile(
+        return FileUtils::exportArrayReportToFile(
             $exportedActionResults,
             $contentType,
             $destinationFullFilePath,

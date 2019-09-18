@@ -11,6 +11,7 @@
 
 namespace Forte\Worker\Actions\Checks\Files;
 
+use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Factories\ActionFactory;
@@ -18,7 +19,6 @@ use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Exceptions\ValidationException;
-use Forte\Worker\Helpers\FileParser;
 
 /**
  * Class ConfigFileHasValidEntries
@@ -50,11 +50,11 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
     }
 
     /**
-     * Set the file content type. Accepted values are the FileParser
+     * Set the file content type. Accepted values are the FileUtils
      * class constants with prefix "CONTENT_TYPE".
      *
      * @param string $type The content type; accepted values are the
-     * FileParser class constants with prefix "CONTENT_TYPE".
+     * FileUtils class constants with prefix "CONTENT_TYPE".
      *
      * @return ConfigFileHasValidEntries
      */
@@ -192,7 +192,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
         parent::validateInstance();
 
         // Check if the given type is supported
-        $contentTypeConstants = FileParser::getSupportedContentTypes();
+        $contentTypeConstants = FileUtils::getSupportedContentTypes();
         if (!in_array($this->contentType, $contentTypeConstants)) {
             $this->throwValidationException(
                 $this,
@@ -226,7 +226,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
         $this->fileExists($this->filePath);
 
         // We read the file and we convert it to an array, when possible.
-        $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
+        $parsedContent = FileUtils::parseFile($this->filePath, $this->contentType);
         if (!is_array($parsedContent)) {
             $this->throwWorkerException(
                 "File content of '%s' cannot be converted to an array.",

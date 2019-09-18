@@ -134,11 +134,11 @@ class ProjectRunnerBuilder
      * Modify the given config key with the given value in the specified file.
      * If the file does not have the specified key, this method will add it
      * to the file. Multi-level configuration keys are supported (each level
-     * separated by the constant FileParser::CONFIG_LEVEL_SEPARATOR - a dot).
+     * separated by the constant FileUtils::CONFIG_LEVEL_SEPARATOR - a dot).
      * (e.g. key1.key2.key3=value3)
      *
      * @param string $filePath The file to modify.
-     * @param string $contentType The content type (accepted values -> constants FileParser::CONTENT_TYPE_XXX).
+     * @param string $contentType The content type (accepted values -> constants FileUtils::CONTENT_TYPE_XXX).
      * @param string $key The key to modify.
      * @param mixed $value The new key value.
      *
@@ -168,11 +168,11 @@ class ProjectRunnerBuilder
     /**
      * Add the given config key with the given value to the specified file.
      * Multi-level configuration keys are supported (each level separated
-     * by the constant FileParser::CONFIG_LEVEL_SEPARATOR - a dot).
+     * by the constant FileUtils::CONFIG_LEVEL_SEPARATOR - a dot).
      * (e.g. key1.key2.key3=value3)
      *
      * @param string $filePath The file to modify.
-     * @param string $contentType The content type (accepted values -> constants FileParser::CONTENT_TYPE_XXX).
+     * @param string $contentType The content type (accepted values -> constants FileUtils::CONTENT_TYPE_XXX).
      * @param string $key The key to add.
      * @param mixed $value The new key value.
      *
@@ -202,11 +202,11 @@ class ProjectRunnerBuilder
     /**
      * Remove the given config key with the given value from the specified file.
      * Multi-level configuration keys are supported (each level separated by the
-     * constant FileParser::CONFIG_LEVEL_SEPARATOR - a dot).
+     * constant FileUtils::CONFIG_LEVEL_SEPARATOR - a dot).
      * (e.g. key1.key2.key3=value3)
      *
      * @param string $filePath The file to modify.
-     * @param string $contentType The content type (accepted values -> constants FileParser::CONTENT_TYPE_XXX).
+     * @param string $contentType The content type (accepted values -> constants FileUtils::CONTENT_TYPE_XXX).
      * @param string $key The key to remove.
      *
      * @return ProjectRunnerBuilder

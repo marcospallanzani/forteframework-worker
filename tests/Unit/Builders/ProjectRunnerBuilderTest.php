@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Builders;
 
+use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
@@ -9,7 +10,6 @@ use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 use Forte\Worker\Builders\ProjectRunnerBuilder;
-use Forte\Worker\Helpers\FileParser;
 use Forte\Worker\Runners\ProjectRunner;
 use Tests\Unit\BaseTest;
 
@@ -32,9 +32,9 @@ class ProjectRunnerBuilderTest extends BaseTest
             ['unzipFile', ['test.zip'], UnzipFile::class],
             ['copyFileTo', [__FILE__], CopyFile::class],
             ['hasInstantiableClass', [__FILE__, __CLASS__], EmptyTransform::class],
-            ['modifyConfigKey', [__FILE__, FileParser::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
-            ['addConfigKey', [__FILE__, FileParser::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
-            ['removeConfigKey', [__FILE__, FileParser::CONTENT_TYPE_JSON, 'key'], ChangeConfigFileEntries::class],
+            ['modifyConfigKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
+            ['addConfigKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
+            ['removeConfigKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key'], ChangeConfigFileEntries::class],
             ['addAction', [ActionFactory::createFileExists(__FILE__)], FileExists::class],
         ];
     }

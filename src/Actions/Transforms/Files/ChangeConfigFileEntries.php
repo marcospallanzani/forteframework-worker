@@ -2,12 +2,12 @@
 
 namespace Forte\Worker\Actions\Transforms\Files;
 
+use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
-use Forte\Worker\Helpers\FileParser;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 
 /**
@@ -38,7 +38,7 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
      * ChangeConfigFileEntries constructor.
      *
      * @param string $filePath The file to modify.
-     * @param string $contentType The content type; accepted values are the FileParser
+     * @param string $contentType The content type; accepted values are the FileUtils
      * class constants with prefix "CONTENT_TYPE".
      */
     public function __construct(string $filePath = "", string $contentType = "")
@@ -51,7 +51,7 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
      * Set the file path and content type to be modified.
      *
      * @param string $filePath The file to modify.
-     * @param string $contentType The content type; accepted values are the FileParser
+     * @param string $contentType The content type; accepted values are the FileUtils
      * class constants with prefix "CONTENT_TYPE".
      *
      * @return ChangeConfigFileEntries
@@ -148,7 +148,7 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
      * Validate this ChangeConfigFileEntries instance using its specific validation logic.
      * It returns true if this ChangeConfigFileEntries instance is well configured, i.e. if:
      * - filePath cannot be an empty string;
-     * - content type is supported (FileParser constants starting with prefix 'CONTENT_TYPE');
+     * - content type is supported (FileUtils constants starting with prefix 'CONTENT_TYPE');
      * - registered modifications (instances of ModifyArray) are valid;
      *
      * @return bool True if no validation breaches were found; false otherwise.
@@ -167,7 +167,7 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
         }
 
         // Check if the given type is supported
-        $contentTypeConstants = FileParser::getSupportedContentTypes();
+        $contentTypeConstants = FileUtils::getSupportedContentTypes();
         if (!in_array($this->contentType, $contentTypeConstants)) {
             $this->throwValidationException(
                 $this,
@@ -205,7 +205,7 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
         $this->fileExists($this->filePath);
 
         // We read the file and we convert it to an array, when possible.
-        $parsedContent = FileParser::parseFile($this->filePath, $this->contentType);
+        $parsedContent = FileUtils::parseFile($this->filePath, $this->contentType);
         if (!is_array($parsedContent)) {
             $this->throwWorkerException(
                 "Impossible to convert the content of file '%s' to an array.",
@@ -223,7 +223,7 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
 
         // We save the new content to the original file.
         if ($this->validateResult($actionResult)) {
-            FileParser::writeToFile($parsedContent, $this->filePath, $this->contentType);
+            FileUtils::writeToFile($parsedContent, $this->filePath, $this->contentType);
         }
 
         return $actionResult;
