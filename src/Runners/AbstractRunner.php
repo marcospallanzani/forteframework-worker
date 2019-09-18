@@ -50,7 +50,8 @@ class AbstractRunner
      * @return array A list of ActionResult instances, where each entry
      * represents the result of each run action.
      *
-     * @throws GeneralException A critical error was found.
+     * @throws ActionException A fatal error happened while executing
+     * the actions.
      */
     public function applyActions(): array
     {
