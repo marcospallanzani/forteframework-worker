@@ -2,8 +2,8 @@
 
 namespace Forte\Worker\Helpers;
 
+use Forte\Stdlib\ClassAccessTrait;
 use Forte\Worker\Exceptions\WorkerException;
-use Forte\Worker\Exceptions\MissingKeyException;
 use Symfony\Component\Yaml\Yaml as YamlReader;
 use Zend\Config\Exception\RuntimeException;
 use Zend\Config\Reader\Ini as IniReader;
