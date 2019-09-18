@@ -56,30 +56,11 @@ class AbstractRunner
     {
         $actionResults = array();
         foreach ($this->actions as $action) {
-//TODO DO WE NEED TO CATCH THE EXCEPTIONS HERE? THEY SHOULD BE HANDLED IN THE RUN METHOD.. AFTER ALL, IF FATAL SHOULD THROW AN EXCEPTION
-            $actionResult = new ActionResult($action);
-            try {
-                if ($action instanceof AbstractAction) {
-                    $actionResult = $action->run();
-                }
-            } catch (ActionException $actionException) {
-
-                // If failure is critical (i.e. fatal or success required), we throw it again
-                if ($actionException->hasFatalFailures()) {
-                    throw $actionException;
-                }
-
-                // If not critical, we add the failure to the current result
-                $actionResult->addActionFailure($actionException);
+            if ($action instanceof AbstractAction) {
+                // We add the current action result to the global list of action results
+                $actionResults[] = $action->run();
             }
-
-            // We add the current action result to the global list of action results
-            $actionResults[] = $actionResult;
-
         }
-
-//TODO CHECK HERE FOR IS SUCCESS REQUIRED
-
         return $actionResults;
     }
 
