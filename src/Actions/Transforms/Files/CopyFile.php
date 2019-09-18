@@ -2,6 +2,7 @@
 
 namespace Forte\Worker\Actions\Transforms\Files;
 
+use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Stdlib\Filters\Files\Copy as CopyFilter;
@@ -41,9 +42,9 @@ class CopyFile extends AbstractAction
         string $destinationFileName = ""
     ) {
         parent::__construct();
-        $this->originFilePath      = $originalFilePath;
-        $this->destinationFolder   = $destinationFolder;
-        $this->destinationFileName = $destinationFileName;
+        $this->copy($originalFilePath);
+        $this->toFolder($destinationFolder);
+        $this->withName($destinationFileName);
     }
 
     /**
@@ -55,7 +56,7 @@ class CopyFile extends AbstractAction
      */
     public function copy(string $originFilePath): self
     {
-        $this->originFilePath = $originFilePath;
+        $this->originFilePath = rtrim($originFilePath, DIRECTORY_SEPARATOR);
 
         return $this;
     }
@@ -92,49 +93,69 @@ class CopyFile extends AbstractAction
      * Create the full destination file path as a concatenation of the
      * destination folder and the destination name.
      *
-     * @param string $defaultDestinationFolder Default destination folder
-     * to be used, if the class destination folder is empty.
+     * @param bool $fatal True, an exception will be thrown if the origin
+     * file does not exist.
      *
      * @return string The full destination file path (concat destination
      * folder and destination name).
-     */
-    public function getDestinationFilePath(string $defaultDestinationFolder = ""): string
-    {
-        // If no default destination folder is specified, we try to use
-        // the default class destination folder
-        if (empty($defaultDestinationFolder)) {
-            $defaultDestinationFolder = $this->getDefaultDestinationFolder();
-        }
-
-        if (empty($this->destinationFolder)) {
-            if (!empty($defaultDestinationFolder)) {
-                return
-                    rtrim($defaultDestinationFolder, DIRECTORY_SEPARATOR) .
-                    DIRECTORY_SEPARATOR .
-                    $this->destinationFileName
-                    ;
-            }
-            return $this->destinationFileName;
-        }
-
-        return
-            $this->destinationFolder .
-            DIRECTORY_SEPARATOR .
-            $this->destinationFileName
-            ;
-    }
-
-    /**
-     * Return the default destination folder (i.e. same folder as
-     * the original file path).
      *
-     * @return string The default destination folder.
+     * @throws GeneralException
      */
-    public function getDefaultDestinationFolder(): string
+    public function getDestinationFilePath(bool $fatal = false): string
     {
-        $info = pathinfo($this->originFilePath);
-        if (is_array($info) && array_key_exists('dirname', $info)) {
-            return $info['dirname'];
+        // We check if the origin file exists
+        try {
+            $this->fileExists($this->originFilePath);
+            $info = pathinfo($this->originFilePath);
+            $dirName        = $info['dirname'];
+            $fileName       = $info['filename'];
+            $fileExtension  = $info['extension'];
+            $fileBaseName   = $info['basename'];
+        } catch (GeneralException $exception) {
+            // If fatal, we rethrow the exception
+            if ($fatal) {
+                throw $exception;
+            }
+
+            // If not fatal, we set the default values for the file info variables
+            if (empty($this->originFilePath)) {
+                $fileExtension = "";
+                $fileName = "";
+            } else {
+                $fileParts = explode('.', $this->originFilePath);
+                if (count($fileParts) == 2) {
+                    $fileExtension = array_pop($fileParts);
+                    $fileName = array_pop($fileParts);
+                } else {
+                    $fileExtension = "";
+                    $fileName = $this->originFilePath;
+                }
+            }
+            $dirName = $this->destinationFolder;
+            $fileBaseName = $this->originFilePath;
+        }
+
+        // We set the destination folder, if not specified
+        if (empty($this->destinationFolder)) {
+            // If no destination folder, we use the same folder as the file to be copied
+            $targetFolder = $dirName;
+        } else {
+            $targetFolder = $this->destinationFolder;
+        }
+
+        // We set the destination file name, if not specified
+        if (empty($this->destinationFileName)) {
+            if ($targetFolder == $dirName) {
+                $targetName = $fileName . "_COPY" . (empty($fileExtension) ? "" : ".$fileExtension");
+            } else {
+                $targetName = $fileBaseName;
+            }
+        } else {
+            $targetName = $this->destinationFileName;
+        }
+
+        if ($targetFolder && $targetName) {
+            return $targetFolder . DIRECTORY_SEPARATOR . $targetName;
         }
         return "";
     }
@@ -169,7 +190,7 @@ class CopyFile extends AbstractAction
         // AND the destination file name is the same as the original file name,
         // THEN we throw an error
         $destinationFilePath = $this->getDestinationFilePath();
-        if (rtrim($this->originFilePath, DIRECTORY_SEPARATOR) === $destinationFilePath) {
+        if ($this->originFilePath === $destinationFilePath) {
             $this->throwValidationException(
                 $this,
                 "The origin file '%s' and the specified destination file '%s' cannot be the same.",
@@ -197,22 +218,8 @@ class CopyFile extends AbstractAction
         // We check if the origin file exists
         $this->fileExists($this->originFilePath);
 
-        $info = pathinfo($this->originFilePath);
-
-        // We check if a destination folder is set:
-        // if empty, we use the same origin file folder
-        if (empty($this->destinationFolder)) {
-            $this->destinationFolder = $info['dirname'];
-        }
-
-        // We check if the destination file name is set:
-        // if empty, we use the origin file name with a "_Copy" suffix
-        if (empty($this->destinationFileName)) {
-            $this->destinationFileName = $info['filename'] . "_COPY." . $info['extension'];
-        }
-
         $copyFilter = new CopyFilter([
-            'target' => $this->getDestinationFilePath(),
+            'target' => $this->getDestinationFilePath(true),
             'overwrite' => true
         ]);
         $copyFilter->filter($this->originFilePath);
