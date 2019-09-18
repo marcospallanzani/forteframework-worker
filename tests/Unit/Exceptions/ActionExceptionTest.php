@@ -1,14 +1,14 @@
 <?php
 
-namespace Tests\Unit\Exceptions;
+namespace Forte\Worker\Tests\Unit\Exceptions;
 
 use Forte\Worker\Exceptions\ActionException;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class ActionExceptionTest.
  *
- * @package Tests\Unit\Exceptions
+ * @package Forte\Worker\Tests\Unit\Exceptions
  */
 class ActionExceptionTest extends BaseTest
 {
