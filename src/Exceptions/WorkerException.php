@@ -3,13 +3,14 @@
 namespace Forte\Worker\Exceptions;
 
 use Forte\Stdlib\ArrayableInterface;
+use Forte\Stdlib\Exceptions\GeneralException;
 
 /**
  * Class WorkerException
  *
  * @package Forte\Worker\Exceptions
  */
-class WorkerException extends \Exception implements ArrayableInterface
+class WorkerException extends GeneralException implements ArrayableInterface
 {
     /**
      * Return an array representation of this WorkerException instance.
