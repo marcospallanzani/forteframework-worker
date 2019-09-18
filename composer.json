@@ -15,7 +15,17 @@
         "zendframework/zend-validator": "^2.12",
         "zendframework/zend-filter": "^2.9",
         "monolog/monolog": "^1.24",
-        "symfony/yaml": "^4.3"
+        "symfony/yaml": "^4.3",
+        "forteframework/stdlib": "1.0.*"
+    },
+    "repositories": {
+        "dev-package": {
+            "type": "path",
+            "url": "../ff-stdlib",
+            "options": {
+                "symlink": true
+            }
+        }
     },
     "autoload" : {
       "psr-4" : {
