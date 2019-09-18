@@ -9,19 +9,19 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Actions\Checks\Strings;
+namespace Forte\Worker\Tests\Unit\Actions\Checks\Strings;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class VerifyStringTest.
  *
- * @package Tests\Unit\Actions\Checks\Strings
+ * @package Forte\Worker\Tests\Unit\Actions\Checks\Strings
  */
 class VerifyStringTest extends BaseTest
 {

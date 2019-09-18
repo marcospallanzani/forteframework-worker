@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Forte\Worker\Tests\Unit;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class BaseTest.
  *
- * @package Tests\Unit
+ * @package Forte\Worker\Tests\Unit
  */
 abstract class BaseTest extends TestCase
 {

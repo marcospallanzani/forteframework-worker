@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Actions\Factories;
+namespace Forte\Worker\Tests\Unit\Actions\Factories;
 
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Checks\Files\DirectoryDoesNotExist;
@@ -27,12 +27,12 @@ use Forte\Worker\Actions\Transforms\Files\RenameDirectory;
 use Forte\Worker\Actions\Transforms\Files\RenameFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 use Forte\Worker\Exceptions\WorkerException;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class ActionFactoryTest.
  *
- * @package Tests\Unit\Actions\Factories
+ * @package Forte\Worker\Tests\Unit\Actions\Factories
  */
 class ActionFactoryTest extends BaseTest
 {

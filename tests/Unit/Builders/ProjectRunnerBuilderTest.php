@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Builders;
+namespace Forte\Worker\Tests\Unit\Builders;
 
 use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\Checks\Files\FileExists;
@@ -11,12 +11,12 @@ use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 use Forte\Worker\Builders\ProjectRunnerBuilder;
 use Forte\Worker\Runners\ProjectRunner;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class ProjectRunnerBuilderTest.
  *
- * @package Tests\Unit\Builders
+ * @package Forte\Worker\Tests\Unit\Builders
  */
 class ProjectRunnerBuilderTest extends BaseTest
 {

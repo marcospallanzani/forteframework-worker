@@ -1,17 +1,17 @@
 <?php
 
-namespace Tests\Unit\Actions\Transforms\Arrays;
+namespace Forte\Worker\Tests\Unit\Actions\Transforms\Arrays;
 
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Exceptions\ValidationException;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class ModifyArrayTest
  *
- * @package Tests\Unit\Actions\Transforms\Arrays
+ * @package Forte\Worker\Tests\Unit\Actions\Transforms\Arrays
  */
 class ModifyArrayTest extends BaseTest
 {

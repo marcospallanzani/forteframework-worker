@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Actions\Checks\Arrays;
+namespace Forte\Worker\Tests\Unit\Actions\Checks\Arrays;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
@@ -9,12 +9,12 @@ use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class VerifyArrayTest
  *
- * @package Tests\Unit\Actions\Checks\Arrays
+ * @package Forte\Worker\Tests\Unit\Actions\Checks\Arrays
  */
 class VerifyArrayTest extends BaseTest
 {

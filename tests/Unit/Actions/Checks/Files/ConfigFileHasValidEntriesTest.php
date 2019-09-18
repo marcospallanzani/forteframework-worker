@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Actions\Checks\Files;
+namespace Forte\Worker\Tests\Unit\Actions\Checks\Files;
 
 use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
@@ -9,12 +9,12 @@ use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class ConfigFileHasValidEntriesTest
  *
- * @package Tests\Unit\Actions\Checks\Files
+ * @package Forte\Worker\Tests\Unit\Actions\Checks\Files
  */
 class ConfigFileHasValidEntriesTest extends BaseTest
 {

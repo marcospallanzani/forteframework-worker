@@ -1,18 +1,18 @@
 <?php
 
-namespace Tests\Unit\Runners;
+namespace Forte\Worker\Tests\Unit\Runners;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Runners\ProjectRunner;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class ProjectRunnersTest.
  *
- * @package Tests\Unit\Runners
+ * @package Forte\Worker\Tests\Unit\Runners
  */
 class ProjectRunnerTest extends BaseTest
 {

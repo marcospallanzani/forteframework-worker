@@ -9,16 +9,16 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Helpers;
+namespace Forte\Worker\Tests\Unit\Helpers;
 
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Helpers\StringHelper;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class StringHelperTest
  *
- * @package Tests\Unit\Helpers
+ * @package Forte\Worker\Tests\Unit\Helpers
  */
 class StringHelperTest extends BaseTest
 {

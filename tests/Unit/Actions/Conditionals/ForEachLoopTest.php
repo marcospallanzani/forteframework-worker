@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Actions\Conditionals;
+namespace Forte\Worker\Tests\Unit\Actions\Conditionals;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Conditionals\ForEachLoop;
@@ -8,12 +8,12 @@ use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Exceptions\ValidationException;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class ForEachLoopTest.
  *
- * @package Tests\Unit\Actions\Conditionals
+ * @package Forte\Worker\Tests\Unit\Actions\Conditionals
  */
 class ForEachLoopTest extends BaseTest
 {

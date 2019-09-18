@@ -9,18 +9,18 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Exceptions;
+namespace Forte\Worker\Tests\Unit\Exceptions;
 
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class ThrowErrorsTraitTest.
  *
- * @package Tests\Unit\Exceptions
+ * @package Forte\Worker\Tests\Unit\Exceptions
  */
 class ThrowErrorsTraitTest extends BaseTest
 {

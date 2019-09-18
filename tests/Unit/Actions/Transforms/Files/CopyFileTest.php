@@ -1,18 +1,18 @@
 <?php
 
-namespace Tests\Unit\Actions\Transforms\Files;
+namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
 use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class CopyFileTest.
  *
- * @package Tests\Unit\Actions\Transforms\Files
+ * @package Forte\Worker\Tests\Unit\Actions\Transforms\Files
  */
 class CopyFileTest extends BaseTest
 {

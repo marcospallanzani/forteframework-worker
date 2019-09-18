@@ -9,17 +9,17 @@
  *  with this source code.
  */
 
-namespace Tests\Unit\Actions\Checks\Files;
+namespace Forte\Worker\Tests\Unit\Actions\Checks\Files;
 
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
-use Tests\Unit\BaseTest;
+use Forte\Worker\Tests\Unit\BaseTest;
 
 /**
  * Class FileExistsTest.
  *
- * @package Tests\Unit\Actions\Checks\Files
+ * @package Forte\Worker\Tests\Unit\Actions\Checks\Files
  */
 class FileExistsTest extends BaseTest
 {
