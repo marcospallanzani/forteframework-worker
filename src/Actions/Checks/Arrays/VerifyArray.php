@@ -2,12 +2,12 @@
 
 namespace Forte\Worker\Actions\Checks\Arrays;
 
+use Forte\Stdlib\ArrayUtils;
 use Forte\Stdlib\ClassAccessTrait;
+use Forte\Stdlib\Exceptions\MissingKeyException;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Exceptions\MissingKeyException;
 use Forte\Worker\Exceptions\ThrowErrorsTrait;
-use Forte\Worker\Helpers\Collection;
 use Forte\Worker\Helpers\StringParser;
 
 /**
@@ -375,7 +375,7 @@ class VerifyArray extends AbstractAction
         $matched = false;
 
         try {
-            $value = Collection::getRequiredNestedArrayValue($this->key, $this->checkContent);
+            $value = ArrayUtils::getValueFromArray($this->key, $this->checkContent);
 
             // If no exceptions are thrown, then the key was found in the given config array
             switch($this->action) {

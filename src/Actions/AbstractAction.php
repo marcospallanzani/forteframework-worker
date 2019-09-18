@@ -2,12 +2,12 @@
 
 namespace Forte\Worker\Actions;
 
+use Forte\Stdlib\ArrayUtils;
 use Forte\Stdlib\ClassAccessTrait;
 use Forte\Stdlib\FileTrait;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ThrowErrorsTrait;
 use Forte\Worker\Exceptions\ValidationException;
-use Forte\Worker\Helpers\Collection;
 use Forte\Worker\Helpers\StringParser;
 
 /**
@@ -313,7 +313,7 @@ abstract class AbstractAction implements ValidActionInterface
         $variables['action_description'] = $this->stringify();
         return array_merge(
             $variables,
-            Collection::variablesToArray(get_object_vars($this))
+            ArrayUtils::variablesToArray(get_object_vars($this))
         );
     }
 
