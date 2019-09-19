@@ -74,21 +74,34 @@ class VerifyString extends AbstractAction
     protected $conditionValue;
 
     /**
+     * @var bool
+     */
+    protected $caseSensitive = false;
+
+    /**
      * VerifyString constructor.
      *
-     * @param string $condition
-     * @param string $conditionValue
-     * @param string $initialContent
+     * @param string $condition The condition to be checked (class constants starting
+     * with CONDITION).
+     * @param string $conditionValue The value used in the condition evaluation
+     * (e.g. if [value] equal to [condition value]).
+     * @param string $initialContent The content to be evaluated (e.g. if [initial content]
+     * equal to [condition value]).
+     * @param bool $caseSensitive True, the condition evaluation will be case sensitive;
+     * false, case-insensitive evaluation. This flag applies to CONDITION_EQUAL_TO,
+     * CONDITION_STARTS_WITH, CONDITION_ENDS_WITH, CONDITION_CONTAINS and CONDITION_REGEX.
      */
     public function __construct(
         string $condition = "",
         $conditionValue = "",
-        string $initialContent = ""
+        string $initialContent = "",
+        bool $caseSensitive = false
     ) {
         parent::__construct();
         $this->condition      = $condition;
         $this->conditionValue = $conditionValue;
         $this->content        = $initialContent;
+        $this->caseSensitive  = $caseSensitive;
     }
 
     /**
@@ -154,7 +167,6 @@ class VerifyString extends AbstractAction
 
         return $this;
     }
-
 
     /**
      * Set this VerifyString instance, so that it checks if the check content
@@ -281,6 +293,20 @@ class VerifyString extends AbstractAction
     }
 
     /**
+     * Set the case-sensitive flag with the specified value.
+     *
+     * @param bool $caseSensitive Whether the check action should be case sensitive or not.
+     *
+     * @return $this
+     */
+    public function caseSensitive(bool $caseSensitive = true): self
+    {
+        $this->caseSensitive = $caseSensitive;
+
+        return $this;
+    }
+
+    /**
      * Set the content to be checked. This method is useful to update
      * a VerifyString instance with a new content, to verify the configured
      * condition against the new content.
@@ -307,51 +333,79 @@ class VerifyString extends AbstractAction
     {
         switch ($this->condition) {
             case self::CONDITION_EQUAL_TO:
-                $actionDescription = "is equal to the specified check value '%s'";
-                break;
+                return $this->formatActionDescription(
+                    "is equal to the specified check value '%s'",
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                );
             case self::CONDITION_LESS_THAN:
-                $actionDescription = "is less than the specified check value '%s'";
-                break;
+                return $this->formatActionDescription(
+                    "is less than the specified check value '%s'",
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                );
             case self::CONDITION_LESS_EQUAL_THAN:
-                $actionDescription = "is less than or equal to the specified check value '%s'";
-                break;
+                return $this->formatActionDescription(
+                    "is less than or equal to the specified check value '%s'",
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                );
             case self::CONDITION_GREATER_THAN:
-                $actionDescription = "is greater than the specified check value '%s'";
-                break;
+                return $this->formatActionDescription(
+                    "is greater than the specified check value '%s'",
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                );
             case self::CONDITION_GREATER_EQUAL_THAN:
-                $actionDescription = "is greater than or equal to the specified check value '%s'";
-                break;
+                return $this->formatActionDescription(
+                    "is greater than or equal to the specified check value '%s'",
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                );
             case self::CONDITION_DIFFERENT_THAN:
-                $actionDescription = "is different than the specified check value '%s'";
-                break;
+                return $this->formatActionDescription(
+                    "is different than the specified check value '%s'",
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                );
             case self::CONDITION_CONTAINS:
-                $actionDescription = "contains the specified check value '%s'";
-                break;
+                return $this->formatActionDescription(
+                    "contains the specified check value '%s'",
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                );
             case self::CONDITION_STARTS_WITH:
-                $actionDescription = "starts with the specified check value '%s'";
-                break;
+                return $this->formatActionDescription(
+                    "starts with the specified check value '%s'",
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                );
             case self::CONDITION_ENDS_WITH:
-                $actionDescription = "ends with the specified check value '%s'";
-                break;
+                return $this->formatActionDescription(
+                    "ends with the specified check value '%s'",
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                );
             case self::CONDITION_IS_EMPTY:
-                $actionDescription = "is empty";
-                break;
+                return $this->formatActionDescription("is empty", $this->content);
             case self::CONDITION_REGEX:
-                $actionDescription = "respects the given regex \"%s\"";
-                break;
+                return $this->formatActionDescription(
+                    "respects the given regex \"%s\"",
+                    $this->content,
+                    $this->conditionValue
+                );
             default:
-                $actionDescription = "";
+                return "Unsupported condition.";
         }
-
-        if ($actionDescription === "") {
-            return "Unsupported condition.";
-        }
-
-        return sprintf(
-            "Check if the given content '%s' $actionDescription.",
-            $this->content,
-            $this->conditionValue
-        );
     }
 
     /**
@@ -363,6 +417,38 @@ class VerifyString extends AbstractAction
     public function getSupportedConditions(): array
     {
         return self::getClassConstants('CONDITION_');
+    }
+
+    /**
+     * Format the given action description with the specified parameters.
+     *
+     * @param string $partialActionDescription
+     * @param string $content
+     * @param string|null $contentValue
+     * @param bool|null $caseSensitive
+     *
+     * @return string
+     */
+    protected function formatActionDescription(
+        string $partialActionDescription,
+        string $content,
+        string $contentValue = null,
+        bool $caseSensitive = null
+    ): string
+    {
+        $arguments[] = $content;
+        if (is_string($contentValue)) {
+            $arguments[] = $contentValue;
+        }
+
+        $description = vsprintf("Check if the given content '%s' $partialActionDescription.", $arguments);
+        if ($caseSensitive === true) {
+            $description = rtrim($description, '.') . " (case sensitive).";
+        } elseif ($caseSensitive === false) {
+            $description = rtrim($description, '.') . " (case insensitive).";
+        }
+
+        return $description;
     }
 
     /**
@@ -380,40 +466,63 @@ class VerifyString extends AbstractAction
     {
         switch ($this->condition) {
             case self::CONDITION_EQUAL_TO:
-                return $actionResult->setResult($this->content === $this->conditionValue);
-                break;
+                return $actionResult->setResult(StringHelper::equalTo(
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                ));
             case self::CONDITION_LESS_THAN:
-                return $actionResult->setResult($this->content < $this->conditionValue);
-                break;
+                return $actionResult->setResult(StringHelper::lessThan(
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                ));
             case self::CONDITION_LESS_EQUAL_THAN:
-                return $actionResult->setResult($this->content <= $this->conditionValue);
-                break;
+                return $actionResult->setResult(StringHelper::lessThanEqualTo(
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                ));
             case self::CONDITION_GREATER_THAN:
-                return $actionResult->setResult($this->content > $this->conditionValue);
-                break;
+                return $actionResult->setResult(StringHelper::greaterThan(
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                ));
             case self::CONDITION_GREATER_EQUAL_THAN:
-                return $actionResult->setResult($this->content >= $this->conditionValue);
-                break;
+                return $actionResult->setResult(StringHelper::greaterThanEqualTo(
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                ));
             case self::CONDITION_DIFFERENT_THAN:
-                return $actionResult->setResult($this->content !== $this->conditionValue);
-                break;
+                return $actionResult->setResult(StringHelper::differentThan(
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                ));
             case self::CONDITION_CONTAINS:
-                $found = strpos($this->content, $this->conditionValue);
-                $conditionMet = ((!is_bool($found) && strpos($this->content, $this->conditionValue) >= 0) ? true : false);
-                return $actionResult->setResult($conditionMet);
-                break;
+                return $actionResult->setResult(StringHelper::contains(
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                ));
             case self::CONDITION_STARTS_WITH:
-                return $actionResult->setResult(StringHelper::startsWith($this->content, $this->conditionValue));
-                break;
+                return $actionResult->setResult(StringHelper::startsWith(
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                ));
             case self::CONDITION_ENDS_WITH:
-                return $actionResult->setResult(StringHelper::endsWith($this->content, $this->conditionValue));
-                break;
+                return $actionResult->setResult(StringHelper::endsWith(
+                    $this->content,
+                    $this->conditionValue,
+                    $this->caseSensitive
+                ));
             case self::CONDITION_IS_EMPTY:
                 return $actionResult->setResult(empty($this->content));
-                break;
             case self::CONDITION_REGEX:
                 return $actionResult->setResult((bool) (preg_match($this->conditionValue, $this->content)));
-                break;
             default:
                 $this->throwWorkerException("Condition type %s not supported.", $this->condition);
         }
