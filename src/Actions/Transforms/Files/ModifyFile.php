@@ -55,6 +55,11 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
     protected $actions = [];
 
     /**
+     * @var bool
+     */
+    protected $caseSensitive = false;
+
+    /**
      * ModifyFile constructor.
      *
      * This class performs different actions to modify a given file. The available
@@ -78,11 +83,15 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
      * conditions are described by the object VerifyString.
      *
      * @param string $filePath The file path of the file to be modified.
+     * @param bool $caseSensitive True, the modification action evaluation will be case sensitive;
+     * false, case-insensitive evaluation. This flag applies to MODIFY_FILE_REPLACE_IN_LINE and
+     * MODIFY_FILE_REMOVE_IN_LINE modification action.
      */
-    public function __construct(string $filePath = "")
+    public function __construct(string $filePath = "", bool $caseSensitive = false)
     {
         parent::__construct();
         $this->filePath = $filePath;
+        $this->caseSensitive = $caseSensitive;
     }
 
     /**
@@ -95,6 +104,21 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
     public function modify(string $filePath): self
     {
         $this->filePath = $filePath;
+
+        return $this;
+    }
+
+    /**
+     * Set the case-sensitive flag with the specified value.
+     *
+     * @param bool $caseSensitive Whether the modification action evaluation should be
+     * case sensitive or not.
+     *
+     * @return $this
+     */
+    public function caseSensitive(bool $caseSensitive = true): self
+    {
+        $this->caseSensitive = $caseSensitive;
 
         return $this;
     }
@@ -572,8 +596,11 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
                 }
                 break;
             case self::MODIFY_FILE_REMOVE_IN_LINE:
-//TODO SHOULD WE CHECK HERE THE CASE AS WELL?????
-                $line = str_replace($searchValue, "", $line);
+                if ($this->caseSensitive) {
+                    $line = str_replace($searchValue, "", $line);
+                } else {
+                    $line = str_ireplace($searchValue, "", $line);
+                }
                 break;
             case self::MODIFY_FILE_REMOVE_LINE:
                 if (StringHelper::endsWith($line, PHP_EOL)) {
@@ -583,7 +610,11 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
                 }
                 break;
             case self::MODIFY_FILE_REPLACE_IN_LINE:
-                $line = str_replace($searchValue, $replaceValue, $line);
+                if ($this->caseSensitive) {
+                    $line = str_replace($searchValue, $replaceValue, $line);
+                } else {
+                    $line = str_ireplace($searchValue, $replaceValue, $line);
+                }
                 break;
             case self::MODIFY_FILE_REPLACE_LINE:
                 $newLine = $replaceValue;
