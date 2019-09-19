@@ -103,20 +103,27 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
      * Replace the search value with the replace value in each line of the specified
      * file, that starts with the given condition value.
      *
-     * @param mixed $conditionValue
-     * @param mixed $searchValue
-     * @param mixed $replaceValue
+     * @param mixed $conditionValue The value used in the condition statement (e.g. if starts with xxx).
+     * @param mixed $searchValue The value to search in the content.
+     * @param mixed $replaceValue The value to replace the matched content.
+     * @param bool $caseSensitive Whether or not a case-sensitive check action should be performed.
      *
      * @return ModifyFile
      */
-    public function replaceValueIfLineStartsWith($conditionValue, $searchValue, $replaceValue): self
+    public function replaceValueIfLineStartsWith(
+        $conditionValue,
+        $searchValue,
+        $replaceValue,
+        bool $caseSensitive = false
+    ): self
     {
         return $this->addAction(
             self::MODIFY_FILE_REPLACE_IN_LINE,
             VerifyString::CONDITION_STARTS_WITH,
             $conditionValue,
             $replaceValue,
-            $searchValue
+            $searchValue,
+            $caseSensitive
         );
     }
 
@@ -124,18 +131,25 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
      * Replace each line, of the specified file, that starts with the given condition
      * value with the given replace value.
      *
-     * @param mixed $conditionValue
-     * @param mixed $replaceValue
+     * @param mixed $conditionValue The value used in the condition statement (e.g. if starts with xxx).
+     * @param mixed $replaceValue The value to replace the matched content.
+     * @param bool $caseSensitive Whether or not a case-sensitive check action should be performed.
      *
      * @return ModifyFile
      */
-    public function replaceLineIfLineStartsWith($conditionValue, $replaceValue): self
+    public function replaceLineIfLineStartsWith(
+        $conditionValue,
+        $replaceValue,
+        bool $caseSensitive = false
+    ): self
     {
         return $this->addAction(
             self::MODIFY_FILE_REPLACE_LINE,
             VerifyString::CONDITION_STARTS_WITH,
             $conditionValue,
-            $replaceValue
+            $replaceValue,
+            "",
+            $caseSensitive
         );
     }
 
@@ -147,17 +161,23 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
      * @param mixed $searchValue The value to search for in the original string and that
      * will be modified by the action specific modification (e.g. replace searchValue
      * with replaceValue).
+     * @param bool $caseSensitive Whether or not a case-sensitive check action should be performed.
      *
      * @return ModifyFile
      */
-    public function removeValueIfLineStartsWith($conditionValue, $searchValue): self
+    public function removeValueIfLineStartsWith(
+        $conditionValue,
+        $searchValue,
+        bool $caseSensitive = false
+    ): self
     {
         return $this->addAction(
             self::MODIFY_FILE_REMOVE_IN_LINE,
             VerifyString::CONDITION_STARTS_WITH,
             $conditionValue,
             '',
-            $searchValue
+            $searchValue,
+            $caseSensitive
         );
     }
 
@@ -166,15 +186,22 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
      * value with the given replace value.
      *
      * @param mixed $conditionValue The condition value.
+     * @param bool $caseSensitive Whether or not a case-sensitive check action should be performed.
      *
      * @return ModifyFile
      */
-    public function removeLineIfLineStartsWith($conditionValue): self
+    public function removeLineIfLineStartsWith(
+        $conditionValue,
+        bool $caseSensitive = false
+    ): self
     {
         return $this->addAction(
             self::MODIFY_FILE_REMOVE_LINE,
             VerifyString::CONDITION_STARTS_WITH,
-            $conditionValue
+            $conditionValue,
+            "",
+            "",
+            $caseSensitive
         );
     }
 
@@ -184,16 +211,23 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
      *
      * @param string $templatePath The template path.
      * @param mixed $conditionValue The condition value.
+     * @param bool $caseSensitive Whether or not a case-sensitive check action should be performed.
      *
      * @return ModifyFile
      */
-    public function replaceWithTemplateIfLineEqualTo(string $templatePath, $conditionValue): self
+    public function replaceWithTemplateIfLineEqualTo(
+        string $templatePath,
+        $conditionValue,
+        bool $caseSensitive = false
+    ): self
     {
         return $this->addAction(
             self::MODIFY_FILE_REPLACE_WITH_TEMPLATE,
             VerifyString::CONDITION_EQUAL_TO,
             $conditionValue,
-            $templatePath
+            $templatePath,
+            "",
+            $caseSensitive
         );
     }
 
@@ -203,16 +237,23 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
      *
      * @param string $templatePath The template path.
      * @param mixed $conditionValue The condition value.
+     * @param bool $caseSensitive Whether or not a case-sensitive check action should be performed.
      *
      * @return ModifyFile
      */
-    public function addTemplateIfLineEqualTo(string $templatePath, $conditionValue): self
+    public function addTemplateIfLineEqualTo(
+        string $templatePath,
+        $conditionValue,
+        bool $caseSensitive = false
+    ): self
     {
         return $this->addAction(
             self::MODIFY_FILE_APPEND_TEMPLATE,
             VerifyString::CONDITION_EQUAL_TO,
             $conditionValue,
-            $templatePath
+            $templatePath,
+            "",
+            $caseSensitive
         );
     }
 
@@ -229,6 +270,7 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
      * @param mixed $searchValue The value to search for in the original string and that
      * will be modified by the action specific modification (e.g. replace searchValue
      * with replaceValue).
+     * @param bool $caseSensitive Whether the check action should be case sensitive or not.
      *
      * @return ModifyFile
      */
@@ -237,14 +279,20 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
         string $conditionType,
         $conditionValue,
         $replaceValue = "",
-        $searchValue = ""
+        $searchValue = "",
+        bool $caseSensitive = false
     ): self
     {
         $this->actions[] = [
             "action"    => $actionType,
             'search'    => $searchValue,
             "value"     => $replaceValue,
-            "condition" => ActionFactory::createVerifyString($conditionType, $conditionValue)
+            "condition" => ActionFactory::createVerifyString(
+                $conditionType,
+                $conditionValue,
+                "",
+                $caseSensitive
+            )
         ];
 
         return $this;
@@ -524,6 +572,7 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
                 }
                 break;
             case self::MODIFY_FILE_REMOVE_IN_LINE:
+//TODO SHOULD WE CHECK HERE THE CASE AS WELL?????
                 $line = str_replace($searchValue, "", $line);
                 break;
             case self::MODIFY_FILE_REMOVE_LINE:

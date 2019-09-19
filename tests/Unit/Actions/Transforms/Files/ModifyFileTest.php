@@ -62,49 +62,70 @@ class ModifyFileTest extends BaseTest
     /**
      * Data provider for stringify tests.
      *
+     * @param string $testName
+     * @param bool $caseSensitive
+     *
      * @return array
      */
-    public function stringifyProvider(): array
+    public function stringifyProvider(string $testName, bool $caseSensitive = false): array
     {
+        if ($caseSensitive) {
+            $caseSensitiveMessage = "(case sensitive)";
+        } else {
+            $caseSensitiveMessage = "(case insensitive)";
+        }
+
         // Test for action MODIFY_FILE_REPLACE_IN_LINE
-        $replaceValueIfLineStartsWith = $this->getReplaceValueModifyFile();
+        $replaceValueIfLineStartsWith = $this->getReplaceValueModifyFile('ANY', $caseSensitive);
         $this->applyContentToActions($replaceValueIfLineStartsWith);
 
         // Test for action MODIFY_FILE_REPLACE_LINE
-        $replaceLineIfLineStartsWith = $this->getReplaceLineModifyFile();
+        $replaceLineIfLineStartsWith = $this->getReplaceLineModifyFile('ANY', $caseSensitive);
         $this->applyContentToActions($replaceLineIfLineStartsWith);
 
         // Test for action MODIFY_FILE_REMOVE_IN_LINE
-        $removeValueIfLineStartsWith = $this->getRemoveValueModifyFile();
+        $removeValueIfLineStartsWith = $this->getRemoveValueModifyFile('ANY', $caseSensitive);
         $this->applyContentToActions($removeValueIfLineStartsWith);
 
         // Test for action MODIFY_FILE_REMOVE_LINE
-        $removeLineIfLineStartsWith = $this->getRemoveLineModifyFile();
+        $removeLineIfLineStartsWith = $this->getRemoveLineModifyFile('ANY', $caseSensitive);
         $this->applyContentToActions($removeLineIfLineStartsWith);
 
         // Test for action MODIFY_FILE_APPEND_TO_LINE
-        $appendValueToLineIfLineStartsWith = $this->getAppendValueModifyFile();
+        $appendValueToLineIfLineStartsWith = $this->getAppendValueModifyFile('ANY', $caseSensitive);
         $this->applyContentToActions($appendValueToLineIfLineStartsWith);
 
         // Test for action MODIFY_FILE_APPEND_TEMPLATE
-        $appendTemplateToLineIfLineStartsWith = $this->getAppendTemplateModifyFile();
+        $appendTemplateToLineIfLineStartsWith = $this->getAppendTemplateModifyFile('ANY', $caseSensitive);
         $this->applyContentToActions($appendTemplateToLineIfLineStartsWith);
 
         // Test for action MODIFY_FILE_REPLACE_WITH_TEMPLATE
-        $replaceWithTemplateIfLineStartsWith = $this->getReplaceWithTemplateModifyFile();
+        $replaceWithTemplateIfLineStartsWith = $this->getReplaceWithTemplateModifyFile('ANY', $caseSensitive);
         $this->applyContentToActions($replaceWithTemplateIfLineStartsWith);
 
         return [
-            [$replaceValueIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace content 'CONTENT' with '".self::TEST_REPLACED_CONTENT."' in each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
-            [$replaceLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace each line that meets the following condition with '".self::TEST_REPLACED_CONTENT."': 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
-            [$appendValueToLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Append content '".self::TEST_APPENDED_CONTENT."' to each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
-            [$removeValueIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Remove content 'CONTENT' in each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
-            [$removeLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Remove each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
-            [$appendTemplateToLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Append template '".self::TEST_FILE_TEMPLATE."' to each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
-            [$replaceWithTemplateIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace each line that meets the following condition, with template '".self::TEST_FILE_TEMPLATE."': 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY'.';" . PHP_EOL],
+            [$replaceValueIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace content 'CONTENT' with '".self::TEST_REPLACED_CONTENT."' in each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY' $caseSensitiveMessage.';" . PHP_EOL],
+            [$replaceLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace each line that meets the following condition with '".self::TEST_REPLACED_CONTENT."': 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY' $caseSensitiveMessage.';" . PHP_EOL],
+            [$appendValueToLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Append content '".self::TEST_APPENDED_CONTENT."' to each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY' $caseSensitiveMessage.';" . PHP_EOL],
+            [$removeValueIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Remove content 'CONTENT' in each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY' $caseSensitiveMessage.';" . PHP_EOL],
+            [$removeLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Remove each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY' $caseSensitiveMessage.';" . PHP_EOL],
+            [$appendTemplateToLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Append template '".self::TEST_FILE_TEMPLATE."' to each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY' $caseSensitiveMessage.';" . PHP_EOL],
+            [$replaceWithTemplateIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace each line that meets the following condition, with template '".self::TEST_FILE_TEMPLATE."': 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY' $caseSensitiveMessage.';" . PHP_EOL],
             [ActionFactory::createModifyFile(self::TEST_FILE_MODIFY), "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "No transformations configured." . PHP_EOL],
             [ActionFactory::createModifyFile(''), "Apply the following transformations to the specified file '': " . PHP_EOL . "No transformations configured." . PHP_EOL],
         ];
+    }
+
+    /**
+     * Data provider for case-insensitive stringify tests.
+     *
+     * @param string $testName
+     *
+     * @return array
+     */
+    public function stringifyCaseInsensitiveProvider(string $testName): array
+    {
+        return $this->stringifyProvider($testName, true);
     }
 
     /**
@@ -114,16 +135,32 @@ class ModifyFileTest extends BaseTest
      */
     public function applyProvider(): array
     {
-        // Action | is valid | is fatal | success required | expected value | exception | exception content
+        // Action | is valid | is fatal | success required | expected value | exception | expected content
         return [
-            [$this->getReplaceValueModifyFile(), true, false, false, true, false, 'ANY REPLACED CONTENT'],
-            [$this->getReplaceLineModifyFile(), true, false, false, true, false, self::TEST_REPLACED_CONTENT],
-            [$this->getRemoveValueModifyFile(), true, false, false, true, false, 'ANY '],
-            [$this->getRemoveLineModifyFile(), true, false, false, true, false, ''],
-            [$this->getAppendValueModifyFile(), true, false, false, true, false, self::TEST_CONTENT . self::TEST_APPENDED_CONTENT],
-            [$this->getAppendTemplateModifyFile(), true, false, false, true, false, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
-            [$this->getReplaceWithTemplateModifyFile(), true, false, false, true, false, self::TEST_TEMPLATE_CONTENT],
+            [$this->getReplaceValueModifyFile('ANY'), true, false, false, true, false, 'ANY REPLACED CONTENT'],
+            [$this->getReplaceLineModifyFile('ANY'), true, false, false, true, false, self::TEST_REPLACED_CONTENT],
+            [$this->getRemoveValueModifyFile('ANY'), true, false, false, true, false, 'ANY '],
+            [$this->getRemoveLineModifyFile('ANY'), true, false, false, true, false, ''],
+            [$this->getAppendValueModifyFile('ANY'), true, false, false, true, false, self::TEST_CONTENT . self::TEST_APPENDED_CONTENT],
+            [$this->getAppendTemplateModifyFile('ANY'), true, false, false, true, false, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
+            [$this->getReplaceWithTemplateModifyFile('ANY'), true, false, false, true, false, self::TEST_TEMPLATE_CONTENT],
             [ActionFactory::createModifyFile(self::TEST_FILE_MODIFY), true, false, false, true, false, self::TEST_CONTENT],
+            /** Case sensitive tests */
+            [$this->getReplaceValueModifyFile('any'), true, false, false, true, false, 'ANY REPLACED CONTENT'],
+            // The action executed correctly but didn't change the content as the case-sensitive check condition was not met (verify string)
+            [$this->getReplaceValueModifyFile('any', true), true, false, false, true, false, self::TEST_CONTENT],
+            [$this->getReplaceLineModifyFile('any'), true, false, false, true, false, self::TEST_REPLACED_CONTENT],
+            [$this->getReplaceLineModifyFile('any', true), true, false, false, true, false, self::TEST_CONTENT],
+            [$this->getRemoveValueModifyFile('any'), true, false, false, true, false, 'ANY '],
+            [$this->getRemoveValueModifyFile('any', true), true, false, false, true, false, self::TEST_CONTENT],
+            [$this->getRemoveLineModifyFile('any'), true, false, false, true, false, ''],
+            [$this->getRemoveLineModifyFile('any', true), true, false, false, true, false, self::TEST_CONTENT],
+            [$this->getAppendValueModifyFile('any'), true, false, false, true, false, self::TEST_CONTENT . self::TEST_APPENDED_CONTENT],
+            [$this->getAppendValueModifyFile('any', true), true, false, false, true, false, self::TEST_CONTENT],
+            [$this->getAppendTemplateModifyFile('any'), true, false, false, true, false, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
+            [$this->getAppendTemplateModifyFile('any', true), true, false, false, true, false, self::TEST_CONTENT],
+            [$this->getReplaceWithTemplateModifyFile('any'), true, false, false, true, false, self::TEST_TEMPLATE_CONTENT],
+            [$this->getReplaceWithTemplateModifyFile('any', true), true, false, false, true, false, self::TEST_CONTENT],
             /** Negative cases */
             /** not successful, no fatal */
             [ActionFactory::createModifyFile(''), false, false, false, false, false, self::TEST_CONTENT],
@@ -197,6 +234,7 @@ class ModifyFileTest extends BaseTest
      * Test method ModifyFile::stringify().
      *
      * @dataProvider stringifyProvider
+     * @dataProvider stringifyCaseInsensitiveProvider
      *
      * @param ModifyFile $modifyFile
      * @param string $expectedMessage
@@ -222,59 +260,73 @@ class ModifyFileTest extends BaseTest
     /**
      * Return an instance of ModifyFile to test the modification MODIFY_FILE_REPLACE_IN_LINE.
      *
+     * @param string $conditionValue
+     * @param bool $caseSensitive
+     *
      * @return ModifyFile
      */
-    protected function getReplaceValueModifyFile(): ModifyFile
+    protected function getReplaceValueModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
             ActionFactory::createModifyFile()
                 ->modify(self::TEST_FILE_MODIFY)
-                ->replaceValueIfLineStartsWith('ANY', 'CONTENT', self::TEST_REPLACED_CONTENT)
+                ->replaceValueIfLineStartsWith($conditionValue, 'CONTENT', self::TEST_REPLACED_CONTENT, $caseSensitive)
             ;
     }
 
     /**
      * Return an instance of ModifyFile to test the modification MODIFY_FILE_REMOVE_IN_LINE.
      *
+     * @param string $conditionValue
+     * @param bool $caseSensitive
+     *
      * @return ModifyFile
      */
-    protected function getRemoveValueModifyFile(): ModifyFile
+    protected function getRemoveValueModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
             ActionFactory::createModifyFile()
                 ->modify(self::TEST_FILE_MODIFY)
-                ->removeValueIfLineStartsWith('ANY', 'CONTENT')
+                ->removeValueIfLineStartsWith($conditionValue, 'CONTENT', $caseSensitive)
             ;
     }
 
     /**
      * Return an instance of ModifyFile to test the modification MODIFY_FILE_REMOVE_LINE.
      *
+     * @param string $conditionValue
+     * @param bool $caseSensitive
+     *
      * @return ModifyFile
      */
-    protected function getRemoveLineModifyFile(): ModifyFile
+    protected function getRemoveLineModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
             ActionFactory::createModifyFile()
                 ->modify(self::TEST_FILE_MODIFY)
-                ->removeLineIfLineStartsWith('ANY')
+                ->removeLineIfLineStartsWith($conditionValue, $caseSensitive)
             ;
     }
 
     /**
      * Return an instance of ModifyFile to test the modification MODIFY_FILE_APPEND_TO_LINE.
      *
+     * @param string $conditionValue
+     * @param bool $caseSensitive
+     *
      * @return ModifyFile
      */
-    protected function getAppendValueModifyFile(): ModifyFile
+    protected function getAppendValueModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
             ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->addAction(
                     ModifyFile::MODIFY_FILE_APPEND_TO_LINE,
                     VerifyString::CONDITION_STARTS_WITH,
-                    'ANY',
-                    self::TEST_APPENDED_CONTENT
+                    $conditionValue,
+                    self::TEST_APPENDED_CONTENT,
+                    "",
+                    $caseSensitive
                 )
             ;
     }
@@ -282,17 +334,22 @@ class ModifyFileTest extends BaseTest
     /**
      * Return an instance of ModifyFile to test the modification MODIFY_FILE_APPEND_TEMPLATE.
      *
+     * @param string $conditionValue
+     * @param bool $caseSensitive
+     *
      * @return ModifyFile
      */
-    protected function getAppendTemplateModifyFile(): ModifyFile
+    protected function getAppendTemplateModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
             ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->addAction(
                     ModifyFile::MODIFY_FILE_APPEND_TEMPLATE,
                     VerifyString::CONDITION_STARTS_WITH,
-                    'ANY',
-                    self::TEST_FILE_TEMPLATE
+                    $conditionValue,
+                    self::TEST_FILE_TEMPLATE,
+                    "",
+                    $caseSensitive
                 )
             ;
     }
@@ -300,17 +357,22 @@ class ModifyFileTest extends BaseTest
     /**
      * Return an instance of ModifyFile to test the modification MODIFY_FILE_REPLACE_WITH_TEMPLATE.
      *
+     * @param string $conditionValue
+     * @param bool $caseSensitive
+     *
      * @return ModifyFile
      */
-    protected function getReplaceWithTemplateModifyFile(): ModifyFile
+    protected function getReplaceWithTemplateModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
             ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
                 ->addAction(
                     ModifyFile::MODIFY_FILE_REPLACE_WITH_TEMPLATE,
                     VerifyString::CONDITION_STARTS_WITH,
-                    'ANY',
-                    self::TEST_FILE_TEMPLATE
+                    $conditionValue,
+                    self::TEST_FILE_TEMPLATE,
+                    "",
+                    $caseSensitive
                 )
             ;
     }
@@ -318,23 +380,28 @@ class ModifyFileTest extends BaseTest
     /**
      * Return an instance of ModifyFile to test the modification MODIFY_FILE_REPLACE_LINE.
      *
+     * @param string $conditionValue
+     * @param bool $caseSensitive
+     *
      * @return ModifyFile
      */
-    protected function getReplaceLineModifyFile(): ModifyFile
+    protected function getReplaceLineModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
             ActionFactory::createModifyFile()
                 ->modify(self::TEST_FILE_MODIFY)
-                ->replaceLineIfLineStartsWith('ANY', self::TEST_REPLACED_CONTENT)
+                ->replaceLineIfLineStartsWith($conditionValue, self::TEST_REPLACED_CONTENT, $caseSensitive)
             ;
     }
 
     /**
      * Return a bad configured ModifyFile instance.
      *
+     * @param bool $caseSensitive
+     *
      * @return ModifyFile
      */
-    protected function getModifyFileWithUnsupportedAction(): ModifyFile
+    protected function getModifyFileWithUnsupportedAction(bool $caseSensitive = false): ModifyFile
     {
         return
             ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
@@ -342,7 +409,9 @@ class ModifyFileTest extends BaseTest
                     'wrong_action',
                     VerifyString::CONDITION_STARTS_WITH,
                     'ANY',
-                    self::TEST_FILE_TEMPLATE
+                    self::TEST_FILE_TEMPLATE,
+                    "",
+                    $caseSensitive
                 )
             ;
     }
@@ -350,9 +419,11 @@ class ModifyFileTest extends BaseTest
     /**
      * Return a bad configured ModifyFile instance.
      *
+     * @param bool $caseSensitive
+     *
      * @return ModifyFile
      */
-    protected function getModifyFileWithUnsupportedCondition(): ModifyFile
+    protected function getModifyFileWithUnsupportedCondition(bool $caseSensitive = false): ModifyFile
     {
         return
             ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
@@ -360,7 +431,9 @@ class ModifyFileTest extends BaseTest
                     ModifyFile::MODIFY_FILE_REPLACE_WITH_TEMPLATE,
                     'wrong_condition',
                     'ANY',
-                    self::TEST_FILE_TEMPLATE
+                    self::TEST_FILE_TEMPLATE,
+                    "",
+                    $caseSensitive
                 )
             ;
     }
