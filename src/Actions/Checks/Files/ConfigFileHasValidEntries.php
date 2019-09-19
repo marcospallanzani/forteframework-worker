@@ -43,8 +43,10 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
      * @param string $filePath The file path to check.
      * @param string $contentType The file content type.
      */
-    public function __construct(string $filePath = "", string $contentType = "")
-    {
+    public function __construct(
+        string $filePath = "",
+        string $contentType = ""
+    ) {
         parent::__construct($filePath);
         $this->contentType = $contentType;
     }
@@ -136,18 +138,51 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
      * @param mixed $value The expected value
      * @param string $action The comparison action to be performed. Accepted
      * values are the VerifyArray constants with prefix "CHECK_".
+     * @param bool $caseSensitive Whether or not a case-sensitive check action
+     * should be performed.
      *
      * @return ConfigFileHasValidEntries
      */
     public function hasKeyWithValue(
         string $key,
         $value,
-        string $action = VerifyArray::CHECK_CONTAINS
+        string $action = VerifyArray::CHECK_CONTAINS,
+        bool $caseSensitive = false
     ): self
     {
-        $this->checks[] = ActionFactory::createVerifyArray($key, $action, $value);
+        $this->checks[] = ActionFactory::createVerifyArray($key, $action, $value)->caseSensitive($caseSensitive);
 
         return $this;
+    }
+
+    /**
+     * Run the given nested action and modify the given nested action result accordingly.
+     *
+     * @param AbstractAction $nestedAction The nested action to be run.
+     * @param ActionResult $nestedActionResult The nested action result to be modified by
+     * the given nested run action.
+     * @param array $failedNestedActions A list of failed nested actions.
+     * @param mixed $content The content to be used by the run method, if required.
+     * @param array $actionOptions Additional options required to run the given
+     * AbstractAction subclass instance.
+     *
+     * @throws ActionException
+     */
+    public function runNestedAction(
+        AbstractAction &$nestedAction,
+        ActionResult &$nestedActionResult,
+        array &$failedNestedActions,
+        &$content = null,
+        array &$actionOptions = array()
+    ): void
+    {
+        if ($nestedAction instanceof VerifyArray) {
+            $nestedAction->checkContent($content);
+        }
+        $nestedActionResult = $nestedAction->run();
+        if (!$nestedAction->validateResult($nestedActionResult)) {
+            $failedNestedActions[] = $nestedActionResult;
+        }
     }
 
     /**
@@ -243,35 +278,5 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
         );
 
         return $actionResult;
-    }
-
-    /**
-     * Run the given nested action and modify the given nested action result accordingly.
-     *
-     * @param AbstractAction $nestedAction The nested action to be run.
-     * @param ActionResult $nestedActionResult The nested action result to be modified by
-     * the given nested run action.
-     * @param array $failedNestedActions A list of failed nested actions.
-     * @param mixed $content The content to be used by the run method, if required.
-     * @param array $actionOptions Additional options required to run the given
-     * AbstractAction subclass instance.
-     *
-     * @throws ActionException
-     */
-    public function runNestedAction(
-        AbstractAction &$nestedAction,
-        ActionResult &$nestedActionResult,
-        array &$failedNestedActions,
-        &$content = null,
-        array &$actionOptions = array()
-    ): void
-    {
-        if ($nestedAction instanceof VerifyArray) {
-            $nestedAction->checkContent($content);
-        }
-        $nestedActionResult = $nestedAction->run();
-        if (!$nestedAction->validateResult($nestedActionResult)) {
-            $failedNestedActions[] = $nestedActionResult;
-        }
     }
 }

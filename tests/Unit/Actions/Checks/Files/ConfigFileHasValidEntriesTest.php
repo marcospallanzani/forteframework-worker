@@ -291,7 +291,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
 
         $fileEntriesInstances = $this->getFileHasValidEntriesInstances();
         foreach ($fileEntriesInstances as $instance) {
-            // Instance | key | value | compare action | is fatal | is success required | expected | exception
+            // Instance | key | value | compare action | is fatal | is success required | expected | exception | case sensitive
             $providedValues = array_merge($providedValues, [
                 /** CHECK_CONTAINS */
                 [clone $instance, 'key1', 'value1', VerifyArray::CHECK_CONTAINS, false, false, true, false],
@@ -306,6 +306,12 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key4.key5', 'ue5', VerifyArray::CHECK_CONTAINS, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', 'val', VerifyArray::CHECK_CONTAINS, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', '5', VerifyArray::CHECK_CONTAINS, false, false, true, false],
+                /** Case sensitive tests */
+                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_CONTAINS, false, false, true, false, true],
+                [clone $instance, 'key1', 'VALUE1', VerifyArray::CHECK_CONTAINS, false, false, true, false, false],
+                [clone $instance, 'key1', 'Val', VerifyArray::CHECK_CONTAINS, false, false, false, false, true],
+                [clone $instance, 'key1', 'test', VerifyArray::CHECK_CONTAINS, false, false, false, false, true],
+                [clone $instance, 'key1', 'test', VerifyArray::CHECK_CONTAINS, false, false, false, false, false],
                 /** Negative cases */
                 /** not successful, no fatal */
                 // The only way to throw an action exception is to break one or more validation checks
@@ -341,6 +347,12 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', 'val', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', 'v', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
+                /** Case sensitive tests */
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_STARTS_WITH, false, false, true, false, true],
+                [clone $instance, 'key2.key3', 'VALUE', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
+                [clone $instance, 'key2.key3', 'VALUE', VerifyArray::CHECK_STARTS_WITH, false, false, false, false, true],
+                [clone $instance, 'key2.key3', 'LUE', VerifyArray::CHECK_STARTS_WITH, false, false, false, false],
+                [clone $instance, 'key2.key3', 'LUE', VerifyArray::CHECK_STARTS_WITH, false, false, false, false, true],
                 /** Negative cases */
                 /** not successful, no fatal */
                 // The only way to throw an action exception is to break one or more validation checks
@@ -375,6 +387,12 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', 'ue5', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', '5', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
+                /** Case sensitive tests */
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_ENDS_WITH, false, false, true, false, true],
+                [clone $instance, 'key2.key3', 'LUE3', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
+                [clone $instance, 'key2.key3', 'LUE3', VerifyArray::CHECK_ENDS_WITH, false, false, false, false, true],
+                [clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_ENDS_WITH, false, false, false, false, false],
+                [clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_ENDS_WITH, false, false, false, false, true],
                 /** Negative cases */
                 /** not successful, no fatal */
                 // The only way to throw an action exception is to break one or more validation checks
@@ -403,6 +421,12 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_EQUALS, false, false, true, false],
                 [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EQUALS, false, false, true, false],
                 [clone $instance, 'key99', '', VerifyArray::CHECK_EQUALS, false, false, true, false],
+                /** Case sensitive tests */
+                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EQUALS, false, false, true, false, true],
+                [clone $instance, 'key2.key4.key5', 'VALUE5', VerifyArray::CHECK_EQUALS, false, false, true, false],
+                [clone $instance, 'key2.key4.key5', 'VALUE5', VerifyArray::CHECK_EQUALS, false, false, false, false, true],
+                [clone $instance, 'key2.key4.key5', 'test', VerifyArray::CHECK_EQUALS, false, false, false, false],
+                [clone $instance, 'key2.key4.key5', 'test', VerifyArray::CHECK_EQUALS, false, false, false, false, true],
                 /** Negative cases */
                 /** not successful, no fatal */
                 array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_EQUALS], $failParams),
@@ -471,21 +495,42 @@ class ConfigFileHasValidEntriesTest extends BaseTest
     /**
      * Data provider for stringify tests.
      *
+     * @param string $testName
+     * @param bool $caseSensitive
+     *
      * @return array
      */
-    public function stringifyProvider(): array
+    public function stringifyProvider(string $testName, bool $caseSensitive = false): array
     {
+        if ($caseSensitive) {
+            $caseSensitiveMessage = "(case sensitive)";
+        } else {
+            $caseSensitiveMessage = "(case insensitive)";
+        }
         $filePath = self::TEST_FILE_TMP_JSON;
         $key = 'key';
         $value = "value";
+
         return [
             [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON), "Run the following checks in file '$filePath':"],
             [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKey($key), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and has any value"],
             [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithNonEmptyValue($key), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and is not empty (empty string or null)"],
             [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithEmptyValue($key), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and is empty (empty string or null)"],
-            [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and is equal to value '$value'"],
-            [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithValue($key, $value, VerifyArray::CHECK_CONTAINS), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and contains value '$value'"],
+            [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS, $caseSensitive), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and is equal to value '$value' $caseSensitiveMessage"],
+            [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithValue($key, $value, VerifyArray::CHECK_CONTAINS, $caseSensitive), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and contains value '$value' $caseSensitiveMessage"],
         ];
+    }
+
+    /**
+     * Data provider for case-insensitive stringify tests.
+     *
+     * @param string $testName
+     *
+     * @return array
+     */
+    public function stringifyCaseInsensitiveProvider(string $testName): array
+    {
+        return $this->stringifyProvider($testName, true);
     }
 
     /**
@@ -693,6 +738,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
      * @param bool $isSuccessRequired
      * @param bool $expected
      * @param bool $exceptionExpected
+     * @param bool $caseSensitive
      *
      * @throws ActionException
      */
@@ -704,7 +750,8 @@ class ConfigFileHasValidEntriesTest extends BaseTest
         bool $isFatal,
         bool $isSuccessRequired,
         bool $expected,
-        bool $exceptionExpected
+        bool $exceptionExpected,
+        bool $caseSensitive = false
     ): void
     {
         if ($exceptionExpected) {
@@ -713,7 +760,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
         $this->assertEquals(
             $expected,
             $fileHasValidEntries
-                ->hasKeyWithValue($key, $value, $compareActionType)
+                ->hasKeyWithValue($key, $value, $compareActionType, $caseSensitive)
                 ->setIsFatal($isFatal)
                 ->setIsSuccessRequired($isSuccessRequired)
                 ->run()
@@ -725,6 +772,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
      * Test method ConfigFileHasValidEntries::stringify().
      *
      * @dataProvider stringifyProvider
+     * @dataProvider stringifyCaseInsensitiveProvider
      *
      * @param ConfigFileHasValidEntries $fileHasValidEntries
      * @param string $expected
