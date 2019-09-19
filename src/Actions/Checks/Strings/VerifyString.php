@@ -88,8 +88,8 @@ class VerifyString extends AbstractAction
      * @param string $initialContent The content to be evaluated (e.g. if [initial content]
      * equal to [condition value]).
      * @param bool $caseSensitive True, the condition evaluation will be case sensitive;
-     * false, case-insensitive evaluation. This flag applies to CONDITION_EQUAL_TO,
-     * CONDITION_STARTS_WITH, CONDITION_ENDS_WITH, CONDITION_CONTAINS and CONDITION_REGEX.
+     * false, case-insensitive evaluation. This flag applies to all conditions except
+     * CONDITION_REGEX and CONDITION_IS_EMPTY.
      */
     public function __construct(
         string $condition = "",
