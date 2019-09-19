@@ -68,11 +68,15 @@ class VerifyArrayTest extends BaseTest
         return [
             ['key1', VerifyArray::CHECK_ANY, 'value1', $reverse, "Check if key 'key1' is set and has any value"],
             ['key1', VerifyArray::CHECK_MISSING_KEY, 'value1', $reverse, "Check if key 'key1' is " . ($reverse ? "" : "not ") . "set"],
-            ['key1', VerifyArray::CHECK_ENDS_WITH, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not end" : "ends") . " with value 'value1'"],
-            ['key1', VerifyArray::CHECK_STARTS_WITH, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not start" : "starts") . " with value 'value1'"],
-            ['key1', VerifyArray::CHECK_EQUALS, 'value1', $reverse, "Check if key 'key1' is set and is " . ($reverse ? "not " : "") . "equal to value 'value1'"],
+            ['key1', VerifyArray::CHECK_ENDS_WITH, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not end" : "ends") . " with value 'value1' (case insensitive)"],
+            ['key1', VerifyArray::CHECK_ENDS_WITH, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not end" : "ends") . " with value 'value1' (case sensitive)", true],
+            ['key1', VerifyArray::CHECK_STARTS_WITH, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not start" : "starts") . " with value 'value1' (case insensitive)"],
+            ['key1', VerifyArray::CHECK_STARTS_WITH, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not start" : "starts") . " with value 'value1' (case sensitive)", true],
+            ['key1', VerifyArray::CHECK_EQUALS, 'value1', $reverse, "Check if key 'key1' is set and is " . ($reverse ? "not " : "") . "equal to value 'value1' (case insensitive)"],
+            ['key1', VerifyArray::CHECK_EQUALS, 'value1', $reverse, "Check if key 'key1' is set and is " . ($reverse ? "not " : "") . "equal to value 'value1' (case sensitive)", true],
             ['key1', VerifyArray::CHECK_EMPTY, 'value1', $reverse, "Check if key 'key1' is set and is " . ($reverse ? "not " : "") . "empty (empty string or null)"],
-            ['key1', VerifyArray::CHECK_CONTAINS, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value 'value1'"],
+            ['key1', VerifyArray::CHECK_CONTAINS, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value 'value1' (case insensitive)"],
+            ['key1', VerifyArray::CHECK_CONTAINS, 'value1', $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value 'value1' (case sensitive)", true],
             ['key1', VerifyArray::CHECK_CONTAINS, true, $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value 'true'"],
             ['key1', VerifyArray::CHECK_CONTAINS, 55, $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value '55'"],
             ['key1', VerifyArray::CHECK_CONTAINS, null, $reverse, "Check if key 'key1' is set and " . ($reverse ? "does not contain" : "contains") . " value 'null'"],
@@ -156,7 +160,7 @@ class VerifyArrayTest extends BaseTest
     public function checkProvider(): array
     {
         return [
-            // Array to check | key | operation | value | reverse action | is fatal | is success required | expected | exception
+            // Array to check | key | operation | value | reverse action | is fatal | is success required | expected | exception | case sensitive
             /** CHECK_ANY tests */
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, '', false, false, false, true, false],
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, 'value', false, false, false, true, false],
@@ -171,6 +175,10 @@ class VerifyArrayTest extends BaseTest
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'lue2', false, false, false, true, false],
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'value2', false, false, false, true, false],
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'xxx', false, false, false, false, false],
+            /** Case-sensitive cases */
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'ue2', false, false, false, true, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'UE2', false, false, false, true, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'UE2', false, false, false, false, false, true],
             /** negative cases */
             /** not successful, no fatal */
             [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', false, false, false, false, false],
@@ -188,6 +196,10 @@ class VerifyArrayTest extends BaseTest
             [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value', false, false, false, true, false],
             [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value15', false, false, false, true, false],
             [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'xxx', false, false, false, false, false],
+            /** Case-sensitive cases */
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'val', false, false, false, true, false, true],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'VAL', false, false, false, true, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'VAL', false, false, false, false, false, true],
             /** negative cases */
             /** not successful, no fatal */
             [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', false, false, false, false, false],
@@ -206,6 +218,10 @@ class VerifyArrayTest extends BaseTest
             [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long', false, false, false, true, false],
             [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long test value', false, false, false, true, false],
             [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'xxx', false, false, false, false, false],
+            /** Case-sensitive cases */
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'long', false, false, false, true, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'LONG', false, false, false, true, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'LONG', false, false, false, false, false, true],
             /** negative cases */
             /** not successful, no fatal */
             [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', false, false, false, false, false],
@@ -222,6 +238,10 @@ class VerifyArrayTest extends BaseTest
             [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, false, false, false, true, false],
             [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, '66', false, false, false, true, false],
             [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, true, false, false, false, false, false],
+            /** Case-sensitive cases */
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, false, false, false, true, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', false, false, false, true, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', false, false, false, false, false, true],
             /** negative cases */
             /** not successful, no fatal */
             [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', false, false, false, false, false],
@@ -272,7 +292,7 @@ class VerifyArrayTest extends BaseTest
     public function checkReverseProvider(): array
     {
         return [
-            // Array to check | key | operation | value | reverse action | is fatal | is success required | expected | exception
+            // Array to check | key | operation | value | reverse action | is fatal | is success required | expected | exception | case sensitive
             /** CHECK_ANY tests */
             /** negative cases */
             /** not successful, no fatal */
@@ -289,6 +309,10 @@ class VerifyArrayTest extends BaseTest
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'lue2', true, false, false, false, false],
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'value2', true, false, false, false, false],
             [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'xxx', true, false, false, true, false],
+            /** Case-sensitive cases */
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'XXX', true, false, false, true, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'LUE2', true, false, false, false, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'LUE2', true, false, false, true, false, true],
             /** negative cases */
             /** not successful, no fatal */
             [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', true, false, false, false, false],
@@ -306,6 +330,10 @@ class VerifyArrayTest extends BaseTest
             [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value', true, false, false, false, false],
             [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value15', true, false, false, false, false],
             [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'xxx', true, false, false, true, false],
+            /** Case-sensitive cases */
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_STARTS_WITH, 'XXX', true, false, false, true, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_STARTS_WITH, 'VAL', true, false, false, false, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_STARTS_WITH, 'VAL', true, false, false, true, false, true],
             /** negative cases */
             /** not successful, no fatal */
             [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', true, false, false, false, false],
@@ -324,6 +352,10 @@ class VerifyArrayTest extends BaseTest
             [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long', true, false, false, false, false],
             [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long test value', true, false, false, false, false],
             [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'xxx', true, false, false, true, false],
+            /** Case-sensitive cases */
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'A LONG TEST', true, false, false, false, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'A LONG TEST', true, false, false, true, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'XXX', true, false, false, true, false, true],
             /** negative cases */
             /** not successful, no fatal */
             [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', true, false, false, false, false],
@@ -340,6 +372,10 @@ class VerifyArrayTest extends BaseTest
             [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, true, false, false, false /*they are equal*/, false],
             [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, '66', true, false, false, false /*they are equal*/, false],
             [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, true, true, false, false, true, false],
+            /** Case-sensitive cases */
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, true, false, false, false /*they are equal*/, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', true, false, false, false, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', true, false, false, true, false, true],
             /** negative cases */
             /** not successful, no fatal */
             [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', true, false, false, false, false],
@@ -429,13 +465,24 @@ class VerifyArrayTest extends BaseTest
      *
      * @param string $key
      * @param string $operation
-     * @param mixed  $value
+     * @param mixed $value
      * @param bool $reverseAction
      * @param string $expected
+     * @param bool $caseSensitive
      */
-    public function testStringify(string $key, string $operation, $value, bool $reverseAction, string $expected): void
+    public function testStringify(
+        string $key,
+        string $operation,
+        $value,
+        bool $reverseAction,
+        string $expected,
+        bool $caseSensitive = false
+    ): void
     {
-        $this->stringifyTest($expected, ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction));
+        $this->stringifyTest(
+            $expected,
+            ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction, $caseSensitive)
+        );
     }
 
     /**
@@ -488,6 +535,7 @@ class VerifyArrayTest extends BaseTest
      * @param bool $isSuccessRequired
      * @param mixed $expectedResult
      * @param bool $expectException
+     * @param bool $caseSensitive
      *
      * @throws ActionException
      */
@@ -500,13 +548,15 @@ class VerifyArrayTest extends BaseTest
         bool $isFatal,
         bool $isSuccessRequired,
         $expectedResult,
-        bool $expectException
+        bool $expectException,
+        bool $caseSensitive = false
     ): void
     {
         /** @var VerifyArray $verifyArray */
         $verifyArray =
             ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction)
                 ->checkContent($array)
+                ->caseSensitive($caseSensitive)
                 ->setIsFatal($isFatal)
                 ->setIsSuccessRequired($isSuccessRequired)
         ;

@@ -50,6 +50,11 @@ class VerifyArray extends AbstractAction
     protected $action;
 
     /**
+     * @var bool
+     */
+    protected $caseSensitive = false;
+
+    /**
      * If true, the opposite check will be performed
      * (e.g. contains -> not-contains).
      *
@@ -73,18 +78,22 @@ class VerifyArray extends AbstractAction
      * @param mixed $value The value to be matched by the action condition.
      * @param bool $reverseAction Whether the reverse actions should be performed or not
      * (e.g. contains -> not-contains).
+     * @param bool $caseSensitive True, the condition evaluation will be case sensitive;
+     * false, case-insensitive evaluation.
      */
     public function __construct(
         string $key = "",
         string $action = "",
         $value = null,
-        bool $reverseAction = false
+        bool $reverseAction = false,
+        bool $caseSensitive = false
     ) {
         parent::__construct();
         $this->key           = $key;
         $this->action        = $action;
         $this->value         = $value;
         $this->reverseAction = $reverseAction;
+        $this->caseSensitive = $caseSensitive;
     }
 
     /**
@@ -192,6 +201,19 @@ class VerifyArray extends AbstractAction
     }
 
     /**
+     * Set the case-sensitive flag with the specified value.
+     *
+     * @param bool $caseSensitive Whether the check action should be case sensitive or not.
+     *
+     * @return $this
+     */
+    public function caseSensitive(bool $caseSensitive = true): self
+    {
+        $this->caseSensitive = $caseSensitive;
+
+        return $this;
+    }
+    /**
      * Reverse the current configured action to its opposite.
      *
      * e.g.
@@ -251,27 +273,27 @@ class VerifyArray extends AbstractAction
             case self::CHECK_ANY:
                 return "$baseMessage and has any value";
             case self::CHECK_CONTAINS:
-                return sprintf(
+                return $this->appendCaseSensitiveMessage(sprintf(
                     "%s and %s value '%s'",
                     $baseMessage,
                     $reverseAction,
                     StringHelper::stringifyVariable($this->value)
-                );
+                ));
             case self::CHECK_ENDS_WITH:
             case self::CHECK_STARTS_WITH:
-                return sprintf(
+                return $this->appendCaseSensitiveMessage(sprintf(
                     "%s and %s with value '%s'",
                     $baseMessage,
                     $reverseAction,
                     StringHelper::stringifyVariable($this->value)
-                );
+                ));
             case self::CHECK_EQUALS:
-                return sprintf(
+                return $this->appendCaseSensitiveMessage(sprintf(
                     "%s and %s equal to value '%s'",
                     $baseMessage,
                     $reverseAction,
                     StringHelper::stringifyVariable($this->value)
-                );
+                ));
             case self::CHECK_EMPTY:
                 return "$baseMessage and $reverseAction empty (empty string or null)";
             case self::CHECK_MISSING_KEY:
@@ -289,6 +311,22 @@ class VerifyArray extends AbstractAction
     public function __toString()
     {
         return $this->stringify();
+    }
+
+    /**
+     * Append a suffix "case sensitive" or "case insensitive" to the given message, if the
+     * current check message is a string.
+     *
+     * @param string $message The initial message.
+     *
+     * @return string The modified message.
+     */
+    protected function appendCaseSensitiveMessage(string $message): string
+    {
+        if (is_string($this->value)) {
+            $message .= " (case " . ($this->caseSensitive ? "sensitive" : "insensitive") . ")";
+        }
+        return $message;
     }
 
     /**
@@ -476,10 +514,7 @@ class VerifyArray extends AbstractAction
     protected function valueContains($searchValue): bool
     {
         if (is_string($searchValue) && is_string($this->value)) {
-            if (strpos($searchValue, $this->value) !== false) {
-                return true;
-            }
-            return false;
+            return StringHelper::contains($searchValue, $this->value, $this->caseSensitive);
         } elseif (is_array($searchValue)) {
             return array_key_exists($this->value, $searchValue);
         }
@@ -501,7 +536,7 @@ class VerifyArray extends AbstractAction
     protected function ValueEndsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
-            return StringHelper::endsWith($value, $this->value);
+            return StringHelper::endsWith($value, $this->value, $this->caseSensitive);
         }
         $this->throwWorkerException(
             "Check %s supports only strings for both the configured and expected values.",
@@ -521,7 +556,7 @@ class VerifyArray extends AbstractAction
     protected function valueStartsWith($value): bool
     {
         if (is_string($this->value) && is_string($value)) {
-            return StringHelper::startsWith($value, $this->value);
+            return StringHelper::startsWith($value, $this->value, $this->caseSensitive);
         }
         $this->throwWorkerException(
             "Check %s supports only strings for both the configured and expected values.",
@@ -538,13 +573,14 @@ class VerifyArray extends AbstractAction
      */
     protected function valueEqualTo($value): bool
     {
-        if (is_numeric($this->value) && is_numeric($value)) {
-            if ($this->value == $value) {
-                return true;
-            }
-        }
-        // We check on type
-        if ($this->value === $value) {
+        if (is_string($value) && is_string($this->value)) {
+            // For strings, we also check cases
+            return StringHelper::equalTo($value, $this->value, $this->caseSensitive);
+        } elseif (is_numeric($this->value) && is_numeric($value)) {
+            // For numeric string, we don't check on the type as '10.1' and 10.1 should be considered as equal
+            return $this->value == $value;
+        } elseif ($this->value === $value) {
+            // For all other variable types, we check on the type
             return true;
         }
         return false;
