@@ -213,6 +213,7 @@ class VerifyArray extends AbstractAction
 
         return $this;
     }
+
     /**
      * Reverse the current configured action to its opposite.
      *
