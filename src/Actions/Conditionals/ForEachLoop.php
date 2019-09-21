@@ -123,8 +123,13 @@ class ForEachLoop extends AbstractAction
             $actionResult->addActionResult($caseActionResult);
         }
 
-        // All actions have run successfully (i.e. no errors)
-        $actionResult->setResult(true);
+        // We check if all actions are successful: if so, we set the final result
+        // to true; false otherwise.
+        if ($actionResult->isSuccessfulAction()) {
+            $actionResult->setResult(true);
+        } else {
+            $actionResult->setResult(false);
+        }
 
         return $actionResult;
     }

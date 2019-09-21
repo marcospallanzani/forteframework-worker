@@ -42,7 +42,7 @@ class ForEachLoopTest extends BaseTest
                 true,
                 false,
                 false,
-                true,
+                false,
                 false,
                 "Run the following sequence of actions: \nCheck if file 'xxx' exists.\nCheck if file 'xxx' exists.\n"
             ],
