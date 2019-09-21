@@ -14,6 +14,7 @@ use Forte\Worker\Actions\Conditionals\ForEachLoop;
 use Forte\Worker\Actions\Conditionals\IfStatement;
 use Forte\Worker\Actions\Conditionals\SwitchStatement;
 use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Lists\FilesInDirectory;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
@@ -67,6 +68,7 @@ class ActionFactoryTest extends BaseTest
             [MakeDirectory::class, $wrongParams],
             [IfStatement::class, $wrongParams],
             [ForEachLoop::class, $wrongParams],
+            [FilesInDirectory::class, $wrongParams],
         ];
     }
 
@@ -145,6 +147,9 @@ class ActionFactoryTest extends BaseTest
 
         $this->assertInstanceOf(SwitchStatement::class, ActionFactory::createSwitchStatement(true, null));
         $this->assertInstanceOf(SwitchStatement::class, ActionFactory::create(SwitchStatement::class, true, null));
+
+        $this->assertInstanceOf(FilesInDirectory::class, ActionFactory::createFilesInDirectory());
+        $this->assertInstanceOf(FilesInDirectory::class, ActionFactory::create(FilesInDirectory::class));
     }
 
     /**

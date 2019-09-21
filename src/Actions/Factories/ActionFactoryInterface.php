@@ -14,6 +14,7 @@ use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Conditionals\ForEachLoop;
 use Forte\Worker\Actions\Conditionals\IfStatement;
 use Forte\Worker\Actions\Conditionals\SwitchStatement;
+use Forte\Worker\Actions\Lists\FilesInDirectory;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
@@ -240,6 +241,15 @@ interface ActionFactoryInterface
      * @return SwitchStatement
      */
     public static function createSwitchStatement(...$parameters): SwitchStatement;
+
+    /**
+     * Create an instance of the FilesInDirectory class.
+     *
+     * @param mixed ...$parameters The construction parameters.
+     *
+     * @return FilesInDirectory
+     */
+    public static function createFilesInDirectory(...$parameters): FilesInDirectory;
 
     /**
      * Create an instance of the given Abstract subclass name (full namespace).

@@ -14,6 +14,7 @@ use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Conditionals\ForEachLoop;
 use Forte\Worker\Actions\Conditionals\IfStatement;
 use Forte\Worker\Actions\Conditionals\SwitchStatement;
+use Forte\Worker\Actions\Lists\FilesInDirectory;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
@@ -319,6 +320,20 @@ class ActionFactory implements ActionFactoryInterface
     }
 
     /**
+     * Create an instance of the FilesInDirectory class.
+     *
+     * @param mixed ...$parameters The construction parameters.
+     *
+     * @return FilesInDirectory
+     *
+     * @throws ConfigurationException
+     */
+    public static function createFilesInDirectory(...$parameters): FilesInDirectory
+    {
+        return new FilesInDirectory(...$parameters);
+    }
+
+    /**
      * Create an instance of the given Abstract subclass
      * name (full namespace).
      *
@@ -405,6 +420,9 @@ class ActionFactory implements ActionFactoryInterface
                     break;
                 case SwitchStatement::class:
                     return self::createSwitchStatement(...$parameters);
+                    break;
+                case FilesInDirectory::class:
+                    return self::createFilesInDirectory(...$parameters);
                     break;
                 default:
                     throw new WorkerException("The given action type '$class' is not supported.");
