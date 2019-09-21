@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Actions\Transforms\Files;
 
-use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\WorkerException;
 
@@ -20,7 +20,7 @@ use Forte\Worker\Exceptions\WorkerException;
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class RemoveFile extends AbstractAction
+class RemoveFile extends AbstractFileAction
 {
     const REMOVE_SINGLE_FILE  = "remove_single_file";
     const REMOVE_FILE_PATTERN = "remove_file_pattern";
@@ -103,6 +103,18 @@ class RemoveFile extends AbstractAction
     public function removeDirectory(string $directoryPath): self
     {
         return $this->remove($directoryPath, self::REMOVE_DIRECTORY);
+    }
+
+    /**
+     * Set the path required by the RemoveFile instance.
+     *
+     * @param string $path The path to be set.
+     *
+     * @return $this
+     */
+    public function path(string $path): RemoveFile
+    {
+        return $this->removeFile($path);
     }
 
     /**

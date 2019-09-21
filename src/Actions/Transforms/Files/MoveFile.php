@@ -1,10 +1,8 @@
 <?php
 
-
 namespace Forte\Worker\Actions\Transforms\Files;
 
-
-use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Factories\ActionFactory;
 
@@ -13,7 +11,7 @@ use Forte\Worker\Actions\Factories\ActionFactory;
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class MoveFile extends AbstractAction
+class MoveFile extends AbstractFileAction
 {
     /**
      * @var string
@@ -88,6 +86,18 @@ class MoveFile extends AbstractAction
         $this->isTargetFullPath = false;
 
         return $this;
+    }
+
+    /**
+     * Set the path required by the MoveFile instance.
+     *
+     * @param string $path The path to be set.
+     *
+     * @return $this
+     */
+    public function path(string $path): MoveFile
+    {
+        return $this->move($path);
     }
 
     /**

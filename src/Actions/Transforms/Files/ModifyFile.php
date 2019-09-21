@@ -13,6 +13,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Stdlib\ClassAccessTrait;
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
 use Forte\Worker\Actions\Factories\ActionFactory;
@@ -29,7 +30,7 @@ use Forte\Worker\Helpers\StringHelper;
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
+class ModifyFile extends AbstractFileAction implements NestedActionCallbackInterface
 {
     use ClassAccessTrait, ThrowErrorsTrait;
 
@@ -144,6 +145,34 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
         return $this->addAction(
             self::MODIFY_FILE_REPLACE_IN_LINE,
             VerifyString::CONDITION_STARTS_WITH,
+            $conditionValue,
+            $replaceValue,
+            $searchValue,
+            $caseSensitive
+        );
+    }
+
+    /**
+     * Replace the search value with the replace value in each line of the specified
+     * file, that contains the given condition value.
+     *
+     * @param mixed $conditionValue The value used in the condition statement (e.g. if starts with xxx).
+     * @param mixed $searchValue The value to search in the content.
+     * @param mixed $replaceValue The value to replace the matched content.
+     * @param bool $caseSensitive Whether or not a case-sensitive check action should be performed.
+     *
+     * @return ModifyFile
+     */
+    public function replaceValueIfLineContains(
+        $conditionValue,
+        $searchValue,
+        $replaceValue,
+        bool $caseSensitive = false
+    ): self
+    {
+        return $this->addAction(
+            self::MODIFY_FILE_REPLACE_IN_LINE,
+            VerifyString::CONDITION_CONTAINS,
             $conditionValue,
             $replaceValue,
             $searchValue,
@@ -419,6 +448,18 @@ class ModifyFile extends AbstractAction implements NestedActionCallbackInterface
     public function getSupportedActions(): array
     {
         return self::getClassConstants('MODIFY_FILE_');
+    }
+
+    /**
+     * Set the path required by the ModifyFile instance.
+     *
+     * @param string $path The path to be set.
+     *
+     * @return $this
+     */
+    public function path(string $path): ModifyFile
+    {
+        return $this->modify($path);
     }
 
     /**

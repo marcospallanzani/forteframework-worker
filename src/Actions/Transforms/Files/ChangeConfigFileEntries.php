@@ -4,6 +4,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
@@ -15,7 +16,7 @@ use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class ChangeConfigFileEntries extends AbstractAction implements NestedActionCallbackInterface
+class ChangeConfigFileEntries extends AbstractFileAction implements NestedActionCallbackInterface
 {
     /**
      * The file to modify.
@@ -145,6 +146,52 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
     }
 
     /**
+     * Run the given nested action and modify the given nested action result accordingly.
+     *
+     * @param AbstractAction $nestedAction The nested action to be run.
+     * @param ActionResult $nestedActionResult The nested action result to be modified by
+     * the given nested run action.
+     * @param array $failedNestedActions A list of failed nested actions.
+     * @param mixed $content The content to be used by the run method, if required.
+     * @param array $actionOptions Additional options required to run the given
+     * AbstractAction subclass instance.
+     *
+     * @throws ActionException
+     */
+    public function runNestedAction(
+        AbstractAction &$nestedAction,
+        ActionResult &$nestedActionResult,
+        array &$failedNestedActions,
+        &$content = null,
+        array &$actionOptions = array()
+    ): void
+    {
+        if ($nestedAction instanceof ModifyArray) {
+            $nestedAction->modifyContent($content);
+        }
+        $nestedActionResult = $nestedAction->run();
+        if (!$nestedAction->validateResult($nestedActionResult)) {
+            $failedNestedActions[] = $nestedActionResult;
+        } else {
+            $content = $nestedActionResult->getResult();
+        }
+    }
+
+    /**
+     * Set the path required by the ChangeConfigFileEntries instance.
+     *
+     * @param string $path The path to be set.
+     *
+     * @return $this
+     */
+    public function path(string $path): ChangeConfigFileEntries
+    {
+        $this->filePath = $path;
+
+        return $this;
+    }
+
+    /**
      * Validate this ChangeConfigFileEntries instance using its specific validation logic.
      * It returns true if this ChangeConfigFileEntries instance is well configured, i.e. if:
      * - filePath cannot be an empty string;
@@ -227,37 +274,5 @@ class ChangeConfigFileEntries extends AbstractAction implements NestedActionCall
         }
 
         return $actionResult;
-    }
-
-    /**
-     * Run the given nested action and modify the given nested action result accordingly.
-     *
-     * @param AbstractAction $nestedAction The nested action to be run.
-     * @param ActionResult $nestedActionResult The nested action result to be modified by
-     * the given nested run action.
-     * @param array $failedNestedActions A list of failed nested actions.
-     * @param mixed $content The content to be used by the run method, if required.
-     * @param array $actionOptions Additional options required to run the given
-     * AbstractAction subclass instance.
-     *
-     * @throws ActionException
-     */
-    public function runNestedAction(
-        AbstractAction &$nestedAction,
-        ActionResult &$nestedActionResult,
-        array &$failedNestedActions,
-        &$content = null,
-        array &$actionOptions = array()
-    ): void
-    {
-        if ($nestedAction instanceof ModifyArray) {
-            $nestedAction->modifyContent($content);
-        }
-        $nestedActionResult = $nestedAction->run();
-        if (!$nestedAction->validateResult($nestedActionResult)) {
-            $failedNestedActions[] = $nestedActionResult;
-        } else {
-            $content = $nestedActionResult->getResult();
-        }
     }
 }

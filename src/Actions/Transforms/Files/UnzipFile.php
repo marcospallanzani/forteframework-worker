@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Actions\Transforms\Files;
 
-use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
 use Zend\Filter\Decompress;
 
@@ -11,7 +11,7 @@ use Zend\Filter\Decompress;
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class UnzipFile extends AbstractAction
+class UnzipFile extends AbstractFileAction
 {
     /**
      * @var string
@@ -60,6 +60,18 @@ class UnzipFile extends AbstractAction
         $this->extractToPath = $extractToPath;
 
         return $this;
+    }
+
+    /**
+     * Set the path required by the UnzipFile instance.
+     *
+     * @param string $path The path to be set.
+     *
+     * @return $this
+     */
+    public function path(string $path): UnzipFile
+    {
+        return $this->open($path);
     }
 
     /**

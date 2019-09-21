@@ -3,7 +3,7 @@
 namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Stdlib\Exceptions\GeneralException;
-use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Stdlib\Filters\Files\Copy as CopyFilter;
 
@@ -12,7 +12,7 @@ use Forte\Stdlib\Filters\Files\Copy as CopyFilter;
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class CopyFile extends AbstractAction
+class CopyFile extends AbstractFileAction
 {
     /**
      * @var string
@@ -158,6 +158,18 @@ class CopyFile extends AbstractAction
             return $targetFolder . DIRECTORY_SEPARATOR . $targetName;
         }
         return "";
+    }
+
+    /**
+     * Set the path required by the CopyFile instance.
+     *
+     * @param string $path The path to be set.
+     *
+     * @return $this
+     */
+    public function path(string $path): CopyFile
+    {
+        return $this->copy($path);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Actions\Transforms\Files;
 
-use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\WorkerException;
 
@@ -11,7 +11,7 @@ use Forte\Worker\Exceptions\WorkerException;
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class MakeDirectory extends AbstractAction
+class MakeDirectory extends AbstractFileAction
 {
     /**
      * @var string
@@ -27,7 +27,6 @@ class MakeDirectory extends AbstractAction
      * MakeDirectory constructor.
      *
      * @param string $directoryPath The directory path to create.
-     * @param string $mode The creation mode.
      */
     public function __construct(string $directoryPath = "")
     {
@@ -47,6 +46,18 @@ class MakeDirectory extends AbstractAction
         $this->directoryPath = $directoryPath;
 
         return $this;
+    }
+
+    /**
+     * Set the path required by the MakeDirectory instance.
+     *
+     * @param string $path The path to be set.
+     *
+     * @return $this
+     */
+    public function path(string $path): MakeDirectory
+    {
+        return $this->create($path);
     }
 
     /**

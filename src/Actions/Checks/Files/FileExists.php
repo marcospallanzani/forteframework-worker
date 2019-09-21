@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Actions\Checks\Files;
 
-use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ValidationException;
 
@@ -20,7 +20,7 @@ use Forte\Worker\Exceptions\ValidationException;
  *
  * @package Forte\Worker\Actions\Checks\Files
  */
-class FileExists extends AbstractAction
+class FileExists extends AbstractFileAction
 {
     /**
      * @var string
@@ -41,13 +41,13 @@ class FileExists extends AbstractAction
     /**
      * Set the file path for this FileExists instance.
      *
-     * @param string $filePath The file path to check
+     * @param string $path The file path to check
      *
      * @return FileExists
      */
-    public function path(string $filePath): self
+    public function path(string $path): FileExists
     {
-        $this->filePath = $filePath;
+        $this->filePath = $path;
 
         return $this;
     }

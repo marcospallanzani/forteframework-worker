@@ -2,7 +2,7 @@
 
 namespace Forte\Worker\Actions\Transforms\Files;
 
-use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
 
 /**
@@ -12,7 +12,7 @@ use Forte\Worker\Actions\ActionResult;
  *
  * @package Forte\Worker\Actions\Transforms\Files
  */
-class RenameFile extends AbstractAction
+class RenameFile extends AbstractFileAction
 {
     /**
      * @var string
@@ -66,6 +66,18 @@ class RenameFile extends AbstractAction
         $this->targetName = trim($targetName, DIRECTORY_SEPARATOR);
 
         return $this;
+    }
+
+    /**
+     * Set the path required by the RenameFile instance.
+     *
+     * @param string $path The path to be set.
+     *
+     * @return $this
+     */
+    public function path(string $path): RenameFile
+    {
+        return $this->rename($path);
     }
 
     /**
