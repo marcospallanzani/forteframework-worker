@@ -168,6 +168,23 @@ class ActionResult
     }
 
     /**
+     * Return true if all run actions (main, nested, pre-run and post-run actions)
+     * executed without errors and they all returned a positive result.
+     *
+     * @return bool
+     */
+    public function isSuccessfulAction(): bool
+    {
+        if ($this->isSuccessfulRun()
+            && $this->checkActionResultsArray($this->actionsResults)
+                && $this->checkActionResultsArray($this->preRunActionResults)
+                    && $this->checkActionResultsArray($this->postRunActionResults)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Return the AbstractAction subclass instance wrapped
      * by this ActionResult instance.
      *
@@ -454,5 +471,22 @@ class ActionResult
         }
 
         return $array;
+    }
+
+    /**
+     * Check if the given list of ActionResult instances hold a positive result.
+     *
+     * @param array $actionResults The ActionResult instances to check.
+     *
+     * @return bool True if all the given ActionResult instances hold a positive result.
+     */
+    protected function checkActionResultsArray(array $actionResults): bool
+    {
+        foreach ($actionResults as $actionResult) {
+            if (!$actionResult->getAction()->validateResult($actionResult)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
