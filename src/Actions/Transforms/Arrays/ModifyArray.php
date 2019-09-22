@@ -21,7 +21,7 @@ class ModifyArray extends AbstractAction
     /**
      * Supported actions.
      */
-    const MODIFY_ADD          = "modify_add";
+    const MODIFY_ADD_KEY      = "modify_add_key";
     const MODIFY_REMOVE_KEY   = "modify_remove_key";
     const MODIFY_CHANGE_VALUE = "modify_change_value";
 
@@ -79,7 +79,7 @@ class ModifyArray extends AbstractAction
      */
     public function addKey(string $key, $value): self
     {
-        $this->action = self::MODIFY_ADD;
+        $this->action = self::MODIFY_ADD_KEY;
         $this->key    = $key;
         $this->value  = $value;
 
@@ -87,15 +87,16 @@ class ModifyArray extends AbstractAction
     }
 
     /**
-     * Set this ModifyArray instance, so that it modifies the given key with the given value
-     * in the specified "modify-content". If the key does not exist, it will be added.
+     * Set this ModifyArray instance, so that it modifies the value associated to the
+     * given key with the given value in the specified "modify-content". If the key
+     * does not exist, it will be added.
      *
      * @param string $key The key of the value to be modified.
      * @param mixed $value The new value for the given key.
      *
      * @return ModifyArray
      */
-    public function modifyKey(string $key, $value): self
+    public function changeValueByKey(string $key, $value): self
     {
         $this->action = self::MODIFY_CHANGE_VALUE;
         $this->key    = $key;
@@ -176,7 +177,7 @@ class ModifyArray extends AbstractAction
     public function stringify(): string
     {
         switch($this->action) {
-            case self::MODIFY_ADD:
+            case self::MODIFY_ADD_KEY:
                 return sprintf(
                     "Add value '%s' with key '%s'",
                     StringHelper::stringifyVariable($this->value),
@@ -290,7 +291,7 @@ class ModifyArray extends AbstractAction
                     $array[$currentKey] = $value;
                 } else {
                     // We have found a non-array element but we are not at the end of our keys tree
-                    if ($action === self::MODIFY_ADD || $action === self::MODIFY_CHANGE_VALUE) {
+                    if ($action === self::MODIFY_ADD_KEY || $action === self::MODIFY_CHANGE_VALUE) {
                         // If key does not exist, we add the missing key
                         // (no need to apply any changes for the remove action)
                         $array[$currentKey] = [];
@@ -332,7 +333,7 @@ class ModifyArray extends AbstractAction
     protected function applyChangeByType(array &$array, string $key, string $action, $value): void
     {
         switch($action) {
-            case self::MODIFY_ADD:
+            case self::MODIFY_ADD_KEY:
             case self::MODIFY_CHANGE_VALUE:
                 $this->modificationApplied = true;
                 $array[$key] = $value;

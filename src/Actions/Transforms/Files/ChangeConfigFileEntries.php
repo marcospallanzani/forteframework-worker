@@ -89,7 +89,7 @@ class ChangeConfigFileEntries extends AbstractFileAction implements NestedAction
      */
     public function addKeyWithValue(string $key, $value): self
     {
-        $this->modifications[] = ActionFactory::createModifyArray($key, ModifyArray::MODIFY_ADD, $value);
+        $this->modifications[] = ActionFactory::createModifyArray($key, ModifyArray::MODIFY_ADD_KEY, $value);
 
         return $this;
     }
@@ -106,7 +106,7 @@ class ChangeConfigFileEntries extends AbstractFileAction implements NestedAction
      *
      * @return ChangeConfigFileEntries
      */
-    public function modifyKeyWithValue(string $key, $value): self
+    public function changeValueByKey(string $key, $value): self
     {
         $this->modifications[] = ActionFactory::createModifyArray($key, ModifyArray::MODIFY_CHANGE_VALUE, $value);
 

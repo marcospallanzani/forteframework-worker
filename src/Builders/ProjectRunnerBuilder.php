@@ -211,7 +211,7 @@ class ProjectRunnerBuilder
 
         $this->addAction(
             /** main action */
-            ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->modifyKeyWithValue($key, $value),
+            ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->changeValueByKey($key, $value),
             /** pre-run actions */
             [],
             /** post-run actions */
