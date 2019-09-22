@@ -93,47 +93,16 @@ class CopyFile extends AbstractFileAction
      * Create the full destination file path as a concatenation of the
      * destination folder and the destination name.
      *
-     * @param bool $fatal True, an exception will be thrown if the origin
-     * file does not exist.
-     *
      * @return string The full destination file path (concat destination
      * folder and destination name).
-     *
-     * @throws GeneralException
      */
-    public function getDestinationFilePath(bool $fatal = false): string
+    public function getDestinationFilePath(): string
     {
-        // We check if the origin file exists
-        try {
-            $this->fileExists($this->originFilePath);
-            $info = pathinfo($this->originFilePath);
-            $dirName        = $info['dirname'];
-            $fileName       = $info['filename'];
-            $fileExtension  = $info['extension'];
-            $fileBaseName   = $info['basename'];
-        } catch (GeneralException $exception) {
-            // If fatal, we rethrow the exception
-            if ($fatal) {
-                throw $exception;
-            }
-
-            // If not fatal, we set the default values for the file info variables
-            if (empty($this->originFilePath)) {
-                $fileExtension = "";
-                $fileName = "";
-            } else {
-                $fileParts = explode('.', $this->originFilePath);
-                if (count($fileParts) == 2) {
-                    $fileExtension = array_pop($fileParts);
-                    $fileName = array_pop($fileParts);
-                } else {
-                    $fileExtension = "";
-                    $fileName = $this->originFilePath;
-                }
-            }
-            $dirName = $this->destinationFolder;
-            $fileBaseName = $this->originFilePath;
-        }
+        $info = pathinfo($this->originFilePath);
+        $dirName        = array_key_exists('dirname', $info) ? $info['dirname'] : '';
+        $fileName       = array_key_exists('filename', $info) ? $info['filename'] : '';
+        $fileExtension  = array_key_exists('extension', $info) ? $info['extension'] : '';
+        $fileBaseName   = array_key_exists('basename', $info) ? $info['basename'] : '';
 
         // We set the destination folder, if not specified
         if (empty($this->destinationFolder)) {
@@ -179,12 +148,7 @@ class CopyFile extends AbstractFileAction
      */
     public function stringify(): string
     {
-        try {
-            $targetPath = $this->getDestinationFilePath();
-        } catch (GeneralException $generalException) {
-            $targetPath = "";
-        }
-        return sprintf("Copy file '%s' to '%s'.", $this->originFilePath, $targetPath);
+        return sprintf("Copy file '%s' to '%s'.", $this->originFilePath, $this->getDestinationFilePath());
     }
 
     /**
@@ -236,7 +200,7 @@ class CopyFile extends AbstractFileAction
         $this->fileExists($this->originFilePath);
 
         $copyFilter = new CopyFilter([
-            'target' => $this->getDestinationFilePath(true),
+            'target' => $this->getDestinationFilePath(),
             'overwrite' => true
         ]);
         $copyFilter->filter($this->originFilePath);

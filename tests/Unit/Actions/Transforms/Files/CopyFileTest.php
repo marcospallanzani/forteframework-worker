@@ -77,16 +77,16 @@ class CopyFileTest extends BaseTest
             [self::TEST_COPY_FILE_PATH, "", "", true, false, false, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_COPY_FILE_DEFAULT_PATH)],
             /** Negative cases */
             /** not successful, no fatal */
-            ["xxx.json", "", "xxx_copy.json", true, false, false, false, false, "Copy file 'xxx.json' to ''."],
-            ["xxx.json", "", "", true, false, false, false, false, "Copy file 'xxx.json' to ''."],
+            ["xxx.json", "", "xxx_copy.json", true, false, false, false, false, "Copy file 'xxx.json' to './xxx_copy.json'."],
+            ["xxx.json", "", "", true, false, false, false, false, "Copy file 'xxx.json' to './xxx_COPY.json'."],
             ["", "", "", false, false, false, false, false, "Copy file '' to ''."],
             /** fatal */
-            ["xxx.json", "", "xxx_copy.json", true, true, false, false, true, "Copy file 'xxx.json' to ''."],
-            ["xxx.json", "", "", true, true, false, false, true, "Copy file 'xxx.json' to ''."],
+            ["xxx.json", "", "xxx_copy.json", true, true, false, false, true, "Copy file 'xxx.json' to './xxx_copy.json'."],
+            ["xxx.json", "", "", true, true, false, false, true, "Copy file 'xxx.json' to './xxx_COPY.json'."],
             ["", "", "", false, true, false, false, true, "Copy file '' to ''."],
             /** success required */
-            ["xxx.json", "", "xxx_copy.json", true, false, true, false, true, "Copy file 'xxx.json' to ''."],
-            ["xxx.json", "", "", true, false, true, false, true, "Copy file 'xxx.json' to ''."],
+            ["xxx.json", "", "xxx_copy.json", true, false, true, false, true, "Copy file 'xxx.json' to './xxx_copy.json'."],
+            ["xxx.json", "", "", true, false, true, false, true, "Copy file 'xxx.json' to './xxx_COPY.json'."],
             ["", "", "", false, false, true, false, true, "Copy file '' to ''."],
         ];
     }
@@ -155,7 +155,6 @@ class CopyFileTest extends BaseTest
      * @param bool $exceptionExpected
      *
      * @throws ActionException An error occurred while copying the file.
-     * @throws GeneralException The origin file does not exist.
      */
     public function testRun(
         string $sourcePath,
