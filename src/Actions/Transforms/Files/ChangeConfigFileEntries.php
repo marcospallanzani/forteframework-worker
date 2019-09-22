@@ -2,6 +2,7 @@
 
 namespace Forte\Worker\Actions\Transforms\Files;
 
+use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\AbstractFileAction;
@@ -41,6 +42,8 @@ class ChangeConfigFileEntries extends AbstractFileAction implements NestedAction
      * @param string $filePath The file to modify.
      * @param string $contentType The content type; accepted values are the FileUtils
      * class constants with prefix "CONTENT_TYPE".
+     *
+     * @throws GeneralException Impossible to define the content type for the given file path.
      */
     public function __construct(string $filePath = "", string $contentType = "")
     {
@@ -56,9 +59,16 @@ class ChangeConfigFileEntries extends AbstractFileAction implements NestedAction
      * class constants with prefix "CONTENT_TYPE".
      *
      * @return ChangeConfigFileEntries
+     *
+     * @throws GeneralException Impossible to define the content type for the given file path.
      */
-    public function modify(string $filePath, string $contentType): self
+    public function modify(string $filePath, string $contentType = ""): self
     {
+        // If the content type is not specified, we try to guess it from the file extension
+        if (!empty($filePath) && empty($contentType)) {
+            $fileInfo = pathinfo($filePath);
+            $contentType = FileUtils::getContentTypeByFileExtension($fileInfo['extension']);
+        }
         $this->filePath    = $filePath;
         $this->contentType = $contentType;
 
