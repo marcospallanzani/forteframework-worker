@@ -7,6 +7,7 @@ use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Runners\ProjectRunner;
 
 /**
@@ -293,6 +294,45 @@ class ProjectRunnerBuilder
             /** post-run actions */
             [ActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->doesNotHaveKey($key)]
         );
+
+        return $this;
+    }
+
+    /**
+     * Add a modification action to change the namespace in all php files.
+     *
+     * @param string $oldNameSpace The namespace to be replaced.
+     * @param string $newNameSpace The new namespace.
+     * @param bool $isPartial If true, the given namespaces will be treated as part of a namespace;
+     * in this case, this function will make sure that the given partial namespaces will end with a
+     * backslash "\".
+     *
+     * @return ProjectRunnerBuilder
+     *
+     * @throws ConfigurationException
+     */
+    public function changeProjectPhpNamespace(string $oldNameSpace, string $newNameSpace, bool $isPartial = false): self
+    {
+        // a partial namespace should end with a backslash.
+        if ($isPartial) {
+            $oldNameSpace = rtrim($oldNameSpace, '\\') . '\\';
+            $newNameSpace = rtrim($newNameSpace, '\\') . '\\';
+        }
+
+        $this->addAction(ActionFactory::createFilesInDirectory()
+            ->in($this->getRunner()->getProjectFolder())
+            ->filePatterns(['*.php'])
+            ->addAction(
+                ActionFactory::createModifyFile()
+                    ->replaceValueIfLineContains(
+                        $oldNameSpace,
+                        $oldNameSpace,
+                        $newNameSpace,
+                        false
+                    )
+                )
+            )
+        ;
 
         return $this;
     }

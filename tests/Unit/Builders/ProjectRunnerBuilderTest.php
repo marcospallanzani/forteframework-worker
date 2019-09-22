@@ -12,6 +12,7 @@ use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
 use Forte\Worker\Builders\ProjectRunnerBuilder;
 use Forte\Worker\Exceptions\ActionException;
+use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Runners\ProjectRunner;
 use Forte\Worker\Tests\Unit\BaseTest;
 
@@ -27,6 +28,9 @@ class ProjectRunnerBuilderTest extends BaseTest
      */
     const ENV_FILE_PATH      = 'env.testModify';
     const ENV_FILE_FULL_PATH = __DIR__ . '/env.testModify';
+    const PHP_FILES_DIR_PATH = __DIR__ . '/phptests';
+    const PHP_FILE_FULL_PATH = self::PHP_FILES_DIR_PATH . '/test.php';
+    const PHP_CONTENT = "<?php \n\nnamespace Test\Name\Space;\n\n/**\n *\n * @package \Test\Name\Space \n * Test\Name\n */ ";
 
     /**
      * This method is called before each test.
@@ -34,6 +38,10 @@ class ProjectRunnerBuilderTest extends BaseTest
     public function setUp(): void
     {
         parent::setUp();
+        if (!is_dir(self::PHP_FILES_DIR_PATH)) {
+            @mkdir(self::PHP_FILES_DIR_PATH);
+        }
+        @file_put_contents(self::PHP_FILE_FULL_PATH, self::PHP_CONTENT);
     }
 
     /**
@@ -43,6 +51,8 @@ class ProjectRunnerBuilderTest extends BaseTest
     {
         parent::tearDown();
         @unlink(self::ENV_FILE_FULL_PATH);
+        @unlink(self::PHP_FILE_FULL_PATH);
+        @rmdir(self::PHP_FILES_DIR_PATH);
     }
 
     /**
@@ -61,6 +71,29 @@ class ProjectRunnerBuilderTest extends BaseTest
             ['addConfigKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
             ['removeConfigKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key'], ChangeConfigFileEntries::class],
             ['addAction', [ActionFactory::createFileExists(__FILE__)], FileExists::class],
+        ];
+    }
+
+    /**
+     * Data provider for all namespaces tests.
+     *
+     * @return array
+     */
+    public function namespaceProvider(): array
+    {
+        return [
+            [
+                'Test\Name',
+                'Modified\Name\Partial',
+                true,
+                "<?php \n\nnamespace Modified\Name\Partial\Space;\n\n/**\n *\n * @package \Modified\Name\Partial\Space \n * Test\Name\n */ "
+            ],
+            [
+                'Test\Name',
+                'Modified\Name\Partial',
+                false,
+                "<?php \n\nnamespace Modified\Name\Partial\Space;\n\n/**\n *\n * @package \Modified\Name\Partial\Space \n * Modified\Name\Partial\n */ "
+            ],
         ];
     }
 
@@ -137,5 +170,36 @@ class ProjectRunnerBuilderTest extends BaseTest
         $builder->modifyEnvFileConfigKey($filePath, "KEY1", 500);
         $builder->setFatalStatusForAllActions(true);
         $builder->getRunner()->applyActions();
+    }
+
+    /**
+     * Test function ProjectRunnerBuilder::changePhpNamespace().
+     *
+     * @dataProvider namespaceProvider
+     *
+     * @param string $oldNameSpace
+     * @param string $newNameSpace
+     * @param bool $isPartial
+     * @param string $modifiedContent
+     *
+     * @throws ActionException
+     * @throws ConfigurationException
+     */
+    public function testChangeNameSpace(
+        string $oldNameSpace,
+        string $newNameSpace,
+        bool $isPartial,
+        string $modifiedContent
+    ): void
+    {
+        $builder = new ProjectRunnerBuilder(self::PHP_FILES_DIR_PATH);
+
+        // Partial mode
+        $builder->changeProjectPhpNamespace($oldNameSpace, $newNameSpace, $isPartial);
+        $builder->getRunner()->applyActions();
+        $this->assertEquals(
+            $modifiedContent,
+            @file_get_contents(self::PHP_FILE_FULL_PATH)
+        );
     }
 }
