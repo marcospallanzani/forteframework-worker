@@ -35,21 +35,27 @@ class ProjectRunnerBuilder
      * Add an action to decompress the given zip file. It unzips the file in
      * the base project folder specified in the constructor.
      *
-     * @param string $zipFilePath The zip file to unzip.
+     * @param string $zipFilePath The full path of the zip file to unzip.
+     * @param string $extractToPath The relative path of the project directory, where the
+     * zip file should be decompressed.
      *
      * @return self
      */
-    public function unzipFile(string $zipFilePath): self
+    public function unzipFile(string $zipFilePath, string $extractToPath = ""): self
     {
-        $fullProjectPath = $this->runner->getProjectFolder();
+        if (empty($extractToPath)) {
+            $extractToPath = $this->runner->getProjectFolder();
+        } else {
+            $extractToPath = $this->getFilePathInProject($extractToPath);
+        }
 
         $this->addAction(
             /** main action */
-            ActionFactory::createUnzipFile()->open($zipFilePath)->extractTo($fullProjectPath),
+            ActionFactory::createUnzipFile()->open($zipFilePath)->extractTo($extractToPath),
             /** pre-run actions */
             [ActionFactory::createFileExists($zipFilePath)],
             /** post-run actions */
-            [ActionFactory::createFileExists($fullProjectPath)]
+            [ActionFactory::createFileExists($extractToPath)]
         );
 
         return $this;
@@ -64,7 +70,9 @@ class ProjectRunnerBuilder
      */
     public function dirExists(string $path): self
     {
-//TODO HERE ADD THE NEW CONDITIONAL ACTION
+        // The given relative path is converted to an absolute file path
+        $path = $this->getFilePathInProject($path);
+
         $this->addAction(
             /** main action */
             ActionFactory::createDirectoryExists($path),
@@ -94,12 +102,18 @@ class ProjectRunnerBuilder
         string $targetFolder = ''
     ): self
     {
+        // The given relative paths are converted to an absolute paths
+        $sourceFilePath = $this->getFilePathInProject($sourceFilePath);
+        if (!empty($targetFolder)) {
+            $targetFolder = $this->getFilePathInProject($targetFolder);
+        }
+
         $copy = ActionFactory::createCopyFile()
             ->copy($sourceFilePath)
             ->toFolder($targetFolder)
             ->withName($targetFileName)
         ;
-//TODO method copy->getDestinationFilePath shouln't throw an exception
+
         $this->addAction(
             /** main action */
             $copy,
@@ -123,6 +137,9 @@ class ProjectRunnerBuilder
      */
     public function hasInstantiableClass(string $classFilePath, string $className): self
     {
+        // The given relative path is converted to an absolute path
+        $classFilePath = $this->getFilePathInProject($classFilePath);
+
         $this->addAction(
         /** main action */
             ActionFactory::createEmptyTransform(),
@@ -144,6 +161,9 @@ class ProjectRunnerBuilder
      */
     public function modifyEnvFileConfigKey(string $filePath, string $key, $value): self
     {
+        // The given relative path is converted to an absolute path
+        $filePath = $this->getFilePathInProject($filePath);
+
         $this->addAction(
             /** main action */
             ActionFactory::createModifyFile($filePath)
@@ -183,6 +203,9 @@ class ProjectRunnerBuilder
      */
     public function modifyConfigKey(string $filePath, string $contentType, string $key, $value): self
     {
+        // The given relative path is converted to an absolute path
+        $filePath = $this->getFilePathInProject($filePath);
+
         $this->addAction(
             /** main action */
             ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->modifyKeyWithValue($key, $value),
@@ -217,6 +240,9 @@ class ProjectRunnerBuilder
      */
     public function addConfigKey(string $filePath, string $contentType, string $key, $value): self
     {
+        // The given relative file path is converted to an absolute file path
+        $filePath = $this->getFilePathInProject($filePath);
+
         $this->addAction(
             /** main action */
             ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->addKeyWithValue($key, $value),
@@ -250,6 +276,9 @@ class ProjectRunnerBuilder
      */
     public function removeConfigKey(string $filePath, string $contentType, string $key): self
     {
+        // The given relative file path is converted to an absolute file path
+        $filePath = $this->getFilePathInProject($filePath);
+
         $this->addAction(
             /** main action */
             ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->removeKey($key),

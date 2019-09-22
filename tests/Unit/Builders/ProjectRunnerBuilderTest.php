@@ -25,7 +25,8 @@ class ProjectRunnerBuilderTest extends BaseTest
     /**
      * Test constants.
      */
-    const ENV_FILE_PATH = __DIR__  . '/.env.testModify';
+    const ENV_FILE_PATH      = 'env.testModify';
+    const ENV_FILE_FULL_PATH = __DIR__ . '/env.testModify';
 
     /**
      * This method is called before each test.
@@ -41,7 +42,7 @@ class ProjectRunnerBuilderTest extends BaseTest
     public function tearDown(): void
     {
         parent::tearDown();
-        @unlink(self::ENV_FILE_PATH);
+        @unlink(self::ENV_FILE_FULL_PATH);
     }
 
     /**
@@ -100,7 +101,7 @@ class ProjectRunnerBuilderTest extends BaseTest
     public function testModifyEnvFileConfigKey(): void
     {
         // We write the test file first
-        @file_put_contents(self::ENV_FILE_PATH, "KEY1=10\nKEY2=20\nKEY3=30");
+        @file_put_contents(self::ENV_FILE_FULL_PATH, "KEY1=10\nKEY2=20\nKEY3=30");
 
         // We modify its content and check if it's correct
         $builder = new ProjectRunnerBuilder(__DIR__);
@@ -109,7 +110,7 @@ class ProjectRunnerBuilderTest extends BaseTest
         $builder->getRunner()->applyActions();
 
         // Now we open the file and check if the content has been correctly changed
-        $envVariables = FileUtils::parseFile(self::ENV_FILE_PATH, FileUtils::CONTENT_TYPE_ENV);
+        $envVariables = FileUtils::parseFile(self::ENV_FILE_FULL_PATH, FileUtils::CONTENT_TYPE_ENV);
         $this->assertIsArray($envVariables);
         $this->assertCount(3, $envVariables);
         $this->assertArrayHasKey('KEY1', $envVariables);
@@ -128,9 +129,10 @@ class ProjectRunnerBuilderTest extends BaseTest
     public function testModifyEnvFileConfigKeyWithWrongFile(): void
     {
         // We modify its content and check if it's correct
-        $filePath = __DIR__ . "/xxx";
+        $filePath = "xxx";
+        $fileFullPath = __DIR__ . "/xxx";
         $this->expectException(ActionException::class);
-        $this->expectExceptionMessage("The file '$filePath' does not exist.");
+        $this->expectExceptionMessage("The file '$fileFullPath' does not exist.");
         $builder = new ProjectRunnerBuilder(__DIR__);
         $builder->modifyEnvFileConfigKey($filePath, "KEY1", 500);
         $builder->setFatalStatusForAllActions(true);
