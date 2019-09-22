@@ -195,13 +195,15 @@ class ProjectRunnerBuilder
      * (e.g. key1.key2.key3=value3)
      *
      * @param string $filePath The file to modify.
-     * @param string $contentType The content type (accepted values -> constants FileUtils::CONTENT_TYPE_XXX).
      * @param string $key The key to modify.
      * @param mixed $value The new key value.
+     * @param string $contentType The content type (accepted values -> constants
+     * FileUtils::CONTENT_TYPE_XXX). If not specified, the content type will be
+     * guessed from the given file path.
      *
      * @return ProjectRunnerBuilder
      */
-    public function modifyConfigKey(string $filePath, string $contentType, string $key, $value): self
+    public function modifyConfigKey(string $filePath, string $key, $value, string $contentType = ""): self
     {
         // The given relative path is converted to an absolute path
         $filePath = $this->getFilePathInProject($filePath);
@@ -232,13 +234,15 @@ class ProjectRunnerBuilder
      * (e.g. key1.key2.key3=value3)
      *
      * @param string $filePath The file to modify.
-     * @param string $contentType The content type (accepted values -> constants FileUtils::CONTENT_TYPE_XXX).
      * @param string $key The key to add.
      * @param mixed $value The new key value.
+     * @param string $contentType The content type (accepted values -> constants
+     * FileUtils::CONTENT_TYPE_XXX). If not specified, the content type will be
+     * guessed from the given file path.
      *
      * @return ProjectRunnerBuilder
      */
-    public function addConfigKey(string $filePath, string $contentType, string $key, $value): self
+    public function addConfigKey(string $filePath, string $key, $value, string $contentType = ""): self
     {
         // The given relative file path is converted to an absolute file path
         $filePath = $this->getFilePathInProject($filePath);
@@ -269,12 +273,14 @@ class ProjectRunnerBuilder
      * (e.g. key1.key2.key3=value3)
      *
      * @param string $filePath The file to modify.
-     * @param string $contentType The content type (accepted values -> constants FileUtils::CONTENT_TYPE_XXX).
      * @param string $key The key to remove.
+     * @param string $contentType The content type (accepted values -> constants
+     * FileUtils::CONTENT_TYPE_XXX). If not specified, the content type will be
+     * guessed from the given file path.
      *
      * @return ProjectRunnerBuilder
      */
-    public function removeConfigKey(string $filePath, string $contentType, string $key): self
+    public function removeConfigKey(string $filePath, string $key, string $contentType = ""): self
     {
         // The given relative file path is converted to an absolute file path
         $filePath = $this->getFilePathInProject($filePath);
