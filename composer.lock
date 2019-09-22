@@ -43,12 +43,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcospallanzani/forteframework-stdlib.git",
-                "reference": "99157c5d215d2eabff63dd455104b5e480836bae"
+                "reference": "6eb9adaebeffa7e8ab1a8a5a4d94381ff6a660b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcospallanzani/forteframework-stdlib/zipball/99157c5d215d2eabff63dd455104b5e480836bae",
-                "reference": "99157c5d215d2eabff63dd455104b5e480836bae",
+                "url": "https://api.github.com/repos/marcospallanzani/forteframework-stdlib/zipball/6eb9adaebeffa7e8ab1a8a5a4d94381ff6a660b7",
+                "reference": "6eb9adaebeffa7e8ab1a8a5a4d94381ff6a660b7",
                 "shasum": ""
             },
             "require": {
@@ -80,13 +80,13 @@
             "description": "ForteFramework Standard Library: a set of classes for general purposes.",
             "homepage": "https://www.forteframework.com",
             "keywords": [
-                "stardard library"
+                "standard library"
             ],
             "support": {
                 "source": "https://github.com/marcospallanzani/forteframework-stdlib/tree/master",
                 "issues": "https://github.com/marcospallanzani/forteframework-stdlib/issues"
             },
-            "time": "2019-09-18T11:54:00+00:00"
+            "time": "2019-09-21T20:37:33+00:00"
         },
         {
             "name": "monolog/monolog",
