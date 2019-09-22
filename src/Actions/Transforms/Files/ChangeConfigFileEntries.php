@@ -115,6 +115,23 @@ class ChangeConfigFileEntries extends AbstractFileAction implements NestedAction
 
     /**
      * Add a nested action to this ChangeConfigFileEntries instance, so that it
+     * replaces the given old key with the given new key. The new key should be
+     * the desired last-level key part of a multi-level key.
+     *
+     * @param string $oldKey The old key (multi-levels allowed).
+     * @param string $newKey The new key (the last level of a key chain here allowed).
+     *
+     * @return ChangeConfigFileEntries
+     */
+    public function changeKey(string $oldKey, string $newKey): self
+    {
+        $this->modifications[] = ActionFactory::createModifyArray()->changeKey($oldKey, $newKey);
+
+        return $this;
+    }
+
+    /**
+     * Add a nested action to this ChangeConfigFileEntries instance, so that it
      * removes, from the specified file, the config entries with the given key.
      * The key can have multiple nested levels, separated by the constant
      * ModifyArray::ARRAY_LEVELS_SEPARATOR.
