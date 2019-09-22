@@ -7,6 +7,7 @@ use Forte\Stdlib\ClassAccessTrait;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Exceptions\ThrowErrorsTrait;
+use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\StringHelper;
 
 /**
@@ -23,6 +24,7 @@ class ModifyArray extends AbstractAction
      */
     const MODIFY_ADD_KEY      = "modify_add_key";
     const MODIFY_REMOVE_KEY   = "modify_remove_key";
+    const MODIFY_CHANGE_KEY   = "modify_change_key";
     const MODIFY_CHANGE_VALUE = "modify_change_value";
 
     /**
@@ -106,6 +108,43 @@ class ModifyArray extends AbstractAction
     }
 
     /**
+     * Set this ModifyArray instance, so that it replaces the given old key with the
+     * given new key. The new key should be the desired last-level key part of a multi-
+     * level key.
+     *
+     * E.g. to replace key "key2.key3" with "key2.key4" you should pass the following
+     * parameters:
+     *
+     * - $oldKey="key2.key3";
+     * - $lastLevelNewKey="key4";
+     *
+     * NOTE that if the given new index is already set, an exception will be thrown.
+     * Let's consider the following array:
+     *  [
+     *      key1 => value1,
+     *      key2 => [
+     *          key3 => value3,
+     *          key4 => value4,
+     *      ]
+     *  ]
+     *
+     * Trying to rename key "key2.key3" to "key2.key4", will throw a WorkerException.
+     *
+     * @param string $oldKey The key to be replaced by the new given key.
+     * @param string $lastLevelNewKey The last-level key to replace the given old key.
+     *
+     * @return ModifyArray
+     */
+    public function changeKey(string $oldKey, string $lastLevelNewKey): self
+    {
+        $this->action = self::MODIFY_CHANGE_KEY;
+        $this->key    = $oldKey;
+        $this->value  = $lastLevelNewKey;
+
+        return $this;
+    }
+
+    /**
      * Set this ModifyArray instance, so that it removes the given key
      * from the specified "modify-content".
      *
@@ -138,19 +177,17 @@ class ModifyArray extends AbstractAction
     }
 
     /**
-     * Validate the given action result. This method returns true if the
-     * given ActionResult instance has a result value that is considered
-     * as a positive case by this ModifyArray instance. This happens if
-     * the flag 'modificationApplied' is true (i.e. the given array was
-     * actually modified) and if the result is a valid array.
+     * Validate the given action result. This method returns true if the specified
+     * ActionResult instance has a result value that is considered as a positive case
+     * by this ModifyArray instance. This happens if the flag 'modificationApplied'
+     * is true (i.e. the given array was actually modified) and if the result is a
+     * valid array.
      *
-     * @param ActionResult $actionResult The ActionResult instance to
-     * be checked with the specific validation logic of the current
-     * ModifyArray instance.
+     * @param ActionResult $actionResult The ActionResult instance to be checked with
+     * the specific validation logic of the current ModifyArray instance.
      *
-     * @return bool True if the given ActionResult instance has a result
-     * value that is considered as a positive case by this ModifyArray
-     * instance; false otherwise.
+     * @return bool True if the given ActionResult instance has a result value that is
+     * considered as a positive case by this ModifyArray instance; false otherwise.
      */
     public function validateResult(ActionResult $actionResult): bool
     {
@@ -168,11 +205,10 @@ class ModifyArray extends AbstractAction
     }
 
     /**
-     * Return a human-readable string representation of this
-     * ModifyArray instance.
+     * Return a human-readable string representation of this ModifyArray instance.
      *
-     * @return string A human-readable string representation
-     * of this ModifyArray instance.
+     * @return string A human-readable string representation of this ModifyArray
+     * instance.
      */
     public function stringify(): string
     {
@@ -185,12 +221,18 @@ class ModifyArray extends AbstractAction
                 );
             case self::MODIFY_CHANGE_VALUE:
                 return sprintf(
-                    "Modify key '%s' and set it to '%s'",
+                    "Modify value with key '%s' and set it to '%s'",
                     $this->key,
                     StringHelper::stringifyVariable($this->value)
                 );
             case self::MODIFY_REMOVE_KEY:
                 return sprintf("Remove key '%s'", $this->key);
+            case self::MODIFY_CHANGE_KEY:
+                return sprintf(
+                    "Change key '%s' and set it to '%s'",
+                    $this->key,
+                    $this->value
+                );
             default:
                 return "Unsupported action";
         }
@@ -223,7 +265,8 @@ class ModifyArray extends AbstractAction
             $this->throwValidationException($this, "No key specified.");
         }
 
-        // If no action is specified OR an unsupported action is given, then we throw an error.
+        // If no action is specified OR an unsupported action is given, then we
+        // throw an error.
         $modifyConstants = $this->getSupportedActions();
         if (!in_array($this->action, $modifyConstants)) {
             $this->throwValidationException(
@@ -231,6 +274,19 @@ class ModifyArray extends AbstractAction
                 "Action %s not supported. Supported actions are [%s]",
                 $this->action,
                 implode(', ', $modifyConstants)
+            );
+        }
+
+        // We validate the value, which is required only by modify-change-key action.
+        // The other actions don't need a value. In the case of remove key, it is just
+        // not required; in the case of modify-value and add-key, it should be possible
+        // to set an existing key with an empty value or to set a new key with an empty
+        // value.
+        if ($this->action === self::MODIFY_CHANGE_KEY && empty($this->value)) {
+            $this->throwValidationException(
+                $this,
+                "Action %s requires a value. None or empty value was given.",
+                $this->action
             );
         }
 
@@ -258,12 +314,16 @@ class ModifyArray extends AbstractAction
      * Applies the configured changes to the given array.
      * This method supports multi-level arrays too.
      *
-     * @param array $array
-     * @param string $key
-     * @param string $action
-     * @param mixed $modifiedValue
+     * @param array $array The array to be modified.
+     * @param string $key The key to be modified, added, removed or whose value
+     * needs to be changed.
+     * @param string $action The action to perform. Possible values are class
+     * constants starting with prefix 'MODIFY_';
+     * @param mixed $modifiedValue The value to be used to perform the configured action.
      *
      * @return array|mixed|null
+     *
+     * @throws WorkerException Error occurred while modifying the array.
      */
     protected function applyChangeToArray(array &$array, string $key, string $action, $modifiedValue): array
     {
@@ -291,7 +351,7 @@ class ModifyArray extends AbstractAction
                     $array[$currentKey] = $value;
                 } else {
                     // We have found a non-array element but we are not at the end of our keys tree
-                    if ($action === self::MODIFY_ADD_KEY || $action === self::MODIFY_CHANGE_VALUE) {
+                    if (in_array($action, [self::MODIFY_ADD_KEY, self::MODIFY_CHANGE_VALUE, self::MODIFY_CHANGE_KEY])) {
                         // If key does not exist, we add the missing key
                         // (no need to apply any changes for the remove action)
                         $array[$currentKey] = [];
@@ -323,12 +383,16 @@ class ModifyArray extends AbstractAction
     /**
      * Applies the given action to the given array for the given key and value.
      *
-     * @param array  $array
-     * @param string $key
-     * @param string $action
-     * @param mixed  $value
+     * @param array $array The array to be modified.
+     * @param string $key The key to be modified, added, removed or whose value needs
+     * to be changed.
+     * @param string $action The action to perform. Possible values are class constants
+     * starting with prefix 'MODIFY_';
+     * @param mixed $value The value to be used to perform the configured action.
      *
      * @return void
+     *
+     * @throws WorkerException Error occurred while modifying the array.
      */
     protected function applyChangeByType(array &$array, string $key, string $action, $value): void
     {
@@ -340,6 +404,18 @@ class ModifyArray extends AbstractAction
                 break;
             case self::MODIFY_REMOVE_KEY:
                 $this->modificationApplied = true;
+                unset($array[$key]);
+                break;
+            case self::MODIFY_CHANGE_KEY:
+                if (array_key_exists($value, $array)) {
+                    $this->throwWorkerException(
+                        'It is not possible to override an existing key, when using action [%s].',
+                        $action
+                    );
+                }
+                $this->modificationApplied = true;
+                $oldKeyValue = $array[$key];
+                $array[$value] = $oldKeyValue;
                 unset($array[$key]);
                 break;
         }

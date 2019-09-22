@@ -22,15 +22,17 @@ class ModifyArrayTest extends BaseTest
      */
     public function modificationsProvider(): array
     {
+        // key | action | value | expected
         return [
             ['key1', ModifyArray::MODIFY_ADD_KEY, 'value1', "Add value 'value1' with key 'key1'"],
             ['key1', ModifyArray::MODIFY_ADD_KEY, ['test-array' => 'array-value'], "Add value '{\"test-array\":\"array-value\"}' with key 'key1'"],
             ['key1', ModifyArray::MODIFY_ADD_KEY, true, "Add value 'true' with key 'key1'"],
             ['key1', ModifyArray::MODIFY_ADD_KEY, null, "Add value 'null' with key 'key1'"],
-            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, 'value1', "Modify key 'key1' and set it to 'value1'"],
-            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, ['test-array' => 'array-value'], "Modify key 'key1' and set it to '{\"test-array\":\"array-value\"}'"],
-            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, true, "Modify key 'key1' and set it to 'true'"],
-            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, null, "Modify key 'key1' and set it to 'null'"],
+            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, 'value1', "Modify value with key 'key1' and set it to 'value1'"],
+            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, ['test-array' => 'array-value'], "Modify value with key 'key1' and set it to '{\"test-array\":\"array-value\"}'"],
+            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, true, "Modify value with key 'key1' and set it to 'true'"],
+            ['key1', ModifyArray::MODIFY_CHANGE_VALUE, null, "Modify value with key 'key1' and set it to 'null'"],
+            ['key1', ModifyArray::MODIFY_CHANGE_KEY, 'key2', "Change key 'key1' and set it to 'key2'"],
             ['key1', ModifyArray::MODIFY_REMOVE_KEY, 'value1', "Remove key 'key1'"],
             ['key1', "", 'value1', "Unsupported action"],
         ];
@@ -45,13 +47,20 @@ class ModifyArrayTest extends BaseTest
     {
         $addArray = ['added' => 'value'];
         $array = ['test1' => ['test3' => ['test4' => ['test5' => 'value5']]], 'test2' => 'value2'];
+        $arrayFourLevels = ['test1' => ['test3' => ['test4' => ['test5' => ['test6' => 'value6']]]], 'test2' => 'value2'];
         $modifiedOneLevel = ['test1' => ['test3' => ['test4' => ['test5' => 'value5']]], 'test2' => 'value2', 'test6' => 'value6'];
         $modifiedArrayThreeLevels = ['test1' => ['test3' => ['test4' => ['key1' => $addArray, 'test5' => 'value5']]], 'test2' => 'value2'];
+        $modifiedArrayThreeLevelsChangeKey = ['test1' => ['test3' => ['test4' => ['test6' => 'value5']]], 'test2' => 'value2'];
         $modifiedArrayFourLevels = ['test1' => ['test3' => ['test4' => ['test6' => ['key1' => $addArray], 'test5' => 'value5']]], 'test2' => 'value2'];
+        $modifiedArrayFourLevelsChangeKey = ['test1' => ['test3' => ['test4' => ['test5' => ['test7' => 'value6']]]], 'test2' => 'value2'];
         return [
+            // string key | string action | value | array array | array expected
             ['test6', ModifyArray::MODIFY_ADD_KEY, 'value6', $array, $modifiedOneLevel],
             ['test1.test3.test4.key1', ModifyArray::MODIFY_ADD_KEY, $addArray, $array, $modifiedArrayThreeLevels],
             ['test1.test3.test4.test6.key1', ModifyArray::MODIFY_ADD_KEY, $addArray, $array, $modifiedArrayFourLevels],
+            ['added', ModifyArray::MODIFY_CHANGE_KEY, 'test66', $addArray, ['test66' => 'value']],
+            ['test1.test3.test4.test5', ModifyArray::MODIFY_CHANGE_KEY, 'test6', $array, $modifiedArrayThreeLevelsChangeKey],
+            ['test1.test3.test4.test5.test6', ModifyArray::MODIFY_CHANGE_KEY, 'test7', $arrayFourLevels, $modifiedArrayFourLevelsChangeKey],
             ['test6', ModifyArray::MODIFY_CHANGE_VALUE, 'value6', $array, $modifiedOneLevel],
             ['test1.test3.test4.key1', ModifyArray::MODIFY_CHANGE_VALUE, $addArray, $array, $modifiedArrayThreeLevels],
             ['test1.test3.test4.test6.key1', ModifyArray::MODIFY_CHANGE_VALUE, $addArray, $array, $modifiedArrayFourLevels],
@@ -71,19 +80,37 @@ class ModifyArrayTest extends BaseTest
      */
     public function validationWithErrorsProvider(): array
     {
-        // Action | exception message | expect exception | expected value
+        // Action | exception message | expect exception
         return [
             [
-                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_ADD_KEY),
+                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_ADD_KEY, 'value'),
                 '',
                 false,
-                ['key' => '']
+            ],
+            [
+                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_CHANGE_KEY, 'value'),
+                '',
+                false,
+            ],
+            [
+                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_CHANGE_VALUE, 'value'),
+                '',
+                false,
+            ],
+            [
+                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_REMOVE_KEY),
+                '',
+                false,
+            ],
+            [
+                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_CHANGE_KEY),
+                'Action modify_change_key requires a value. None or empty value was given.',
+                true,
             ],
             [
                 ActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD_KEY),
                 "No key specified",
                 true,
-                null
             ],
             [
                 $modifyWrongAction = ActionFactory::createModifyArray('key1', 'wrong_action'),
@@ -92,13 +119,11 @@ class ModifyArrayTest extends BaseTest
                     implode(', ', $modifyWrongAction->getSupportedActions())
                 ),
                 true,
-                null
             ],
             [
                 ActionFactory::createModifyArray('', ''),
                 "No key specified",
                 true,
-                null
             ],
         ];
     }
@@ -114,12 +139,14 @@ class ModifyArrayTest extends BaseTest
         return [
             [
                 ActionFactory::createModifyArray('key', ModifyArray::MODIFY_ADD_KEY),
+                true,
                 '',
                 false,
                 ['key' => '']
             ],
             [
                 ActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD_KEY),
+                false,
                 "No key specified",
                 true,
                 null,
@@ -128,6 +155,7 @@ class ModifyArrayTest extends BaseTest
             ],
             [
                 ActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD_KEY),
+                false,
                 "No key specified",
                 true,
                 null,
@@ -136,6 +164,7 @@ class ModifyArrayTest extends BaseTest
             ],
             [
                 ActionFactory::createModifyArray('', ''),
+                false,
                 "No key specified",
                 true,
                 null,
@@ -144,6 +173,7 @@ class ModifyArrayTest extends BaseTest
             ],
             [
                 ActionFactory::createModifyArray('', ''),
+                false,
                 "No key specified",
                 true,
                 null,
@@ -152,6 +182,7 @@ class ModifyArrayTest extends BaseTest
             ],
             [
                 $modifyWrongAction = ActionFactory::createModifyArray('key1', 'wrong_action'),
+                false,
                 sprintf(
                     "Action wrong_action not supported. Supported actions are [%s]",
                     implode(', ', $modifyWrongAction->getSupportedActions())
@@ -163,6 +194,7 @@ class ModifyArrayTest extends BaseTest
             ],
             [
                 $modifyWrongAction = ActionFactory::createModifyArray('key1', 'wrong_action'),
+                false,
                 sprintf(
                     "Action wrong_action not supported. Supported actions are [%s]",
                     implode(', ', $modifyWrongAction->getSupportedActions())
@@ -171,6 +203,19 @@ class ModifyArrayTest extends BaseTest
                 null,
                 false,
                 true
+            ],
+            [
+                $modifyKeyAlreadyExists = ActionFactory::createModifyArray()->changeKey('key1', 'key2'),
+                true,
+                sprintf(
+                    "It is not possible to override an existing key, when using action [%s]",
+                    ModifyArray::MODIFY_CHANGE_KEY
+                ),
+                true,
+                null,
+                false,
+                true,
+                ['key1' => 'value1', 'key2' => 'value2']
             ],
         ];
     }
@@ -182,7 +227,7 @@ class ModifyArrayTest extends BaseTest
      */
     public function actionProvider(): array
     {
-        $testArray = ['key1' => 'value1', 'key2' => ''];
+        $testArray = ['key1' => 'value1', 'key2' => '', 'key5' => ['key6' => 'value6']];
 
         return [
             [
@@ -206,9 +251,19 @@ class ModifyArrayTest extends BaseTest
                 array_merge($testArray, ['key2' => 'value2'])
             ],
             [
+                ActionFactory::createModifyArray()->changeKey('key1', 'key3'),
+                $testArray,
+                ['key3' => 'value1', 'key2' => '', 'key5' => ['key6' => 'value6']]
+            ],
+            [
+                ActionFactory::createModifyArray()->changeKey('key5.key6', 'key7'),
+                $testArray,
+                ['key1' => 'value1', 'key2' => '', 'key5' => ['key7' => 'value6']]
+            ],
+            [
                 ActionFactory::createModifyArray()->removeKey('key2'),
                 $testArray,
-                ['key1' => 'value1']
+                ['key1' => 'value1', 'key5' => ['key6' => 'value6']]
             ],
             [
                 ActionFactory::createModifyArray()->removeKey('key4'),
@@ -283,28 +338,32 @@ class ModifyArrayTest extends BaseTest
      * @dataProvider runWithErrorsProvider
      *
      * @param ModifyArray $modifyArray
+     * @param bool $isValid
      * @param string $exceptionMessage
      * @param bool $expectException
      * @param mixed $expected
      * @param bool $isFatal
      * @param bool $isSuccessRequired
+     * @param array $content
      *
      * @throws ActionException
      */
     public function testFailRun(
         ModifyArray $modifyArray,
+        bool $isValid,
         string $exceptionMessage,
         bool $expectException,
         $expected,
         bool $isFatal = false,
-        bool $isSuccessRequired = false
+        bool $isSuccessRequired = false,
+        array $content = []
     ): void
     {
         $this->runBasicTest(
             $expectException,
-            !$expectException,
+            $isValid,
             $modifyArray
-                ->modifyContent([])
+                ->modifyContent($content)
                 ->setIsFatal($isFatal)
                 ->setIsSuccessRequired($isSuccessRequired),
             $expected,
