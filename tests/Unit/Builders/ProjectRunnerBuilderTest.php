@@ -67,7 +67,7 @@ class ProjectRunnerBuilderTest extends BaseTest
             ['unzipFile', ['test.zip'], UnzipFile::class],
             ['copyFileTo', [__FILE__], CopyFile::class],
             ['hasInstantiableClass', [__FILE__, __CLASS__], EmptyTransform::class],
-            ['modifyConfigKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
+            ['modifyConfigValueByKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
             ['addConfigKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
             ['removeConfigKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key'], ChangeConfigFileEntries::class],
             ['addAction', [ActionFactory::createFileExists(__FILE__)], FileExists::class],

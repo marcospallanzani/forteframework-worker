@@ -204,7 +204,7 @@ class ProjectRunnerBuilder
      *
      * @return ProjectRunnerBuilder
      */
-    public function modifyConfigKey(string $filePath, string $key, $value, string $contentType = ""): self
+    public function modifyConfigValueByKey(string $filePath, string $key, $value, string $contentType = ""): self
     {
         // The given relative path is converted to an absolute path
         $filePath = $this->getFilePathInProject($filePath);
