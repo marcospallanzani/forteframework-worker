@@ -43,12 +43,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcospallanzani/forteframework-stdlib.git",
-                "reference": "2c30106b290c74594de377c82b6fb6a06b371bd8"
+                "reference": "e7e738a767a559291d2c628e6df425d007f13955"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcospallanzani/forteframework-stdlib/zipball/2c30106b290c74594de377c82b6fb6a06b371bd8",
-                "reference": "2c30106b290c74594de377c82b6fb6a06b371bd8",
+                "url": "https://api.github.com/repos/marcospallanzani/forteframework-stdlib/zipball/e7e738a767a559291d2c628e6df425d007f13955",
+                "reference": "e7e738a767a559291d2c628e6df425d007f13955",
                 "shasum": ""
             },
             "require": {
@@ -86,7 +86,7 @@
                 "source": "https://github.com/marcospallanzani/forteframework-stdlib/tree/master",
                 "issues": "https://github.com/marcospallanzani/forteframework-stdlib/issues"
             },
-            "time": "2019-09-23T11:02:10+00:00"
+            "time": "2019-09-23T12:35:25+00:00"
         },
         {
             "name": "monolog/monolog",
