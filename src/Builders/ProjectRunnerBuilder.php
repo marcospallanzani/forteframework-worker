@@ -229,6 +229,39 @@ class ProjectRunnerBuilder
     }
 
     /**
+     * Replace the given old array key with the given new array key. The new key should be
+     * the desired last-level key part of a multi-level key.
+     *
+     * @param string $filePath The file to modify.
+     * @param string $oldKey The old array key to replace with the new given key.
+     * @param mixed $newKey The new array key.
+     * @param string $contentType The content type (accepted values -> constants
+     * FileUtils::CONTENT_TYPE_XXX). If not specified, the content type will be
+     * guessed from the given file path.
+     *
+     * @return ProjectRunnerBuilder
+     */
+    public function modifyConfigKey(string $filePath, string $oldKey, $newKey, string $contentType = ""): self
+    {
+        // The given relative path is converted to an absolute path
+        $filePath = $this->getFilePathInProject($filePath);
+
+        $this->addAction(
+            /** main action */
+            ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->changeKey($oldKey, $newKey),
+            /** pre-run actions */
+            [],
+            /** post-run actions */
+            [
+                ActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->hasKey($newKey),
+                ActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->doesNotHaveKey($oldKey),
+            ]
+        );
+
+        return $this;
+    }
+
+    /**
      * Add the given config key with the given value to the specified file.
      * Multi-level configuration keys are supported (each level separated
      * by the constant FileUtils::CONFIG_LEVEL_SEPARATOR - a dot).

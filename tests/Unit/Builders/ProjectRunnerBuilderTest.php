@@ -26,11 +26,15 @@ class ProjectRunnerBuilderTest extends BaseTest
     /**
      * Test constants.
      */
-    const ENV_FILE_PATH      = 'env.testModify';
-    const ENV_FILE_FULL_PATH = __DIR__ . '/env.testModify';
+    const ENV_FILE_NAME = 'env.testModify';
+    const JSON_FILE_NAME = 'test.json';
+    const ENV_FILE_FULL_PATH = __DIR__ . '/' . self::ENV_FILE_NAME;
+    const JSON_FILE_FULL_PATH = __DIR__ . '/' . self::JSON_FILE_NAME;
     const PHP_FILES_DIR_PATH = __DIR__ . '/phptests';
     const PHP_FILE_FULL_PATH = self::PHP_FILES_DIR_PATH . '/test.php';
-    const PHP_CONTENT = "<?php \n\nnamespace Test\Name\Space;\n\n/**\n *\n * @package \Test\Name\Space \n * Test\Name\n */ ";
+    const PHP_CONTENT        = "<?php \n\nnamespace Test\Name\Space;\n\n/**\n *\n * @package \Test\Name\Space \n * Test\Name\n */ ";
+    const JSON_CONTENT       = "{\"KEY1\":10,\"KEY2\":20,\"KEY3\":30}";
+    const ENV_CONTENT        = "KEY1=10\nKEY2=20\nKEY3=30";
 
     /**
      * This method is called before each test.
@@ -42,6 +46,8 @@ class ProjectRunnerBuilderTest extends BaseTest
             @mkdir(self::PHP_FILES_DIR_PATH);
         }
         @file_put_contents(self::PHP_FILE_FULL_PATH, self::PHP_CONTENT);
+        @file_put_contents(self::JSON_FILE_FULL_PATH, self::JSON_CONTENT);
+        @file_put_contents(self::ENV_FILE_FULL_PATH, self::ENV_CONTENT);
     }
 
     /**
@@ -51,6 +57,7 @@ class ProjectRunnerBuilderTest extends BaseTest
     {
         parent::tearDown();
         @unlink(self::ENV_FILE_FULL_PATH);
+        @unlink(self::JSON_FILE_FULL_PATH);
         @unlink(self::PHP_FILE_FULL_PATH);
         @rmdir(self::PHP_FILES_DIR_PATH);
     }
@@ -67,9 +74,10 @@ class ProjectRunnerBuilderTest extends BaseTest
             ['unzipFile', ['test.zip'], UnzipFile::class],
             ['copyFileTo', [__FILE__], CopyFile::class],
             ['hasInstantiableClass', [__FILE__, __CLASS__], EmptyTransform::class],
-            ['modifyConfigValueByKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
-            ['addConfigKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key', 'value'], ChangeConfigFileEntries::class],
-            ['removeConfigKey', [__FILE__, FileUtils::CONTENT_TYPE_JSON, 'key'], ChangeConfigFileEntries::class],
+            ['modifyConfigValueByKey', [__FILE__, 'key', 'value'], ChangeConfigFileEntries::class],
+            ['modifyConfigKey', [__FILE__, 'key', 'value'], ChangeConfigFileEntries::class],
+            ['addConfigKey', [__FILE__, 'key', 'value'], ChangeConfigFileEntries::class],
+            ['removeConfigKey', [__FILE__, 'key'], ChangeConfigFileEntries::class],
             ['addAction', [ActionFactory::createFileExists(__FILE__)], FileExists::class],
         ];
     }
@@ -133,13 +141,10 @@ class ProjectRunnerBuilderTest extends BaseTest
      */
     public function testModifyEnvFileConfigKey(): void
     {
-        // We write the test file first
-        @file_put_contents(self::ENV_FILE_FULL_PATH, "KEY1=10\nKEY2=20\nKEY3=30");
-
         // We modify its content and check if it's correct
         $builder = new ProjectRunnerBuilder(__DIR__);
-        $builder->modifyEnvFileConfigKey(self::ENV_FILE_PATH, "KEY1", 500);
-        $builder->modifyEnvFileConfigKey(self::ENV_FILE_PATH, "KEY3", '');
+        $builder->modifyEnvFileConfigKey(self::ENV_FILE_NAME, "KEY1", 500);
+        $builder->modifyEnvFileConfigKey(self::ENV_FILE_NAME, "KEY3", '');
         $builder->getRunner()->applyActions();
 
         // Now we open the file and check if the content has been correctly changed
@@ -170,6 +175,32 @@ class ProjectRunnerBuilderTest extends BaseTest
         $builder->modifyEnvFileConfigKey($filePath, "KEY1", 500);
         $builder->setFatalStatusForAllActions(true);
         $builder->getRunner()->applyActions();
+    }
+
+    /**
+     * Test function ProjectRunnerBuilder::modifyConfigKey().
+     *
+     * @throws ActionException
+     * @throws GeneralException
+     */
+    public function testModifyConfigKey(): void
+    {
+        // We modify its content and check if it's correct
+        $builder = new ProjectRunnerBuilder(__DIR__);
+        $builder->modifyConfigKey(self::JSON_FILE_NAME, "KEY1", "KEY10");
+        $builder->getRunner()->applyActions();
+
+        // Now we open the file and check if the content has been correctly changed
+        $envVariables = FileUtils::parseFile(self::JSON_FILE_FULL_PATH, FileUtils::CONTENT_TYPE_JSON);
+        $this->assertIsArray($envVariables);
+        $this->assertCount(3, $envVariables);
+        $this->assertArrayNotHasKey('KEY1', $envVariables);
+        $this->assertArrayHasKey('KEY10', $envVariables);
+        $this->assertArrayHasKey('KEY2', $envVariables);
+        $this->assertArrayHasKey('KEY3', $envVariables);
+        $this->assertEquals(10, $envVariables['KEY10']);
+        $this->assertEquals(20, $envVariables['KEY2']);
+        $this->assertEquals(30, $envVariables['KEY3']);
     }
 
     /**
