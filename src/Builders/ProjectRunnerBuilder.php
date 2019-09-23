@@ -4,6 +4,7 @@ namespace Forte\Worker\Builders;
 
 use Forte\Stdlib\DotenvLoader;
 use Forte\Stdlib\FileUtils;
+use Forte\Stdlib\StringUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Factories\ActionFactory;
@@ -348,8 +349,8 @@ class ProjectRunnerBuilder
     {
         // a partial namespace should end with a backslash.
         if ($isPartial) {
-            $oldNameSpace = rtrim($oldNameSpace, '\\') . '\\';
-            $newNameSpace = rtrim($newNameSpace, '\\') . '\\';
+            $oldNameSpace = StringUtils::rightTrim($oldNameSpace, '\\') . '\\';
+            $newNameSpace = StringUtils::rightTrim($newNameSpace, '\\') . '\\';
         }
 
         $this->addAction(ActionFactory::createFilesInDirectory()
