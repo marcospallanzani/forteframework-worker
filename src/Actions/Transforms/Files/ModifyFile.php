@@ -285,6 +285,32 @@ class ModifyFile extends AbstractFileAction implements NestedActionCallbackInter
     }
 
     /**
+     * Replace each line, of the specified file, that contains the given condition
+     * value, with the given template.
+     *
+     * @param string $templatePath The template path.
+     * @param mixed $conditionValue The condition value.
+     * @param bool $caseSensitive Whether or not a case-sensitive check action should be performed.
+     *
+     * @return ModifyFile
+     */
+    public function replaceWithTemplateIfLineContains(
+        string $templatePath,
+        $conditionValue,
+        bool $caseSensitive = false
+    ): self
+    {
+        return $this->addAction(
+            self::MODIFY_FILE_REPLACE_WITH_TEMPLATE,
+            VerifyString::CONDITION_CONTAINS,
+            $conditionValue,
+            $templatePath,
+            "",
+            $caseSensitive
+        );
+    }
+
+    /**
      * Add the given template to each line, of the specified file, that is equal to the given
      * condition value.
      *
