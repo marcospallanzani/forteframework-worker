@@ -259,6 +259,30 @@ class ModifyFile extends AbstractFileAction implements NestedActionCallbackInter
     }
 
     /**
+     * Remove each line, of the specified file, that contains the given condition value, with the
+     * given replace value.
+     *
+     * @param mixed $conditionValue The condition value.
+     * @param bool $caseSensitive Whether or not a case-sensitive check action should be performed.
+     *
+     * @return ModifyFile
+     */
+    public function removeLineIfLineContains(
+        $conditionValue,
+        bool $caseSensitive = false
+    ): self
+    {
+        return $this->addAction(
+            self::MODIFY_FILE_REMOVE_LINE,
+            VerifyString::CONDITION_CONTAINS,
+            $conditionValue,
+            "",
+            "",
+            $caseSensitive
+        );
+    }
+
+    /**
      * Replace each line, of the specified file, that is equal to the given condition
      * value, with the given template.
      *
