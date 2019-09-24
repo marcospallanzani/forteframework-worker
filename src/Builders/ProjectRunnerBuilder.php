@@ -465,7 +465,7 @@ class ProjectRunnerBuilder
     {
         foreach ($this->runner->getActions() as &$action) {
             if ($action instanceof AbstractAction) {
-                $action->setIsFatal($successRequired);
+                $action->setIsSuccessRequired($successRequired);
             }
         }
 
