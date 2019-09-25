@@ -41,6 +41,15 @@ class ForEachLoopTest extends BaseTest
                 [ActionFactory::createFileExists('xxx'), ActionFactory::createFileExists('xxx')],
                 true,
                 ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
+                true,
+                false,
+                "Run the following sequence of actions: \nCheck if file 'xxx' exists.\nCheck if file 'xxx' exists.\n"
+            ],
+            // Only from success required on we change the parent action result (the parent action result here is the foreach loop)
+            [
+                [ActionFactory::createFileExists('xxx'), ActionFactory::createFileExists('xxx')],
+                true,
+                ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED,
                 false,
                 false,
                 "Run the following sequence of actions: \nCheck if file 'xxx' exists.\nCheck if file 'xxx' exists.\n"
@@ -54,7 +63,6 @@ class ForEachLoopTest extends BaseTest
                 true,
                 "Run the following sequence of actions: \nCheck if file '".__FILE__."' exists.\nCreate directory '".__DIR__."'.\n"
             ],
-//TODO MISSING TESTS FOR SUCCESS REQUIRED
             /** not successful, fatal -> critical */
             [
                 [ActionFactory::createFileExists(__FILE__), ActionFactory::createMakeDirectory(__DIR__)],
