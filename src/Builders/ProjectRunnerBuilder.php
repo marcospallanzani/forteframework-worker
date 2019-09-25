@@ -164,11 +164,6 @@ class ProjectRunnerBuilder
      */
     public function modifyEnvFileConfigKey(string $filePath, string $key, $value): self
     {
-        // We need to add double quotes to the value, if it contains spaces
-        if (strpos($value, ' ') !== false) {
-            $value = '"' . $value . '"';
-        }
-
         // The given relative path is converted to an absolute path
         $filePath = $this->getFilePathInProject($filePath);
 
