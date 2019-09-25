@@ -3,6 +3,7 @@
 namespace Forte\Worker\Tests\Unit\Actions\Conditionals;
 
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ConfigurationException;
@@ -23,7 +24,7 @@ class IfStatementTest extends BaseTest
      */
     public function statementsProvider(): array
     {
-        // if-statements | is valid | is fatal | is success required | expected result | exception expected | message
+        // default action | if-statements | is valid | severity | expected result | exception expected | message
         return [
             [
                 ActionFactory::createFileExists(__FILE__),
@@ -33,8 +34,7 @@ class IfStatementTest extends BaseTest
                     [ActionFactory::createFileExists(__FILE__), ActionFactory::createFileExists(__FILE__)]
                 ],
                 true,
-                false,
-                false,
+                ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 true,
                 false,
                 "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Check if file '".__FILE__."' exists.]; \nDEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
@@ -49,8 +49,7 @@ class IfStatementTest extends BaseTest
                     [ActionFactory::createFileExists('xxx'), ActionFactory::createFileExists('xxx')]
                 ],
                 true,
-                false,
-                false,
+                ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 false,
                 false,
                 "Run the following chain of if-else statements: \nIF [Check if file 'xxx' exists.] THEN [Check if file 'xxx' exists.]; \nDEFAULT CONDITION [Check if file 'xxx' exists.]"
@@ -61,16 +60,16 @@ class IfStatementTest extends BaseTest
                 // We have to wrap the array [condition, run-action] into another array,
                 // as the method createFileExists is a variadic function
                 [
-                    [ActionFactory::createFileExists(__FILE__), ActionFactory::createMakeDirectory(__DIR__)->setIsFatal(true)]
+                    [ActionFactory::createFileExists(__FILE__), ActionFactory::createMakeDirectory(__DIR__)->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)]
                 ],
                 true,
-                true,
-                false,
+                ActionInterface::EXECUTION_SEVERITY_FATAL,
                 false,
                 true,
                 "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Create directory '".__DIR__."'.]; \nDEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
             ],
-            /** not successful, fatal */
+//TODO MISSING SUCCESS-REQUIRED CASE
+            /** not successful, fatal -> critical */
             [
                 ActionFactory::createFileExists(__FILE__),
                 // We have to wrap the array [condition, run-action] into another array,
@@ -79,8 +78,7 @@ class IfStatementTest extends BaseTest
                     [ActionFactory::createFileExists(__FILE__), ActionFactory::createMakeDirectory(__DIR__)]
                 ],
                 true,
-                false,
-                true,
+                ActionInterface::EXECUTION_SEVERITY_CRITICAL,
                 false,
                 true,
                 "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Create directory '".__DIR__."'.]; \nDEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
@@ -125,8 +123,7 @@ class IfStatementTest extends BaseTest
      * @param AbstractAction $defaultAction
      * @param array $ifStatements
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      * @param string $message
@@ -137,8 +134,7 @@ class IfStatementTest extends BaseTest
         AbstractAction $defaultAction,
         array $ifStatements,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected,
         string $message
@@ -155,8 +151,7 @@ class IfStatementTest extends BaseTest
      * @param AbstractAction $defaultAction
      * @param array $ifStatements
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      *
@@ -167,8 +162,7 @@ class IfStatementTest extends BaseTest
         AbstractAction $defaultAction,
         array $ifStatements,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected
     ): void
@@ -179,8 +173,7 @@ class IfStatementTest extends BaseTest
             $isValid,
             ActionFactory::createIfStatement($defaultAction)
                 ->addStatements($ifStatements)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired),
+                ->setActionSeverity($actionSeverity),
             $expected
         );
     }

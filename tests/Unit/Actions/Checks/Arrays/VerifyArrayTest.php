@@ -3,6 +3,7 @@
 namespace Forte\Worker\Tests\Unit\Actions\Checks\Arrays;
 
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
@@ -160,127 +161,128 @@ class VerifyArrayTest extends BaseTest
     public function checkProvider(): array
     {
         return [
-            // Array to check | key | operation | value | reverse action | is fatal | is success required | expected | exception | case sensitive
+            // Array to check | key | operation | value | reverse action | severity | expected | exception | case sensitive
             /** CHECK_ANY tests */
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, '', false, false, false, true, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, 'value', false, false, false, true, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, 'value', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_ANY, '', false, false, false, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_ANY, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_ANY, '', false, true, false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_ANY, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** CHECK_ENDS_WITH -> in reverse mode -> CHECK_NOT_ENDS_WITH tests */
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'ue2', false, false, false, true, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'lue2', false, false, false, true, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'value2', false, false, false, true, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'xxx', false, false, false, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'ue2', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'lue2', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'value2', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'xxx', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** Case-sensitive cases */
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'ue2', false, false, false, true, false, true],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'UE2', false, false, false, true, false, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'UE2', false, false, false, false, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'ue2', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'UE2', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'UE2', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', false, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, 'ue2', false, false, false, false, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, '', false, false, false, false, false], /** true because no value is specified */
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), false, false, false, null, false],
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, 'ue2', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false], /** true because no value is specified */
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, null, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', false, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, 'ue2', false, true, false, false, true],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, '', false, true, false, false, true], /** true because no value is specified */
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), false, true, false, null, true],
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, 'ue2', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true], /** true because no value is specified */
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), false, ActionInterface::EXECUTION_SEVERITY_FATAL, null, true],
 
             /** CHECK_STARTS_WITH -> in reverse mode -> CHECK_NOT_STARTS_WITH tests */
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'val', false, false, false, true, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value', false, false, false, true, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value15', false, false, false, true, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'xxx', false, false, false, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'val', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value15', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'xxx', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** Case-sensitive cases */
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'val', false, false, false, true, false, true],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'VAL', false, false, false, true, false, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'VAL', false, false, false, false, false, true],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'val', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'VAL', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'VAL', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', false, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', false, false, false, false, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, '', false, false, false, false, false],  /** true because no value is specified */
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), false, false, false, null, false],
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],  /** true because no value is specified */
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, null, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', false, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', false, true, false, false, true],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, '', false, true, false, false, true],  /** true because no value is specified */
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), false, true, false, null, true],
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],  /** true because no value is specified */
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), false, ActionInterface::EXECUTION_SEVERITY_FATAL, null, true],
 
             /** CHECK_CONTAINS -> in reverse mode -> CHECK_NOT_CONTAINS tests */
-            [$this->testArray, 'test1', VerifyArray::CHECK_CONTAINS, 'test2', false, false, false, true, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'long', false, false, false, true, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long', false, false, false, true, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long test value', false, false, false, true, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'xxx', false, false, false, false, false],
+            [$this->testArray, 'test1', VerifyArray::CHECK_CONTAINS, 'test2', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'long', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long test value', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'xxx', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** Case-sensitive cases */
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'long', false, false, false, true, false, true],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'LONG', false, false, false, true, false, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'LONG', false, false, false, false, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'long', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'LONG', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'LONG', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', false, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', false, false, false, false, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', false, false, false, false, false], /** true because no value is specified */
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), false, false, false, null, false],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false], /** true because no value is specified */
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, null, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', false, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', false, true, false, false, true],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', false, true, false, false, true], /** true because no value is specified */
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), false, true, false, null, true],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true], /** true because no value is specified */
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), false, ActionInterface::EXECUTION_SEVERITY_FATAL, null, true],
 
             /** CHECK_EQUALS -> in reverse mode -> CHECK_NOT_EQUALS tests */
-            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, false, false, false, true, false],
-            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, '66', false, false, false, true, false],
-            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, true, false, false, false, false, false],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, '66', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, true, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** Case-sensitive cases */
-            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, false, false, false, true, false, true],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', false, false, false, true, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', false, false, false, false, false, true],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', false, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', false, false, false, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', false, true, false, true, true],
-            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', false, true, false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, true, true],
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** CHECK_EMPTY -> in reverse mode -> CHECK_NOT_EMPTY tests */
-            [$this->testArray, 'test16.test17', VerifyArray::CHECK_EMPTY, '', false, false, false, true, false],
-            [$this->testArray, 'test16.test18', VerifyArray::CHECK_EMPTY, '', false, false, false, false, false],
+            [$this->testArray, 'test16.test17', VerifyArray::CHECK_EMPTY, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test16.test18', VerifyArray::CHECK_EMPTY, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_EMPTY, '', false, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_EMPTY, 'value', false, false, false, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, 'value', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_EMPTY, '', false, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_EMPTY, 'value', false, true, false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, 'value', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** CHECK_MISSING_KEY -> in reverse mode -> CHECK_NOT_MISSING_KEY tests */
-            [$this->testArray, 'test16.test18', VerifyArray::CHECK_MISSING_KEY, '', false, false, false, false, false],
-            [$this->testArray, 'test.notdefined', VerifyArray::CHECK_MISSING_KEY, '', false, false, false, true, false],
+            [$this->testArray, 'test16.test18', VerifyArray::CHECK_MISSING_KEY, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test.notdefined', VerifyArray::CHECK_MISSING_KEY, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, '', false, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, 'value', false, false, false, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, 'value', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, '', false, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, 'value', false, true, false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, 'value', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** general fail tests */
             /** not successful, no fatal */
-            [$this->testArray, 'key1', 'wrong_action', '', false, false, false, null, false],
-            [$this->testArray, '', '', '', false, false, false, null, false],
-            [$this->testArray, 'key', '', '', false, false, false, null, false],
+            [$this->testArray, 'key1', 'wrong_action', '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, null, false],
+            [$this->testArray, '', '', '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, null, false],
+            [$this->testArray, 'key', '', '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, null, false],
             /** not successful, fatal */
-            [$this->testArray, 'key1', 'wrong_action', '', false, true, false, null, true],
-            [$this->testArray, '', '', '', false, true, false, null, true],
-            [$this->testArray, 'key', '', '', false, true, false, null, true],
+            [$this->testArray, 'key1', 'wrong_action', '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, null, true],
+            [$this->testArray, '', '', '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, null, true],
+            [$this->testArray, 'key', '', '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, null, true],
+//TODO MISSING TESTS FOR SUCCESS REQUIRED AND CRITICAL CASES
         ];
     }
 
@@ -296,126 +298,127 @@ class VerifyArrayTest extends BaseTest
             /** CHECK_ANY tests */
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, '', true, false, false, false, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, 'value', true, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_ANY, '', true, false, false, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, 'value', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_ANY, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, '', true, true, false, false, true],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, 'value', true, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_ANY, '', true, true, false, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ANY, 'value', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_ANY, '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** CHECK_ENDS_WITH -> in reverse mode -> CHECK_NOT_ENDS_WITH tests */
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'ue2', true, false, false, false, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'lue2', true, false, false, false, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'value2', true, false, false, false, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'xxx', true, false, false, true, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'ue2', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'lue2', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'value2', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'xxx', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** Case-sensitive cases */
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'XXX', true, false, false, true, false, true],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'LUE2', true, false, false, false, false, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'LUE2', true, false, false, true, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'XXX', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'LUE2', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, 'LUE2', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', true, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, 'ue2', true, false, false, false, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, '', true, false, false, false, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), true, false, false, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, 'ue2', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', true, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, 'ue2', true, true, false, false, true],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, '', true, true, false, false, true],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), true, true, false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_ENDS_WITH, 'ue2', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_ENDS_WITH, new \stdClass(), true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** CHECK_STARTS_WITH -> in reverse mode -> CHECK_NOT_STARTS_WITH tests */
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'val', true, false, false, false, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value', true, false, false, false, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value15', true, false, false, false, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'xxx', true, false, false, true, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'val', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'value15', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, 'xxx', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** Case-sensitive cases */
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_STARTS_WITH, 'XXX', true, false, false, true, false, true],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_STARTS_WITH, 'VAL', true, false, false, false, false, false],
-            [$this->testArray, 'test1.test2', VerifyArray::CHECK_STARTS_WITH, 'VAL', true, false, false, true, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_STARTS_WITH, 'XXX', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_STARTS_WITH, 'VAL', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, false],
+            [$this->testArray, 'test1.test2', VerifyArray::CHECK_STARTS_WITH, 'VAL', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', true, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', true, false, false, false, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, '', true, false, false, false, false],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), true, false, false, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', true, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', true, true, false, false, true],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, '', true, true, false, false, true],
-            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), true, true, false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_STARTS_WITH, 'valu', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, 'test3.test14.test15', VerifyArray::CHECK_STARTS_WITH, new \stdClass(), true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** CHECK_CONTAINS -> in reverse mode -> CHECK_NOT_CONTAINS tests */
-            [$this->testArray, 'test1', VerifyArray::CHECK_CONTAINS, 'test2', true, false, false, false, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'long', true, false, false, false, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long', true, false, false, false, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long test value', true, false, false, false, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'xxx', true, false, false, true, false],
+            [$this->testArray, 'test1', VerifyArray::CHECK_CONTAINS, 'test2', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'long', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'a long test value', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'xxx', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** Case-sensitive cases */
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'A LONG TEST', true, false, false, false, false, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'A LONG TEST', true, false, false, true, false, true],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'XXX', true, false, false, true, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'A LONG TEST', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'A LONG TEST', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, 'XXX', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', true, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', true, false, false, false, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', true, false, false, false, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), true, false, false, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', true, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', true, true, false, false, true],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', true, true, false, false, true],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), true, true, false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_CONTAINS, '55', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_CONTAINS, new \stdClass(), true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** CHECK_EQUALS -> in reverse mode -> CHECK_NOT_EQUALS tests */
-            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, true, false, false, false /*they are equal*/, false],
-            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, '66', true, false, false, false /*they are equal*/, false],
-            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, true, true, false, false, true, false],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false /*they are equal*/, false],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, '66', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false /*they are equal*/, false],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, true, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** Case-sensitive cases */
-            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, true, false, false, false /*they are equal*/, false, true],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', true, false, false, false, false, false],
-            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', true, false, false, true, false, true],
+            [$this->testArray, 'test5.test6.test11.test12.test13', VerifyArray::CHECK_EQUALS, 66, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false /*they are equal*/, false, true],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, false],
+            [$this->testArray, 'test5.test6.test7.test8.test9.test10', VerifyArray::CHECK_EQUALS, 'THIS IS A LONG TEST VALUE', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', true, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', true, false, false, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', true, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', true, true, false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_EQUALS, '66', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** CHECK_EMPTY -> in reverse mode -> CHECK_NOT_EMPTY tests */
-            [$this->testArray, 'test16.test17', VerifyArray::CHECK_EMPTY, '', true, false, false, false, false],
-            [$this->testArray, 'test16.test18', VerifyArray::CHECK_EMPTY, '', true, false, false, true, false],
+            [$this->testArray, 'test16.test17', VerifyArray::CHECK_EMPTY, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'test16.test18', VerifyArray::CHECK_EMPTY, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_EMPTY, '', true, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_EMPTY, 'value', true, false, false, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, 'value', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_EMPTY, '', true, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_EMPTY, 'value', true, true, false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_EMPTY, 'value', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** CHECK_MISSING_KEY -> in reverse mode -> CHECK_NOT_MISSING_KEY tests */
-            [$this->testArray, 'test16.test18', VerifyArray::CHECK_MISSING_KEY, '', true, false, false, true, false],
-            [$this->testArray, 'test.notdefined', VerifyArray::CHECK_MISSING_KEY, '', true, false, false, false, false],
+            [$this->testArray, 'test16.test18', VerifyArray::CHECK_MISSING_KEY, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$this->testArray, 'test.notdefined', VerifyArray::CHECK_MISSING_KEY, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** negative cases */
             /** not successful, no fatal */
-            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, '', true, false, false, false, false],
-            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, 'value', true, false, false, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, 'value', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, '', true, true, false, false, true],
-            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, 'value', true, true, false, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', VerifyArray::CHECK_MISSING_KEY, 'value', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** general fail tests */
             /** not successful, no fatal */
-            [$this->testArray, 'key1', 'wrong_action', '', true, false, false, false, false],
-            [$this->testArray, '', '', '', true, false, false, false, false],
-            [$this->testArray, 'key', '', '', true, false, false, false, false],
+            [$this->testArray, 'key1', 'wrong_action', '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, '', '', '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$this->testArray, 'key', '', '', true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [$this->testArray, 'key1', 'wrong_action', '', true, true, false, false, true],
-            [$this->testArray, '', '', '', true, true, false, false, true],
-            [$this->testArray, 'key', '', '', true, true, false, false, true],
+            [$this->testArray, 'key1', 'wrong_action', '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, '', '', '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [$this->testArray, 'key', '', '', true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
         ];
+//TODO MISSING TEST CASES FOR SUCCESS REQUIRED AND CRITICAL SEVERITIES
     }
 
     /**
@@ -531,8 +534,7 @@ class VerifyArrayTest extends BaseTest
      * @param string $operation
      * @param $value
      * @param bool $reverseAction
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param mixed $expectedResult
      * @param bool $expectException
      * @param bool $caseSensitive
@@ -545,8 +547,7 @@ class VerifyArrayTest extends BaseTest
         string $operation,
         $value,
         bool $reverseAction,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expectedResult,
         bool $expectException,
         bool $caseSensitive = false
@@ -557,8 +558,7 @@ class VerifyArrayTest extends BaseTest
             ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction)
                 ->checkContent($array)
                 ->caseSensitive($caseSensitive)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
+                ->setActionSeverity($actionSeverity)
         ;
 
         if ($expectException) {
@@ -579,7 +579,7 @@ class VerifyArrayTest extends BaseTest
             "test1" => "test2"
         ];
         $verifyArray = ActionFactory::createVerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
-        $verifyArray->setIsFatal(true);
+        $verifyArray->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL);
         $this->expectException(ActionException::class);
         $verifyArray->checkContent($array)->run();
     }
@@ -631,7 +631,7 @@ class VerifyArrayTest extends BaseTest
             ->once()
             ->andReturn([])
         ;
-        $verifyArrayMock->checkContent($this->testArray)->setIsFatal(true);
+        $verifyArrayMock->checkContent($this->testArray)->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL);
         $verifyArrayMock->run();
     }
 

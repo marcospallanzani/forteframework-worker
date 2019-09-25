@@ -3,6 +3,7 @@
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
 use Forte\Stdlib\Exceptions\GeneralException;
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Exceptions\ActionException;
@@ -68,26 +69,32 @@ class CopyFileTest extends BaseTest
      */
     public function filesProvider(): array
     {
-        // source path | target dir | target name | is valid | is fatal | is success required | expected result | exception expected
+        // source path | target dir | target name | is valid | severity | expected result | exception expected
         return [
-            [self::TEST_COPY_FILE_PATH, "", self::TEST_TARGET_FILE, true, false, false, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_FILE_CUSTOM_NAME_IN_DIR)],
-            [self::TEST_COPY_FILE_PATH, self::TEST_TARGET_DIR, self::TEST_TARGET_FILE, true, false, false, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_FILE_CUSTOM_NAME)],
-            [self::TEST_COPY_FILE_PATH, self::TEST_TARGET_DIR, "", true, false, false, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_TARGET_DIR . DIRECTORY_SEPARATOR . self::TEST_SOURCE_NAME)],
-            [self::TEST_COPY_FILE_PATH, self::TEST_SOURCE_DIR, "", true, false, false, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_COPY_FILE_DEFAULT_PATH)],
-            [self::TEST_COPY_FILE_PATH, "", "", true, false, false, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_COPY_FILE_DEFAULT_PATH)],
+            [self::TEST_COPY_FILE_PATH, "", self::TEST_TARGET_FILE, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_FILE_CUSTOM_NAME_IN_DIR)],
+            [self::TEST_COPY_FILE_PATH, self::TEST_TARGET_DIR, self::TEST_TARGET_FILE, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_FILE_CUSTOM_NAME)],
+            [self::TEST_COPY_FILE_PATH, self::TEST_TARGET_DIR, "", true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_TARGET_DIR . DIRECTORY_SEPARATOR . self::TEST_SOURCE_NAME)],
+            [self::TEST_COPY_FILE_PATH, self::TEST_SOURCE_DIR, "", true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_COPY_FILE_DEFAULT_PATH)],
+            [self::TEST_COPY_FILE_PATH, "", "", true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_COPY_FILE_DEFAULT_PATH)],
             /** Negative cases */
             /** not successful, no fatal */
-            ["xxx.json", "", "xxx_copy.json", true, false, false, false, false, "Copy file 'xxx.json' to './xxx_copy.json'."],
-            ["xxx.json", "", "", true, false, false, false, false, "Copy file 'xxx.json' to './xxx_COPY.json'."],
-            ["", "", "", false, false, false, false, false, "Copy file '' to ''."],
+            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Copy file 'xxx.json' to './xxx_copy.json'."],
+            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Copy file 'xxx.json' to './xxx_COPY.json'."],
+            ["", "", "", false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Copy file '' to ''."],
             /** fatal */
-            ["xxx.json", "", "xxx_copy.json", true, true, false, false, true, "Copy file 'xxx.json' to './xxx_copy.json'."],
-            ["xxx.json", "", "", true, true, false, false, true, "Copy file 'xxx.json' to './xxx_COPY.json'."],
-            ["", "", "", false, true, false, false, true, "Copy file '' to ''."],
+            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Copy file 'xxx.json' to './xxx_copy.json'."],
+            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Copy file 'xxx.json' to './xxx_COPY.json'."],
+            ["", "", "", false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Copy file '' to ''."],
+//TODO THIS SHOULD BE DONE WITH MOCK OBJECTS
             /** success required */
-            ["xxx.json", "", "xxx_copy.json", true, false, true, false, true, "Copy file 'xxx.json' to './xxx_copy.json'."],
-            ["xxx.json", "", "", true, false, true, false, true, "Copy file 'xxx.json' to './xxx_COPY.json'."],
-            ["", "", "", false, false, true, false, true, "Copy file '' to ''."],
+            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED, false, false, "Copy file 'xxx.json' to './xxx_copy.json'."],
+            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED, false, false, "Copy file 'xxx.json' to './xxx_COPY.json'."],
+            ["", "", "", false, ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED, false, false, "Copy file '' to ''."],
+//TODO THIS SHOULD BE DONE WITH MOCK OBJECTS
+            /** critical */
+            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Copy file 'xxx.json' to './xxx_copy.json'."],
+            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Copy file 'xxx.json' to './xxx_COPY.json'."],
+            ["", "", "", false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Copy file '' to ''."],
         ];
     }
 
@@ -118,8 +125,7 @@ class CopyFileTest extends BaseTest
      * @param string $targetDir
      * @param string $targetName
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      * @param string $message
@@ -129,8 +135,7 @@ class CopyFileTest extends BaseTest
         string $targetDir,
         string $targetName,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected,
         string $message
@@ -149,8 +154,7 @@ class CopyFileTest extends BaseTest
      * @param string $targetDir
      * @param string $targetName
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      *
@@ -161,14 +165,13 @@ class CopyFileTest extends BaseTest
         string $targetDir,
         string $targetName,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected
     ): void
     {
         $action = $this->getConfiguredAction($sourcePath, $targetDir, $targetName);
-        $action->setIsFatal($isFatal)->setIsSuccessRequired($isSuccessRequired);
+        $action->setActionSeverity($actionSeverity);
 
         // Basic checks
         $this->runBasicTest(

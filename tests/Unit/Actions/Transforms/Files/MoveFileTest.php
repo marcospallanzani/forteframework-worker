@@ -3,6 +3,7 @@
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
@@ -54,22 +55,24 @@ class MoveFileTest extends BaseTest
     public function moveProvider(): array
     {
         return [
-            // source | target | full target path | is valid | fatal | success required | expected | exception | message
-            [self::TEST_SOURCE_FILE_TMP, self::TEST_TARGET_PATH_TMP, true, true, false, false, true, false, "Move file '".self::TEST_SOURCE_FILE_TMP."' to '".self::TEST_TARGET_PATH_TMP."'."],
-            [self::TEST_SOURCE_FILE_TMP, self::TEST_TARGET_DIR_TMP, false, true, false, false, true, false, "Move file '".self::TEST_SOURCE_FILE_TMP."' to '".self::TEST_TARGET_DIR_TMP.self::TEST_SOURCE_FILE_NAME_TMP."'."],
+            // source | target | full target path | is valid | severity | expected | exception | message
+            [self::TEST_SOURCE_FILE_TMP, self::TEST_TARGET_PATH_TMP, true, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, "Move file '".self::TEST_SOURCE_FILE_TMP."' to '".self::TEST_TARGET_PATH_TMP."'."],
+            [self::TEST_SOURCE_FILE_TMP, self::TEST_TARGET_DIR_TMP, false, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, "Move file '".self::TEST_SOURCE_FILE_TMP."' to '".self::TEST_TARGET_DIR_TMP.self::TEST_SOURCE_FILE_NAME_TMP."'."],
             /** Negative cases */
             /** not successful, no fatal */
-            ['', self::TEST_TARGET_PATH_TMP, true, false, false, false, false, false, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
-            [self::TEST_SOURCE_FILE_TMP, '', true, false, false, false, false, false, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
-            ['', '', true, false, false, false, false, false, "Move file '' to ''."],
+            ['', self::TEST_TARGET_PATH_TMP, true, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
+            [self::TEST_SOURCE_FILE_TMP, '', true, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
+            ['', '', true, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Move file '' to ''."],
             /** fatal */
-            ['', self::TEST_TARGET_PATH_TMP, true, false, true, false, false, true, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
-            [self::TEST_SOURCE_FILE_TMP, '', true, false, true, false, false, true, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
-            ['', '', true, false, true, false, false, true, "Move file '' to ''."],
+            ['', self::TEST_TARGET_PATH_TMP, true, false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
+            [self::TEST_SOURCE_FILE_TMP, '', true, false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
+            ['', '', true, false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Move file '' to ''."],
             /** success required */
-            ['', self::TEST_TARGET_PATH_TMP, true, false, false, true, false, true, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
-            [self::TEST_SOURCE_FILE_TMP, '', true, false, false, true, false, true, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
-            ['', '', true, false, false, true, false, true, "Move file '' to ''."],
+//TODO IMPLEMENT MISSING TESTS
+            /** critical */
+            ['', self::TEST_TARGET_PATH_TMP, true, false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Move file '' to '".self::TEST_TARGET_PATH_TMP."'."],
+            [self::TEST_SOURCE_FILE_TMP, '', true, false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Move file '".self::TEST_SOURCE_FILE_TMP."' to ''."],
+            ['', '', true, false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Move file '' to ''."],
         ];
     }
 
@@ -103,8 +106,7 @@ class MoveFileTest extends BaseTest
      * @param string $targetPath
      * @param bool $isFullTargetPath
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      * @param string $message
@@ -114,8 +116,7 @@ class MoveFileTest extends BaseTest
         string $targetPath,
         bool $isFullTargetPath,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected,
         string $message
@@ -137,8 +138,7 @@ class MoveFileTest extends BaseTest
      * @param string $targetPath
      * @param bool $isFullTargetPath
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      *
@@ -149,16 +149,14 @@ class MoveFileTest extends BaseTest
         string $targetPath,
         bool $isFullTargetPath,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected
     ): void
     {
         $action = ActionFactory::createMoveFile()
             ->move($sourcePath)
-            ->setIsFatal($isFatal)
-            ->setIsSuccessRequired($isSuccessRequired)
+            ->setActionSeverity($actionSeverity)
         ;
 
         $this->setTarget($action, $isFullTargetPath, $targetPath);

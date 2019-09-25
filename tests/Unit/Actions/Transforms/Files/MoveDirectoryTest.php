@@ -2,6 +2,7 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
@@ -47,21 +48,23 @@ class MoveDirectoryTest extends BaseTest
     public function moveProvider(): array
     {
         return [
-            // source | target | is valid | fatal | success required | expected | exception | message
-            [self::TEST_SOURCE_DIRECTORY_TMP, self::TEST_TARGET_DIRECTORY_TMP, true, false, false, true, false, "Move directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to '".self::TEST_TARGET_DIRECTORY_TMP."'."],
+            // source | target | is valid | severity | expected | exception | message
+            [self::TEST_SOURCE_DIRECTORY_TMP, self::TEST_TARGET_DIRECTORY_TMP, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, "Move directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to '".self::TEST_TARGET_DIRECTORY_TMP."'."],
             /** Negative cases */
             /** not successful, no fatal */
-            ['', self::TEST_TARGET_DIRECTORY_TMP, false, false, false, false, false, "Move directory '' to '".self::TEST_TARGET_DIRECTORY_TMP."'."],
-            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, false, false, false, false, "Move directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
-            ['', '', false, false, false, false, false, "Move directory '' to ''."],
+            ['', self::TEST_TARGET_DIRECTORY_TMP, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Move directory '' to '".self::TEST_TARGET_DIRECTORY_TMP."'."],
+            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Move directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
+            ['', '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Move directory '' to ''."],
             /** fatal */
-            ['', self::TEST_TARGET_DIRECTORY_TMP, false, true, false, false, true, "Move directory '' to '".self::TEST_TARGET_DIRECTORY_TMP."'."],
-            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, true, false, false, true, "Move directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
-            ['', '', false, true, false, false, true, "Move directory '' to ''."],
+            ['', self::TEST_TARGET_DIRECTORY_TMP, false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Move directory '' to '".self::TEST_TARGET_DIRECTORY_TMP."'."],
+            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Move directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
+            ['', '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Move directory '' to ''."],
             /** success required */
-            ['', self::TEST_TARGET_DIRECTORY_TMP, false, false, true, false, true, "Move directory '' to '".self::TEST_TARGET_DIRECTORY_TMP."'."],
-            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, false, true, false, true, "Move directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
-            ['', '', false, false, true, false, true, "Move directory '' to ''."],
+//TODO MISSING TESTS FOR SUCCESS REQUIRED
+            /** success required */
+            ['', self::TEST_TARGET_DIRECTORY_TMP, false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Move directory '' to '".self::TEST_TARGET_DIRECTORY_TMP."'."],
+            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Move directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
+            ['', '', false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Move directory '' to ''."],
         ];
     }
 
@@ -89,8 +92,7 @@ class MoveDirectoryTest extends BaseTest
      * @param string $sourcePath
      * @param string $targetPath
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      * @param string $message
@@ -99,8 +101,7 @@ class MoveDirectoryTest extends BaseTest
         string $sourcePath,
         string $targetPath,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected,
         string $message
@@ -117,8 +118,7 @@ class MoveDirectoryTest extends BaseTest
      * @param string $sourcePath
      * @param string $targetPath
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      *
@@ -128,8 +128,7 @@ class MoveDirectoryTest extends BaseTest
         string $sourcePath,
         string $targetPath,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected
     ): void
@@ -141,8 +140,7 @@ class MoveDirectoryTest extends BaseTest
             ActionFactory::createMoveDirectory()
                 ->move($sourcePath)
                 ->to($targetPath)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired),
+                ->setActionSeverity($actionSeverity),
             $expected
         );
 

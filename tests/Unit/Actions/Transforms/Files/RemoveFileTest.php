@@ -11,6 +11,7 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
@@ -68,20 +69,22 @@ class RemoveFileTest extends BaseTest
     public function filesProvider(): array
     {
         return [
-            // File path | is valid | expected result | is fatal | is success required | exception expected | remove mode | expected stringify message
-            [self::TEST_FILE_TXT, true, true, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_TXT . "'."],
-            [self::TEST_FILE_JSON, true, true, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_JSON . "'."],
+            // File path | is valid | expected result | severity | exception expected | remove mode | expected stringify message
+            [self::TEST_FILE_TXT, true, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_TXT . "'."],
+            [self::TEST_FILE_JSON, true, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_FILE_JSON . "'."],
             /** Negative cases */
             /** not successful, no fatal */
-            [self::TEST_WRONG_FILE, true, false, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
-            [self::TEST_DIR_TMP, true, false, false, false, false, RemoveFile::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."],
-            ['', false, false, false, false, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
+            [self::TEST_WRONG_FILE, true, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
+            [self::TEST_DIR_TMP, true, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, RemoveFile::REMOVE_DIRECTORY, "Remove directory '" . self::TEST_DIR_TMP . "'."],
+            ['', false, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
             /** not successful, fatal */
-            [self::TEST_WRONG_FILE, true, false, true, false, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
-            ['', false, false, true, false, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
+            [self::TEST_WRONG_FILE, true, false, ActionInterface::EXECUTION_SEVERITY_FATAL, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
+            ['', false, false, ActionInterface::EXECUTION_SEVERITY_FATAL, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
             /** successful with negative result, is success required */
-            [self::TEST_WRONG_FILE, true, false, false, true, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
-            ['', false, false, false, true, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
+//TODO IMPLEMENT MISSING TEST CASES
+            /** critical (errors or negative result -> exception)*/
+            [self::TEST_WRONG_FILE, true, false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file '" . self::TEST_WRONG_FILE . "'."],
+            ['', false, false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, true, RemoveFile::REMOVE_SINGLE_FILE, "Remove file ''."],
         ];
     }
 
@@ -94,8 +97,7 @@ class RemoveFileTest extends BaseTest
      * @param string $filePath
      * @param bool $isValid
      * @param bool $expected
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param bool $exceptionExpected
      *
      * @throws ActionException
@@ -104,8 +106,7 @@ class RemoveFileTest extends BaseTest
         string $filePath,
         bool $isValid,
         bool $expected,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         bool $exceptionExpected
     ): void
     {
@@ -116,8 +117,7 @@ class RemoveFileTest extends BaseTest
                 ->removeFile($filePath)
                 ->addBeforeAction(ActionFactory::createFileExists($filePath))
                 ->addAfterAction(ActionFactory::createFileDoesNotExist($filePath))
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired),
+                ->setActionSeverity($actionSeverity),
             $expected
         );
     }
@@ -131,8 +131,7 @@ class RemoveFileTest extends BaseTest
      * @param string $filePath
      * @param bool $isValid
      * @param bool $expected
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param bool $exceptionExpected
      *
      * @throws ActionException
@@ -141,8 +140,7 @@ class RemoveFileTest extends BaseTest
         string $filePath,
         bool $isValid,
         bool $expected,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         bool $exceptionExpected
     ): void
     {
@@ -151,8 +149,7 @@ class RemoveFileTest extends BaseTest
             $isValid,
             ActionFactory::createRemoveFile()
                 ->removeFile($filePath)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired),
+                ->setActionSeverity($actionSeverity),
             $expected
         );
     }
@@ -169,7 +166,7 @@ class RemoveFileTest extends BaseTest
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->expectException(ActionException::class);
-        ActionFactory::createRemoveFile()->removeFile(self::TEST_DIR_TMP)->setIsFatal(true)->run();
+        ActionFactory::createRemoveFile()->removeFile(self::TEST_DIR_TMP)->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)->run();
     }
 
     /**
@@ -242,7 +239,7 @@ class RemoveFileTest extends BaseTest
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->expectException(ActionException::class);
-        ActionFactory::createRemoveFile()->removeFile(__DIR__ . '/files/xxx/')->setIsFatal(true)->run();
+        ActionFactory::createRemoveFile()->removeFile(__DIR__ . '/files/xxx/')->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)->run();
     }
 
     /**
@@ -272,8 +269,7 @@ class RemoveFileTest extends BaseTest
      * @param string $filePath
      * @param bool $isValid
      * @param bool $expected
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param bool $exceptionExpected
      * @param string $removeMode
      *
@@ -283,8 +279,7 @@ class RemoveFileTest extends BaseTest
         string $filePath,
         bool $isValid,
         bool $expected,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         bool $exceptionExpected,
         string $removeMode
     ): void
@@ -300,8 +295,7 @@ class RemoveFileTest extends BaseTest
      * @param string $filePath
      * @param bool $isValid
      * @param bool $expected
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param bool $exceptionExpected
      * @param string $mode
      * @param string $message
@@ -310,8 +304,7 @@ class RemoveFileTest extends BaseTest
         string $filePath,
         bool $isValid,
         bool $expected,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         bool $exceptionExpected,
         string $mode,
         string $message

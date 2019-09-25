@@ -11,6 +11,7 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Checks\Files;
 
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
@@ -79,13 +80,14 @@ class FileHasInstantiableClassTest extends BaseTest
     {
         $selfClass = (new \ReflectionClass(get_called_class()))->getShortName();
 
+        // filePath | className | actionSeverity | expected | exceptionExpected
         return [
-            ["", "", true, false, false, true],
-            ["", $selfClass, true, false, false, true],
-            [__FILE__, "", false, false, true, false],
-            [__FILE__, $selfClass, false, false, true, false],
-            [self::TEST_FILE_TMP, $selfClass, false, false, false, false],
-            [__FILE__, "test", false, false, false, false],
+            ["", "", ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            ["", $selfClass, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [__FILE__, "", ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [__FILE__, $selfClass, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [self::TEST_FILE_TMP, $selfClass, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [__FILE__, "test", ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
         ];
     }
 
@@ -121,8 +123,7 @@ class FileHasInstantiableClassTest extends BaseTest
      *
      * @param string $filePath
      * @param string $className
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param bool $expected
      * @param bool $exceptionExpected
      *
@@ -131,8 +132,7 @@ class FileHasInstantiableClassTest extends BaseTest
     public function testCheckFileHasClass(
         string $filePath,
         string $className,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         bool $expected,
         bool $exceptionExpected
     ): void
@@ -143,8 +143,7 @@ class FileHasInstantiableClassTest extends BaseTest
         $this->assertEquals(
             $expected,
             ActionFactory::createFileHasInstantiableClass($filePath, $className)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
+                ->setActionSeverity($actionSeverity)
                 ->run()
                 ->getResult()
         );

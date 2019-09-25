@@ -2,6 +2,7 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
@@ -48,24 +49,26 @@ class RenameDirectoryTest extends BaseTest
     public function renameProvider(): array
     {
         return [
-            // source | target | is valid | fatal | success required | expected | exception | message
-            [self::TEST_SOURCE_DIRECTORY_TMP, self::TEST_TARGET_DIRECTORY_TMP, true, false, false, true, false, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to '".self::TEST_TARGET_DIRECTORY_TMP."'."],
+            // source | target | is valid | severity | expected | exception | message
+            [self::TEST_SOURCE_DIRECTORY_TMP, self::TEST_TARGET_DIRECTORY_TMP, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to '".self::TEST_TARGET_DIRECTORY_TMP."'."],
             /** Negative cases */
             /** not successful, no fatal */
-            [self::TEST_SOURCE_DIRECTORY_TMP, self::TEST_TARGET_PATH_TMP, false, false, false, false, false, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to '".self::TEST_TARGET_PATH_TMP."'."],
-            ['', self::TEST_TARGET_PATH_TMP, false, false, false, false, false, "Rename directory '' to '".self::TEST_TARGET_PATH_TMP."'."],
-            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, false, false, false, false, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
-            ['', '', false, false, false, false, false, "Rename directory '' to ''."],
+            [self::TEST_SOURCE_DIRECTORY_TMP, self::TEST_TARGET_PATH_TMP, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to '".self::TEST_TARGET_PATH_TMP."'."],
+            ['', self::TEST_TARGET_PATH_TMP, false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Rename directory '' to '".self::TEST_TARGET_PATH_TMP."'."],
+            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
+            ['', '', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Rename directory '' to ''."],
             /** fatal */
-            [self::TEST_SOURCE_DIRECTORY_TMP, self::TEST_TARGET_PATH_TMP, false, true, false, false, true, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to '".self::TEST_TARGET_PATH_TMP."'."],
-            ['', self::TEST_TARGET_PATH_TMP, false, true, false, false, true, "Rename directory '' to '".self::TEST_TARGET_PATH_TMP."'."],
-            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, true, false, false, true, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
-            ['', '', false, true, false, false, true, "Rename directory '' to ''."],
+            [self::TEST_SOURCE_DIRECTORY_TMP, self::TEST_TARGET_PATH_TMP, false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to '".self::TEST_TARGET_PATH_TMP."'."],
+            ['', self::TEST_TARGET_PATH_TMP, false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Rename directory '' to '".self::TEST_TARGET_PATH_TMP."'."],
+            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
+            ['', '', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Rename directory '' to ''."],
             /** success required */
-            [self::TEST_SOURCE_DIRECTORY_TMP, self::TEST_TARGET_PATH_TMP, false, false, true, false, true, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to '".self::TEST_TARGET_PATH_TMP."'."],
-            ['', self::TEST_TARGET_PATH_TMP, false, false, true, false, true, "Rename directory '' to '".self::TEST_TARGET_PATH_TMP."'."],
-            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, false, true, false, true, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
-            ['', '', false, false, true, false, true, "Rename directory '' to ''."],
+//TODO MISSING TEST CASES
+            /** critical */
+            [self::TEST_SOURCE_DIRECTORY_TMP, self::TEST_TARGET_PATH_TMP, false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to '".self::TEST_TARGET_PATH_TMP."'."],
+            ['', self::TEST_TARGET_PATH_TMP, false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Rename directory '' to '".self::TEST_TARGET_PATH_TMP."'."],
+            [self::TEST_SOURCE_DIRECTORY_TMP, '', false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Rename directory '".self::TEST_SOURCE_DIRECTORY_TMP."' to ''."],
+            ['', '', false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Rename directory '' to ''."],
         ];
     }
 
@@ -93,8 +96,7 @@ class RenameDirectoryTest extends BaseTest
      * @param string $sourcePath
      * @param string $targetName
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      * @param string $message
@@ -103,8 +105,7 @@ class RenameDirectoryTest extends BaseTest
         string $sourcePath,
         string $targetName,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected,
         string $message
@@ -121,8 +122,7 @@ class RenameDirectoryTest extends BaseTest
      * @param string $sourcePath
      * @param string $targetName
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      *
@@ -132,8 +132,7 @@ class RenameDirectoryTest extends BaseTest
         string $sourcePath,
         string $targetName,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected
     ): void
@@ -145,8 +144,7 @@ class RenameDirectoryTest extends BaseTest
             ActionFactory::createRenameDirectory()
                 ->rename($sourcePath)
                 ->to($targetName)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired),
+                ->setActionSeverity($actionSeverity),
             $expected
         );
 

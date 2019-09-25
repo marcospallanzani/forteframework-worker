@@ -2,6 +2,7 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
@@ -56,18 +57,20 @@ class MakeDirectoryTest extends BaseTest
     public function directoryProvider(): array
     {
         return [
-            // directory path | is valid | fatal | success required | expected | exception | message
-            [self::TEST_DIR_TMP, true, false, false, true, false, "Create directory '".self::TEST_DIR_TMP."'."],
+            // directory path | is valid | severity | expected | exception | message
+            [self::TEST_DIR_TMP, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, "Create directory '".self::TEST_DIR_TMP."'."],
             /** Negative cases */
             /** not successful, no fatal */
-            ['', false, false, false, false, false, "Create directory ''."],
-            [self::TEST_DIR_EXIST_TMP, true, false, false, false, false, "Create directory '".self::TEST_DIR_EXIST_TMP."'."],
+            ['', false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Create directory ''."],
+            [self::TEST_DIR_EXIST_TMP, true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Create directory '".self::TEST_DIR_EXIST_TMP."'."],
             /** fatal */
-            ['', false, true, false, false, true, "Create directory ''."],
-            [self::TEST_DIR_EXIST_TMP, true, true, false, false, true, "Create directory '".self::TEST_DIR_EXIST_TMP."'."],
+            ['', false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Create directory ''."],
+            [self::TEST_DIR_EXIST_TMP, true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Create directory '".self::TEST_DIR_EXIST_TMP."'."],
             /** success required */
-            ['', false, false, true, false, true, "Create directory ''."],
-            [self::TEST_DIR_EXIST_TMP, true, false, true, false, true, "Create directory '".self::TEST_DIR_EXIST_TMP."'."],
+//TODO
+            /** critical */
+            ['', false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Create directory ''."],
+            [self::TEST_DIR_EXIST_TMP, true, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Create directory '".self::TEST_DIR_EXIST_TMP."'."],
         ];
     }
 
@@ -93,8 +96,7 @@ class MakeDirectoryTest extends BaseTest
      *
      * @param string $directoryPath
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      * @param string $message
@@ -102,8 +104,7 @@ class MakeDirectoryTest extends BaseTest
     public function testStringify(
         string $directoryPath,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected,
         string $message
@@ -119,8 +120,7 @@ class MakeDirectoryTest extends BaseTest
      *
      * @param string $directoryPath
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      *
@@ -129,8 +129,7 @@ class MakeDirectoryTest extends BaseTest
     public function testRun(
         string $directoryPath,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected
     ): void
@@ -141,8 +140,7 @@ class MakeDirectoryTest extends BaseTest
             $isValid,
             ActionFactory::createMakeDirectory()
                 ->create($directoryPath)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired),
+                ->setActionSeverity($actionSeverity),
             $expected
         );
 

@@ -2,7 +2,9 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Checks\Files;
 
+use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Stdlib\FileUtils;
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
 use Forte\Worker\Actions\Factories\ActionFactory;
@@ -33,7 +35,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
     /**
      * This method is called before each test.
      *
-     * @throws WorkerException
+     * @throws GeneralException
      */
     public function setUp(): void
     {
@@ -109,86 +111,86 @@ class ConfigFileHasValidEntriesTest extends BaseTest
         list($jsonEntries, $arrayEntries, $iniEntries, $xmlEntries, $yamlEntries) = $this->getFileHasValidEntriesInstances();
 //TODO ADD CASES FOR IS SUCCESS REQUIRED
         return [
-            // ConfigFileHasValidEntries instance | key | is fatal | is success required | expected | expect an exception
+            // ConfigFileHasValidEntries instance | key | severity | expected | expect an exception
             /** JSON TESTS */
-            [$jsonEntries, 'key1', false, false, true, false],
-            [$jsonEntries, 'key2.key3', false, false, true, false],
-            [$jsonEntries, 'key2.key4.key5', false, false, true, false],
+            [$jsonEntries, 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$jsonEntries, 'key2.key3', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$jsonEntries, 'key2.key4.key5', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** Negative cases */
             /** not successful, no fatal */
-            [$jsonEntries, 'key2.key4.key7', false, false, false, false],
-            [$jsonEntries, 'key2.key4.key5.key6', false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_JSON), 'key1', false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_JSON, ''), 'key1', false, false, false, false],
+            [$jsonEntries, 'key2.key4.key7', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$jsonEntries, 'key2.key4.key5.key6', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_JSON), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_JSON, ''), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
             // The only way to throw an action exception is to break one or more validation checks
-            [$jsonEntries, '', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_JSON), 'key1', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_JSON, ''), 'key1', true, false, false, true],
+            [$jsonEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_JSON), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_JSON, ''), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** ARRAY TESTS */
-            [$arrayEntries, 'key1', false, false, true, false],
-            [$arrayEntries, 'key2.key3', false, false, true, false],
-            [$arrayEntries, 'key2.key4.key5', false, false, true, false],
+            [$arrayEntries, 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$arrayEntries, 'key2.key3', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$arrayEntries, 'key2.key4.key5', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** Negative cases */
             /** not successful, no fatal */
-            [$arrayEntries, 'key2.key4.key7', false, false, false, false],
-            [$arrayEntries, 'key2.key4.key5.key6', false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_ARRAY), 'key1', false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_ARRAY, ''), 'key1', false, false, false, false],
+            [$arrayEntries, 'key2.key4.key7', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$arrayEntries, 'key2.key4.key5.key6', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_ARRAY), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_ARRAY, ''), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
             // The only way to throw an action exception is to break one or more validation checks
-            [$arrayEntries, '', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_ARRAY), 'key1', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_ARRAY, ''), 'key1', true, false, false, true],
+            [$arrayEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_ARRAY), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_ARRAY, ''), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** INI TESTS */
-            [$iniEntries, 'key1', false, false, true, false],
-            [$iniEntries, 'key2.key3', false, false, true, false],
-            [$iniEntries, 'key2.key4.key5', false, false, true, false],
+            [$iniEntries, 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$iniEntries, 'key2.key3', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$iniEntries, 'key2.key4.key5', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** Negative cases */
             /** not successful, no fatal */
-            [$iniEntries, 'key2.key4.key7', false, false, false, false],
-            [$iniEntries, 'key2.key4.key5.key6', false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_INI), 'key1', false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', false, false, false, false],
+            [$iniEntries, 'key2.key4.key7', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$iniEntries, 'key2.key4.key5.key6', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_INI), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
             // The only way to throw an action exception is to break one or more validation checks
-            [$iniEntries, '', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_INI), 'key1', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', true, false, false, true],
+            [$iniEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_INI), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** XML TESTS */
-            [$xmlEntries, 'key1', false, false, true, false],
-            [$xmlEntries, 'key2.key3', false, false, true, false],
-            [$xmlEntries, 'key2.key4.key5', false, false, true, false],
+            [$xmlEntries, 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$xmlEntries, 'key2.key3', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$xmlEntries, 'key2.key4.key5', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** Negative cases */
             /** not successful, no fatal */
-            [$xmlEntries, 'key2.key4.key7', false, false, false, false],
-            [$xmlEntries, 'key2.key4.key5.key6', false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_XML), 'key1', false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', false, false, false, false],
+            [$xmlEntries, 'key2.key4.key7', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$xmlEntries, 'key2.key4.key5.key6', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_XML), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, ''), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
             // The only way to throw an action exception is to break one or more validation checks
-            [$xmlEntries, '', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_XML), 'key1', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_XML, ''), 'key1', true, false, false, true],
+            [$xmlEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_XML), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_XML, ''), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** YAML TESTS */
-            [$yamlEntries, 'key1', false, false, true, false],
-            [$yamlEntries, 'key2.key3', false, false, true, false],
-            [$yamlEntries, 'key2.key4.key5', false, false, true, false],
+            [$yamlEntries, 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$yamlEntries, 'key2.key3', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [$yamlEntries, 'key2.key4.key5', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** Negative cases */
             /** not successful, no fatal */
-            [$yamlEntries, 'key2.key4.key7', false, false, false, false],
-            [$yamlEntries, 'key2.key4.key5.key6', false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', false, false, false, false],
+            [$yamlEntries, 'key2.key4.key7', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [$yamlEntries, 'key2.key4.key5.key6', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
             // The only way to throw an action exception is to break one or more validation checks
-            [$yamlEntries, '', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', true, false, false, true],
+            [$yamlEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
         ];
     }
 
@@ -206,36 +208,38 @@ class ConfigFileHasValidEntriesTest extends BaseTest
         list($jsonEntries, $arrayEntries, $iniEntries, $xmlEntries, $yamlEntries) = $this->getFileHasValidEntriesInstances();
 
         return [
-            [clone $jsonEntries, $validKey, false, false, true, false],
-            [clone $arrayEntries, $validKey, false, false,  true, false],
-            [clone $iniEntries, $validKey, false, false,  true, false],
-            [clone $xmlEntries, $validKey, false, false,  true, false],
-            [clone $yamlEntries, $validKey, false, false,  true, false],
+            [clone $jsonEntries, $validKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [clone $arrayEntries, $validKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [clone $iniEntries, $validKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [clone $xmlEntries, $validKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+            [clone $yamlEntries, $validKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
             /** Negative cases */
             /** not successful, no fatal */
-            [clone $jsonEntries, $failKey, false, false, false, false],
-            [clone $arrayEntries, $failKey, false, false, false, false],
-            [clone $iniEntries, $failKey, false, false, false, false],
-            [clone $xmlEntries, $failKey, false, false, false, false],
-            [clone $yamlEntries, $failKey, false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', false, false, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', false, false, false, false],
+            [clone $jsonEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [clone $arrayEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [clone $iniEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [clone $xmlEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [clone $yamlEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
-            [clone $jsonEntries, '', true, false, false, true],
-            [clone $arrayEntries, '', true, false, false, true],
-            [clone $iniEntries, '', true, false, false, true],
-            [clone $xmlEntries, '', true, false, false, true],
-            [clone $yamlEntries, '', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), '', true, false, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), '', true, false, false, true],
-            /** successful with negative result, is success required */
-            [clone $jsonEntries, $failKey, false, true, false, true],
-            [clone $arrayEntries, $failKey, false, true, false, true],
-            [clone $iniEntries, $failKey, false, true, false, true],
-            [clone $xmlEntries, $failKey, false, true, false, true],
-            [clone $yamlEntries, $failKey, false, true, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), '', false, true, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), '', false, true, false, true],
+            [clone $jsonEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [clone $arrayEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [clone $iniEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [clone $xmlEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [clone $yamlEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            /** successful with negative result, critical */
+//TODO IMPLEMENT IS SUCCESS REQUIRED CASE: THE NEGATIVE RESULT OF AN ACTION SETS THE MAIN ACTION RESULT TO ITS NEGATIVE CASE (CHILD ACTION, PRE-RUN ETC)
+            /** successful with negative result, critical */
+            [clone $jsonEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
+            [clone $arrayEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
+            [clone $iniEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
+            [clone $xmlEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
+            [clone $yamlEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), '', ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
+            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), '', ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
         ];
 
     }
@@ -285,33 +289,33 @@ class ConfigFileHasValidEntriesTest extends BaseTest
     {
         $providedValues = [];
 
-        $failParams = [false, false, false, false];
-        $fatalParams = [true, false, false, true];
-        $successRequiredParams = [false, true, false, true];
+        $failParams = [ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false];
+        $fatalParams = [ActionInterface::EXECUTION_SEVERITY_FATAL, false, true];
+        $criticalParams = [ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true];
 
         $fileEntriesInstances = $this->getFileHasValidEntriesInstances();
         foreach ($fileEntriesInstances as $instance) {
-            // Instance | key | value | compare action | is fatal | is success required | expected | exception | case sensitive
+            // Instance | key | value | compare action | severity | expected | exception | case sensitive
             $providedValues = array_merge($providedValues, [
                 /** CHECK_CONTAINS */
-                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_CONTAINS, false, false, true, false],
-                [clone $instance, 'key1', 'ue1', VerifyArray::CHECK_CONTAINS, false, false, true, false],
-                [clone $instance, 'key1', 'val', VerifyArray::CHECK_CONTAINS, false, false, true, false],
-                [clone $instance, 'key1', '1', VerifyArray::CHECK_CONTAINS, false, false, true, false],
-                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_CONTAINS, false, false, true, false],
-                [clone $instance, 'key2.key3', 'ue3', VerifyArray::CHECK_CONTAINS, false, false, true, false],
-                [clone $instance, 'key2.key3', 'val', VerifyArray::CHECK_CONTAINS, false, false, true, false],
-                [clone $instance, 'key2.key3', '3', VerifyArray::CHECK_CONTAINS, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_CONTAINS, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', 'ue5', VerifyArray::CHECK_CONTAINS, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', 'val', VerifyArray::CHECK_CONTAINS, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', '5', VerifyArray::CHECK_CONTAINS, false, false, true, false],
+                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key1', 'ue1', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key1', 'val', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key1', '1', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'ue3', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'val', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', '3', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', 'ue5', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', 'val', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', '5', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
                 /** Case sensitive tests */
-                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_CONTAINS, false, false, true, false, true],
-                [clone $instance, 'key1', 'VALUE1', VerifyArray::CHECK_CONTAINS, false, false, true, false, false],
-                [clone $instance, 'key1', 'Val', VerifyArray::CHECK_CONTAINS, false, false, false, false, true],
-                [clone $instance, 'key1', 'test', VerifyArray::CHECK_CONTAINS, false, false, false, false, true],
-                [clone $instance, 'key1', 'test', VerifyArray::CHECK_CONTAINS, false, false, false, false, false],
+                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
+                [clone $instance, 'key1', 'VALUE1', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, false],
+                [clone $instance, 'key1', 'Val', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
+                [clone $instance, 'key1', 'test', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
+                [clone $instance, 'key1', 'test', VerifyArray::CHECK_CONTAINS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, false],
                 /** Negative cases */
                 /** not successful, no fatal */
                 // The only way to throw an action exception is to break one or more validation checks
@@ -326,33 +330,33 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $fatalParams),
                 array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $fatalParams),
                 /** successful with negative result, is success required */
-                array_merge([clone $instance, 'key1', 'yrew', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
-                array_merge([clone $instance, 'key2.key4.key5', '3', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
-                array_merge([clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
-                array_merge([clone $instance, 'key99', 'xxx', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $successRequiredParams),
+                array_merge([clone $instance, 'key1', 'yrew', VerifyArray::CHECK_CONTAINS], $criticalParams),
+                array_merge([clone $instance, 'key2.key4.key5', '3', VerifyArray::CHECK_CONTAINS], $criticalParams),
+                array_merge([clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_CONTAINS], $criticalParams),
+                array_merge([clone $instance, 'key99', 'xxx', VerifyArray::CHECK_CONTAINS], $criticalParams),
+                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $criticalParams),
+                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $criticalParams),
 
             ]);
 
-            // Instance | key | value | compare action | is fatal | is success required | expected | exception
+            // Instance | key | value | compare action | severity| expected | exception
             $providedValues = array_merge($providedValues, [
                 /** CHECK_STARTS_WITH */
-                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
-                [clone $instance, 'key1', 'val', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
-                [clone $instance, 'key1', 'v', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key3', 'val', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key3', 'v', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', 'val', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', 'v', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
+                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key1', 'val', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key1', 'v', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'val', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'v', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', 'val', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', 'v', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
                 /** Case sensitive tests */
-                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_STARTS_WITH, false, false, true, false, true],
-                [clone $instance, 'key2.key3', 'VALUE', VerifyArray::CHECK_STARTS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key3', 'VALUE', VerifyArray::CHECK_STARTS_WITH, false, false, false, false, true],
-                [clone $instance, 'key2.key3', 'LUE', VerifyArray::CHECK_STARTS_WITH, false, false, false, false],
-                [clone $instance, 'key2.key3', 'LUE', VerifyArray::CHECK_STARTS_WITH, false, false, false, false, true],
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
+                [clone $instance, 'key2.key3', 'VALUE', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'VALUE', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
+                [clone $instance, 'key2.key3', 'LUE', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+                [clone $instance, 'key2.key3', 'LUE', VerifyArray::CHECK_STARTS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
                 /** Negative cases */
                 /** not successful, no fatal */
                 // The only way to throw an action exception is to break one or more validation checks
@@ -367,32 +371,32 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
                 array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
                 /** successful with negative result, is success required */
-                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
-                array_merge([clone $instance, 'key2.key4.key5', 'lue5', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
-                array_merge([clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
-                array_merge([clone $instance, 'key99', 'lue', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $successRequiredParams),
+                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
+                array_merge([clone $instance, 'key2.key4.key5', 'lue5', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
+                array_merge([clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
+                array_merge([clone $instance, 'key99', 'lue', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
+                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
+                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
             ]);
 
-            // Instance | key | value | compare action | is fatal | is success required | expected | exception
+            // Instance | key | value | compare action | severity | expected | exception
             $providedValues = array_merge($providedValues, [
                 /** CHECK_ENDS_WITH */
-                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
-                [clone $instance, 'key1', 'ue1', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
-                [clone $instance, 'key1', '1', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key3', 'ue3', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key3', '3', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', 'ue5', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', '5', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
+                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key1', 'ue1', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key1', '1', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'ue3', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', '3', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', 'ue5', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', '5', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
                 /** Case sensitive tests */
-                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_ENDS_WITH, false, false, true, false, true],
-                [clone $instance, 'key2.key3', 'LUE3', VerifyArray::CHECK_ENDS_WITH, false, false, true, false],
-                [clone $instance, 'key2.key3', 'LUE3', VerifyArray::CHECK_ENDS_WITH, false, false, false, false, true],
-                [clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_ENDS_WITH, false, false, false, false, false],
-                [clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_ENDS_WITH, false, false, false, false, true],
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
+                [clone $instance, 'key2.key3', 'LUE3', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'LUE3', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
+                [clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, false],
+                [clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_ENDS_WITH, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
                 /** Negative cases */
                 /** not successful, no fatal */
                 // The only way to throw an action exception is to break one or more validation checks
@@ -408,25 +412,25 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $fatalParams),
                 /** successful with negative result, is success required */
                 // The only way to throw an action exception is to break one or more validation checks
-                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_ENDS_WITH], $successRequiredParams),
-                array_merge([clone $instance, 'key2.key4.key5', '', VerifyArray::CHECK_ENDS_WITH], $successRequiredParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $successRequiredParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $successRequiredParams),
+                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_ENDS_WITH], $criticalParams),
+                array_merge([clone $instance, 'key2.key4.key5', '', VerifyArray::CHECK_ENDS_WITH], $criticalParams),
+                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $criticalParams),
+                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $criticalParams),
             ]);
 
             // Instance | key | value | compare action | is fatal | is success required | expected | exception
             $providedValues = array_merge($providedValues, [
                 /** CHECK_EQUALS */
-                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_EQUALS, false, false, true, false],
-                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_EQUALS, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EQUALS, false, false, true, false],
-                [clone $instance, 'key99', '', VerifyArray::CHECK_EQUALS, false, false, true, false],
+                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_EQUALS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_EQUALS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EQUALS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key99', '', VerifyArray::CHECK_EQUALS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
                 /** Case sensitive tests */
-                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EQUALS, false, false, true, false, true],
-                [clone $instance, 'key2.key4.key5', 'VALUE5', VerifyArray::CHECK_EQUALS, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', 'VALUE5', VerifyArray::CHECK_EQUALS, false, false, false, false, true],
-                [clone $instance, 'key2.key4.key5', 'test', VerifyArray::CHECK_EQUALS, false, false, false, false],
-                [clone $instance, 'key2.key4.key5', 'test', VerifyArray::CHECK_EQUALS, false, false, false, false, true],
+                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EQUALS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, true],
+                [clone $instance, 'key2.key4.key5', 'VALUE5', VerifyArray::CHECK_EQUALS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', 'VALUE5', VerifyArray::CHECK_EQUALS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
+                [clone $instance, 'key2.key4.key5', 'test', VerifyArray::CHECK_EQUALS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+                [clone $instance, 'key2.key4.key5', 'test', VerifyArray::CHECK_EQUALS, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, true],
                 /** Negative cases */
                 /** not successful, no fatal */
                 array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_EQUALS], $failParams),
@@ -443,48 +447,48 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $fatalParams),
                 /** successful with negative result, is success required */
                 // The only way to throw an action exception is to break one or more validation checks
-                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_EQUALS], $successRequiredParams),
-                array_merge([clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_EQUALS], $successRequiredParams),
-                array_merge([clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_EQUALS], $successRequiredParams),
-                array_merge([clone $instance, 'key99', 'lue', VerifyArray::CHECK_EQUALS], $successRequiredParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $successRequiredParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $successRequiredParams),
+                array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_EQUALS], $criticalParams),
+                array_merge([clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_EQUALS], $criticalParams),
+                array_merge([clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_EQUALS], $criticalParams),
+                array_merge([clone $instance, 'key99', 'lue', VerifyArray::CHECK_EQUALS], $criticalParams),
+                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $criticalParams),
+                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $criticalParams),
             ]);
 
-            // Instance | key | value | compare action | is fatal | is success required | expected | exception
+            // Instance | key | value | compare action | severity | expected | exception
             $providedValues = array_merge($providedValues, [
 //TODO CHANGE THE IS FATAL CASES WHEN THE ISVALID WILL BEHAVE AS THE RUN METHOD
                 /** CHECK_EMPTY */
-                [clone $instance, 'key99', '', VerifyArray::CHECK_EMPTY, false, false, true, false],
+                [clone $instance, 'key99', '', VerifyArray::CHECK_EMPTY, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
                 /** Negative cases */
                 /** is fatal case: action successfully run with no errors, then no exception */
-                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_EMPTY, true, false, false, false],
+                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_EMPTY, ActionInterface::EXECUTION_SEVERITY_FATAL, false, false],
                 /** is success case: action successfully but with negative result, then exception */
-                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_EMPTY, false, true, false, true],
+                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_EMPTY, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
                 /** is fatal case: action successfully run with no errors, then no exception */
-                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EMPTY, true, false, false, false],
+                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EMPTY, ActionInterface::EXECUTION_SEVERITY_FATAL, false, false],
                 /** is success case: action successfully but with negative result, then exception */
-                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EMPTY, false, true, false, true],
+                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_EMPTY, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
                 /** is fatal case: action successfully run with no errors, then no exception */
-                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_EMPTY, true, false, false, false],
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_EMPTY, ActionInterface::EXECUTION_SEVERITY_FATAL, false, false],
                 /** is success case: action successfully but with negative result, then exception */
-                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_EMPTY, false, true, false, true],
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_EMPTY, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
             ]);
 
-            // Instance | key | value | compare action | is fatal | is success required | expected | exception
+            // Instance | key | value | compare action | severity | expected | exception
             $providedValues = array_merge($providedValues, [
                 /** CHECK_ANY */
-                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_ANY, false, false, true, false],
-                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_ANY, false, false, true, false],
-                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_ANY, false, false, true, false],
-                [clone $instance, 'key99', '', VerifyArray::CHECK_ANY, false, false, true, false],
+                [clone $instance, 'key1', 'value1', VerifyArray::CHECK_ANY, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key3', 'value3', VerifyArray::CHECK_ANY, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key2.key4.key5', 'value5', VerifyArray::CHECK_ANY, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
+                [clone $instance, 'key99', '', VerifyArray::CHECK_ANY, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
                 /** Negative cases */
             ]);
 
             // Instance | key | value | compare action | is fatal | is success required | expected | exception
             $providedValues = array_merge($providedValues, [
                 /** CHECK_MISSING_KEY */
-                [clone $instance, 'key1000', 'value1', VerifyArray::CHECK_MISSING_KEY, false, false, true, false],
+                [clone $instance, 'key1000', 'value1', VerifyArray::CHECK_MISSING_KEY, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
                 /** Negative cases */
             ]);
         }
@@ -540,8 +544,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
      *
      * @param ConfigFileHasValidEntries $fileHasValidEntries
      * @param string $key
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity,
      * @param bool $expected
      * @param $exceptionExpected
      *
@@ -550,8 +553,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
     public function testRunHasKey(
         ConfigFileHasValidEntries $fileHasValidEntries,
         string $key,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         bool $expected,
         $exceptionExpected
     ): void
@@ -563,8 +565,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             $expected,
             $fileHasValidEntries
                 ->hasKey($key)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
+                ->setActionSeverity($actionSeverity)
                 ->run()
                 ->getResult()
         );
@@ -603,6 +604,8 @@ class ConfigFileHasValidEntriesTest extends BaseTest
 
     /**
      * If we try to parse an empty json file (created with wrong syntax use), we should get a RuntimeException.
+     *
+     * @throws ActionException
      */
     public function testRunHasKeyWithEmptyFile(): void
     {
@@ -610,7 +613,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
         $this->expectException(WorkerException::class);
         ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_EMPTY)
             ->contentType(FileUtils::CONTENT_TYPE_JSON)->hasKey('test1')
-            ->setIsFatal(true)
+            ->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)
             ->run();
     }
 
@@ -621,8 +624,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
      *
      * @param ConfigFileHasValidEntries $fileHasValidEntries
      * @param string $key
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param bool $expected
      * @param bool $exceptionExpected
      *
@@ -631,8 +633,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
     public function testRunDoesNotHaveKey(
         ConfigFileHasValidEntries $fileHasValidEntries,
         string $key,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         bool $expected,
         bool $exceptionExpected
     ): void
@@ -644,8 +645,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             $expected,
             $fileHasValidEntries
                 ->doesNotHaveKey($key)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
+                ->setActionSeverity($actionSeverity)
                 ->run()
                 ->getResult()
         );
@@ -658,8 +658,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
      *
      * @param ConfigFileHasValidEntries $fileHasValidEntries
      * @param string $key
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param bool $expected
      * @param bool $exceptionExpected
      *
@@ -668,8 +667,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
     public function testRunHasKeyWithEmptyValue(
         ConfigFileHasValidEntries $fileHasValidEntries,
         string $key,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         bool $expected,
         bool $exceptionExpected
     ): void
@@ -681,8 +679,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             $expected,
             $fileHasValidEntries
                 ->hasKeyWithEmptyValue($key)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
+                ->setActionSeverity($actionSeverity)
                 ->run()
                 ->getResult()
         );
@@ -695,8 +692,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
      *
      * @param ConfigFileHasValidEntries $fileHasValidEntries
      * @param string $key
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param bool $expected
      * @param bool $exceptionExpected
      *
@@ -705,8 +701,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
     public function testRunHasKeyWithNonEmptyValue(
         ConfigFileHasValidEntries $fileHasValidEntries,
         string $key,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         bool $expected,
         bool $exceptionExpected
     ): void
@@ -718,8 +713,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             $expected,
             $fileHasValidEntries
                 ->hasKeyWithNonEmptyValue($key)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
+                ->setActionSeverity($actionSeverity)
                 ->run()
                 ->getResult()
         );
@@ -734,8 +728,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
      * @param string $key
      * @param mixed $value
      * @param string $compareActionType
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param bool $expected
      * @param bool $exceptionExpected
      * @param bool $caseSensitive
@@ -747,8 +740,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
         string $key,
         $value,
         string $compareActionType,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         bool $expected,
         bool $exceptionExpected,
         bool $caseSensitive = false
@@ -761,8 +753,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             $expected,
             $fileHasValidEntries
                 ->hasKeyWithValue($key, $value, $compareActionType, $caseSensitive)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired)
+                ->setActionSeverity($actionSeverity)
                 ->run()
                 ->getResult()
         );

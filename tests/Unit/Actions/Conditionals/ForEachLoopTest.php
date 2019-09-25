@@ -3,6 +3,7 @@
 namespace Forte\Worker\Tests\Unit\Actions\Conditionals;
 
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Conditionals\ForEachLoop;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
@@ -24,13 +25,12 @@ class ForEachLoopTest extends BaseTest
      */
     public function actionsProvider(): array
     {
-        // actions | is valid | is fatal | is success required | expected result | exception expected | message
+        // actions | is valid | severity | expected result | exception expected | message
         return [
             [
                 [ActionFactory::createFileExists(__FILE__), ActionFactory::createFileExists(__FILE__)],
                 true,
-                false,
-                false,
+                ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 true,
                 false,
                 "Run the following sequence of actions: \nCheck if file '".__FILE__."' exists.\nCheck if file '".__FILE__."' exists.\n"
@@ -40,28 +40,26 @@ class ForEachLoopTest extends BaseTest
             [
                 [ActionFactory::createFileExists('xxx'), ActionFactory::createFileExists('xxx')],
                 true,
-                false,
-                false,
+                ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 false,
                 false,
                 "Run the following sequence of actions: \nCheck if file 'xxx' exists.\nCheck if file 'xxx' exists.\n"
             ],
             /** not successful, fatal */
             [
-                [ActionFactory::createFileExists(__FILE__), ActionFactory::createMakeDirectory(__DIR__)->setIsFatal(true)],
+                [ActionFactory::createFileExists(__FILE__), ActionFactory::createMakeDirectory(__DIR__)->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)],
                 true,
-                true,
-                false,
+                ActionInterface::EXECUTION_SEVERITY_FATAL,
                 false,
                 true,
                 "Run the following sequence of actions: \nCheck if file '".__FILE__."' exists.\nCreate directory '".__DIR__."'.\n"
             ],
-            /** not successful, fatal */
+//TODO MISSING TESTS FOR SUCCESS REQUIRED
+            /** not successful, fatal -> critical */
             [
                 [ActionFactory::createFileExists(__FILE__), ActionFactory::createMakeDirectory(__DIR__)],
                 true,
-                false,
-                true,
+                ActionInterface::EXECUTION_SEVERITY_CRITICAL,
                 false,
                 true,
                 "Run the following sequence of actions: \nCheck if file '".__FILE__."' exists.\nCreate directory '".__DIR__."'.\n"
@@ -78,9 +76,11 @@ class ForEachLoopTest extends BaseTest
      * @param bool $isValid
      *
      * @throws ValidationException
+     * @throws ConfigurationException
      */
     public function testIsValid(array $actions, bool $isValid): void
     {
+//TODO MISSING TESTS FOR CONFIGURATION EXCEPTION
         $forEachLoopAction = ActionFactory::createForEachLoop($actions);
         $this->isValidTest($isValid, $forEachLoopAction);
 
@@ -111,17 +111,17 @@ class ForEachLoopTest extends BaseTest
      *
      * @param array $actions
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      * @param string $message
+     *
+     * @throws ConfigurationException
      */
     public function testStringify(
         array $actions,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected,
         string $message
@@ -137,18 +137,17 @@ class ForEachLoopTest extends BaseTest
      *
      * @param array $actions
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      *
      * @throws ActionException
+     * @throws ConfigurationException
      */
     public function testRun(
         array $actions,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected
     ): void
@@ -162,9 +161,7 @@ class ForEachLoopTest extends BaseTest
         $this->runBasicTest(
             $exceptionExpected,
             $isValid,
-            $forEachLoopAction
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired),
+            $forEachLoopAction->setActionSeverity($actionSeverity),
             $expected
         );
     }

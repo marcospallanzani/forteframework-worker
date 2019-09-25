@@ -3,6 +3,7 @@
 namespace Forte\Worker\Tests\Unit\Actions\Conditionals;
 
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ConfigurationException;
@@ -41,7 +42,7 @@ class SwitchStatementTest extends BaseTest
         $modifyArray2 = ActionFactory::createModifyArray()->addKey(self::ADDED_VALUE_KEY_2, self::CASE_EXPRESSION_VALUE_2)->modifyContent($array);
         $modifyArray3 = ActionFactory::createModifyArray()->addKey(self::ADDED_VALUE_KEY_3, self::CASE_EXPRESSION_VALUE_3)->modifyContent($array);
 
-        // expression | cases | default case | is valid | is fatal | is success required | expected result | exception expected | message
+        // expression | cases | default case | is valid | severity | expected result | exception expected | message
         return [
             [
                 self::CASE_EXPRESSION_VALUE_1,
@@ -51,8 +52,7 @@ class SwitchStatementTest extends BaseTest
                 ],
                 $modifyArray3,
                 true,
-                false,
-                false,
+                ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 [
                     self::ADDED_VALUE_KEY_1 => self::CASE_EXPRESSION_VALUE_1,
                     'test_5' => 'value_5',
@@ -71,8 +71,7 @@ class SwitchStatementTest extends BaseTest
                 ],
                 $modifyArray3,
                 true,
-                false,
-                false,
+                ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 [
                     self::ADDED_VALUE_KEY_2 => self::CASE_EXPRESSION_VALUE_2,
                     'test_5' => 'value_5',
@@ -91,8 +90,7 @@ class SwitchStatementTest extends BaseTest
                 ],
                 $modifyArray3,
                 true,
-                false,
-                false,
+                ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 [
                     self::ADDED_VALUE_KEY_3 => self::CASE_EXPRESSION_VALUE_3,
                     'test_5' => 'value_5',
@@ -112,8 +110,7 @@ class SwitchStatementTest extends BaseTest
                 ],
                 $modifyArray3,
                 true,
-                false,
-                false,
+                ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 false,
                 false,
                 "Run the following sequence of switch case statements: \n" .
@@ -124,28 +121,28 @@ class SwitchStatementTest extends BaseTest
             [
                 self::CASE_EXPRESSION_VALUE_1,
                 [
-                    [self::CASE_EXPRESSION_VALUE_1, ActionFactory::createFileExists()->setIsFatal(true)],
+                    [self::CASE_EXPRESSION_VALUE_1, ActionFactory::createFileExists()->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)],
                 ],
                 $modifyArray3,
                 true,
-                true,
-                false,
+                ActionInterface::EXECUTION_SEVERITY_FATAL,
                 false,
                 true,
                 "Run the following sequence of switch case statements: \n" .
                 "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Check if file '' exists.]; \n" .
                 "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; \n"
             ],
-            /** not successful, fatal */
+            /** success required */
+//TODO MISSING TEST CASES
+            /** critical */
             [
                 self::CASE_EXPRESSION_VALUE_1,
                 [
-                    [self::CASE_EXPRESSION_VALUE_1, ActionFactory::createFileExists()->setIsFatal(true)],
+                    [self::CASE_EXPRESSION_VALUE_1, ActionFactory::createFileExists()->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)],
                 ],
                 $modifyArray3,
                 true,
-                false,
-                true,
+                ActionInterface::EXECUTION_SEVERITY_CRITICAL,
                 false,
                 true,
                 "Run the following sequence of switch case statements: \n" .
@@ -230,8 +227,7 @@ class SwitchStatementTest extends BaseTest
      * @param array $cases
      * @param AbstractAction $defaultAction
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      * @param string $message
@@ -243,8 +239,7 @@ class SwitchStatementTest extends BaseTest
         array $cases,
         AbstractAction $defaultAction,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected,
         string $message
@@ -268,22 +263,19 @@ class SwitchStatementTest extends BaseTest
      * @param array $cases
      * @param AbstractAction $defaultAction
      * @param bool $isValid
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param $expected
      * @param bool $exceptionExpected
      *
-     * @throws ConfigurationException
-     *
      * @throws ActionException
+     * @throws ConfigurationException
      */
     public function testRun(
         $expression,
         array $cases,
         AbstractAction $defaultAction,
         bool $isValid,
-        bool $isFatal,
-        bool $isSuccessRequired,
+        int $actionSeverity,
         $expected,
         bool $exceptionExpected
     ): void
@@ -296,8 +288,7 @@ class SwitchStatementTest extends BaseTest
                 ->addExpression($expression)
                 ->addCases($cases)
                 ->addDefaultCase($defaultAction)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired),
+                ->setActionSeverity($actionSeverity),
             $expected
         );
     }

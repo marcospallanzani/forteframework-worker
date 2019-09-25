@@ -95,7 +95,7 @@ class ProjectRunnerTest extends BaseTest
 //                2,
 //                0,
 //                [
-//                    (new FileExists('wrong-file'))->setIsSuccessRequired(true),
+//                    (new FileExists('wrong-file'))->setActionSeverity(ActionInterface::),
 //                    (ActionFactory::createDirectoryExists("wrong-directory")),
 //                ],
 //                false
@@ -106,8 +106,8 @@ class ProjectRunnerTest extends BaseTest
 //                0,
 //                0,
 //                [
-//                    (new FileExists(''))->isSuccessRequired(true),
-//                    (ActionFactory::createDirectoryExists(""))->isSuccessRequired(true),
+//                    (new FileExists(''))->setActionSeverity(ActionInterface::),
+//                    (ActionFactory::createDirectoryExists(""))->setActionSeverity(ActionInterface::),
 //                ],
 //                true
 //            ],

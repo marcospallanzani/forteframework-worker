@@ -2,6 +2,7 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Arrays;
 
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
@@ -135,7 +136,8 @@ class ModifyArrayTest extends BaseTest
      */
     public function runWithErrorsProvider(): array
     {
-        // Action | exception message | expect exception | expected value | fatal | success required
+        // Action | is valid | exception message | expect exception | expected value | severity | content
+//TODO MISSING SUCCESS REQUIRED CASE
         return [
             [
                 ActionFactory::createModifyArray('key', ModifyArray::MODIFY_ADD_KEY),
@@ -150,8 +152,7 @@ class ModifyArrayTest extends BaseTest
                 "No key specified",
                 true,
                 null,
-                true,
-                false
+                ActionInterface::EXECUTION_SEVERITY_FATAL,
             ],
             [
                 ActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD_KEY),
@@ -159,8 +160,7 @@ class ModifyArrayTest extends BaseTest
                 "No key specified",
                 true,
                 null,
-                false,
-                true
+                ActionInterface::EXECUTION_SEVERITY_CRITICAL
             ],
             [
                 ActionFactory::createModifyArray('', ''),
@@ -168,8 +168,7 @@ class ModifyArrayTest extends BaseTest
                 "No key specified",
                 true,
                 null,
-                true,
-                false
+                ActionInterface::EXECUTION_SEVERITY_FATAL
             ],
             [
                 ActionFactory::createModifyArray('', ''),
@@ -177,8 +176,7 @@ class ModifyArrayTest extends BaseTest
                 "No key specified",
                 true,
                 null,
-                false,
-                true
+                ActionInterface::EXECUTION_SEVERITY_CRITICAL
             ],
             [
                 $modifyWrongAction = ActionFactory::createModifyArray('key1', 'wrong_action'),
@@ -189,8 +187,7 @@ class ModifyArrayTest extends BaseTest
                 ),
                 true,
                 null,
-                true,
-                false
+                ActionInterface::EXECUTION_SEVERITY_FATAL
             ],
             [
                 $modifyWrongAction = ActionFactory::createModifyArray('key1', 'wrong_action'),
@@ -201,8 +198,7 @@ class ModifyArrayTest extends BaseTest
                 ),
                 true,
                 null,
-                false,
-                true
+                ActionInterface::EXECUTION_SEVERITY_CRITICAL
             ],
             [
                 $modifyKeyAlreadyExists = ActionFactory::createModifyArray()->changeKey('key1', 'key2'),
@@ -213,8 +209,7 @@ class ModifyArrayTest extends BaseTest
                 ),
                 true,
                 null,
-                false,
-                true,
+                ActionInterface::EXECUTION_SEVERITY_CRITICAL,
                 ['key1' => 'value1', 'key2' => 'value2']
             ],
         ];
@@ -342,8 +337,7 @@ class ModifyArrayTest extends BaseTest
      * @param string $exceptionMessage
      * @param bool $expectException
      * @param mixed $expected
-     * @param bool $isFatal
-     * @param bool $isSuccessRequired
+     * @param int $actionSeverity
      * @param array $content
      *
      * @throws ActionException
@@ -354,8 +348,7 @@ class ModifyArrayTest extends BaseTest
         string $exceptionMessage,
         bool $expectException,
         $expected,
-        bool $isFatal = false,
-        bool $isSuccessRequired = false,
+        int $actionSeverity = ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
         array $content = []
     ): void
     {
@@ -364,8 +357,7 @@ class ModifyArrayTest extends BaseTest
             $isValid,
             $modifyArray
                 ->modifyContent($content)
-                ->setIsFatal($isFatal)
-                ->setIsSuccessRequired($isSuccessRequired),
+                ->setActionSeverity($actionSeverity),
             $expected,
             $exceptionMessage
         );
