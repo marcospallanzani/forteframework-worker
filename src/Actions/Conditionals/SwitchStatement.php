@@ -417,10 +417,7 @@ class SwitchStatement extends AbstractAction
     protected function getActionForBlockExecution(AbstractAction $blockAction): AbstractAction
     {
         $action = clone $blockAction;
-        $action
-            ->setIsFatal(true)
-            ->setIsSuccessRequired(false)
-        ;
+        $action->setActionSeverity(self::EXECUTION_SEVERITY_FATAL);
 
         return $action;
     }

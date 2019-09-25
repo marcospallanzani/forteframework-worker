@@ -3,6 +3,7 @@
 namespace Forte\Worker\Exceptions;
 
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\ActionInterface;
 
 /**
  * Class ActionException.
@@ -130,7 +131,7 @@ class ActionException extends WorkerException
     public static function checkForFatalFailures(ActionException $actionException): bool
     {
         $action = $actionException->getAction();
-        if ($action->isFatal()) {
+        if ($action->getActionSeverity() >= ActionInterface::EXECUTION_SEVERITY_FATAL) {
             return true;
         }
 

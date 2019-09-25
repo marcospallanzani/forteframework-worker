@@ -6,6 +6,7 @@ use Forte\Stdlib\DotenvLoader;
 use Forte\Stdlib\FileUtils;
 use Forte\Stdlib\StringUtils;
 use Forte\Worker\Actions\AbstractAction;
+use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ConfigurationException;
@@ -434,18 +435,16 @@ class ProjectRunnerBuilder
     }
 
     /**
-     * Set the "fatal" status with the given flag for all registered actions.
-     *
-     * @param bool $fatal The desired "fatal" status (true, all actions will
-     * be marked as fatal).
+     * Set the severity flag of all registered actions to "fatal".
      *
      * @return ProjectRunnerBuilder
      */
-    public function setFatalStatusForAllActions(bool $fatal = true): self
+    public function setNonCriticalStatusForAllActions(): self
     {
         foreach ($this->runner->getActions() as &$action) {
             if ($action instanceof AbstractAction) {
-                $action->setIsFatal($fatal);
+//TODO WE SHOULD CHANGE THE SEVERITY OF PRE- AND POST-RUN ACTIONS TOO (OR CHILDREN ACTIONS)
+                $action->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL);
             }
         }
 
@@ -453,19 +452,50 @@ class ProjectRunnerBuilder
     }
 
     /**
-     * Set the "success-required" status with the given flag for all
-     * registered actions.
-     *
-     * @param bool $successRequired The desired "success-required"
-     * status (true, all actions will be marked as success-required).
+     * Set the severity flag of all registered actions to "fatal".
      *
      * @return ProjectRunnerBuilder
      */
-    public function setSuccessRequiredForAllActions(bool $successRequired = true): self
+    public function setFatalStatusForAllActions(): self
     {
         foreach ($this->runner->getActions() as &$action) {
             if ($action instanceof AbstractAction) {
-                $action->setIsSuccessRequired($successRequired);
+//TODO WE SHOULD CHANGE THE SEVERITY OF PRE- AND POST-RUN ACTIONS TOO (OR CHILDREN ACTIONS)
+                $action->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the severity flag of all registered actions to "success-required".
+     *
+     * @return ProjectRunnerBuilder
+     */
+    public function setSuccessRequiredSeverityForAllActions(): self
+    {
+        foreach ($this->runner->getActions() as &$action) {
+            if ($action instanceof AbstractAction) {
+//TODO WE SHOULD CHANGE THE SEVERITY OF PRE- AND POST-RUN ACTIONS TOO (OR CHILDREN ACTIONS)
+                $action->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the severity flag of all registered actions to "critical".
+     *
+     * @return ProjectRunnerBuilder
+     */
+    public function setCriticalSeverityForAllActions(): self
+    {
+        foreach ($this->runner->getActions() as &$action) {
+            if ($action instanceof AbstractAction) {
+//TODO WE SHOULD CHANGE THE SEVERITY OF PRE- AND POST-RUN ACTIONS TOO (OR CHILDREN ACTIONS)
+                $action->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED);
             }
         }
 

@@ -73,11 +73,8 @@ class IfStatement extends AbstractAction
          * result of the condition action should result in the execution of the next registered
          * if-elseif block (or the default block) and not in a thrown error.
          */
-        $runAction->setIsFatal(true);
-        $conditionAction
-            ->setIsFatal(true)
-            ->setIsSuccessRequired(false)
-        ;
+        $runAction->setActionSeverity(self::EXECUTION_SEVERITY_FATAL);
+        $conditionAction->setActionSeverity(self::EXECUTION_SEVERITY_FATAL);
 
         $conditionUniqueId = $conditionAction->getUniqueExecutionId();
         $this->runActions[$conditionUniqueId] = $runAction;

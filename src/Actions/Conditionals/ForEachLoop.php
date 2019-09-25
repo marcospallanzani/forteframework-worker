@@ -119,19 +119,17 @@ class ForEachLoop extends AbstractAction
         foreach ($this->actions as $action) {
             // We run the action
             /** @var AbstractAction $action */
-            $caseActionResult = $action->run();
-            $actionResult->addActionResult($caseActionResult);
+            $currentActionResult = $action->run();
+            $actionResult->addActionResult($currentActionResult);
         }
 
-        // We check if all actions are successful: if so, we set the final result
-        // to true; false otherwise.
-        if ($actionResult->isSuccessfulAction()) {
-            $actionResult->setResult(true);
-        } else {
-            $actionResult->setResult(false);
-        }
-
-        return $actionResult;
+        /**
+         * The loop executed without errors and we can set the result to its positive case.
+         * In case this action is marked as "success-required", the AbstractAction::run()
+         * method will handle that case, once all nested, pre- and post-run actions have
+         * executed.
+         */
+        return $actionResult->setResult(true);
     }
 
     /**
@@ -174,25 +172,22 @@ class ForEachLoop extends AbstractAction
     }
 
     /**
-     * Clone and modify the given AbstractAction subclass instance so that it can be executed
-     * in a switch case block. It sets the cloned action as FATAL, so that, in case of error,
-     * an exception will be thrown and caught in the AbstractAction::run() method. The idea is
-     * to stop the execution of a switch-case loop, if an error occurred in the execution of
-     * any of its blocks. We also set the cloned action as NON-SUCCESS-REQUIRED, as a negative
-     * action result should be accepted as a possible result.
+     * Clone and modify the given AbstractAction subclass instance so that it can be executed in a
+     * foreach loop. It sets the cloned action as FATAL, so that, in case of error,an exception will
+     * be thrown and caught in the AbstractAction::run() method. The idea is to stop the execution
+     * of a foreach loop, if an error occurred in the execution of any of its blocks. We also set the
+     * cloned action severity with a level higher than "SUCCESS-REQUIRED", as a negative action result
+     * should be accepted as a possible result.
      *
-     * @param AbstractAction $blockAction The action to be modified for the execution
-     * of a switch case block.
+     * @param AbstractAction $blockAction The action to be modified for the execution of a foreach
+     * iteration.
      *
-     * @return AbstractAction The modified action to be used in the switch-case blocks.
+     * @return AbstractAction The modified action to be used in a foreach iteration.
      */
     protected function getActionForBlockExecution(AbstractAction $blockAction): AbstractAction
     {
         $action = clone $blockAction;
-        $action
-            ->setIsFatal(true)
-            ->setIsSuccessRequired(false)
-        ;
+        $action->setActionSeverity(self::EXECUTION_SEVERITY_FATAL);
 
         return $action;
     }

@@ -36,37 +36,20 @@ abstract class AbstractAction implements ValidActionInterface
     protected $afterActions = array();
 
     /**
-     * When this flag is set to true, all errors raised by this action
-     * should stop the execution of the main process. This logic is
-     * implemented in the runner class (instances of AbstractRunner).
-     *
-     * @var bool
-     */
-    protected $isFatal = false;
-
-    /**
-     * When this flag is set to true, the system will check the result of
-     * the action. If it is successful (no errors and successful result),
-     * then the execution will continue. If not successful, an exception
-     * will be thrown. This flag can be used to express complex condition
-     * where one action is executed only if a previous action executed
-     * correctly and returned its positive case result.
-     * E.g. modify a configuration key X in a file Y, if file Y exists.
-     * If the pre-check on file Y existence executed with no errors but
-     * returned false (i.e. the file does not exist), we shouldn't run
-     * the dependent action "modify configuration key X2.
-     *
-     * @var bool
-     */
-    protected $isSuccessRequired = false;
-
-    /**
      * This ID represents a unique identifier for an AbstractAction subclass
      * instance, so that it can be identified in a multi-level chain of actions.
      *
      * @var string
      */
     protected $uniqueExecutionId = "";
+
+    /**
+     * The severity of this action. Possible values are
+     * ActionInterface::EXECUTION_SEVERITY_XXX constants.
+     *
+     * @var int
+     */
+    protected $severity = self::EXECUTION_SEVERITY_NON_CRITICAL;
 
     /**
      * Apply the subclass action.
@@ -156,6 +139,18 @@ abstract class AbstractAction implements ValidActionInterface
 
                 // We run the post-run actions
                 $this->runAfterActions($actionResult);
+
+                /**
+                 * Once all actions have executed, we check if there are some failed
+                 * pre- or post-run actions; if that's the case AND the current action
+                 * is marked as "success-required", then we set the global main action
+                 * result to its negative case
+                 */
+                if (!$actionResult->isSuccessfulAction()
+                        && $this->getActionSeverity() >= ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED
+                ) {
+                    $this->setNegativeResult($actionResult);
+                }
             }
         } catch (\Exception $exception) {
 
@@ -193,7 +188,7 @@ abstract class AbstractAction implements ValidActionInterface
 
             // If we caught a fatal ActionException thrown by a child process
             // OR the current action is fatal, then we throw the exception
-            if ($childFatalError || $this->isFatal) {
+            if ($childFatalError || $this->severity >= ActionInterface::EXECUTION_SEVERITY_FATAL) {
                 throw $actionFailure;
             } else {
                 $actionResult->addActionFailure($actionFailure);
@@ -201,10 +196,10 @@ abstract class AbstractAction implements ValidActionInterface
         }
 
         // If the result of the last execution of the run method returned a negative case,
-        // in case this action is flagged as 'success required', we need to throw an exception
-        if (!$this->validateResult($actionResult) && $this->isSuccessRequired) {
+        // in case this action is flagged as 'critical', we need to throw an exception
+        if (!$this->validateResult($actionResult) && $this->severity >= ActionInterface::EXECUTION_SEVERITY_CRITICAL) {
             /**
-             * We throw a new ActionException with an appropriate "success-required" message if:
+             * We throw a new ActionException with an appropriate "critical" message if:
              * - the current result has failures (i.e. the result was negative because of an error);
              * - the current result has NO failure (i.e. the action executed correctly, but the result was
              *   negative, e.g. check condition "file-exists" always runs successfully but return a negative
@@ -217,7 +212,7 @@ abstract class AbstractAction implements ValidActionInterface
                 $this->throwActionExceptionWithChildren(
                     $actionResult->getAction(),
                     $actionResult->getActionFailures(),
-                    "Positive result expected (action marked as 'success-required')."
+                    "Positive result expected (action marked as 'critical')."
                 );
             }
         }
@@ -260,44 +255,30 @@ abstract class AbstractAction implements ValidActionInterface
     }
 
     /**
-     * Ree
-     * @return bool True if this AbstractAction subclass instance is fatal; false otherwise.
-     */
-    public function isFatal(): bool
-    {
-        return $this->isFatal;
-    }
-
-    /**
-     * Set the fatal flag with the desired value.
+     * Return the action severity of this implementing class instance.
      *
-     * @param bool $isFatal The desired fatal flag value.
+     * @return int The action severity.
+     */
+    public function getActionSeverity(): int
+    {
+        return $this->severity;
+    }
+
+    /**
+     * Set the action severity. If no OR unsupported severity is specified, the default
+     * value self::EXECUTION_SEVERITY_NON_CRITICAL will be used.
      *
-     * @return AbstractAction
-     */
-    public function setIsFatal(bool $isFatal): self
-    {
-        $this->isFatal = $isFatal;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSuccessRequired(): bool
-    {
-        return $this->isSuccessRequired;
-    }
-
-    /**
-     * @param bool $isSuccessRequired
+     * @param int $severity The severity.
      *
      * @return AbstractAction
      */
-    public function setIsSuccessRequired(bool $isSuccessRequired): self
+    public function setActionSeverity(int $severity = self::EXECUTION_SEVERITY_NON_CRITICAL): self
     {
-        $this->isSuccessRequired = $isSuccessRequired;
+        if (in_array($severity, $this->getSeverities())) {
+            $this->severity = $severity;
+        } else {
+            $this->severity = self::EXECUTION_SEVERITY_NON_CRITICAL;
+        }
 
         return $this;
     }
@@ -362,6 +343,16 @@ abstract class AbstractAction implements ValidActionInterface
     public function setNegativeResult(ActionResult &$actionResult): void
     {
         $actionResult->setResult(false);
+    }
+
+    /**
+     * Return a list of supported severity constants.
+     *
+     * @return array
+     */
+    public function getSeverities(): array
+    {
+        return self::getClassConstants('EXECUTION_SEVERITY_');
     }
 
     /**
@@ -469,7 +460,6 @@ abstract class AbstractAction implements ValidActionInterface
                 $actionResult->addFailedPreRunActionResult($preActionResult);
             }
 
-//TODO SHOULD WE HANDLE HERE THE CASE IS SUCCESS REQUIRED SEPARATELY FROM THE FATAL CASE?
             $preActionResult->setEndTimestamp();
         }
     }
@@ -517,7 +507,7 @@ abstract class AbstractAction implements ValidActionInterface
                 // to the list of failed post-run action results
                 $actionResult->addFailedPostRunActionResult($postActionResult);
             }
-//TODO SHOULD WE HANDLE HERE THE CASE IS SUCCESS REQUIRED SEPARATELY FROM THE FATAL CASE?
+
             $postActionResult->setEndTimestamp();
         }
     }
@@ -575,7 +565,7 @@ abstract class AbstractAction implements ValidActionInterface
 
                 // We handle the caught ActionException for the just-run failed check: if fatal,
                 // we throw it again so that it can be caught and handled in the run method
-                if ($nestedRunAction->isFatal()) {
+                if ($nestedRunAction->getActionSeverity() >= ActionInterface::EXECUTION_SEVERITY_FATAL) {
                     throw $actionException;
                 }
 
@@ -619,7 +609,7 @@ abstract class AbstractAction implements ValidActionInterface
     }
 
     /**
-     * Handle the given child ActionException instance. It also handles the "isFatal"
+     * Handle the given child ActionException instance. It also handles the "fatal"
      * case of the child AbstractAction subclass instance.
      *
      * @param ActionResult $childActionResult
@@ -640,7 +630,7 @@ abstract class AbstractAction implements ValidActionInterface
         $childActionResult->addActionFailure($childActionException);
 
         // If FATAL action failed, we throw the error, so that the main action can be interrupted
-        if ($childActionResult->getAction()->isFatal()) {
+        if ($childActionResult->getAction()->getActionSeverity() >= ActionInterface::EXECUTION_SEVERITY_FATAL) {
             $this->throwActionExceptionWithChildren(
                 $parentActionResult->getAction(),
                 [$childActionException],
