@@ -2,6 +2,7 @@
 
 namespace Forte\Worker\Builders;
 
+use Forte\Stdlib\ArrayUtils;
 use Forte\Stdlib\DotenvLoader;
 use Forte\Stdlib\FileUtils;
 use Forte\Stdlib\StringUtils;
@@ -248,6 +249,10 @@ class ProjectRunnerBuilder
         // The given relative path is converted to an absolute path
         $filePath = $this->getFilePathInProject($filePath);
 
+        // Compute the full tree of the new key: it will be used in the post-run actions
+        $oldKeyParts = explode(ArrayUtils::ARRAY_KEYS_LEVEL_SEPARATOR, $oldKey);
+        $newKeyFullTree = str_replace(end($oldKeyParts), $newKey, $oldKey);
+
         $this->addAction(
             /** main action */
             ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->changeKey($oldKey, $newKey),
@@ -255,7 +260,7 @@ class ProjectRunnerBuilder
             [],
             /** post-run actions */
             [
-                ActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->hasKey($newKey),
+                ActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->hasKey($newKeyFullTree),
                 ActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->doesNotHaveKey($oldKey),
             ]
         );
