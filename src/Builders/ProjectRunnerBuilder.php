@@ -145,10 +145,8 @@ class ProjectRunnerBuilder
         $classFilePath = $this->getFilePathInProject($classFilePath);
 
         $this->addAction(
-        /** main action */
-            ActionFactory::createEmptyTransform(),
-            /** pre-run actions */
-            [ActionFactory::createFileHasInstantiableClass($classFilePath, $className)]
+            /** main action */
+            ActionFactory::createFileHasInstantiableClass($classFilePath, $className)
         );
 
         return $this;

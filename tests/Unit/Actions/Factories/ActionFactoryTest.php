@@ -16,7 +16,6 @@ use Forte\Worker\Actions\Conditionals\SwitchStatement;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Actions\Lists\FilesInDirectory;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
-use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\MakeDirectory;
@@ -105,9 +104,6 @@ class ActionFactoryTest extends BaseTest
 
         $this->assertInstanceOf(ModifyArray::class, ActionFactory::createModifyArray());
         $this->assertInstanceOf(ModifyArray::class, ActionFactory::create(ModifyArray::class));
-
-        $this->assertInstanceOf(EmptyTransform::class, ActionFactory::createEmptyTransform());
-        $this->assertInstanceOf(EmptyTransform::class, ActionFactory::create(EmptyTransform::class));
 
         $this->assertInstanceOf(ChangeConfigFileEntries::class, ActionFactory::createChangeConfigFileEntries());
         $this->assertInstanceOf(ChangeConfigFileEntries::class, ActionFactory::create(ChangeConfigFileEntries::class));

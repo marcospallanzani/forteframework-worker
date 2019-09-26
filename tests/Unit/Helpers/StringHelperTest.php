@@ -42,7 +42,7 @@ class StringHelperTest extends BaseTest
             [100.10, '100.1'],
             [['test1' => 'value1'], '{"test1":"value1"}'],
             [$stdClass, 'Class type: stdClass. Object value: {"test1":"value1"}.'],
-            [ActionFactory::createEmptyTransform(), 'Class type: Forte\Worker\Actions\Transforms\EmptyTransform. Object value: Empty transform.'],
+            [ActionFactory::createFileExists(__FILE__), "Class type: Forte\Worker\Actions\Checks\Files\FileExists. Object value: Check if file '".__FILE__."' exists.."],
         ];
     }
 

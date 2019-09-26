@@ -2,6 +2,7 @@
 
 namespace Forte\Worker\Actions\Factories;
 
+use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Checks\Files\DirectoryDoesNotExist;
@@ -16,7 +17,6 @@ use Forte\Worker\Actions\Conditionals\IfStatement;
 use Forte\Worker\Actions\Conditionals\SwitchStatement;
 use Forte\Worker\Actions\Lists\FilesInDirectory;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
-use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\MakeDirectory;
@@ -115,6 +115,8 @@ class ActionFactory implements ActionFactoryInterface
      * @param mixed ...$parameters The construction parameters.
      *
      * @return ConfigFileHasValidEntries An instance of ConfigFileHasValidEntries.
+     *
+     * @throws GeneralException Error while setting the content type field.
      */
     public static function createConfigFileHasValidEntries(...$parameters): ConfigFileHasValidEntries
     {
@@ -251,18 +253,6 @@ class ActionFactory implements ActionFactoryInterface
     public static function createUnzipFile(...$parameters): UnzipFile
     {
         return new UnzipFile(...$parameters);
-    }
-
-    /**
-     * Create an instance of the EmptyTransform class.
-     *
-     * @param mixed ...$parameters The construction parameters.
-     *
-     * @return EmptyTransform An instance of EmptyTransform.
-     */
-    public static function createEmptyTransform(...$parameters): EmptyTransform
-    {
-        return new EmptyTransform();
     }
 
     /**
@@ -405,9 +395,6 @@ class ActionFactory implements ActionFactoryInterface
                     break;
                 case UnzipFile::class:
                     return self::createUnzipFile(...$parameters);
-                    break;
-                case EmptyTransform::class:
-                    return self::createEmptyTransform(...$parameters);
                     break;
                 case MakeDirectory::class:
                     return self::createMakeDirectory(...$parameters);

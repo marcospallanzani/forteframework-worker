@@ -5,8 +5,8 @@ namespace Forte\Worker\Tests\Unit\Builders;
 use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\Checks\Files\FileExists;
+use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
 use Forte\Worker\Actions\Factories\ActionFactory;
-use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
@@ -73,7 +73,7 @@ class ProjectRunnerBuilderTest extends BaseTest
             // Add method | add method params | expected action class
             ['unzipFile', ['test.zip'], UnzipFile::class],
             ['copyFileTo', [__FILE__], CopyFile::class],
-            ['hasInstantiableClass', [__FILE__, __CLASS__], EmptyTransform::class],
+            ['hasInstantiableClass', [__FILE__, __CLASS__], FileHasInstantiableClass::class],
             ['modifyConfigValueByKey', [__FILE__, 'key', 'value'], ChangeConfigFileEntries::class],
             ['modifyConfigKey', [__FILE__, 'key', 'value'], ChangeConfigFileEntries::class],
             ['addConfigKey', [__FILE__, 'key', 'value'], ChangeConfigFileEntries::class],

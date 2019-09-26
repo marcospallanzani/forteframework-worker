@@ -16,7 +16,6 @@ use Forte\Worker\Actions\Conditionals\IfStatement;
 use Forte\Worker\Actions\Conditionals\SwitchStatement;
 use Forte\Worker\Actions\Lists\FilesInDirectory;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
-use Forte\Worker\Actions\Transforms\EmptyTransform;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\MakeDirectory;
@@ -196,15 +195,6 @@ interface ActionFactoryInterface
      * @return UnzipFile An instance of UnzipFile.
      */
     public static function createUnzipFile(...$parameters): UnzipFile;
-
-    /**
-     * Create an instance of the EmptyTransform class.
-     *
-     * @param mixed ...$parameters The construction parameters.
-     *
-     * @return EmptyTransform An instance of EmptyTransform.
-     */
-    public static function createEmptyTransform(...$parameters): EmptyTransform;
 
     /**
      * Create an instance of the MakeDirectory class.
