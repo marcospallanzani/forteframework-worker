@@ -11,6 +11,7 @@
 
 namespace Forte\Worker\Actions\Checks\Files;
 
+use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
@@ -42,13 +43,42 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
      *
      * @param string $filePath The file path to check.
      * @param string $contentType The file content type.
+     *
+     * @throws GeneralException Error while setting the content type field.
      */
     public function __construct(
         string $filePath = "",
         string $contentType = ""
     ) {
-        parent::__construct($filePath);
+        parent::__construct();
+        /**
+         * We MUST set up the content before the path, so that an empty content type
+         * could be overridden by a content type guessed from the file extension.
+         */
         $this->contentType = $contentType;
+
+        // This action MUST be done after the content type is set.
+        $this->path($filePath);
+    }
+
+    /**
+     * Set the file path for this FileExists instance.
+     *
+     * @param string $path The file path to check.
+     *
+     * @return FileExists
+     *
+     * @throws GeneralException Error while getting file info (extension).
+     */
+    public function path(string $path): FileExists
+    {
+        // If the content type is not specified, we try to guess it from the file extension
+        if (!empty($path) && empty($this->contentType)) {
+            $fileInfo = pathinfo($path);
+            $this->contentType = FileUtils::getContentTypeByFileExtension($fileInfo['extension']);
+        }
+
+        return parent::path($path);
     }
 
     /**
