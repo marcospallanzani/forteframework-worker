@@ -143,9 +143,10 @@ class ForEachLoop extends AbstractAction
     protected function validateInstance(): bool
     {
         $wrongActions = [];
-        try {
-            // We validate each registered AbstractAction subclass instance.
-            foreach ($this->actions as $action) {
+
+        // We validate each registered AbstractAction subclass instance.
+        foreach ($this->actions as $action) {
+            try {
                 if ($action instanceof AbstractAction) {
                     $action->isValid();
                 } else {
@@ -154,9 +155,9 @@ class ForEachLoop extends AbstractAction
                         StringHelper::stringifyVariable($action)
                     );
                 }
+            } catch (WorkerException $workerException) {
+                $wrongActions[] = $workerException;
             }
-        } catch (WorkerException $workerException) {
-            $wrongActions[] = $workerException;
         }
 
         // If errors were caught, we throw a new exception with all the caught ones as children failures
