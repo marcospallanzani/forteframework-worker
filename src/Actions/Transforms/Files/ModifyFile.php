@@ -12,6 +12,7 @@
 namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Stdlib\ClassAccessTrait;
+use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
@@ -480,9 +481,19 @@ class ModifyFile extends AbstractFileAction implements NestedActionCallbackInter
     }
 
     /**
+     * Return the configured file path.
+     *
+     * @return string The configured file path.
+     */
+    public function getFilePath(): string
+    {
+        return $this->filePath;
+    }
+
+    /**
      * Return a list of configured actions.
      *
-     * @return array
+     * @return array Configured actions list.
      */
     public function getActions(): array
     {
@@ -510,6 +521,30 @@ class ModifyFile extends AbstractFileAction implements NestedActionCallbackInter
     public function path(string $path): ModifyFile
     {
         return $this->modify($path);
+    }
+
+    /**
+     * Validate the given action result. This method returns true if the given
+     * ActionResult instance has a result value that is considered as a positive
+     * case by this ModifyFile instance.
+     *
+     * In the case of a ModifyFile instance, the positive case consist of a non-
+     * empty array, which contains the lines of the modified file.
+     *
+     * @param ActionResult $actionResult The ActionResult instance to be checked
+     * with the specific validation logic of the current ModifyFile instance.
+     *
+     * @return bool True if the given ActionResult instance has a result value
+     * that is considered as a positive case by this ModifyFile instance; false
+     * otherwise.
+     */
+    public function validateResult(ActionResult $actionResult): bool
+    {
+        // Default case: we assume that the result can be casted to a boolean value
+        if (is_array($actionResult->getResult())) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -635,17 +670,38 @@ class ModifyFile extends AbstractFileAction implements NestedActionCallbackInter
         }
         fclose($fileHandler);
 
-        // We save the new content to the original file.
+        /**
+         * In the positive case, we set the modified content as the main action result.
+         * By setting the modified content as the action result, we can allow a higher
+         * extendibility of this class (e.g. extend this class so that it reads the file,
+         * modifies its content but doesn't write it to the file and returns it to the
+         * rest of the application for further user).
+         */
+        if ($actionResult->getResult() === true) {
+            $actionResult->setResult($modifiedContent);
+        }
+
         if ($this->validateResult($actionResult)) {
             // We write the modified content line by line to the same file
-            $fileHandler = fopen($this->filePath, 'w+') or die("Can't open file.");
-            foreach ($modifiedContent as $line) {
-                fwrite($fileHandler, $line);
-            }
-            fclose($fileHandler);
+            $this->writeModifiedContent($modifiedContent);
         }
 
         return $actionResult;
+    }
+
+    /**
+     * Write the given lines to the configured class file.
+     *
+     * @param array $modifiedContent All the lines to write to the configured class file.
+     */
+    protected function writeModifiedContent(array $modifiedContent): void
+    {
+        // We write the modified content line by line to the same file
+        $fileHandler = fopen($this->filePath, 'w+') or die("Can't open file.");
+        foreach ($modifiedContent as $line) {
+            fwrite($fileHandler, $line);
+        }
+        fclose($fileHandler);
     }
 
     /**
@@ -655,7 +711,7 @@ class ModifyFile extends AbstractFileAction implements NestedActionCallbackInter
      *
      * @return string The file content.
      *
-     * @throws WorkerException
+     * @throws GeneralException
      */
     protected function getFileContent(string $filePath): string
     {
@@ -674,7 +730,7 @@ class ModifyFile extends AbstractFileAction implements NestedActionCallbackInter
      *
      * @return mixed|string|null
      *
-     * @throws WorkerException
+     * @throws GeneralException
      */
     protected function applyActionToLine(string $action, string $searchValue, string $replaceValue, string $line)
     {
@@ -739,7 +795,7 @@ class ModifyFile extends AbstractFileAction implements NestedActionCallbackInter
      * @param array $actionOptions Additional options required to run the given
      * AbstractAction subclass instance.
      *
-     * @throws WorkerException
+     * @throws GeneralException
      */
     public function runNestedAction(
         AbstractAction &$nestedAction,

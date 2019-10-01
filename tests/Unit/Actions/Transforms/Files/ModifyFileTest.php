@@ -112,8 +112,8 @@ class ModifyFileTest extends BaseTest
             [$removeLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Remove each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY' $caseSensitiveMessage.';" . PHP_EOL],
             [$appendTemplateToLineIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Append template '".self::TEST_FILE_TEMPLATE."' to each line that meets the following condition: 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY' $caseSensitiveMessage.';" . PHP_EOL],
             [$replaceWithTemplateIfLineStartsWith, "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "0. Replace each line that meets the following condition, with template '".self::TEST_FILE_TEMPLATE."': 'Check if the given content '".self::TEST_CONTENT."' starts with the specified check value 'ANY' $caseSensitiveMessage.';" . PHP_EOL],
-            [ActionFactory::createModifyFile(self::TEST_FILE_MODIFY), "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "No transformations configured." . PHP_EOL],
-            [ActionFactory::createModifyFile(''), "Apply the following transformations to the specified file '': " . PHP_EOL . "No transformations configured." . PHP_EOL],
+            [$this->getTestInstance(self::TEST_FILE_MODIFY), "Apply the following transformations to the specified file '".self::TEST_FILE_MODIFY."': " . PHP_EOL . "No transformations configured." . PHP_EOL],
+            [$this->getTestInstance(), "Apply the following transformations to the specified file '': " . PHP_EOL . "No transformations configured." . PHP_EOL],
         ];
     }
 
@@ -136,51 +136,51 @@ class ModifyFileTest extends BaseTest
      */
     public function applyProvider(): array
     {
-        // Action | is valid | severity | expected value | exception | expected content
+        // Action | is valid | severity | result | exception | expected content
         return [
-            [$this->getReplaceValueModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, 'ANY REPLACED CONTENT'],
-            [$this->getReplaceLineModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_REPLACED_CONTENT],
-            [$this->getRemoveValueModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, 'ANY '],
-            [$this->getRemoveLineModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, ''],
-            [$this->getAppendValueModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT . self::TEST_APPENDED_CONTENT],
-            [$this->getAppendTemplateModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
-            [$this->getReplaceWithTemplateModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_TEMPLATE_CONTENT],
-            [ActionFactory::createModifyFile(self::TEST_FILE_MODIFY), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT],
+            [$this->getReplaceValueModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, ['ANY REPLACED CONTENT'], false, 'ANY REPLACED CONTENT'],
+            [$this->getReplaceLineModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_REPLACED_CONTENT], false, self::TEST_REPLACED_CONTENT],
+            [$this->getRemoveValueModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, ['ANY '], false, 'ANY '],
+            [$this->getRemoveLineModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [], false, ''],
+            [$this->getAppendValueModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT . self::TEST_APPENDED_CONTENT], false, self::TEST_CONTENT . self::TEST_APPENDED_CONTENT],
+            [$this->getAppendTemplateModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT], false, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
+            [$this->getReplaceWithTemplateModifyFile('ANY'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_TEMPLATE_CONTENT], false, self::TEST_TEMPLATE_CONTENT],
+            [$this->getTestInstance(self::TEST_FILE_MODIFY), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT], false, self::TEST_CONTENT],
             /** Case sensitive tests (ACTION) */
-            [$this->getReplaceValueModifyFile('ANY', 'content')->caseSensitive(true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, 'ANY CONTENT'],
-            [$this->getReplaceValueModifyFile('ANY', 'content')->caseSensitive(false), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, 'ANY REPLACED CONTENT'],
-            [$this->getReplaceValueModifyFile('ANY', 'CONTENT')->caseSensitive(false), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, 'ANY REPLACED CONTENT'],
-            [$this->getRemoveValueModifyFile('ANY', 'content')->caseSensitive(true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, 'ANY CONTENT'],
-            [$this->getRemoveValueModifyFile('ANY', 'content')->caseSensitive(false), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, 'ANY '],
-            [$this->getRemoveValueModifyFile('ANY', 'CONTENT')->caseSensitive(false), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, 'ANY '],
+            [$this->getReplaceValueModifyFile('ANY', 'content')->caseSensitive(true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, ['ANY CONTENT'], false, 'ANY CONTENT'],
+            [$this->getReplaceValueModifyFile('ANY', 'content')->caseSensitive(false), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, ['ANY REPLACED CONTENT'], false, 'ANY REPLACED CONTENT'],
+            [$this->getReplaceValueModifyFile('ANY', 'CONTENT')->caseSensitive(false), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, ['ANY REPLACED CONTENT'], false, 'ANY REPLACED CONTENT'],
+            [$this->getRemoveValueModifyFile('ANY', 'content')->caseSensitive(true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, ['ANY CONTENT'], false, 'ANY CONTENT'],
+            [$this->getRemoveValueModifyFile('ANY', 'content')->caseSensitive(false), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, ['ANY '], false, 'ANY '],
+            [$this->getRemoveValueModifyFile('ANY', 'CONTENT')->caseSensitive(false), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, ['ANY '], false, 'ANY '],
             /** Case sensitive tests (CHECKS) */
-            [$this->getReplaceValueModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, 'ANY REPLACED CONTENT'],
+            [$this->getReplaceValueModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, ['ANY REPLACED CONTENT'], false, 'ANY REPLACED CONTENT'],
             // The action executed correctly but didn't change the content as the case-sensitive check condition was not met (verify string)
-            [$this->getReplaceValueModifyFile('any', 'CONTENT', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT],
-            [$this->getReplaceLineModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_REPLACED_CONTENT],
-            [$this->getReplaceLineModifyFile('any', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT],
-            [$this->getRemoveValueModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, 'ANY '],
-            [$this->getRemoveValueModifyFile('any', 'CONTENT', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT],
-            [$this->getRemoveLineModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, ''],
-            [$this->getRemoveLineModifyFile('any', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT],
-            [$this->getAppendValueModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT . self::TEST_APPENDED_CONTENT],
-            [$this->getAppendValueModifyFile('any', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT],
-            [$this->getAppendTemplateModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
-            [$this->getAppendTemplateModifyFile('any', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT],
-            [$this->getReplaceWithTemplateModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_TEMPLATE_CONTENT],
-            [$this->getReplaceWithTemplateModifyFile('any', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, self::TEST_CONTENT],
+            [$this->getReplaceValueModifyFile('any', 'CONTENT', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT], false, self::TEST_CONTENT],
+            [$this->getReplaceLineModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_REPLACED_CONTENT], false, self::TEST_REPLACED_CONTENT],
+            [$this->getReplaceLineModifyFile('any', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT], false, self::TEST_CONTENT],
+            [$this->getRemoveValueModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, ['ANY '], false, 'ANY '],
+            [$this->getRemoveValueModifyFile('any', 'CONTENT', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT], false, self::TEST_CONTENT],
+            [$this->getRemoveLineModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [], false, ''],
+            [$this->getRemoveLineModifyFile('any', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT], false, self::TEST_CONTENT],
+            [$this->getAppendValueModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT . self::TEST_APPENDED_CONTENT], false, self::TEST_CONTENT . self::TEST_APPENDED_CONTENT],
+            [$this->getAppendValueModifyFile('any', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT], false, self::TEST_CONTENT],
+            [$this->getAppendTemplateModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT], false, self::TEST_CONTENT . self::TEST_TEMPLATE_CONTENT],
+            [$this->getAppendTemplateModifyFile('any', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT], false, self::TEST_CONTENT],
+            [$this->getReplaceWithTemplateModifyFile('any'), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_TEMPLATE_CONTENT], false, self::TEST_TEMPLATE_CONTENT],
+            [$this->getReplaceWithTemplateModifyFile('any', true), true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, [self::TEST_CONTENT], false, self::TEST_CONTENT],
             /** Negative cases */
             /** not successful, no fatal */
-            [ActionFactory::createModifyFile(''), false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, self::TEST_CONTENT],
+            [$this->getTestInstance(), false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedAction(), false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedCondition(), false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, self::TEST_CONTENT],
             /** not successful, fatal */
-            [ActionFactory::createModifyFile(''), false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, self::TEST_CONTENT],
+            [$this->getTestInstance(), false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedAction(), false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedCondition(), false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, self::TEST_CONTENT],
 //TODO SUCCESS REQUIRED MISSING
             /** successful with negative result, critical */
-            [ActionFactory::createModifyFile(''), false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, self::TEST_CONTENT],
+            [$this->getTestInstance(), false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedAction(), false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, self::TEST_CONTENT],
             [$this->getModifyFileWithUnsupportedCondition(), false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, self::TEST_CONTENT],
         ];
@@ -194,7 +194,7 @@ class ModifyFileTest extends BaseTest
      * @param ModifyFile $modifyFile
      * @param bool $isValid
      * @param int $actionSeverity
-     * @param bool $expected
+     * @param mixed $expected
      * @param bool $expectedException
      * @param string $expectedContent
      *
@@ -204,7 +204,7 @@ class ModifyFileTest extends BaseTest
         ModifyFile $modifyFile,
         bool $isValid,
         int $actionSeverity,
-        bool $expected,
+        $expected,
         bool $expectedException,
         string $expectedContent
     ): void
@@ -278,7 +278,7 @@ class ModifyFileTest extends BaseTest
     ): ModifyFile
     {
         return
-            ActionFactory::createModifyFile()
+            $this->getTestInstance()
                 ->modify(self::TEST_FILE_MODIFY)
                 ->replaceValueIfLineStartsWith($conditionValue, $searchValue, self::TEST_REPLACED_CONTENT, $caseSensitive)
             ;
@@ -300,7 +300,7 @@ class ModifyFileTest extends BaseTest
     ): ModifyFile
     {
         return
-            ActionFactory::createModifyFile()
+            $this->getTestInstance()
                 ->modify(self::TEST_FILE_MODIFY)
                 ->removeValueIfLineStartsWith($conditionValue, $searchValue, $caseSensitive)
             ;
@@ -317,7 +317,7 @@ class ModifyFileTest extends BaseTest
     protected function getRemoveLineModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
-            ActionFactory::createModifyFile()
+            $this->getTestInstance()
                 ->modify(self::TEST_FILE_MODIFY)
                 ->removeLineIfLineStartsWith($conditionValue, $caseSensitive)
             ;
@@ -334,7 +334,7 @@ class ModifyFileTest extends BaseTest
     protected function getAppendValueModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
-            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
+            $this->getTestInstance(self::TEST_FILE_MODIFY)
                 ->addAction(
                     ModifyFile::MODIFY_FILE_APPEND_TO_LINE,
                     VerifyString::CONDITION_STARTS_WITH,
@@ -357,7 +357,7 @@ class ModifyFileTest extends BaseTest
     protected function getAppendTemplateModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
-            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
+            $this->getTestInstance(self::TEST_FILE_MODIFY)
                 ->addAction(
                     ModifyFile::MODIFY_FILE_APPEND_TEMPLATE,
                     VerifyString::CONDITION_STARTS_WITH,
@@ -380,7 +380,7 @@ class ModifyFileTest extends BaseTest
     protected function getReplaceWithTemplateModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
-            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
+            $this->getTestInstance(self::TEST_FILE_MODIFY)
                 ->addAction(
                     ModifyFile::MODIFY_FILE_REPLACE_WITH_TEMPLATE,
                     VerifyString::CONDITION_STARTS_WITH,
@@ -403,7 +403,7 @@ class ModifyFileTest extends BaseTest
     protected function getReplaceLineModifyFile(string $conditionValue, bool $caseSensitive = false): ModifyFile
     {
         return
-            ActionFactory::createModifyFile()
+            $this->getTestInstance()
                 ->modify(self::TEST_FILE_MODIFY)
                 ->replaceLineIfLineStartsWith($conditionValue, self::TEST_REPLACED_CONTENT, $caseSensitive)
             ;
@@ -419,7 +419,7 @@ class ModifyFileTest extends BaseTest
     protected function getModifyFileWithUnsupportedAction(bool $caseSensitive = false): ModifyFile
     {
         return
-            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
+            $this->getTestInstance(self::TEST_FILE_MODIFY)
                 ->addAction(
                     'wrong_action',
                     VerifyString::CONDITION_STARTS_WITH,
@@ -441,7 +441,7 @@ class ModifyFileTest extends BaseTest
     protected function getModifyFileWithUnsupportedCondition(bool $caseSensitive = false): ModifyFile
     {
         return
-            ActionFactory::createModifyFile(self::TEST_FILE_MODIFY)
+            $this->getTestInstance(self::TEST_FILE_MODIFY)
                 ->addAction(
                     ModifyFile::MODIFY_FILE_REPLACE_WITH_TEMPLATE,
                     'wrong_condition',
@@ -451,6 +451,18 @@ class ModifyFileTest extends BaseTest
                     $caseSensitive
                 )
             ;
+    }
+
+    /**
+     * Create a ModifyFile instance to run the tests.
+     *
+     * @param string $filePath
+     *
+     * @return ModifyFile
+     */
+    protected function getTestInstance(string $filePath = "")
+    {
+        return ActionFactory::createModifyFile($filePath);
     }
 
     /**
