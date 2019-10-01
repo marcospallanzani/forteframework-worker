@@ -43,12 +43,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcospallanzani/forteframework-stdlib.git",
-                "reference": "e95131845587101e55577e54136dcf07d329470a"
+                "reference": "9a7fc9d74119a8588417c00b4a1dc50053891c7b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcospallanzani/forteframework-stdlib/zipball/e95131845587101e55577e54136dcf07d329470a",
-                "reference": "e95131845587101e55577e54136dcf07d329470a",
+                "url": "https://api.github.com/repos/marcospallanzani/forteframework-stdlib/zipball/9a7fc9d74119a8588417c00b4a1dc50053891c7b",
+                "reference": "9a7fc9d74119a8588417c00b4a1dc50053891c7b",
                 "shasum": ""
             },
             "require": {
@@ -86,7 +86,7 @@
                 "source": "https://github.com/marcospallanzani/forteframework-stdlib/tree/master",
                 "issues": "https://github.com/marcospallanzani/forteframework-stdlib/issues"
             },
-            "time": "2019-09-25T14:47:36+00:00"
+            "time": "2019-09-30T17:50:55+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -1361,16 +1361,16 @@
         },
         {
             "name": "mockery/mockery",
-            "version": "1.2.3",
+            "version": "1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mockery/mockery.git",
-                "reference": "4eff936d83eb809bde2c57a3cea0ee9643769031"
+                "reference": "b3453f75fd23d9fd41685f2148f4abeacabc6405"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mockery/mockery/zipball/4eff936d83eb809bde2c57a3cea0ee9643769031",
-                "reference": "4eff936d83eb809bde2c57a3cea0ee9643769031",
+                "url": "https://api.github.com/repos/mockery/mockery/zipball/b3453f75fd23d9fd41685f2148f4abeacabc6405",
+                "reference": "b3453f75fd23d9fd41685f2148f4abeacabc6405",
                 "shasum": ""
             },
             "require": {
@@ -1384,7 +1384,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "1.2.x-dev"
                 }
             },
             "autoload": {
@@ -1422,7 +1422,7 @@
                 "test double",
                 "testing"
             ],
-            "time": "2019-08-07T15:01:07+00:00"
+            "time": "2019-09-30T08:30:27+00:00"
         },
         {
             "name": "myclabs/deep-copy",

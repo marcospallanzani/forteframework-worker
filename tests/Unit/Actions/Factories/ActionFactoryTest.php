@@ -2,6 +2,7 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Factories;
 
+use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Checks\Files\DirectoryDoesNotExist;
 use Forte\Worker\Actions\Checks\Files\DirectoryExists;
@@ -20,12 +21,14 @@ use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\MakeDirectory;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
+use Forte\Worker\Actions\Transforms\Files\ModifyFileContent;
 use Forte\Worker\Actions\Transforms\Files\MoveDirectory;
 use Forte\Worker\Actions\Transforms\Files\MoveFile;
 use Forte\Worker\Actions\Transforms\Files\RemoveFile;
 use Forte\Worker\Actions\Transforms\Files\RenameDirectory;
 use Forte\Worker\Actions\Transforms\Files\RenameFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
+use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Tests\Unit\BaseTest;
 
@@ -58,6 +61,7 @@ class ActionFactoryTest extends BaseTest
             [ChangeConfigFileEntries::class, $wrongParams],
             [CopyFile::class, $wrongParams],
             [ModifyFile::class, $wrongParams],
+            [ModifyFileContent::class, $wrongParams],
             [MoveDirectory::class, $wrongParams],
             [MoveFile::class, $wrongParams],
             [RemoveFile::class, $wrongParams],
@@ -75,6 +79,8 @@ class ActionFactoryTest extends BaseTest
      * Test for all ActionFactory creation methods.
      *
      * @throws WorkerException
+     * @throws GeneralException
+     * @throws ConfigurationException
      */
     public function testCreateMethods(): void
     {
@@ -113,6 +119,9 @@ class ActionFactoryTest extends BaseTest
 
         $this->assertInstanceOf(ModifyFile::class, ActionFactory::createModifyFile());
         $this->assertInstanceOf(ModifyFile::class, ActionFactory::create(ModifyFile::class));
+
+        $this->assertInstanceOf(ModifyFileContent::class, ActionFactory::createModifyFileContent());
+        $this->assertInstanceOf(ModifyFileContent::class, ActionFactory::create(ModifyFileContent::class));
 
         $this->assertInstanceOf(MoveDirectory::class, ActionFactory::createMoveDirectory());
         $this->assertInstanceOf(MoveDirectory::class, ActionFactory::create(MoveDirectory::class));

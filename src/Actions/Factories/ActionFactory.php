@@ -21,6 +21,7 @@ use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\MakeDirectory;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
+use Forte\Worker\Actions\Transforms\Files\ModifyFileContent;
 use Forte\Worker\Actions\Transforms\Files\MoveDirectory;
 use Forte\Worker\Actions\Transforms\Files\MoveFile;
 use Forte\Worker\Actions\Transforms\Files\RemoveFile;
@@ -181,6 +182,18 @@ class ActionFactory implements ActionFactoryInterface
     public static function createModifyFile(...$parameters): ModifyFile
     {
         return new ModifyFile(...$parameters);
+    }
+
+    /**
+     * Create an instance of the ModifyFileContent class.
+     *
+     * @param mixed ...$parameters The construction parameters.
+     *
+     * @return ModifyFileContent An instance of ModifyFileContent.
+     */
+    public static function createModifyFileContent(...$parameters): ModifyFileContent
+    {
+        return new ModifyFileContent(...$parameters);
     }
 
     /**
@@ -377,6 +390,9 @@ class ActionFactory implements ActionFactoryInterface
                     break;
                 case ModifyFile::class:
                     return self::createModifyFile(...$parameters);
+                    break;
+                case ModifyFileContent::class:
+                    return self::createModifyFileContent(...$parameters);
                     break;
                 case MoveDirectory::class:
                     return self::createMoveDirectory(...$parameters);
