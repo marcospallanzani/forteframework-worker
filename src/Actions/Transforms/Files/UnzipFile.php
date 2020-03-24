@@ -4,6 +4,8 @@ namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
+use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Exceptions\ConfigurationException;
 use Zend\Filter\Decompress;
 
 /**
@@ -49,15 +51,37 @@ class UnzipFile extends AbstractFileAction
     }
 
     /**
-     * Extract the zip file to the specified destination path.
+     * Extract the zip file to the specified destination path. If the given extractToPath
+     * does not exist, the first parent folder of the given directory will be used.
      *
      * @param string $extractToPath The destination extraction path.
+     * @param bool   $force         Whether or not this action should force the creation of
+     *                              the specified extract-to path.
      *
      * @return UnzipFile
+     *
+     * @throws ConfigurationException
      */
-    public function extractTo(string $extractToPath): self
+    public function extractTo(string $extractToPath, bool $force = false): self
     {
         $this->extractToPath = $extractToPath;
+
+        // If the extract path does not exist, and we are in the force mode,
+        // we need to check if it exists; if it does not, then we create the
+        // given extract-to path on the file system
+        if ($force) {
+            $this->addBeforeAction(
+                ActionFactory::createIfStatement(
+                    null,
+                    [
+                        [
+                            ActionFactory::createDirectoryDoesNotExist($extractToPath),
+                            ActionFactory::createMakeDirectory($extractToPath)
+                        ],
+                    ]
+                )
+            );
+        }
 
         return $this;
     }
