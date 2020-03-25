@@ -170,7 +170,8 @@ class AbstractRunner
      */
     public function reset(): bool
     {
-        $this->actions = [];
+        $this->actions       = [];
+        $this->actionResults = [];
 
         return true;
     }
