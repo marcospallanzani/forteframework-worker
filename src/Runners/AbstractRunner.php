@@ -23,6 +23,13 @@ class AbstractRunner
     protected $actions = [];
 
     /**
+     * Action results.
+     *
+     * @var array An array containing a result set of each run action.
+     */
+    protected $actionResults = [];
+
+    /**
      * Get a list of actions to be applied.
      *
      * @return array An array of AbstractAction subclass instances.
@@ -30,6 +37,16 @@ class AbstractRunner
     public function getActions(): array
     {
         return $this->actions;
+    }
+
+    /**
+     * Get a list of action results.
+     *
+     * @return array An array of action results.
+     */
+    public function getActionResults(): array
+    {
+        return $this->actionResults;
     }
 
     /**
@@ -59,10 +76,10 @@ class AbstractRunner
         foreach ($this->actions as $action) {
             if ($action instanceof AbstractAction) {
                 // We add the current action result to the global list of action results
-                $actionResults[] = $action->run();
+                $this->actionResults[$action->getUniqueExecutionId()] = $action->run();
             }
         }
-        return $actionResults;
+        return $this->actionResults;
     }
 
     /**
@@ -74,6 +91,8 @@ class AbstractRunner
      * FileUtils constants starting with "CONTENT_TYPE_").
      * @param string $destinationFullFilePath The destination file path. If not given,
      * a default file name will be created.
+     * @param bool $includeResults Whether the action result (if available), should be
+     * added to the export data.
      *
      * @return string The export full file path.
      *
@@ -82,14 +101,19 @@ class AbstractRunner
      */
     public function exportAllActionsToFile(
         string $contentType = FileUtils::CONTENT_TYPE_JSON,
-        string $destinationFullFilePath = ""
+        string $destinationFullFilePath = "",
+        bool $includeResults = false
     ): string
     {
         $exportedActions = [];
         foreach ($this->actions as $action) {
             if ($action instanceof AbstractAction) {
-                $actionResult = new ActionResult($action);
-                $exportedActions[] = $actionResult->toArray(false);
+                if (array_key_exists($action->getUniqueExecutionId(), $this->actionResults)) {
+                    $actionResult = $this->actionResults[$action->getUniqueExecutionId()];
+                } else {
+                    $actionResult = new ActionResult($action);
+                }
+                $exportedActions[] = $actionResult->toArray($includeResults);
             }
         }
 
