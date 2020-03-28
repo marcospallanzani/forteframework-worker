@@ -44,6 +44,8 @@ class ProjectRunnerBuilder
      * zip file should be decompressed.
      *
      * @return self
+     *
+     * @throws ConfigurationException
      */
     public function unzipFile(string $zipFilePath, string $extractToPath = ""): self
     {
@@ -160,6 +162,8 @@ class ProjectRunnerBuilder
      * @param mixed $value The new value for the specified key.
      *
      * @return $this
+     *
+     * @throws \Forte\Stdlib\Exceptions\GeneralException
      */
     public function modifyEnvFileConfigKey(string $filePath, string $key, $value): self
     {
@@ -204,6 +208,8 @@ class ProjectRunnerBuilder
      * guessed from the given file path.
      *
      * @return ProjectRunnerBuilder
+     *
+     * @throws \Forte\Stdlib\Exceptions\GeneralException
      */
     public function modifyConfigValueByKey(string $filePath, string $key, $value, string $contentType = ""): self
     {
@@ -241,6 +247,7 @@ class ProjectRunnerBuilder
      * guessed from the given file path.
      *
      * @return ProjectRunnerBuilder
+     * @throws \Forte\Stdlib\Exceptions\GeneralException
      */
     public function modifyConfigKey(string $filePath, string $oldKey, $newKey, string $contentType = ""): self
     {
@@ -511,7 +518,7 @@ class ProjectRunnerBuilder
      *
      * @param string $projectRootFolder The project root folder.
      */
-    protected function reset(string $projectRootFolder): void
+    public function reset(string $projectRootFolder): void
     {
         $this->runner = new ProjectRunner($projectRootFolder);
     }
