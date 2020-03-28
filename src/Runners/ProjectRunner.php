@@ -42,13 +42,7 @@ class ProjectRunner extends AbstractRunner
      */
     public function __construct(string $projectFolder)
     {
-        // Set the full project path
-        $this->projectFolder = rtrim($projectFolder, DIRECTORY_SEPARATOR);
-        // Set the installation folder
-        $this->installationFolder = dirname($projectFolder);
-        // Set the relative project path (last-level folder)
-        $pathParts = explode(DIRECTORY_SEPARATOR, $this->projectFolder);
-        $this->relativeFolder = array_pop($pathParts);
+        $this->setProjectFolders($projectFolder);
     }
 
     /**
@@ -79,5 +73,23 @@ class ProjectRunner extends AbstractRunner
     public function getRelativeFolder(): string
     {
         return $this->relativeFolder;
+    }
+
+    /**
+     * Set the project folders with the given new project folder path.
+     *
+     * @param string $projectFolder The new project folder path.
+     *
+     * @return void
+     */
+    public function setProjectFolders(string $projectFolder): void
+    {
+        // Set the full project path
+        $this->projectFolder = rtrim($projectFolder, DIRECTORY_SEPARATOR);
+        // Set the installation folder
+        $this->installationFolder = dirname($projectFolder);
+        // Set the relative project path (last-level folder)
+        $pathParts = explode(DIRECTORY_SEPARATOR, $this->projectFolder);
+        $this->relativeFolder = array_pop($pathParts);
     }
 }
