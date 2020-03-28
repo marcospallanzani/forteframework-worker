@@ -126,6 +126,35 @@ class AbstractRunner
     }
 
     /**
+     * Reset the current runner instance to its initial state (no configured actions).
+     *
+     * @return bool True if the runner instance was reset to its initial state.
+     */
+    public function reset(): bool
+    {
+        $this->actions       = [];
+        $this->actionResults = [];
+
+        return true;
+    }
+
+    /**
+     * Return true if all the run actions were succesful; false otherwise.
+     *
+     * @return bool True if all the run actions were succesful; false otherwise.
+     */
+    public function checkActionResults(): bool
+    {
+        foreach ($this->actionResults as $result) {
+            if ($result instanceof ActionResult && !$result->getAction()->validateResult($result)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Export the given list of ActionResult instances to the destination full file
      * path. If no destination full file path is specified, a default path will be
      * generated.
@@ -161,18 +190,5 @@ class AbstractRunner
             $destinationFullFilePath,
             "export_action_results_"
         );
-    }
-
-    /**
-     * Reset the current runner instance to its initial state (no configured actions).
-     *
-     * @return bool True if the runner instance was reset to its initial state.
-     */
-    public function reset(): bool
-    {
-        $this->actions       = [];
-        $this->actionResults = [];
-
-        return true;
     }
 }
