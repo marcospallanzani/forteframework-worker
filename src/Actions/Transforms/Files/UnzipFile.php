@@ -6,7 +6,7 @@ use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Factories\ActionFactory;
 use Forte\Worker\Exceptions\ConfigurationException;
-use Zend\Filter\Decompress;
+use Laminas\Filter\Decompress;
 
 /**
  * Class UnzipFile
