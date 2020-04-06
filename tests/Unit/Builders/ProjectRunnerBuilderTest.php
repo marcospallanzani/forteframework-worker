@@ -6,7 +6,7 @@ use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\Checks\Files\FileExists;
 use Forte\Worker\Actions\Checks\Files\FileHasInstantiableClass;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Actions\Transforms\Files\ChangeConfigFileEntries;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Actions\Transforms\Files\UnzipFile;
@@ -78,7 +78,7 @@ class ProjectRunnerBuilderTest extends BaseTest
             ['modifyConfigKey', [__FILE__, 'key', 'value'], ChangeConfigFileEntries::class],
             ['addConfigKey', [__FILE__, 'key', 'value'], ChangeConfigFileEntries::class],
             ['removeConfigKey', [__FILE__, 'key'], ChangeConfigFileEntries::class],
-            ['addAction', [ActionFactory::createFileExists(__FILE__)], FileExists::class],
+            ['addAction', [WorkerActionFactory::createFileExists(__FILE__)], FileExists::class],
         ];
     }
 

@@ -5,7 +5,7 @@ namespace Forte\Worker\Tests\Unit\Actions\Conditionals;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Conditionals\ForEachLoop;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Exceptions\ValidationException;
@@ -28,7 +28,7 @@ class ForEachLoopTest extends BaseTest
         // actions | is valid | severity | expected result | exception expected | message
         return [
             [
-                [ActionFactory::createFileExists(__FILE__), ActionFactory::createFileExists(__FILE__)],
+                [WorkerActionFactory::createFileExists(__FILE__), WorkerActionFactory::createFileExists(__FILE__)],
                 true,
                 ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 true,
@@ -38,7 +38,7 @@ class ForEachLoopTest extends BaseTest
             /** Negative cases */
             /** not successful, not fatal */
             [
-                [ActionFactory::createFileExists('xxx'), ActionFactory::createFileExists('xxx')],
+                [WorkerActionFactory::createFileExists('xxx'), WorkerActionFactory::createFileExists('xxx')],
                 true,
                 ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 true,
@@ -47,7 +47,7 @@ class ForEachLoopTest extends BaseTest
             ],
             // Only from success required on we change the parent action result (the parent action result here is the foreach loop)
             [
-                [ActionFactory::createFileExists('xxx'), ActionFactory::createFileExists('xxx')],
+                [WorkerActionFactory::createFileExists('xxx'), WorkerActionFactory::createFileExists('xxx')],
                 true,
                 ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED,
                 false,
@@ -56,7 +56,7 @@ class ForEachLoopTest extends BaseTest
             ],
             /** not successful, fatal */
             [
-                [ActionFactory::createFileExists(__FILE__), ActionFactory::createMakeDirectory(__DIR__)->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)],
+                [WorkerActionFactory::createFileExists(__FILE__), WorkerActionFactory::createMakeDirectory(__DIR__)->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)],
                 true,
                 ActionInterface::EXECUTION_SEVERITY_FATAL,
                 false,
@@ -65,7 +65,7 @@ class ForEachLoopTest extends BaseTest
             ],
             /** not successful, fatal -> critical */
             [
-                [ActionFactory::createFileExists(__FILE__), ActionFactory::createMakeDirectory(__DIR__)],
+                [WorkerActionFactory::createFileExists(__FILE__), WorkerActionFactory::createMakeDirectory(__DIR__)],
                 true,
                 ActionInterface::EXECUTION_SEVERITY_CRITICAL,
                 false,
@@ -89,7 +89,7 @@ class ForEachLoopTest extends BaseTest
     public function testIsValid(array $actions, bool $isValid): void
     {
 //TODO MISSING TESTS FOR CONFIGURATION EXCEPTION
-        $forEachLoopAction = ActionFactory::createForEachLoop($actions);
+        $forEachLoopAction = WorkerActionFactory::createForEachLoop($actions);
         $this->isValidTest($isValid, $forEachLoopAction);
 
         $registeredActions = $forEachLoopAction->getActions();
@@ -135,7 +135,7 @@ class ForEachLoopTest extends BaseTest
         string $message
     ): void
     {
-        $this->stringifyTest($message, ActionFactory::createForEachLoop($actions));
+        $this->stringifyTest($message, WorkerActionFactory::createForEachLoop($actions));
     }
 
     /**
@@ -160,7 +160,7 @@ class ForEachLoopTest extends BaseTest
         bool $exceptionExpected
     ): void
     {
-        $forEachLoopAction = ActionFactory::createForEachLoop();
+        $forEachLoopAction = WorkerActionFactory::createForEachLoop();
         foreach ($actions as $action) {
             $forEachLoopAction->addAction($action);
         }

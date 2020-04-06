@@ -7,7 +7,7 @@ use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
 use Forte\Worker\Actions\Checks\Files\ConfigFileHasValidEntries;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
@@ -137,13 +137,13 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             /** not successful, no fatal */
             [$jsonEntries, 'key2.key4.key7', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             [$jsonEntries, 'key2.key4.key5.key6', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_JSON), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_JSON, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_JSON), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_JSON, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
             // The only way to throw an action exception is to break one or more validation checks
             [$jsonEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_JSON), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_JSON, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_JSON), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_JSON, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** ARRAY TESTS */
             [$arrayEntries, 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
@@ -153,13 +153,13 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             /** not successful, no fatal */
             [$arrayEntries, 'key2.key4.key7', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             [$arrayEntries, 'key2.key4.key5.key6', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_ARRAY), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_ARRAY, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_ARRAY), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_ARRAY, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
             // The only way to throw an action exception is to break one or more validation checks
             [$arrayEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_ARRAY), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_ARRAY, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_ARRAY), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_ARRAY, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** INI TESTS */
             [$iniEntries, 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
@@ -169,13 +169,13 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             /** not successful, no fatal */
             [$iniEntries, 'key2.key4.key7', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             [$iniEntries, 'key2.key4.key5.key6', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_INI), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_INI), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
             // The only way to throw an action exception is to break one or more validation checks
             [$iniEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_INI), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_INI), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** XML TESTS */
             [$xmlEntries, 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
@@ -185,13 +185,13 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             /** not successful, no fatal */
             [$xmlEntries, 'key2.key4.key7', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             [$xmlEntries, 'key2.key4.key5.key6', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_XML), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_XML), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
             // The only way to throw an action exception is to break one or more validation checks
             [$xmlEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_XML), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_XML, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_XML), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_XML, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
 
             /** YAML TESTS */
             [$yamlEntries, 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false],
@@ -201,13 +201,13 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             /** not successful, no fatal */
             [$yamlEntries, 'key2.key4.key7', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             [$yamlEntries, 'key2.key4.key5.key6', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
             // The only way to throw an action exception is to break one or more validation checks
             [$yamlEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
         ];
     }
 
@@ -237,16 +237,16 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             [clone $iniEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             [clone $xmlEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             [clone $yamlEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong-content-type'), 'key1', ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false],
             /** not successful, fatal */
             [clone $jsonEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
             [clone $arrayEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
             [clone $iniEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
             [clone $xmlEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
             [clone $yamlEntries, '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), '', ActionInterface::EXECUTION_SEVERITY_FATAL, false, true],
             /** successful with negative result, critical */
 //TODO IMPLEMENT IS SUCCESS REQUIRED CASE: THE NEGATIVE RESULT OF AN ACTION SETS THE MAIN ACTION RESULT TO ITS NEGATIVE CASE (CHILD ACTION, PRE-RUN ETC)
             /** successful with negative result, critical */
@@ -255,8 +255,8 @@ class ConfigFileHasValidEntriesTest extends BaseTest
             [clone $iniEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
             [clone $xmlEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
             [clone $yamlEntries, $failKey, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), '', ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
-            [ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), '', ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), '', ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
+            [WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, ''), '', ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true],
         ];
 
     }
@@ -339,21 +339,21 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 // The only way to throw an action exception is to break one or more validation checks
                 array_merge([clone $instance, 'key1', 'yrew', VerifyArray::CHECK_CONTAINS], $failParams),
                 array_merge([clone $instance, 'key2.key4.key5', '', VerifyArray::CHECK_CONTAINS], $failParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $failParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $failParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $failParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $failParams),
                 /** not successful, fatal */
                 // The only way to throw an action exception is to break one or more validation checks
                 array_merge([clone $instance, '', 'yrew', VerifyArray::CHECK_CONTAINS], $fatalParams),
                 array_merge([clone $instance, '', '', VerifyArray::CHECK_CONTAINS], $fatalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $fatalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $fatalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $fatalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $fatalParams),
                 /** successful with negative result, is success required */
                 array_merge([clone $instance, 'key1', 'yrew', VerifyArray::CHECK_CONTAINS], $criticalParams),
                 array_merge([clone $instance, 'key2.key4.key5', '3', VerifyArray::CHECK_CONTAINS], $criticalParams),
                 array_merge([clone $instance, 'key2.key3', 'xxx', VerifyArray::CHECK_CONTAINS], $criticalParams),
                 array_merge([clone $instance, 'key99', 'xxx', VerifyArray::CHECK_CONTAINS], $criticalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $criticalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $criticalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $criticalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_CONTAINS], $criticalParams),
 
             ]);
 
@@ -380,21 +380,21 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 // The only way to throw an action exception is to break one or more validation checks
                 array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_STARTS_WITH], $failParams),
                 array_merge([clone $instance, 'key2.key4.key5', '', VerifyArray::CHECK_STARTS_WITH], $failParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $failParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $failParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $failParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $failParams),
                 /** not successful, fatal */
                 // The only way to throw an action exception is to break one or more validation checks
                 array_merge([clone $instance, '', 'alue', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
                 array_merge([clone $instance, '', '', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $fatalParams),
                 /** successful with negative result, is success required */
                 array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
                 array_merge([clone $instance, 'key2.key4.key5', 'lue5', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
                 array_merge([clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
                 array_merge([clone $instance, 'key99', 'lue', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_STARTS_WITH], $criticalParams),
             ]);
 
             // Instance | key | value | compare action | severity | expected | exception
@@ -420,20 +420,20 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 // The only way to throw an action exception is to break one or more validation checks
                 array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_ENDS_WITH], $failParams),
                 array_merge([clone $instance, 'key2.key4.key5', '', VerifyArray::CHECK_ENDS_WITH], $failParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $failParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $failParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $failParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $failParams),
                 /** not successful, fatal */
                 // The only way to throw an action exception is to break one or more validation checks
                 array_merge([clone $instance, '', 'alue', VerifyArray::CHECK_ENDS_WITH], $fatalParams),
                 array_merge([clone $instance, '', '', VerifyArray::CHECK_ENDS_WITH], $fatalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $fatalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $fatalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $fatalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $fatalParams),
                 /** successful with negative result, is success required */
                 // The only way to throw an action exception is to break one or more validation checks
                 array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_ENDS_WITH], $criticalParams),
                 array_merge([clone $instance, 'key2.key4.key5', '', VerifyArray::CHECK_ENDS_WITH], $criticalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $criticalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $criticalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $criticalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_ENDS_WITH], $criticalParams),
             ]);
 
             // Instance | key | value | compare action | is fatal | is success required | expected | exception
@@ -455,22 +455,22 @@ class ConfigFileHasValidEntriesTest extends BaseTest
                 array_merge([clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_EQUALS], $failParams),
                 array_merge([clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_EQUALS], $failParams),
                 array_merge([clone $instance, 'key99', 'lue', VerifyArray::CHECK_EQUALS], $failParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $failParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $failParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $failParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $failParams),
                 /** not successful, fatal */
                 // The only way to throw an action exception is to break one or more validation checks
                 array_merge([clone $instance, '', 'alue', VerifyArray::CHECK_EQUALS], $fatalParams),
                 array_merge([clone $instance, '', '', VerifyArray::CHECK_EQUALS], $fatalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $fatalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $fatalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $fatalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $fatalParams),
                 /** successful with negative result, is success required */
                 // The only way to throw an action exception is to break one or more validation checks
                 array_merge([clone $instance, 'key1', 'alue', VerifyArray::CHECK_EQUALS], $criticalParams),
                 array_merge([clone $instance, 'key2.key4.key5', 'lue', VerifyArray::CHECK_EQUALS], $criticalParams),
                 array_merge([clone $instance, 'key2.key3', 'lue', VerifyArray::CHECK_EQUALS], $criticalParams),
                 array_merge([clone $instance, 'key99', 'lue', VerifyArray::CHECK_EQUALS], $criticalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $criticalParams),
-                array_merge([ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $criticalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries('', FileUtils::CONTENT_TYPE_YAML), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $criticalParams),
+                array_merge([WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, 'wrong_content_type'), 'key1', 'value1', VerifyArray::CHECK_EQUALS], $criticalParams),
             ]);
 
             // Instance | key | value | compare action | severity | expected | exception
@@ -534,12 +534,12 @@ class ConfigFileHasValidEntriesTest extends BaseTest
         $value = "value";
 
         return [
-            [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON), "Run the following checks in file '$filePath':"],
-            [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKey($key), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and has any value"],
-            [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithNonEmptyValue($key), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and is not empty (empty string or null)"],
-            [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithEmptyValue($key), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and is empty (empty string or null)"],
-            [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS, $caseSensitive), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and is equal to value '$value' $caseSensitiveMessage"],
-            [ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithValue($key, $value, VerifyArray::CHECK_CONTAINS, $caseSensitive), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and contains value '$value' $caseSensitiveMessage"],
+            [WorkerActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON), "Run the following checks in file '$filePath':"],
+            [WorkerActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKey($key), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and has any value"],
+            [WorkerActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithNonEmptyValue($key), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and is not empty (empty string or null)"],
+            [WorkerActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithEmptyValue($key), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and is empty (empty string or null)"],
+            [WorkerActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithValue($key, $value, VerifyArray::CHECK_EQUALS, $caseSensitive), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and is equal to value '$value' $caseSensitiveMessage"],
+            [WorkerActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_JSON)->hasKeyWithValue($key, $value, VerifyArray::CHECK_CONTAINS, $caseSensitive), "Run the following checks in file '$filePath': 0. Check if key '$key' is set and contains value '$value' $caseSensitiveMessage"],
         ];
     }
 
@@ -610,7 +610,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
         bool $exceptionExpected
     ): void
     {
-        $fileHasValidEntries = ActionFactory::createConfigFileHasValidEntries($filePath, $contentType);
+        $fileHasValidEntries = WorkerActionFactory::createConfigFileHasValidEntries($filePath, $contentType);
         if (is_string($verifyKey)) {
             $fileHasValidEntries->hasKey($verifyKey);
         }
@@ -629,7 +629,7 @@ class ConfigFileHasValidEntriesTest extends BaseTest
     {
         // An exception should be thrown here because the file is empty and it is decoded to an empty string
         $this->expectException(WorkerException::class);
-        ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_EMPTY)
+        WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_EMPTY)
             ->contentType(FileUtils::CONTENT_TYPE_JSON)->hasKey('test1')
             ->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)
             ->run();
@@ -797,11 +797,11 @@ class ConfigFileHasValidEntriesTest extends BaseTest
     protected function getFileHasValidEntriesInstances(): array
     {
         return [
-            ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_JSON, FileUtils::CONTENT_TYPE_JSON),
-            ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_ARRAY, FileUtils::CONTENT_TYPE_ARRAY),
-            ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, FileUtils::CONTENT_TYPE_INI),
-            ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_XML, FileUtils::CONTENT_TYPE_XML),
-            ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, FileUtils::CONTENT_TYPE_YAML),
+            WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_JSON, FileUtils::CONTENT_TYPE_JSON),
+            WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_ARRAY, FileUtils::CONTENT_TYPE_ARRAY),
+            WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_INI, FileUtils::CONTENT_TYPE_INI),
+            WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_XML, FileUtils::CONTENT_TYPE_XML),
+            WorkerActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_YAML, FileUtils::CONTENT_TYPE_YAML),
 //TODO ADD MISSING TESTS FOR ENV FILE
 //            ActionFactory::createConfigFileHasValidEntries(self::TEST_FILE_TMP_ENV, FileUtils::CONTENT_TYPE_ENV),
         ];

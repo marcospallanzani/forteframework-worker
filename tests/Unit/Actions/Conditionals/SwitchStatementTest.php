@@ -4,7 +4,7 @@ namespace Forte\Worker\Tests\Unit\Actions\Conditionals;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionInterface;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Exceptions\ValidationException;
@@ -38,9 +38,9 @@ class SwitchStatementTest extends BaseTest
             'test_5' => 'value_5'
         ];
 
-        $modifyArray1 = ActionFactory::createModifyArray()->addKey(self::ADDED_VALUE_KEY_1, self::CASE_EXPRESSION_VALUE_1)->modifyContent($array);
-        $modifyArray2 = ActionFactory::createModifyArray()->addKey(self::ADDED_VALUE_KEY_2, self::CASE_EXPRESSION_VALUE_2)->modifyContent($array);
-        $modifyArray3 = ActionFactory::createModifyArray()->addKey(self::ADDED_VALUE_KEY_3, self::CASE_EXPRESSION_VALUE_3)->modifyContent($array);
+        $modifyArray1 = WorkerActionFactory::createModifyArray()->addKey(self::ADDED_VALUE_KEY_1, self::CASE_EXPRESSION_VALUE_1)->modifyContent($array);
+        $modifyArray2 = WorkerActionFactory::createModifyArray()->addKey(self::ADDED_VALUE_KEY_2, self::CASE_EXPRESSION_VALUE_2)->modifyContent($array);
+        $modifyArray3 = WorkerActionFactory::createModifyArray()->addKey(self::ADDED_VALUE_KEY_3, self::CASE_EXPRESSION_VALUE_3)->modifyContent($array);
 
         // expression | cases | default case | is valid | severity | expected result | exception expected | message
         return [
@@ -106,7 +106,7 @@ class SwitchStatementTest extends BaseTest
             [
                 self::CASE_EXPRESSION_VALUE_1,
                 [
-                    [self::CASE_EXPRESSION_VALUE_1, ActionFactory::createFileExists()],
+                    [self::CASE_EXPRESSION_VALUE_1, WorkerActionFactory::createFileExists()],
                 ],
                 $modifyArray3,
                 true,
@@ -121,7 +121,7 @@ class SwitchStatementTest extends BaseTest
             [
                 self::CASE_EXPRESSION_VALUE_1,
                 [
-                    [self::CASE_EXPRESSION_VALUE_1, ActionFactory::createFileExists()->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)],
+                    [self::CASE_EXPRESSION_VALUE_1, WorkerActionFactory::createFileExists()->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)],
                 ],
                 $modifyArray3,
                 true,
@@ -138,7 +138,7 @@ class SwitchStatementTest extends BaseTest
             [
                 self::CASE_EXPRESSION_VALUE_1,
                 [
-                    [self::CASE_EXPRESSION_VALUE_1, ActionFactory::createFileExists()->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)],
+                    [self::CASE_EXPRESSION_VALUE_1, WorkerActionFactory::createFileExists()->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)],
                 ],
                 $modifyArray3,
                 true,
@@ -162,11 +162,11 @@ class SwitchStatementTest extends BaseTest
         // expression | default case | case | expected exception | exception message
         return [
             // expression can be a non-object or an AbstractAction subclass instance
-            [new \stdClass(), ActionFactory::createFileExists(__FILE__), ['test1', ActionFactory::createFileExists(__FILE__)], "The expression of a switch case should be either a non-object or an AbstractAction subclass instance. Given expression is 'Class type: stdClass. Object value: []."],
+            [new \stdClass(), WorkerActionFactory::createFileExists(__FILE__), ['test1', WorkerActionFactory::createFileExists(__FILE__)], "The expression of a switch case should be either a non-object or an AbstractAction subclass instance. Given expression is 'Class type: stdClass. Object value: []."],
             // expression is valid, but the given case is not well formed
-            [ActionFactory::createFileExists(__FILE__), ActionFactory::createFileExists(__FILE__), [ActionFactory::createFileExists(__FILE__)], "Wrong case detected. Expected: an array with two elements, where the first element is the expression value and the second element is the case action (AbstractAction subclass instance)."],
-            ["test1", ActionFactory::createFileExists(__FILE__), [ActionFactory::createFileExists(__FILE__)], "Wrong case detected. Expected: an array with two elements, where the first element is the expression value and the second element is the case action (AbstractAction subclass instance)."],
-            ["test1", ActionFactory::createFileExists(__FILE__), ['test1'], "Wrong case detected. Expected: an array with two elements, where the first element is the expression value and the second element is the case action (AbstractAction subclass instance)."],
+            [WorkerActionFactory::createFileExists(__FILE__), WorkerActionFactory::createFileExists(__FILE__), [WorkerActionFactory::createFileExists(__FILE__)], "Wrong case detected. Expected: an array with two elements, where the first element is the expression value and the second element is the case action (AbstractAction subclass instance)."],
+            ["test1", WorkerActionFactory::createFileExists(__FILE__), [WorkerActionFactory::createFileExists(__FILE__)], "Wrong case detected. Expected: an array with two elements, where the first element is the expression value and the second element is the case action (AbstractAction subclass instance)."],
+            ["test1", WorkerActionFactory::createFileExists(__FILE__), ['test1'], "Wrong case detected. Expected: an array with two elements, where the first element is the expression value and the second element is the case action (AbstractAction subclass instance)."],
         ];
     }
 
@@ -187,7 +187,7 @@ class SwitchStatementTest extends BaseTest
     {
         $this->isValidTest(
             $isValid,
-            ActionFactory::createSwitchStatement()
+            WorkerActionFactory::createSwitchStatement()
                 ->addExpression($expression)
                 ->addCases($cases)
                 ->addDefaultCase($defaultAction)
@@ -215,7 +215,7 @@ class SwitchStatementTest extends BaseTest
     {
         $this->expectException(ConfigurationException::class);
         $this->expectExceptionMessage($exceptionMessage);
-        ActionFactory::createSwitchStatement($expression, $defaultCase, [$case]);
+        WorkerActionFactory::createSwitchStatement($expression, $defaultCase, [$case]);
     }
 
     /**
@@ -247,7 +247,7 @@ class SwitchStatementTest extends BaseTest
     {
         $this->stringifyTest(
             $message,
-            ActionFactory::createSwitchStatement()
+            WorkerActionFactory::createSwitchStatement()
                 ->addExpression($expression)
                 ->addCases($cases)
                 ->addDefaultCase($defaultAction)
@@ -284,7 +284,7 @@ class SwitchStatementTest extends BaseTest
         $this->runBasicTest(
             $exceptionExpected,
             $isValid,
-            ActionFactory::createSwitchStatement()
+            WorkerActionFactory::createSwitchStatement()
                 ->addExpression($expression)
                 ->addCases($cases)
                 ->addDefaultCase($defaultAction)

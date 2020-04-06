@@ -12,7 +12,7 @@
 namespace Forte\Worker\Tests\Unit\Actions\Checks\Files;
 
 use Forte\Worker\Actions\ActionInterface;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Tests\Unit\BaseTest;
@@ -110,7 +110,7 @@ class FileHasInstantiableClassTest extends BaseTest
         }
         $this->assertEquals(
             $expected,
-            ActionFactory::createFileHasInstantiableClass($filePath, $className)->isValid()
+            WorkerActionFactory::createFileHasInstantiableClass($filePath, $className)->isValid()
         );
     }
 
@@ -142,7 +142,7 @@ class FileHasInstantiableClassTest extends BaseTest
         }
         $this->assertEquals(
             $expected,
-            ActionFactory::createFileHasInstantiableClass($filePath, $className)
+            WorkerActionFactory::createFileHasInstantiableClass($filePath, $className)
                 ->setActionSeverity($actionSeverity)
                 ->run()
                 ->getResult()
@@ -170,7 +170,7 @@ class FileHasInstantiableClassTest extends BaseTest
     {
         $this->stringifyTest(
             $stringified,
-            ActionFactory::createFileHasInstantiableClass()
+            WorkerActionFactory::createFileHasInstantiableClass()
                 ->hasClass($className)
                 ->path($filePath)
         );

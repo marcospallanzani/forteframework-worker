@@ -15,7 +15,7 @@ use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
@@ -107,7 +107,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
      */
     public function hasKey(string $key): self
     {
-        $verifyArray = ActionFactory::createVerifyArray($key, VerifyArray::CHECK_ANY);
+        $verifyArray = WorkerActionFactory::createVerifyArray($key, VerifyArray::CHECK_ANY);
         $this->checks[] = $verifyArray;
 
         return $this;
@@ -123,7 +123,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
      */
     public function doesNotHaveKey(string $key): self
     {
-        $this->checks[] = ActionFactory::createVerifyArray($key, VerifyArray::CHECK_MISSING_KEY);
+        $this->checks[] = WorkerActionFactory::createVerifyArray($key, VerifyArray::CHECK_MISSING_KEY);
 
         return $this;
     }
@@ -138,7 +138,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
      */
     public function hasKeyWithEmptyValue(string $key): self
     {
-        $this->checks[] = ActionFactory::createVerifyArray($key, VerifyArray::CHECK_EMPTY);
+        $this->checks[] = WorkerActionFactory::createVerifyArray($key, VerifyArray::CHECK_EMPTY);
 
         return $this;
     }
@@ -153,7 +153,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
      */
     public function hasKeyWithNonEmptyValue(string $key): self
     {
-        $this->checks[] = ActionFactory::createVerifyArray($key, VerifyArray::CHECK_EMPTY, null, true);
+        $this->checks[] = WorkerActionFactory::createVerifyArray($key, VerifyArray::CHECK_EMPTY, null, true);
 
         return $this;
     }
@@ -180,7 +180,7 @@ class ConfigFileHasValidEntries extends FileExists implements NestedActionCallba
         bool $caseSensitive = false
     ): self
     {
-        $this->checks[] = ActionFactory::createVerifyArray($key, $action, $value)->caseSensitive($caseSensitive);
+        $this->checks[] = WorkerActionFactory::createVerifyArray($key, $action, $value)->caseSensitive($caseSensitive);
 
         return $this;
     }

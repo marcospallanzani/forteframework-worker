@@ -9,7 +9,7 @@ use Forte\Stdlib\StringUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Checks\Arrays\VerifyArray;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Runners\ProjectRunner;
 
@@ -57,11 +57,11 @@ class ProjectRunnerBuilder
 
         $this->addAction(
             /** main action */
-            ActionFactory::createUnzipFile()->open($zipFilePath)->extractTo($extractToPath),
+            WorkerActionFactory::createUnzipFile()->open($zipFilePath)->extractTo($extractToPath),
             /** pre-run actions */
-            [ActionFactory::createFileExists($zipFilePath)],
+            [WorkerActionFactory::createFileExists($zipFilePath)],
             /** post-run actions */
-            [ActionFactory::createFileExists($extractToPath)]
+            [WorkerActionFactory::createFileExists($extractToPath)]
         );
 
         return $this;
@@ -81,7 +81,7 @@ class ProjectRunnerBuilder
 
         $this->addAction(
             /** main action */
-            ActionFactory::createDirectoryExists($path),
+            WorkerActionFactory::createDirectoryExists($path),
             /** pre-run actions */
             [],
             /** post-run actions */
@@ -114,7 +114,7 @@ class ProjectRunnerBuilder
             $targetFolder = $this->getFilePathInProject($targetFolder);
         }
 
-        $copy = ActionFactory::createCopyFile()
+        $copy = WorkerActionFactory::createCopyFile()
             ->copy($sourceFilePath)
             ->toFolder($targetFolder)
             ->withName($targetFileName)
@@ -124,9 +124,9 @@ class ProjectRunnerBuilder
             /** main action */
             $copy,
             /** pre-run actions */
-            [ActionFactory::createFileExists($sourceFilePath)],
+            [WorkerActionFactory::createFileExists($sourceFilePath)],
             /** post-run actions */
-            [ActionFactory::createFileExists($copy->getDestinationFilePath())]
+            [WorkerActionFactory::createFileExists($copy->getDestinationFilePath())]
         );
 
         return $this;
@@ -148,7 +148,7 @@ class ProjectRunnerBuilder
 
         $this->addAction(
             /** main action */
-            ActionFactory::createFileHasInstantiableClass($classFilePath, $className)
+            WorkerActionFactory::createFileHasInstantiableClass($classFilePath, $className)
         );
 
         return $this;
@@ -172,7 +172,7 @@ class ProjectRunnerBuilder
 
         $this->addAction(
             /** main action */
-            ActionFactory::createModifyFile($filePath)
+            WorkerActionFactory::createModifyFile($filePath)
                 ->replaceLineIfLineStartsWith(
                     $key."=",
                     DotenvLoader::getLineFromVariables($key, $value)
@@ -181,7 +181,7 @@ class ProjectRunnerBuilder
             [],
             /** post-run actions */
             [
-                ActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_ENV)
+                WorkerActionFactory::createConfigFileHasValidEntries($filePath, FileUtils::CONTENT_TYPE_ENV)
                     ->hasKeyWithValue(
                         $key,
                         $value,
@@ -218,12 +218,12 @@ class ProjectRunnerBuilder
 
         $this->addAction(
             /** main action */
-            ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->changeValueByKey($key, $value),
+            WorkerActionFactory::createChangeConfigFileEntries($filePath, $contentType)->changeValueByKey($key, $value),
             /** pre-run actions */
             [],
             /** post-run actions */
             [
-                ActionFactory::createConfigFileHasValidEntries($filePath, $contentType)
+                WorkerActionFactory::createConfigFileHasValidEntries($filePath, $contentType)
                     ->hasKeyWithValue(
                         $key,
                         $value,
@@ -260,13 +260,13 @@ class ProjectRunnerBuilder
 
         $this->addAction(
             /** main action */
-            ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->changeKey($oldKey, $newKey),
+            WorkerActionFactory::createChangeConfigFileEntries($filePath, $contentType)->changeKey($oldKey, $newKey),
             /** pre-run actions */
             [],
             /** post-run actions */
             [
-                ActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->hasKey($newKeyFullTree),
-                ActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->doesNotHaveKey($oldKey),
+                WorkerActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->hasKey($newKeyFullTree),
+                WorkerActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->doesNotHaveKey($oldKey),
             ]
         );
 
@@ -295,12 +295,12 @@ class ProjectRunnerBuilder
 
         $this->addAction(
             /** main action */
-            ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->addKeyWithValue($key, $value),
+            WorkerActionFactory::createChangeConfigFileEntries($filePath, $contentType)->addKeyWithValue($key, $value),
             /** pre-run actions */
             [],
             /** post-run actions */
             [
-                ActionFactory::createConfigFileHasValidEntries($filePath, $contentType)
+                WorkerActionFactory::createConfigFileHasValidEntries($filePath, $contentType)
                     ->hasKeyWithValue(
                         $key,
                         $value,
@@ -333,11 +333,11 @@ class ProjectRunnerBuilder
 
         $this->addAction(
             /** main action */
-            ActionFactory::createChangeConfigFileEntries($filePath, $contentType)->removeKey($key),
+            WorkerActionFactory::createChangeConfigFileEntries($filePath, $contentType)->removeKey($key),
             /** pre-run actions */
             [],
             /** post-run actions */
-            [ActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->doesNotHaveKey($key)]
+            [WorkerActionFactory::createConfigFileHasValidEntries($filePath, $contentType)->doesNotHaveKey($key)]
         );
 
         return $this;
@@ -364,11 +364,11 @@ class ProjectRunnerBuilder
             $newNameSpace = StringUtils::rightTrim($newNameSpace, '\\') . '\\';
         }
 
-        $this->addAction(ActionFactory::createFilesInDirectory()
+        $this->addAction(WorkerActionFactory::createFilesInDirectory()
             ->in($this->getRunner()->getProjectFolder())
             ->filePatterns(['*.php'])
             ->addAction(
-                ActionFactory::createModifyFile()
+                WorkerActionFactory::createModifyFile()
                     ->replaceValueIfLineContains(
                         $oldNameSpace,
                         $oldNameSpace,

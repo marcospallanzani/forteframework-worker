@@ -36,7 +36,7 @@ use Forte\Worker\Exceptions\WorkerException;
  *
  * @package Forte\Worker\Actions\Factories
  */
-class ActionFactory implements ActionFactoryInterface
+class WorkerActionFactory implements WorkerActionFactoryInterface
 {
     /**
      * Create an instance of the VerifyArray class.
@@ -337,19 +337,14 @@ class ActionFactory implements ActionFactoryInterface
     }
 
     /**
-     * Create an instance of the given Abstract subclass
-     * name (full namespace).
+     * Create an instance of the given Abstract subclass name (full namespace).
      *
-     * @param string $class The AbstractAction subclass
-     * name to be created (full namespace).
+     * @param string $class The AbstractAction subclass name to be created (full namespace).
+     * @param array $parameters The parameters required to generate the desired given action instance
      *
-     * @param array $parameters
+     * @return AbstractAction An instance of the required AbstractAction subclass.
      *
-     * @return AbstractAction An instance of the required
-     * AbstractAction subclass.
-     *
-     * @throws WorkerException The given class parameter
-     * is not a supported AbstractAction subclass name.
+     * @throws WorkerException The given class parameter is not a supported AbstractAction subclass name.
      */
     public static function create(string $class, ...$parameters): AbstractAction
     {

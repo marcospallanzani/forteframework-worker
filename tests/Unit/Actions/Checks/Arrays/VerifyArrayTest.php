@@ -5,7 +5,7 @@ namespace Forte\Worker\Tests\Unit\Actions\Checks\Arrays;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
@@ -434,28 +434,28 @@ class VerifyArrayTest extends BaseTest
 
         return [
             [
-                ActionFactory::createVerifyArray()->checkContent($testArray)->startsWith($keyWithValue, 'val'),
-                ActionFactory::createVerifyArray()->checkContent($testArray)->startsWith($keyWithValue, 'x'),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->startsWith($keyWithValue, 'val'),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->startsWith($keyWithValue, 'x'),
             ],
             [
-                ActionFactory::createVerifyArray()->checkContent($testArray)->endsWith($keyWithValue, 'ue1'),
-                ActionFactory::createVerifyArray()->checkContent($testArray)->endsWith($keyWithValue, 'x'),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->endsWith($keyWithValue, 'ue1'),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->endsWith($keyWithValue, 'x'),
             ],
             [
-                ActionFactory::createVerifyArray()->checkContent($testArray)->contains($keyWithValue, 'ue'),
-                ActionFactory::createVerifyArray()->checkContent($testArray)->contains($keyWithValue, 'x'),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->contains($keyWithValue, 'ue'),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->contains($keyWithValue, 'x'),
             ],
             [
-                ActionFactory::createVerifyArray()->checkContent($testArray)->isEqualTo($keyWithValue, 'value1'),
-                ActionFactory::createVerifyArray()->checkContent($testArray)->isEqualTo($keyWithValue, 'x'),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->isEqualTo($keyWithValue, 'value1'),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->isEqualTo($keyWithValue, 'x'),
             ],
             [
-                ActionFactory::createVerifyArray()->checkContent($testArray)->isEmpty($keyEmptyValue),
-                ActionFactory::createVerifyArray()->checkContent($testArray)->isEmpty($keyWithValue),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->isEmpty($keyEmptyValue),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->isEmpty($keyWithValue),
             ],
             [
-                ActionFactory::createVerifyArray()->checkContent($testArray)->isKeyMissing('key3'),
-                ActionFactory::createVerifyArray()->checkContent($testArray)->isKeyMissing($keyWithValue),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->isKeyMissing('key3'),
+                WorkerActionFactory::createVerifyArray()->checkContent($testArray)->isKeyMissing($keyWithValue),
             ],
         ];
     }
@@ -484,7 +484,7 @@ class VerifyArrayTest extends BaseTest
     {
         $this->stringifyTest(
             $expected,
-            ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction, $caseSensitive)
+            WorkerActionFactory::createVerifyArray($key, $operation, $value, $reverseAction, $caseSensitive)
         );
     }
 
@@ -512,7 +512,7 @@ class VerifyArrayTest extends BaseTest
         bool $expectException
     ): void
     {
-        $verifyArray = ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction);
+        $verifyArray = WorkerActionFactory::createVerifyArray($key, $operation, $value, $reverseAction);
         if ($expectException) {
             $this->expectException(ValidationException::class);
             $isValid = $verifyArray->checkContent($checkContent)->isValid();
@@ -555,7 +555,7 @@ class VerifyArrayTest extends BaseTest
     {
         /** @var VerifyArray $verifyArray */
         $verifyArray =
-            ActionFactory::createVerifyArray($key, $operation, $value, $reverseAction)
+            WorkerActionFactory::createVerifyArray($key, $operation, $value, $reverseAction)
                 ->checkContent($array)
                 ->caseSensitive($caseSensitive)
                 ->setActionSeverity($actionSeverity)
@@ -578,7 +578,7 @@ class VerifyArrayTest extends BaseTest
         $array = [
             "test1" => "test2"
         ];
-        $verifyArray = ActionFactory::createVerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
+        $verifyArray = WorkerActionFactory::createVerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
         $verifyArray->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL);
         $this->expectException(ActionException::class);
         $verifyArray->checkContent($array)->run();
@@ -595,7 +595,7 @@ class VerifyArrayTest extends BaseTest
         $array = [
             "test1" => "test2"
         ];
-        $verifyArray = ActionFactory::createVerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
+        $verifyArray = WorkerActionFactory::createVerifyArray("missing.key", VerifyArray::CHECK_EQUALS, "value", false);
         $actionResult = $verifyArray->checkContent($array)->run();
         $this->assertInstanceOf(ActionResult::class, $actionResult);
         $this->assertEmpty($actionResult->getResult());

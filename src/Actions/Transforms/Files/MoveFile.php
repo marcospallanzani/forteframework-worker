@@ -4,7 +4,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 
 /**
  * Class MoveFile.
@@ -125,7 +125,7 @@ class MoveFile extends AbstractFileAction
         }
 
         if (!is_dir($directory)) {
-            $actionResult->addActionResult(ActionFactory::createMakeDirectory($directory)->run());
+            $actionResult->addActionResult(WorkerActionFactory::createMakeDirectory($directory)->run());
         }
 
         if (!$this->isTargetFullPath) {

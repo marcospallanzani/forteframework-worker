@@ -17,11 +17,10 @@ use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ThrowErrorsTrait;
 use Forte\Worker\Exceptions\ValidationException;
-use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Helpers\StringHelper;
 
 /**
@@ -391,7 +390,7 @@ class ModifyFile extends AbstractFileAction implements NestedActionCallbackInter
             "action"    => $actionType,
             'search'    => $searchValue,
             "value"     => $replaceValue,
-            "condition" => ActionFactory::createVerifyString(
+            "condition" => WorkerActionFactory::createVerifyString(
                 $conditionType,
                 $conditionValue,
                 "",

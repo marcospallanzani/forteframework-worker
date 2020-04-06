@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Checks\Files;
 
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Tests\Unit\BaseTest;
@@ -52,7 +52,7 @@ class DirectoryExistsTest extends BaseTest
         if ($exceptionExpected) {
             $this->expectException(ValidationException::class);
         }
-        $this->assertEquals($expected, ActionFactory::createDirectoryExists($dirPath)->isValid());
+        $this->assertEquals($expected, WorkerActionFactory::createDirectoryExists($dirPath)->isValid());
     }
 
     /**
@@ -63,7 +63,7 @@ class DirectoryExistsTest extends BaseTest
         $dirPath = "/path/to/test";
         $this->stringifyTest(
             "Check if directory '$dirPath' exists.",
-            ActionFactory::createDirectoryExists($dirPath)
+            WorkerActionFactory::createDirectoryExists($dirPath)
         );
     }
 
@@ -77,7 +77,7 @@ class DirectoryExistsTest extends BaseTest
     public function testCheckDirectoryExists(): void
     {
         $dirPath = "/path/to/test";
-        $this->assertEquals(false, ActionFactory::createDirectoryExists($dirPath)->run()->getResult());
-        $this->assertEquals(false, ActionFactory::createDirectoryExists()->path($dirPath)->run()->getResult());
+        $this->assertEquals(false, WorkerActionFactory::createDirectoryExists($dirPath)->run()->getResult());
+        $this->assertEquals(false, WorkerActionFactory::createDirectoryExists()->path($dirPath)->run()->getResult());
     }
 }

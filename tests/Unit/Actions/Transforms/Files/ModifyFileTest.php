@@ -13,7 +13,7 @@ namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\Checks\Strings\VerifyString;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
 use Forte\Worker\Exceptions\ValidationException;
@@ -462,7 +462,7 @@ class ModifyFileTest extends BaseTest
      */
     protected function getTestInstance(string $filePath = "")
     {
-        return ActionFactory::createModifyFile($filePath);
+        return WorkerActionFactory::createModifyFile($filePath);
     }
 
     /**

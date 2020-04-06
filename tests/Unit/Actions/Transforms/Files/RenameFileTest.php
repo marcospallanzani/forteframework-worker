@@ -3,7 +3,7 @@
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\ActionInterface;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Tests\Unit\BaseTest;
@@ -86,7 +86,7 @@ class RenameFileTest extends BaseTest
      */
     public function testIsValid(string $sourcePath, string $targetName, bool $isValid): void
     {
-        $this->isValidTest($isValid, ActionFactory::createRenameFile($sourcePath, $targetName));
+        $this->isValidTest($isValid, WorkerActionFactory::createRenameFile($sourcePath, $targetName));
     }
 
     /**
@@ -112,7 +112,7 @@ class RenameFileTest extends BaseTest
         string $message
     ): void
     {
-        $this->stringifyTest($message, ActionFactory::createRenameFile($sourcePath, $targetName));
+        $this->stringifyTest($message, WorkerActionFactory::createRenameFile($sourcePath, $targetName));
     }
 
     /**
@@ -142,7 +142,7 @@ class RenameFileTest extends BaseTest
         $this->runBasicTest(
             $exceptionExpected,
             $isValid,
-            ActionFactory::createRenameFile()
+            WorkerActionFactory::createRenameFile()
                 ->rename($sourcePath)
                 ->to($targetName)
                 ->setActionSeverity($actionSeverity),

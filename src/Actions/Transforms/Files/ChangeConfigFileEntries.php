@@ -7,7 +7,7 @@ use Forte\Stdlib\FileUtils;
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Actions\NestedActionCallbackInterface;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
@@ -89,7 +89,7 @@ class ChangeConfigFileEntries extends AbstractFileAction implements NestedAction
      */
     public function addKeyWithValue(string $key, $value): self
     {
-        $this->modifications[] = ActionFactory::createModifyArray($key, ModifyArray::MODIFY_ADD_KEY, $value);
+        $this->modifications[] = WorkerActionFactory::createModifyArray($key, ModifyArray::MODIFY_ADD_KEY, $value);
 
         return $this;
     }
@@ -108,7 +108,7 @@ class ChangeConfigFileEntries extends AbstractFileAction implements NestedAction
      */
     public function changeValueByKey(string $key, $value): self
     {
-        $this->modifications[] = ActionFactory::createModifyArray($key, ModifyArray::MODIFY_CHANGE_VALUE, $value);
+        $this->modifications[] = WorkerActionFactory::createModifyArray($key, ModifyArray::MODIFY_CHANGE_VALUE, $value);
 
         return $this;
     }
@@ -125,7 +125,7 @@ class ChangeConfigFileEntries extends AbstractFileAction implements NestedAction
      */
     public function changeKey(string $oldKey, string $newKey): self
     {
-        $this->modifications[] = ActionFactory::createModifyArray()->changeKey($oldKey, $newKey);
+        $this->modifications[] = WorkerActionFactory::createModifyArray()->changeKey($oldKey, $newKey);
 
         return $this;
     }
@@ -143,7 +143,7 @@ class ChangeConfigFileEntries extends AbstractFileAction implements NestedAction
      */
     public function removeKey(string $key): self
     {
-        $this->modifications[] = ActionFactory::createModifyArray($key, ModifyArray::MODIFY_REMOVE_KEY);
+        $this->modifications[] = WorkerActionFactory::createModifyArray($key, ModifyArray::MODIFY_REMOVE_KEY);
 
         return $this;
     }

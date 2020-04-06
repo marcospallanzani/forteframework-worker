@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Actions\Transforms\Files\ModifyFileContent;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Files\ModifyFile;
@@ -100,6 +100,6 @@ class ModifyFileContentTest extends ModifyFileTest
      */
     protected function getTestInstance(string $filePath = "")
     {
-        return ActionFactory::createModifyFileContent($filePath);
+        return WorkerActionFactory::createModifyFileContent($filePath);
     }
 }

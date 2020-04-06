@@ -13,7 +13,7 @@ namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\ActionInterface;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Files\RemoveFile;
 use Forte\Worker\Exceptions\ValidationException;
@@ -113,10 +113,10 @@ class RemoveFileTest extends BaseTest
         $this->runBasicTest(
             $exceptionExpected,
             $isValid,
-            ActionFactory::createRemoveFile()
+            WorkerActionFactory::createRemoveFile()
                 ->removeFile($filePath)
-                ->addBeforeAction(ActionFactory::createFileExists($filePath))
-                ->addAfterAction(ActionFactory::createFileDoesNotExist($filePath))
+                ->addBeforeAction(WorkerActionFactory::createFileExists($filePath))
+                ->addAfterAction(WorkerActionFactory::createFileDoesNotExist($filePath))
                 ->setActionSeverity($actionSeverity),
             $expected
         );
@@ -147,7 +147,7 @@ class RemoveFileTest extends BaseTest
         $this->runBasicTest(
             $exceptionExpected,
             $isValid,
-            ActionFactory::createRemoveFile()
+            WorkerActionFactory::createRemoveFile()
                 ->removeFile($filePath)
                 ->setActionSeverity($actionSeverity),
             $expected
@@ -166,7 +166,7 @@ class RemoveFileTest extends BaseTest
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->expectException(ActionException::class);
-        ActionFactory::createRemoveFile()->removeFile(self::TEST_DIR_TMP)->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)->run();
+        WorkerActionFactory::createRemoveFile()->removeFile(self::TEST_DIR_TMP)->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)->run();
     }
 
     /**
@@ -180,7 +180,7 @@ class RemoveFileTest extends BaseTest
     {
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
-        $actionResult = ActionFactory::createRemoveFile()->removeFile(self::TEST_DIR_TMP)->run();
+        $actionResult = WorkerActionFactory::createRemoveFile()->removeFile(self::TEST_DIR_TMP)->run();
         $this->assertInstanceOf(ActionResult::class, $actionResult);
         $this->assertEmpty($actionResult->getResult());
         $this->assertCount(1, $actionResult->getActionFailures());
@@ -198,10 +198,10 @@ class RemoveFileTest extends BaseTest
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->assertTrue(
-            ActionFactory::createRemoveFile()
+            WorkerActionFactory::createRemoveFile()
                 ->removeDirectory(self::TEST_DIR_TMP)
-                ->addBeforeAction(ActionFactory::createDirectoryExists(self::TEST_DIR_TMP))
-                ->addAfterAction(ActionFactory::createDirectoryDoesNotExist(self::TEST_DIR_TMP))
+                ->addBeforeAction(WorkerActionFactory::createDirectoryExists(self::TEST_DIR_TMP))
+                ->addAfterAction(WorkerActionFactory::createDirectoryDoesNotExist(self::TEST_DIR_TMP))
                 ->run()
                 ->getResult()
         );
@@ -218,10 +218,10 @@ class RemoveFileTest extends BaseTest
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->assertTrue(
-            ActionFactory::createRemoveFile()
+            WorkerActionFactory::createRemoveFile()
                 ->removeFilePattern(self::TEST_DIR_TMP . '/*json')
-                ->addBeforeAction(ActionFactory::createFileExists(self::TEST_FILE_JSON))
-                ->addAfterAction(ActionFactory::createFileDoesNotExist(self::TEST_FILE_JSON))
+                ->addBeforeAction(WorkerActionFactory::createFileExists(self::TEST_FILE_JSON))
+                ->addAfterAction(WorkerActionFactory::createFileDoesNotExist(self::TEST_FILE_JSON))
                 ->run()
                 ->getResult()
         );
@@ -239,7 +239,7 @@ class RemoveFileTest extends BaseTest
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
         $this->expectException(ActionException::class);
-        ActionFactory::createRemoveFile()->removeFile(__DIR__ . '/files/xxx/')->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)->run();
+        WorkerActionFactory::createRemoveFile()->removeFile(__DIR__ . '/files/xxx/')->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)->run();
     }
 
     /**
@@ -253,7 +253,7 @@ class RemoveFileTest extends BaseTest
     {
         // If we try to call the removeFile() method for a directory,
         // an exception should be thrown.
-        $actionResult = ActionFactory::createRemoveFile()->removeFile(__DIR__ . '/files/xxx/')->run();
+        $actionResult = WorkerActionFactory::createRemoveFile()->removeFile(__DIR__ . '/files/xxx/')->run();
         $this->assertInstanceOf(ActionResult::class, $actionResult);
         $this->assertEmpty($actionResult->getResult());
         $this->assertCount(1, $actionResult->getActionFailures());
@@ -284,7 +284,7 @@ class RemoveFileTest extends BaseTest
         string $removeMode
     ): void
     {
-        $this->isValidTest($isValid, ActionFactory::createRemoveFile()->remove($filePath, $removeMode));
+        $this->isValidTest($isValid, WorkerActionFactory::createRemoveFile()->remove($filePath, $removeMode));
     }
 
     /**
@@ -310,6 +310,6 @@ class RemoveFileTest extends BaseTest
         string $message
     ): void
     {
-        $this->stringifyTest($message, ActionFactory::createRemoveFile()->remove($filePath, $mode));
+        $this->stringifyTest($message, WorkerActionFactory::createRemoveFile()->remove($filePath, $mode));
     }
 }

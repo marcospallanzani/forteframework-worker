@@ -3,7 +3,7 @@
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\ActionInterface;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Tests\Unit\BaseTest;
@@ -81,7 +81,7 @@ class MoveDirectoryTest extends BaseTest
      */
     public function testIsValid(string $sourcePath, string $targetPath, bool $isValid): void
     {
-        $this->isValidTest($isValid, ActionFactory::createMoveDirectory($sourcePath, $targetPath));
+        $this->isValidTest($isValid, WorkerActionFactory::createMoveDirectory($sourcePath, $targetPath));
     }
 
     /**
@@ -107,7 +107,7 @@ class MoveDirectoryTest extends BaseTest
         string $message
     ): void
     {
-        $this->stringifyTest($message, ActionFactory::createMoveDirectory($sourcePath, $targetPath));
+        $this->stringifyTest($message, WorkerActionFactory::createMoveDirectory($sourcePath, $targetPath));
     }
 
     /**
@@ -137,7 +137,7 @@ class MoveDirectoryTest extends BaseTest
         $this->runBasicTest(
             $exceptionExpected,
             $isValid,
-            ActionFactory::createMoveDirectory()
+            WorkerActionFactory::createMoveDirectory()
                 ->move($sourcePath)
                 ->to($targetPath)
                 ->setActionSeverity($actionSeverity),

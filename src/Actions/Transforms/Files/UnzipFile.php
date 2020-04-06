@@ -4,7 +4,7 @@ namespace Forte\Worker\Actions\Transforms\Files;
 
 use Forte\Worker\Actions\AbstractFileAction;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ConfigurationException;
 use Laminas\Filter\Decompress;
 
@@ -71,12 +71,12 @@ class UnzipFile extends AbstractFileAction
         // given extract-to path on the file system
         if ($force) {
             $this->addBeforeAction(
-                ActionFactory::createIfStatement(
+                WorkerActionFactory::createIfStatement(
                     null,
                     [
                         [
-                            ActionFactory::createDirectoryDoesNotExist($extractToPath),
-                            ActionFactory::createMakeDirectory($extractToPath)
+                            WorkerActionFactory::createDirectoryDoesNotExist($extractToPath),
+                            WorkerActionFactory::createMakeDirectory($extractToPath)
                         ],
                     ]
                 )

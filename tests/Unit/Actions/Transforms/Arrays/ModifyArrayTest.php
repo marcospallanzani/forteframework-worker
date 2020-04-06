@@ -3,7 +3,7 @@
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Arrays;
 
 use Forte\Worker\Actions\ActionInterface;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Actions\Transforms\Arrays\ModifyArray;
 use Forte\Worker\Exceptions\ValidationException;
@@ -84,37 +84,37 @@ class ModifyArrayTest extends BaseTest
         // Action | exception message | expect exception
         return [
             [
-                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_ADD_KEY, 'value'),
+                WorkerActionFactory::createModifyArray('key', ModifyArray::MODIFY_ADD_KEY, 'value'),
                 '',
                 false,
             ],
             [
-                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_CHANGE_KEY, 'value'),
+                WorkerActionFactory::createModifyArray('key', ModifyArray::MODIFY_CHANGE_KEY, 'value'),
                 '',
                 false,
             ],
             [
-                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_CHANGE_VALUE, 'value'),
+                WorkerActionFactory::createModifyArray('key', ModifyArray::MODIFY_CHANGE_VALUE, 'value'),
                 '',
                 false,
             ],
             [
-                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_REMOVE_KEY),
+                WorkerActionFactory::createModifyArray('key', ModifyArray::MODIFY_REMOVE_KEY),
                 '',
                 false,
             ],
             [
-                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_CHANGE_KEY),
+                WorkerActionFactory::createModifyArray('key', ModifyArray::MODIFY_CHANGE_KEY),
                 'Action modify_change_key requires a value. None or empty value was given.',
                 true,
             ],
             [
-                ActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD_KEY),
+                WorkerActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD_KEY),
                 "No key specified",
                 true,
             ],
             [
-                $modifyWrongAction = ActionFactory::createModifyArray('key1', 'wrong_action'),
+                $modifyWrongAction = WorkerActionFactory::createModifyArray('key1', 'wrong_action'),
                 sprintf(
                     "Action wrong_action not supported. Supported actions are [%s]",
                     implode(', ', $modifyWrongAction->getSupportedActions())
@@ -122,7 +122,7 @@ class ModifyArrayTest extends BaseTest
                 true,
             ],
             [
-                ActionFactory::createModifyArray('', ''),
+                WorkerActionFactory::createModifyArray('', ''),
                 "No key specified",
                 true,
             ],
@@ -140,14 +140,14 @@ class ModifyArrayTest extends BaseTest
 //TODO MISSING SUCCESS REQUIRED CASE
         return [
             [
-                ActionFactory::createModifyArray('key', ModifyArray::MODIFY_ADD_KEY),
+                WorkerActionFactory::createModifyArray('key', ModifyArray::MODIFY_ADD_KEY),
                 true,
                 '',
                 false,
                 ['key' => '']
             ],
             [
-                ActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD_KEY),
+                WorkerActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD_KEY),
                 false,
                 "No key specified",
                 true,
@@ -155,7 +155,7 @@ class ModifyArrayTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_FATAL,
             ],
             [
-                ActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD_KEY),
+                WorkerActionFactory::createModifyArray('', ModifyArray::MODIFY_ADD_KEY),
                 false,
                 "No key specified",
                 true,
@@ -163,7 +163,7 @@ class ModifyArrayTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_CRITICAL
             ],
             [
-                ActionFactory::createModifyArray('', ''),
+                WorkerActionFactory::createModifyArray('', ''),
                 false,
                 "No key specified",
                 true,
@@ -171,7 +171,7 @@ class ModifyArrayTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_FATAL
             ],
             [
-                ActionFactory::createModifyArray('', ''),
+                WorkerActionFactory::createModifyArray('', ''),
                 false,
                 "No key specified",
                 true,
@@ -179,7 +179,7 @@ class ModifyArrayTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_CRITICAL
             ],
             [
-                $modifyWrongAction = ActionFactory::createModifyArray('key1', 'wrong_action'),
+                $modifyWrongAction = WorkerActionFactory::createModifyArray('key1', 'wrong_action'),
                 false,
                 sprintf(
                     "Action wrong_action not supported. Supported actions are [%s]",
@@ -190,7 +190,7 @@ class ModifyArrayTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_FATAL
             ],
             [
-                $modifyWrongAction = ActionFactory::createModifyArray('key1', 'wrong_action'),
+                $modifyWrongAction = WorkerActionFactory::createModifyArray('key1', 'wrong_action'),
                 false,
                 sprintf(
                     "Action wrong_action not supported. Supported actions are [%s]",
@@ -201,7 +201,7 @@ class ModifyArrayTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_CRITICAL
             ],
             [
-                $modifyKeyAlreadyExists = ActionFactory::createModifyArray()->changeKey('key1', 'key2'),
+                $modifyKeyAlreadyExists = WorkerActionFactory::createModifyArray()->changeKey('key1', 'key2'),
                 true,
                 sprintf(
                     "It is not possible to override an existing key, when using action [%s]",
@@ -226,42 +226,42 @@ class ModifyArrayTest extends BaseTest
 
         return [
             [
-                ActionFactory::createModifyArray()->addKey('key3', 'value3'),
+                WorkerActionFactory::createModifyArray()->addKey('key3', 'value3'),
                 $testArray,
                 array_merge($testArray, ['key3' => 'value3'])
             ],
             [
-                ActionFactory::createModifyArray()->addKey('key2', 'value2'),
+                WorkerActionFactory::createModifyArray()->addKey('key2', 'value2'),
                 $testArray,
                 array_merge($testArray, ['key2' => 'value2'])
             ],
             [
-                ActionFactory::createModifyArray()->changeValueByKey('key3', 'value3'),
+                WorkerActionFactory::createModifyArray()->changeValueByKey('key3', 'value3'),
                 $testArray,
                 array_merge($testArray, ['key3' => 'value3'])
             ],
             [
-                ActionFactory::createModifyArray()->changeValueByKey('key2', 'value2'),
+                WorkerActionFactory::createModifyArray()->changeValueByKey('key2', 'value2'),
                 $testArray,
                 array_merge($testArray, ['key2' => 'value2'])
             ],
             [
-                ActionFactory::createModifyArray()->changeKey('key1', 'key3'),
+                WorkerActionFactory::createModifyArray()->changeKey('key1', 'key3'),
                 $testArray,
                 ['key3' => 'value1', 'key2' => '', 'key5' => ['key6' => 'value6']]
             ],
             [
-                ActionFactory::createModifyArray()->changeKey('key5.key6', 'key7'),
+                WorkerActionFactory::createModifyArray()->changeKey('key5.key6', 'key7'),
                 $testArray,
                 ['key1' => 'value1', 'key2' => '', 'key5' => ['key7' => 'value6']]
             ],
             [
-                ActionFactory::createModifyArray()->removeKey('key2'),
+                WorkerActionFactory::createModifyArray()->removeKey('key2'),
                 $testArray,
                 ['key1' => 'value1', 'key5' => ['key6' => 'value6']]
             ],
             [
-                ActionFactory::createModifyArray()->removeKey('key4'),
+                WorkerActionFactory::createModifyArray()->removeKey('key4'),
                 $testArray,
                 $testArray
             ],
@@ -281,7 +281,7 @@ class ModifyArrayTest extends BaseTest
      */
     public function testStringify(string $key, string $action, $value, string $expected): void
     {
-        $this->stringifyTest($expected, ActionFactory::createModifyArray($key, $action, $value));
+        $this->stringifyTest($expected, WorkerActionFactory::createModifyArray($key, $action, $value));
     }
 
     /**
@@ -302,7 +302,7 @@ class ModifyArrayTest extends BaseTest
         $this->runBasicTest(
             false,
             true,
-            ActionFactory::createModifyArray($key, $action, $value)->modifyContent($array),
+            WorkerActionFactory::createModifyArray($key, $action, $value)->modifyContent($array),
             $expected
         );
     }

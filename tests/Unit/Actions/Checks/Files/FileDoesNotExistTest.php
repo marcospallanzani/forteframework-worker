@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Checks\Files;
 
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ValidationException;
 use Forte\Worker\Exceptions\WorkerException;
 use Forte\Worker\Tests\Unit\BaseTest;
@@ -65,7 +65,7 @@ class FileDoesNotExistTest extends BaseTest
         if ($exceptionExpected) {
             $this->expectException(ValidationException::class);
         }
-        $this->assertEquals($expected, ActionFactory::createFileDoesNotExist($filePath)->isValid());
+        $this->assertEquals($expected, WorkerActionFactory::createFileDoesNotExist($filePath)->isValid());
     }
 
     /**
@@ -81,7 +81,7 @@ class FileDoesNotExistTest extends BaseTest
      */
     public function testCheckFileDoesNotExist(string $filePath, bool $expected): void
     {
-        $this->assertEquals($expected, ActionFactory::createFileDoesNotExist($filePath)->run()->getResult());
+        $this->assertEquals($expected, WorkerActionFactory::createFileDoesNotExist($filePath)->run()->getResult());
     }
 
     /**
@@ -92,7 +92,7 @@ class FileDoesNotExistTest extends BaseTest
         $filePath = "/path/to/test/file.php";
         $this->stringifyTest(
             "Check if file '$filePath' does not exist.",
-            ActionFactory::createFileDoesNotExist($filePath)
+            WorkerActionFactory::createFileDoesNotExist($filePath)
         );
     }
 }

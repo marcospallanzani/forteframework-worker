@@ -4,7 +4,7 @@ namespace Forte\Worker\Tests\Unit\Actions\Conditionals;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionInterface;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ConfigurationException;
 use Forte\Worker\Exceptions\ValidationException;
@@ -27,11 +27,11 @@ class IfStatementTest extends BaseTest
         // default action | if-statements | is valid | severity | expected result | exception expected | message
         return [
             [
-                ActionFactory::createFileExists(__FILE__),
+                WorkerActionFactory::createFileExists(__FILE__),
                 // We have to wrap the array [condition, run-action] into another array,
                 // as the method createFileExists is a variadic function
                 [
-                    [ActionFactory::createFileExists(__FILE__), ActionFactory::createFileExists(__FILE__)]
+                    [WorkerActionFactory::createFileExists(__FILE__), WorkerActionFactory::createFileExists(__FILE__)]
                 ],
                 true,
                 ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
@@ -42,11 +42,11 @@ class IfStatementTest extends BaseTest
             /** Negative cases */
             /** not successful, not fatal */
             [
-                ActionFactory::createFileExists('xxx'),
+                WorkerActionFactory::createFileExists('xxx'),
                 // We have to wrap the array [condition, run-action] into another array,
                 // as the method createFileExists is a variadic function
                 [
-                    [ActionFactory::createFileExists('xxx'), ActionFactory::createFileExists('xxx')]
+                    [WorkerActionFactory::createFileExists('xxx'), WorkerActionFactory::createFileExists('xxx')]
                 ],
                 true,
                 ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
@@ -56,11 +56,11 @@ class IfStatementTest extends BaseTest
             ],
             /** not successful, fatal */
             [
-                ActionFactory::createFileExists(__FILE__),
+                WorkerActionFactory::createFileExists(__FILE__),
                 // We have to wrap the array [condition, run-action] into another array,
                 // as the method createFileExists is a variadic function
                 [
-                    [ActionFactory::createFileExists(__FILE__), ActionFactory::createMakeDirectory(__DIR__)->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)]
+                    [WorkerActionFactory::createFileExists(__FILE__), WorkerActionFactory::createMakeDirectory(__DIR__)->setActionSeverity(ActionInterface::EXECUTION_SEVERITY_FATAL)]
                 ],
                 true,
                 ActionInterface::EXECUTION_SEVERITY_FATAL,
@@ -71,11 +71,11 @@ class IfStatementTest extends BaseTest
 //TODO MISSING SUCCESS-REQUIRED CASE
             /** not successful, fatal -> critical */
             [
-                ActionFactory::createFileExists(__FILE__),
+                WorkerActionFactory::createFileExists(__FILE__),
                 // We have to wrap the array [condition, run-action] into another array,
                 // as the method createFileExists is a variadic function
                 [
-                    [ActionFactory::createFileExists(__FILE__), ActionFactory::createMakeDirectory(__DIR__)]
+                    [WorkerActionFactory::createFileExists(__FILE__), WorkerActionFactory::createMakeDirectory(__DIR__)]
                 ],
                 true,
                 ActionInterface::EXECUTION_SEVERITY_CRITICAL,
@@ -100,7 +100,7 @@ class IfStatementTest extends BaseTest
      */
     public function testIsValid(AbstractAction $defaultAction, array $ifStatements, bool $isValid): void
     {
-        $this->isValidTest($isValid, ActionFactory::createIfStatement($defaultAction, $ifStatements));
+        $this->isValidTest($isValid, WorkerActionFactory::createIfStatement($defaultAction, $ifStatements));
     }
 
     /**
@@ -112,7 +112,7 @@ class IfStatementTest extends BaseTest
     public function testIsValidWithWrongConstructionParameters(): void
     {
         $this->expectException(ConfigurationException::class);
-        $this->isValidTest(false, ActionFactory::createIfStatement(null, [ActionFactory::createFileExists(__FILE__)]));
+        $this->isValidTest(false, WorkerActionFactory::createIfStatement(null, [WorkerActionFactory::createFileExists(__FILE__)]));
     }
 
     /**
@@ -140,7 +140,7 @@ class IfStatementTest extends BaseTest
         string $message
     ): void
     {
-        $this->stringifyTest($message, ActionFactory::createIfStatement($defaultAction, $ifStatements));
+        $this->stringifyTest($message, WorkerActionFactory::createIfStatement($defaultAction, $ifStatements));
     }
 
     /**
@@ -171,7 +171,7 @@ class IfStatementTest extends BaseTest
         $this->runBasicTest(
             $exceptionExpected,
             $isValid,
-            ActionFactory::createIfStatement($defaultAction)
+            WorkerActionFactory::createIfStatement($defaultAction)
                 ->addStatements($ifStatements)
                 ->setActionSeverity($actionSeverity),
             $expected

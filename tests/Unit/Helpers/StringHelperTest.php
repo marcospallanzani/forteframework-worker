@@ -11,7 +11,7 @@
 
 namespace Forte\Worker\Tests\Unit\Helpers;
 
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Helpers\StringHelper;
 use Forte\Worker\Tests\Unit\BaseTest;
 
@@ -42,7 +42,7 @@ class StringHelperTest extends BaseTest
             [100.10, '100.1'],
             [['test1' => 'value1'], '{"test1":"value1"}'],
             [$stdClass, 'Class type: stdClass. Object value: {"test1":"value1"}.'],
-            [ActionFactory::createFileExists(__FILE__), "Class type: Forte\Worker\Actions\Checks\Files\FileExists. Object value: Check if file '".__FILE__."' exists.."],
+            [WorkerActionFactory::createFileExists(__FILE__), "Class type: Forte\Worker\Actions\Checks\Files\FileExists. Object value: Check if file '".__FILE__."' exists.."],
         ];
     }
 

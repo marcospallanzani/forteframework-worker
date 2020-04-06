@@ -2,9 +2,8 @@
 
 namespace Forte\Worker\Tests\Unit\Actions\Transforms\Files;
 
-use Forte\Stdlib\Exceptions\GeneralException;
 use Forte\Worker\Actions\ActionInterface;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Actions\Transforms\Files\CopyFile;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Exceptions\ValidationException;
@@ -199,7 +198,7 @@ class CopyFileTest extends BaseTest
      */
     protected function getConfiguredAction(string $sourcePath, string $targetDir, string $targetName): CopyFile
     {
-        $action = ActionFactory::createCopyFile()->copy($sourcePath);
+        $action = WorkerActionFactory::createCopyFile()->copy($sourcePath);
         if (!empty($targetDir)) {
             $action->toFolder($targetDir);
         }

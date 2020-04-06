@@ -4,7 +4,7 @@ namespace Forte\Worker\Tests\Unit\Runners;
 
 use Forte\Worker\Actions\AbstractAction;
 use Forte\Worker\Actions\ActionResult;
-use Forte\Worker\Actions\Factories\ActionFactory;
+use Forte\Worker\Actions\Factories\WorkerActionFactory;
 use Forte\Worker\Exceptions\ActionException;
 use Forte\Worker\Runners\ProjectRunner;
 use Forte\Worker\Tests\Unit\BaseTest;
@@ -30,8 +30,8 @@ class ProjectRunnerTest extends BaseTest
                 0,
                 2,
                 [
-                    ActionFactory::createFileExists(__FILE__)->addBeforeAction(ActionFactory::createFileExists(__FILE__)),
-                    ActionFactory::createFileExists(__FILE__)->addBeforeAction(ActionFactory::createDirectoryExists(__DIR__)),
+                    WorkerActionFactory::createFileExists(__FILE__)->addBeforeAction(WorkerActionFactory::createFileExists(__FILE__)),
+                    WorkerActionFactory::createFileExists(__FILE__)->addBeforeAction(WorkerActionFactory::createDirectoryExists(__DIR__)),
                 ],
                 false
             ],
@@ -51,8 +51,8 @@ class ProjectRunnerTest extends BaseTest
                 2,
                 [
 //TODO AT THE MOMENT THE FAILURE OF A BEFORE ACTION DOES NOT CHANGE THE RESULT OF THE MAIN ACTION: THIS SHOULD BE CHANGED
-                    ActionFactory::createFileExists(__FILE__)->addBeforeAction(ActionFactory::createFileExists('wrong-file')),
-                    ActionFactory::createFileExists(__FILE__)->addBeforeAction(ActionFactory::createDirectoryExists(__DIR__)),
+                    WorkerActionFactory::createFileExists(__FILE__)->addBeforeAction(WorkerActionFactory::createFileExists('wrong-file')),
+                    WorkerActionFactory::createFileExists(__FILE__)->addBeforeAction(WorkerActionFactory::createDirectoryExists(__DIR__)),
                 ],
                 false
             ],
@@ -61,8 +61,8 @@ class ProjectRunnerTest extends BaseTest
                 2,
                 0,
                 [
-                    ActionFactory::createFileExists('wrong-file'),
-                    ActionFactory::createDirectoryExists("wrong-directory"),
+                    WorkerActionFactory::createFileExists('wrong-file'),
+                    WorkerActionFactory::createDirectoryExists("wrong-directory"),
                 ],
                 false
             ],
@@ -71,8 +71,8 @@ class ProjectRunnerTest extends BaseTest
                 2,
                 0,
                 [
-                    ActionFactory::createFileExists(''),
-                    ActionFactory::createDirectoryExists(""),
+                    WorkerActionFactory::createFileExists(''),
+                    WorkerActionFactory::createDirectoryExists(""),
                 ],
                 false
             ],
