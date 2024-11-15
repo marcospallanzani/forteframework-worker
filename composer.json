@@ -7,7 +7,7 @@
     ],
     "homepage": "https://www.forteframework.com",
     "description": "ForteFramework Worker: a suite of classes to check and transform files content.",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "require": {
         "php": ">=8.2",
         "forteframework/stdlib": "dev-master",
