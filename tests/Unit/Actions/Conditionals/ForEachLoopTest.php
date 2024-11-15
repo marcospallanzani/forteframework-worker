@@ -33,7 +33,7 @@ class ForEachLoopTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 true,
                 false,
-                "Run the following sequence of actions: \nCheck if file '".__FILE__."' exists.\nCheck if file '".__FILE__."' exists.\n"
+                "Run the following sequence of actions: " . PHP_EOL . "Check if file '".__FILE__."' exists." . PHP_EOL . "Check if file '".__FILE__."' exists." . PHP_EOL
             ],
             /** Negative cases */
             /** not successful, not fatal */
@@ -43,7 +43,7 @@ class ForEachLoopTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 true,
                 false,
-                "Run the following sequence of actions: \nCheck if file 'xxx' exists.\nCheck if file 'xxx' exists.\n"
+                "Run the following sequence of actions: " . PHP_EOL . "Check if file 'xxx' exists." . PHP_EOL . "Check if file 'xxx' exists." . PHP_EOL
             ],
             // Only from success required on we change the parent action result (the parent action result here is the foreach loop)
             [
@@ -52,7 +52,7 @@ class ForEachLoopTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED,
                 false,
                 false,
-                "Run the following sequence of actions: \nCheck if file 'xxx' exists.\nCheck if file 'xxx' exists.\n"
+                "Run the following sequence of actions: " . PHP_EOL . "Check if file 'xxx' exists." . PHP_EOL . "Check if file 'xxx' exists." . PHP_EOL
             ],
             /** not successful, fatal */
             [
@@ -61,7 +61,7 @@ class ForEachLoopTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_FATAL,
                 false,
                 true,
-                "Run the following sequence of actions: \nCheck if file '".__FILE__."' exists.\nCreate directory '".__DIR__."'.\n"
+                "Run the following sequence of actions: " . PHP_EOL . "Check if file '".__FILE__."' exists." . PHP_EOL . "Create directory '".__DIR__."'." . PHP_EOL
             ],
             /** not successful, fatal -> critical */
             [
@@ -70,7 +70,7 @@ class ForEachLoopTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_CRITICAL,
                 false,
                 true,
-                "Run the following sequence of actions: \nCheck if file '".__FILE__."' exists.\nCreate directory '".__DIR__."'.\n"
+                "Run the following sequence of actions: " . PHP_EOL . "Check if file '".__FILE__."' exists." . PHP_EOL . "Create directory '".__DIR__."'." . PHP_EOL
             ],
         ];
     }

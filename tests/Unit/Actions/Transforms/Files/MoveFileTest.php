@@ -19,10 +19,10 @@ class MoveFileTest extends BaseTest
     /**
      * Temporary files constants.
      */
-    const TEST_SOURCE_FILE_NAME_TMP = '/file-to-move';
+    const TEST_SOURCE_FILE_NAME_TMP = DIRECTORY_SEPARATOR . 'file-to-move';
     const TEST_SOURCE_FILE_TMP      = __DIR__ . self::TEST_SOURCE_FILE_NAME_TMP  ;
-    const TEST_TARGET_PATH_TMP      = __DIR__ . '/file-moved';
-    const TEST_TARGET_DIR_TMP       = __DIR__ . '/dir-file-moved';
+    const TEST_TARGET_PATH_TMP      = __DIR__ . DIRECTORY_SEPARATOR . 'file-moved';
+    const TEST_TARGET_DIR_TMP       = __DIR__ . DIRECTORY_SEPARATOR . 'dir-file-moved';
 
     /**
      * This method is called before each test.
@@ -173,7 +173,7 @@ class MoveFileTest extends BaseTest
         // file is not in the file system anymore
         if ($expected) {
             $this->assertFileExists($targetPath);
-            $this->assertFileNotExists($sourcePath);
+            $this->assertFileDoesNotExist($sourcePath);
         }
     }
 

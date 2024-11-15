@@ -37,7 +37,7 @@ class IfStatementTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 true,
                 false,
-                "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Check if file '".__FILE__."' exists.]; \nDEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
+                "Run the following chain of if-else statements: " . PHP_EOL . "IF [Check if file '".__FILE__."' exists.] THEN [Check if file '".__FILE__."' exists.]; " . PHP_EOL . "DEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
             ],
             /** Negative cases */
             /** not successful, not fatal */
@@ -52,7 +52,7 @@ class IfStatementTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 false,
                 false,
-                "Run the following chain of if-else statements: \nIF [Check if file 'xxx' exists.] THEN [Check if file 'xxx' exists.]; \nDEFAULT CONDITION [Check if file 'xxx' exists.]"
+                "Run the following chain of if-else statements: " . PHP_EOL . "IF [Check if file 'xxx' exists.] THEN [Check if file 'xxx' exists.]; " . PHP_EOL . "DEFAULT CONDITION [Check if file 'xxx' exists.]"
             ],
             /** not successful, fatal */
             [
@@ -66,7 +66,7 @@ class IfStatementTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_FATAL,
                 false,
                 true,
-                "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Create directory '".__DIR__."'.]; \nDEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
+                "Run the following chain of if-else statements: " . PHP_EOL . "IF [Check if file '".__FILE__."' exists.] THEN [Create directory '".__DIR__."'.]; " . PHP_EOL . "DEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
             ],
 //TODO MISSING SUCCESS-REQUIRED CASE
             /** not successful, fatal -> critical */
@@ -81,7 +81,7 @@ class IfStatementTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_CRITICAL,
                 false,
                 true,
-                "Run the following chain of if-else statements: \nIF [Check if file '".__FILE__."' exists.] THEN [Create directory '".__DIR__."'.]; \nDEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
+                "Run the following chain of if-else statements: " . PHP_EOL . "IF [Check if file '".__FILE__."' exists.] THEN [Create directory '".__DIR__."'.]; " . PHP_EOL . "DEFAULT CONDITION [Check if file '".__FILE__."' exists.]"
             ],
         ];
     }

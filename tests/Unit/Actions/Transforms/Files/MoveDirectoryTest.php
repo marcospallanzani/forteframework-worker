@@ -148,7 +148,7 @@ class MoveDirectoryTest extends BaseTest
         // directory is not in the file system anymore
         if ($expected) {
             $this->assertDirectoryExists($targetPath);
-            $this->assertDirectoryNotExists($sourcePath);
+            $this->assertDirectoryDoesNotExist($sourcePath);
         }
     }
 }
