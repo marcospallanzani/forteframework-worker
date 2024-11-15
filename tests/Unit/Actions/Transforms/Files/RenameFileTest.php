@@ -152,7 +152,7 @@ class RenameFileTest extends BaseTest
         // The file has been renamed, then we check if the original file is not in the file system anymore
         if ($expected) {
             $this->assertFileExists(dirname($sourcePath) . DIRECTORY_SEPARATOR . $targetName);
-            $this->assertFileNotExists($sourcePath);
+            $this->assertFileDoesNotExist($sourcePath);
         }
     }
 }

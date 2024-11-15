@@ -29,9 +29,9 @@ class ModifyFileTest extends BaseTest
     /**
      * Temporary files constants.
      */
-    const TEST_FILE_TMP         = __DIR__ . '/file-tests-template';
-    const TEST_FILE_MODIFY      = __DIR__ . '/file-tests-modify';
-    const TEST_FILE_TEMPLATE    = __DIR__ . '/file-tests-template-to-add';
+    const TEST_FILE_TMP         = __DIR__ . DIRECTORY_SEPARATOR . 'file-tests-template';
+    const TEST_FILE_MODIFY      = __DIR__ . DIRECTORY_SEPARATOR . 'file-tests-modify';
+    const TEST_FILE_TEMPLATE    = __DIR__ . DIRECTORY_SEPARATOR . 'file-tests-template-to-add';
     const TEST_WRONG_FILE       = "/path/to/non/existent/file.php";
     const TEST_CONTENT          = "ANY CONTENT";
     const TEST_TEMPLATE_CONTENT = "CONTENT ADDED FROM TEMPLATE";

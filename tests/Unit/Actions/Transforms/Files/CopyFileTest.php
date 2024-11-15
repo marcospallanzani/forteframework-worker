@@ -77,22 +77,22 @@ class CopyFileTest extends BaseTest
             [self::TEST_COPY_FILE_PATH, "", "", true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, true, false, sprintf("Copy file '%s' to '%s'.", self::TEST_COPY_FILE_PATH, self::TEST_COPY_FILE_DEFAULT_PATH)],
             /** Negative cases */
             /** not successful, no fatal */
-            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Copy file 'xxx.json' to './xxx_copy.json'."],
-            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Copy file 'xxx.json' to './xxx_COPY.json'."],
+            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Copy file 'xxx.json' to '." . DIRECTORY_SEPARATOR . "xxx_copy.json'."],
+            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Copy file 'xxx.json' to '." . DIRECTORY_SEPARATOR . "xxx_COPY.json'."],
             ["", "", "", false, ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL, false, false, "Copy file '' to ''."],
             /** fatal */
-            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Copy file 'xxx.json' to './xxx_copy.json'."],
-            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Copy file 'xxx.json' to './xxx_COPY.json'."],
+            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Copy file 'xxx.json' to '." . DIRECTORY_SEPARATOR . "xxx_copy.json'."],
+            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Copy file 'xxx.json' to '." . DIRECTORY_SEPARATOR . "xxx_COPY.json'."],
             ["", "", "", false, ActionInterface::EXECUTION_SEVERITY_FATAL, false, true, "Copy file '' to ''."],
 //TODO THIS SHOULD BE DONE WITH MOCK OBJECTS
             /** success required */
-            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED, false, false, "Copy file 'xxx.json' to './xxx_copy.json'."],
-            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED, false, false, "Copy file 'xxx.json' to './xxx_COPY.json'."],
+            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED, false, false, "Copy file 'xxx.json' to '." . DIRECTORY_SEPARATOR . "xxx_copy.json'."],
+            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED, false, false, "Copy file 'xxx.json' to '." . DIRECTORY_SEPARATOR . "xxx_COPY.json'."],
             ["", "", "", false, ActionInterface::EXECUTION_SEVERITY_SUCCESS_REQUIRED, false, false, "Copy file '' to ''."],
 //TODO THIS SHOULD BE DONE WITH MOCK OBJECTS
             /** critical */
-            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Copy file 'xxx.json' to './xxx_copy.json'."],
-            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Copy file 'xxx.json' to './xxx_COPY.json'."],
+            ["xxx.json", "", "xxx_copy.json", true, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Copy file 'xxx.json' to '." . DIRECTORY_SEPARATOR . "xxx_copy.json'."],
+            ["xxx.json", "", "", true, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Copy file 'xxx.json' to '." . DIRECTORY_SEPARATOR . "xxx_COPY.json'."],
             ["", "", "", false, ActionInterface::EXECUTION_SEVERITY_CRITICAL, false, true, "Copy file '' to ''."],
         ];
     }

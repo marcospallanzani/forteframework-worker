@@ -9,24 +9,24 @@
     "description": "ForteFramework Worker: a suite of classes to check and transform files content.",
     "version": "1.0.0",
     "require": {
-        "php": "^7.4",
-        "psr/log": ">=1.0.0",
-        "symfony/console": "^4.3",
-        "laminas/laminas-config": "^3.3",
-        "laminas/laminas-code": "^3.3",
-        "laminas/laminas-text": "^2.7",
-        "laminas/laminas-json": "^3.1",
-        "laminas/laminas-validator": "^2.12",
-        "laminas/laminas-filter": "^2.9",
-        "monolog/monolog": "^1.24",
-        "symfony/yaml": "^4.3",
-        "forteframework/stdlib": "master@dev",
-        "laminas/laminas-dependency-plugin": "^1.0"
+        "php": ">=8.2",
+        "forteframework/stdlib": "dev-master",
+        "laminas/laminas-config": "^3.9",
+        "laminas/laminas-code": "^4.13",
+        "laminas/laminas-dependency-plugin": "^2.6",
+        "laminas/laminas-text": "^2.11",
+        "laminas/laminas-json": "^3.6",
+        "laminas/laminas-validator": "^2.46",
+        "laminas/laminas-filter": "^2.34",
+        "monolog/monolog": "^3.5",
+        "psr/log": "^3.0",
+        "symfony/console": "^6.4",
+        "symfony/yaml": "^6.4"
     },
     "repositories": [
         {
             "type": "vcs",
-            "url": "git@github.com:marcospallanzani/forteframework-stdlib.git"
+            "url": "https://github.com/marcospallanzani/forteframework-stdlib"
         }
     ],
     "autoload": {
@@ -42,7 +42,13 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^8",
-        "mockery/mockery": "^1.2"
+        "mockery/mockery": "^1.6",
+        "phpunit/phpunit": "^10.5"
+    },
+    "config": {
+        "allow-plugins": {
+            "laminas/laminas-dependency-plugin": true
+        },
+        "sort-packages": true
     }
 }

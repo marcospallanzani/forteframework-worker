@@ -105,6 +105,5 @@ abstract class BaseTest extends TestCase
             }
         }
         $this->assertEquals($expected, $action->run()->getResult());
-
     }
 }

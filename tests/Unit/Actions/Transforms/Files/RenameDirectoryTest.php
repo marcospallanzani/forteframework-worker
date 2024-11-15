@@ -151,7 +151,7 @@ class RenameDirectoryTest extends BaseTest
         // The directory has been renamed, then we check if the original file is not in the file system anymore
         if ($expected) {
             $this->assertDirectoryExists(dirname($sourcePath) . DIRECTORY_SEPARATOR . $targetName);
-            $this->assertDirectoryNotExists($sourcePath);
+            $this->assertDirectoryDoesNotExist($sourcePath);
         }
     }
 }

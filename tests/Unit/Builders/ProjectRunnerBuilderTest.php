@@ -28,13 +28,13 @@ class ProjectRunnerBuilderTest extends BaseTest
      */
     const ENV_FILE_NAME = 'env.testModify';
     const JSON_FILE_NAME = 'test.json';
-    const ENV_FILE_FULL_PATH = __DIR__ . '/' . self::ENV_FILE_NAME;
-    const JSON_FILE_FULL_PATH = __DIR__ . '/' . self::JSON_FILE_NAME;
-    const PHP_FILES_DIR_PATH = __DIR__ . '/phptests';
-    const PHP_FILE_FULL_PATH = self::PHP_FILES_DIR_PATH . '/test.php';
+    const ENV_FILE_FULL_PATH = __DIR__ . DIRECTORY_SEPARATOR . self::ENV_FILE_NAME;
+    const JSON_FILE_FULL_PATH = __DIR__ . DIRECTORY_SEPARATOR . self::JSON_FILE_NAME;
+    const PHP_FILES_DIR_PATH = __DIR__ . DIRECTORY_SEPARATOR . 'phptests';
+    const PHP_FILE_FULL_PATH = self::PHP_FILES_DIR_PATH . DIRECTORY_SEPARATOR . 'test.php';
     const PHP_CONTENT        = "<?php \n\nnamespace Test\Name\Space;\n\n/**\n *\n * @package \Test\Name\Space \n * Test\Name\n */ ";
     const JSON_CONTENT       = "{\"KEY1\":10,\"KEY2\":20,\"KEY3\":30}";
-    const ENV_CONTENT        = "KEY1=10\nKEY2=20\nKEY3=30";
+    const ENV_CONTENT        = "KEY1=10" . PHP_EOL . "KEY2=20" . PHP_EOL . "KEY3=30";
 
     /**
      * This method is called before each test.
@@ -168,7 +168,7 @@ class ProjectRunnerBuilderTest extends BaseTest
     {
         // We modify its content and check if it's correct
         $filePath = "xxx";
-        $fileFullPath = __DIR__ . "/xxx";
+        $fileFullPath = __DIR__ . DIRECTORY_SEPARATOR . "xxx";
         $this->expectException(ActionException::class);
         $this->expectExceptionMessage("The file '$fileFullPath' does not exist.");
         $builder = new ProjectRunnerBuilder(__DIR__);

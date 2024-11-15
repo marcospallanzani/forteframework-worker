@@ -58,10 +58,10 @@ class SwitchStatementTest extends BaseTest
                     'test_5' => 'value_5',
                 ],
                 false,
-                "Run the following sequence of switch case statements: \n" .
-                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_1."' with key '".self::ADDED_VALUE_KEY_1."']; \n" .
-                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_2."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_2."' with key '".self::ADDED_VALUE_KEY_2."']; \n" .
-                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; \n"
+                "Run the following sequence of switch case statements: " . PHP_EOL .
+                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_1."' with key '".self::ADDED_VALUE_KEY_1."']; " . PHP_EOL .
+                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_2."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_2."' with key '".self::ADDED_VALUE_KEY_2."']; " . PHP_EOL .
+                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; " . PHP_EOL
             ],
             [
                 self::CASE_EXPRESSION_VALUE_2,
@@ -77,10 +77,10 @@ class SwitchStatementTest extends BaseTest
                     'test_5' => 'value_5',
                 ],
                 false,
-                "Run the following sequence of switch case statements: \n" .
-                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_1."' with key '".self::ADDED_VALUE_KEY_1."']; \n" .
-                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_2."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_2."' with key '".self::ADDED_VALUE_KEY_2."']; \n" .
-                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; \n"
+                "Run the following sequence of switch case statements: " . PHP_EOL .
+                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_1."' with key '".self::ADDED_VALUE_KEY_1."']; " . PHP_EOL .
+                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_2."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_2."' with key '".self::ADDED_VALUE_KEY_2."']; " . PHP_EOL .
+                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; " . PHP_EOL
             ],
             [
                 self::CASE_EXPRESSION_VALUE_3,
@@ -96,10 +96,10 @@ class SwitchStatementTest extends BaseTest
                     'test_5' => 'value_5',
                 ],
                 false,
-                "Run the following sequence of switch case statements: \n" .
-                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_1."' with key '".self::ADDED_VALUE_KEY_1."']; \n" .
-                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_2."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_2."' with key '".self::ADDED_VALUE_KEY_2."']; \n" .
-                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; \n"
+                "Run the following sequence of switch case statements: " . PHP_EOL .
+                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_1."' with key '".self::ADDED_VALUE_KEY_1."']; " . PHP_EOL .
+                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_2."] THEN [Add value '".self::CASE_EXPRESSION_VALUE_2."' with key '".self::ADDED_VALUE_KEY_2."']; " . PHP_EOL .
+                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; " . PHP_EOL
             ],
             /** Negative cases */
             /** not successful, not fatal */
@@ -113,9 +113,9 @@ class SwitchStatementTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_NON_CRITICAL,
                 false,
                 false,
-                "Run the following sequence of switch case statements: \n" .
-                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Check if file '' exists.]; \n" .
-                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; \n"
+                "Run the following sequence of switch case statements: " . PHP_EOL .
+                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Check if file '' exists.]; " . PHP_EOL .
+                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; " . PHP_EOL
             ],
             /** not successful, fatal */
             [
@@ -128,9 +128,9 @@ class SwitchStatementTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_FATAL,
                 false,
                 true,
-                "Run the following sequence of switch case statements: \n" .
-                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Check if file '' exists.]; \n" .
-                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; \n"
+                "Run the following sequence of switch case statements: " . PHP_EOL .
+                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Check if file '' exists.]; " . PHP_EOL .
+                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; " . PHP_EOL
             ],
             /** success required */
 //TODO MISSING TEST CASES
@@ -145,9 +145,9 @@ class SwitchStatementTest extends BaseTest
                 ActionInterface::EXECUTION_SEVERITY_CRITICAL,
                 false,
                 true,
-                "Run the following sequence of switch case statements: \n" .
-                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Check if file '' exists.]; \n" .
-                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; \n"
+                "Run the following sequence of switch case statements: " . PHP_EOL .
+                "IF EXPRESSION VALUE IS [".self::CASE_EXPRESSION_VALUE_1."] THEN [Check if file '' exists.]; " . PHP_EOL .
+                "DEFAULT STATEMENT [Add value '".self::CASE_EXPRESSION_VALUE_3."' with key '".self::ADDED_VALUE_KEY_3."']; " . PHP_EOL
             ],
         ];
     }
